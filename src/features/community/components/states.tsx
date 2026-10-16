@@ -2,6 +2,7 @@ import { AlertTriangle, Inbox, Loader2, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+import { useLang } from '@/lib/i18n'
 
 type StateProps = {
   className?: string
@@ -9,7 +10,9 @@ type StateProps = {
   description?: string
 }
 
-export function LoadingState({ className, title = '正在加载数据…' }: StateProps) {
+export function LoadingState({ className, title }: StateProps) {
+  const { t } = useLang()
+  title ??= t('state.loading')
   return (
     <div
       className={cn(
@@ -25,9 +28,12 @@ export function LoadingState({ className, title = '正在加载数据…' }: Sta
 
 export function EmptyState({
   className,
-  title = '暂无数据',
-  description = '该部分尚未采集到数据。',
+  title,
+  description,
 }: StateProps) {
+  const { t } = useLang()
+  title ??= t('state.empty.title')
+  description ??= t('state.empty.desc')
   return (
     <div
       className={cn(
@@ -46,10 +52,13 @@ export function EmptyState({
 
 export function ErrorState({
   className,
-  title = '无法加载数据',
-  description = '数据文件无法读取，可能尚未发布。',
+  title,
+  description,
   onRetry,
 }: StateProps & { onRetry?: () => void }) {
+  const { t } = useLang()
+  title ??= t('state.error.title')
+  description ??= t('state.error.desc')
   return (
     <Card className={cn('border-destructive/40', className)}>
       <CardContent className='flex min-h-40 flex-col items-center justify-center gap-3 text-center'>
@@ -61,7 +70,7 @@ export function ErrorState({
         {onRetry ? (
           <Button variant='outline' size='sm' onClick={onRetry}>
             <RefreshCw className='me-2 size-4' />
-            重试
+            {t('state.retry')}
           </Button>
         ) : null}
       </CardContent>

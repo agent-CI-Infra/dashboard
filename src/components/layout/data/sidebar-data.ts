@@ -23,34 +23,42 @@ export const sidebarData: SidebarData = {
       title: '',
       items: [
         {
+          // Collapsible group: collapsed by default, expands to the
+          // community sub-sections (see nav-group's SidebarMenuCollapsible).
           title: '社区概览',
-          url: '/',
           icon: LayoutDashboard,
-        },
-        {
-          title: 'Pull Requests',
-          url: '/pulls',
-          icon: GitPullRequest,
-        },
-        {
-          title: 'Issues',
-          url: '/issues',
-          icon: CircleDot,
-        },
-        {
-          title: '社区成长',
-          url: '/growth',
-          icon: LineChart,
-        },
-        {
-          title: '生态影响力',
-          url: '/ecosystem',
-          icon: Globe,
-        },
-        {
-          title: '关于本站',
-          url: '/about',
-          icon: Info,
+          items: [
+            {
+              title: '社区总览',
+              url: '/',
+              icon: LayoutDashboard,
+            },
+            {
+              title: 'Pull Requests',
+              url: '/pulls',
+              icon: GitPullRequest,
+            },
+            {
+              title: 'Issues',
+              url: '/issues',
+              icon: CircleDot,
+            },
+            {
+              title: '社区成长',
+              url: '/growth',
+              icon: LineChart,
+            },
+            {
+              title: '生态影响力',
+              url: '/ecosystem',
+              icon: Globe,
+            },
+            {
+              title: '关于本站',
+              url: '/about',
+              icon: Info,
+            },
+          ],
         },
         {
           title: 'CI GATE',

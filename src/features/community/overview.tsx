@@ -54,6 +54,8 @@ import { MonitorHeader } from './components/monitor-header'
 import { ErrorState, LoadingState } from './components/states'
 import { useMonitorBase } from './use-monitor'
 import type { TimeRangeSearch } from '@/lib/monitor/ranges'
+import { useLang, type I18nKey } from '@/lib/i18n'
+import { GateLanguageSwitch } from '@/features/gate/components/gate-language-switch'
 import type { Composition, RepoSummary } from '@/lib/monitor/types'
 
 const route = getRouteApi('/_authenticated/')
@@ -66,6 +68,7 @@ const FIXED_RANGE: TimeRangeSearch = { range: '30d' }
 
 /** Click-to-open explanation for the "活跃贡献者" metric. */
 function ActiveContributorsInfo() {
+  const { t } = useLang()
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -78,7 +81,7 @@ function ActiveContributorsInfo() {
         </button>
       </PopoverTrigger>
       <PopoverContent align='start' className='w-72 text-xs leading-relaxed'>
-        统计最近 30 天内创建过 PR 或 Issue 的去重作者数（含外部作者）。
+        {t('community.contributorsInfo')}
       </PopoverContent>
     </Popover>
   )
@@ -89,6 +92,7 @@ function ActiveContributorsInfo() {
  * its indicator weights, without the per-repository calculation.
  */
 function ActivityScoreInfo() {
+  const { t } = useLang()
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -101,16 +105,22 @@ function ActivityScoreInfo() {
         </button>
       </PopoverTrigger>
       <PopoverContent align='start' className='w-80 space-y-3 text-xs leading-relaxed'>
-        <p className='font-medium'>社区活跃度公式</p>
+        <p className='font-medium'>{t('community.score.title')}</p>
         <p className='font-mono text-[11px] break-words'>
           C = (1 / Σαᵢ) · Σ αᵢ · ln(1 + Sᵢ) / ln(1 + max(Sᵢ, Tᵢ))
         </p>
         <table className='w-full'>
           <thead>
             <tr className='text-muted-foreground'>
-              <th className='text-left font-normal'>指标</th>
-              <th className='text-right font-normal'>阈值 Tᵢ</th>
-              <th className='text-right font-normal'>权重 αᵢ</th>
+              <th className='text-left font-normal'>
+                {t('community.score.metric')}
+              </th>
+              <th className='text-right font-normal'>
+                {t('community.score.threshold')} Tᵢ
+              </th>
+              <th className='text-right font-normal'>
+                {t('community.score.weight')} αᵢ
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -126,17 +136,24 @@ function ActivityScoreInfo() {
           </tbody>
         </table>
         <p className='text-muted-foreground'>
-          统计最近 {ACTIVITY_WINDOW_DAYS} 天，Sᵢ 为指标实际值。
+          {t('community.score.window', { days: ACTIVITY_WINDOW_DAYS })}
         </p>
       </PopoverContent>
     </Popover>
   )
 }
 
-function StatRow({ label, value }: { label: string; value: string }) {
+function StatRow({
+  labelKey,
+  value,
+}: {
+  labelKey: I18nKey
+  value: string
+}) {
+  const { t } = useLang()
   return (
     <div className='flex items-center justify-between gap-3 py-1 text-sm'>
-      <span className='text-muted-foreground'>{label}</span>
+      <span className='text-muted-foreground'>{t(labelKey)}</span>
       <span className='font-medium tabular-nums'>{value}</span>
     </div>
   )
@@ -194,6 +211,7 @@ function RepoOverviewBox({
   /** Marks the highest-scoring community on the page. */
   isTop?: boolean
 }) {
+  const { t } = useLang()
   const key = repoKey(repo)
   const base = useMonitorBase(key, FIXED_RANGE)
   const pulls = usePulls(key)
@@ -257,7 +275,7 @@ function RepoOverviewBox({
               className='size-3.5 fill-red-500 text-red-500'
             />
           ) : null}
-          <span className='text-muted-foreground'>活跃度：</span>
+          <span className='text-muted-foreground'>{t('community.activity')}:</span>
           <span className='font-semibold tabular-nums'>
             {activity === null ? '—' : activity.toFixed(2)}
           </span>
@@ -282,18 +300,20 @@ function RepoOverviewBox({
         <MetricCard
           inline
           compact
-          title='累计贡献者'
+          title={t('community.metric.contributors')}
           value={formatNumber(latest?.contributors.total)}
           icon={Users}
-          suffix={`(外部${latest?.contributors.composition.external ?? 0})`}
+          suffix={t('community.extSuffix', {
+            n: latest?.contributors.composition.external ?? 0,
+          })}
         />
         <MetricCard
           inline
           compact
-          title='活跃贡献者'
+          title={t('community.metric.activeContributors')}
           value={formatExact(active.total)}
           icon={Users}
-          suffix={`(外部${active.external})`}
+          suffix={t('community.extSuffix', { n: active.external })}
           info={<ActiveContributorsInfo />}
         />
       </div>
@@ -308,17 +328,26 @@ function RepoOverviewBox({
           </CardHeader>
           <CardContent className='space-y-1'>
             <div className='grid grid-cols-3 gap-x-6'>
-              <StatRow label='PR累计' value={formatNumber(pullsData?.total)} />
-              <StatRow label='内部' value={pullComp.internal} />
-              <StatRow label='评论总数' value={pullComments.total} />
+              <StatRow
+                labelKey='community.pr.total'
+                value={formatNumber(pullsData?.total)}
+              />
+              <StatRow labelKey='community.internal' value={pullComp.internal} />
+              <StatRow
+                labelKey='community.comments.total'
+                value={pullComments.total}
+              />
             </div>
             <div className='grid grid-cols-3 gap-x-6'>
               <StatRow
-                label='Open'
+                labelKey='community.pr.open'
                 value={formatExact(live?.openPulls ?? pullsData?.open)}
               />
-              <StatRow label='外部' value={pullComp.external} />
-              <StatRow label='平均每条评论数' value={pullComments.average} />
+              <StatRow labelKey='community.external' value={pullComp.external} />
+              <StatRow
+                labelKey='community.comments.avg'
+                value={pullComments.average}
+              />
             </div>
           </CardContent>
         </Card>
@@ -333,19 +362,25 @@ function RepoOverviewBox({
           <CardContent className='space-y-1'>
             <div className='grid grid-cols-3 gap-x-6'>
               <StatRow
-                label='Issue累计'
+                labelKey='community.issue.total'
                 value={formatNumber(issuesData?.total)}
               />
-              <StatRow label='内部' value={issueComp.internal} />
-              <StatRow label='评论总数' value={issueComments.total} />
+              <StatRow labelKey='community.internal' value={issueComp.internal} />
+              <StatRow
+                labelKey='community.comments.total'
+                value={issueComments.total}
+              />
             </div>
             <div className='grid grid-cols-3 gap-x-6'>
               <StatRow
-                label='Open'
+                labelKey='community.pr.open'
                 value={formatExact(live?.openIssues ?? issuesData?.open)}
               />
-              <StatRow label='外部' value={issueComp.external} />
-              <StatRow label='平均每条评论数' value={issueComments.average} />
+              <StatRow labelKey='community.external' value={issueComp.external} />
+              <StatRow
+                labelKey='community.comments.avg'
+                value={issueComments.average}
+              />
             </div>
           </CardContent>
         </Card>
@@ -355,6 +390,7 @@ function RepoOverviewBox({
 }
 
 export function CommunityOverview() {
+  const { t } = useLang()
   const search = route.useSearch()
   const navigate = route.useNavigate()
   const reposQuery = useRepos()
@@ -438,7 +474,7 @@ export function CommunityOverview() {
 
   const dataUpdatedAt = (
     <span className='text-xs text-muted-foreground'>
-      数据更新时间 {formatDateTime(sharedUpdatedAt)}
+      {`${t('community.dataUpdatedAt')} ${formatDateTime(sharedUpdatedAt)}`}
     </span>
   )
 
@@ -446,6 +482,7 @@ export function CommunityOverview() {
     <>
       <Header>
         <div className='me-auto' />
+        <GateLanguageSwitch />
         <ThemeSwitch />
       </Header>
       <Main className='flex flex-1 flex-col gap-6'>{children}</Main>
@@ -463,12 +500,12 @@ export function CommunityOverview() {
   return shell(
     <>
       <MonitorHeader
-        title='社区概览'
+        title={t('community.title')}
         description={
           <>
-            开源社区运营与健康度监控平台，动态展示社区规模、活跃度
+            {t('community.description').slice(0, -1)}
             <ActivityScoreInfo />
-            、健康度与影响力。
+            {t('community.description').slice(-1)}
           </>
         }
         meta={undefined}

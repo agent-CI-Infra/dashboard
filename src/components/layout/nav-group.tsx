@@ -40,8 +40,10 @@ export function NavGroup({ title, items }: NavGroupProps) {
     <SidebarGroup>
       <SidebarGroupLabel>{title}</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => {
-          const key = `${item.title}-${item.url}`
+        {items.map((item, index) => {
+          // Key by url (not the translatable title) so switching languages
+          // doesn't remount collapsible groups and lose their open state.
+          const key = item.url ?? `group-${index}`
 
           if (!item.items)
             return <SidebarMenuLink key={key} item={item} href={href} />
@@ -92,7 +94,9 @@ function SidebarMenuCollapsible({
   return (
     <Collapsible
       asChild
-      defaultOpen={checkIsActive(href, item, true)}
+      // Collapsed by default so the sidebar initially shows only the
+      // group titles; users expand a group manually.
+      defaultOpen={false}
       className='group/collapsible'
     >
       <SidebarMenuItem>

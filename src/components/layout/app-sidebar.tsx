@@ -5,19 +5,66 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar'
+import { useLang, type I18nKey } from '@/lib/i18n'
 import { sidebarData } from './data/sidebar-data'
 import { NavGroup } from './nav-group'
 import { TeamSwitcher } from './team-switcher'
 
+/** Sidebar labels by route so titles follow the active language. */
+const NAV_LABEL: Record<string, I18nKey> = {
+  '/': 'nav.community.overview',
+  '/pulls': 'nav.community.pulls',
+  '/issues': 'nav.community.issues',
+  '/growth': 'nav.community.growth',
+  '/ecosystem': 'nav.community.ecosystem',
+  '/about': 'nav.community.about',
+  '/gate': 'nav.ciGate',
+}
+
+/** Fallback for group titles (collapsible parents carry no url). */
+const NAV_TITLE_LABEL: Record<string, I18nKey> = {
+  社区概览: 'nav.community.group',
+}
+
+type SidebarItem = (typeof sidebarData.navGroups)[number]['items'][number]
+
 export function AppSidebar() {
   const { collapsible, variant } = useLayout()
+  const { t } = useLang()
+
+  const translateItems = (items: SidebarItem[]): SidebarItem[] =>
+    items.map((item) => {
+      const labelKey =
+        NAV_LABEL[item.url as string] ?? NAV_TITLE_LABEL[item.title]
+      const title = labelKey ? t(labelKey) : item.title
+      if ('items' in item && item.items) {
+        // The spread keeps the collapsible shape; the cast re-narrows the
+        // discriminated union after overriding `title`.
+        return {
+          ...item,
+          title,
+          items: translateItems(item.items),
+        } as typeof item
+      }
+      return { ...item, title }
+    })
+
+  const navGroups = sidebarData.navGroups.map((group) => ({
+    ...group,
+    items: translateItems(group.items),
+  }))
+  const teams = sidebarData.teams.map((team) => ({
+    ...team,
+    plan: t('app.tagline'),
+  }))
+
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
       <SidebarHeader>
-        <TeamSwitcher teams={sidebarData.teams} />
+        <TeamSwitcher teams={teams} />
       </SidebarHeader>
       <SidebarContent>
-        {sidebarData.navGroups.map((props) => (
+        {navGroups.map((props) => (
           <NavGroup key={props.title} {...props} />
         ))}
       </SidebarContent>

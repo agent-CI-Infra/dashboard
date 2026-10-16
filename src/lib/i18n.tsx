@@ -19,7 +19,13 @@ const DICT = {
     zh: '社区运营与 CI 门禁监控平台',
     en: 'Community ops & CI gate monitoring',
   },
-  'nav.community': { zh: '社区概览', en: 'Community Overview' },
+  'nav.community.group': { zh: '社区概览', en: 'Community' },
+  'nav.community.overview': { zh: '社区总览', en: 'Overview' },
+  'nav.community.pulls': { zh: 'Pull Requests', en: 'Pull Requests' },
+  'nav.community.issues': { zh: 'Issues', en: 'Issues' },
+  'nav.community.growth': { zh: '社区成长', en: 'Growth' },
+  'nav.community.ecosystem': { zh: '生态影响力', en: 'Ecosystem' },
+  'nav.community.about': { zh: '关于本站', en: 'About' },
   'nav.ciGate': { zh: 'CI GATE', en: 'CI GATE' },
 
   'search.placeholder': {
