@@ -1,0 +1,68 @@
+name: Collect community data
+
+# Daily incremental collection plus manual runs.
+# The GITHUB_TOKEN is injected by Actions and never exposed to the frontend.
+
+on:
+  schedule:
+    # 15:00 UTC every day — 23:00 Beijing time (UTC+8).
+    - cron: '0 15 * * *'
+  workflow_dispatch:
+    inputs:
+      full:
+        description: 'Run a full re-collection (ignores incremental hints)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collect-data
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Collect data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Monitored repos default to the keys of config/internal-contributors.json.
+          # Set a repository variable only to override that list.
+          MONITOR_REPOS: ${{ vars.MONITOR_REPOS }}
+          MONITOR_MAX_LIST_PAGES: '40'
+          MONITOR_BOTS: ${{ vars.MONITOR_BOTS }}
+        run: npm run collect
+
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data
+          if git diff --quiet --cached; then
+            echo "No data changes to commit."
+          else
+            git commit -m "chore(data): refresh community metrics [skip ci]"
+            git push
+          fi
+
+      - name: Upload collection artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monitor-data
+          path: public/data
+          retention-days: 14
