@@ -35,6 +35,8 @@ export interface GateRepo {
   /** Branch shown by default (first entry of branchData). */
   defaultBranch: string
   branchData: RepoBranchStat[]
+  /** Optional external dashboard opened when the repo name is clicked. */
+  url?: string
 }
 
 export interface GateCategoryMeta {
@@ -126,6 +128,7 @@ export const GATE_REPOS: GateRepo[] = [
     name: 'sciencediscovery',
     owner: 'openJiuwen-ai',
     defaultBranch: 'main',
+    url: 'https://sciencediscovery.github.io/github-status-board/#overview',
     branchData: [
       branch('main', 'failed', 71.2, [
         stat('build', 96.2, 492, 342),

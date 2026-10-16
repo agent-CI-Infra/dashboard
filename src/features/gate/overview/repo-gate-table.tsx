@@ -96,9 +96,11 @@ function CoverageCell({ coverage }: { coverage: number }) {
     <span
       className={cn(
         'flex h-7 items-center justify-center rounded-md text-[13px] font-medium tabular-nums',
+        // Coverage is its own metric: accent blue — never the green/orange
+        // CI pass-rate scale — and red only below the gate threshold.
         low
           ? 'bg-gate-fail-soft text-gate-fail'
-          : 'bg-gate-pass-soft text-gate-pass'
+          : 'bg-gate-accent-soft text-gate-accent'
       )}
     >
       {formatPercent(coverage)}
@@ -276,9 +278,21 @@ export function RepoGateTable({ repos }: { repos: GateRepo[] }) {
         >
           <div className='min-w-0'>
             <div className='flex min-w-0 items-center gap-1.5'>
-              <span className='truncate text-sm leading-5 font-semibold text-gate-ink'>
-                {repo.name}
-              </span>
+              {repo.url ? (
+                <a
+                  href={repo.url}
+                  target='_blank'
+                  rel='noreferrer'
+                  title={repo.url}
+                  className='truncate text-sm leading-5 font-semibold text-gate-ink hover:text-gate-accent hover:underline'
+                >
+                  {repo.name}
+                </a>
+              ) : (
+                <span className='truncate text-sm leading-5 font-semibold text-gate-ink'>
+                  {repo.name}
+                </span>
+              )}
               <BranchPicker
                 repo={repo}
                 selected={branch}
