@@ -16,6 +16,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { handleServerError } from '@/lib/handle-server-error'
 import { MonitorAutoRefresh } from '@/components/monitor-auto-refresh'
 import { DirectionProvider } from './context/direction-provider'
+import { LanguageProvider } from '@/lib/i18n'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
 // Generated Routes
@@ -103,6 +104,7 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <MonitorAutoRefresh />
+        <LanguageProvider>
         <ThemeProvider>
           <FontProvider>
             <DirectionProvider>
@@ -110,6 +112,7 @@ if (!rootElement.innerHTML) {
             </DirectionProvider>
           </FontProvider>
         </ThemeProvider>
+        </LanguageProvider>
       </QueryClientProvider>
     </StrictMode>
   )

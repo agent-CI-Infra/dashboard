@@ -6,6 +6,7 @@ import {
   Info,
   LayoutDashboard,
   LineChart,
+  ShieldCheck,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -50,6 +51,11 @@ export const sidebarData: SidebarData = {
           title: '关于本站',
           url: '/about',
           icon: Info,
+        },
+        {
+          title: 'CI GATE',
+          url: '/gate',
+          icon: ShieldCheck,
         },
       ],
     },
