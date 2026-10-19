@@ -85,7 +85,9 @@ export interface GateCategoryMeta {
 export const GATE_CATEGORIES: GateCategoryMeta[] = [
   {
     id: 'build',
-    description: 'Trunk gate (main push / manual)',
+    // The SD board publishes no commit/build lane, so this column renders
+    // empty until one exists upstream.
+    description: 'Commit & PR base gate (not published by the SD board)',
     warnBelow: 90,
     failBelow: 80,
   },
@@ -162,19 +164,16 @@ export const GATE_REPOS: GateRepo[] = [
     branchData: [
       branch('main', 'failed', 71.2, [
           stat('ready', 93.8, 1300, 298),
-        stat('build', 88.6, 1565, 164),
         stat('daily', 85.1, 10260, 32, true),
         stat('release', 100, 18720, 4),
       ]),
       branch('release/v1.4', 'passed', 78.6, [
           stat('ready', 96.1, 1265, 96),
-        stat('build', 92.4, 1502, 48),
         stat('daily', 88.9, 9980, 12),
         stat('release', 96.7, 17600, 2),
       ]),
       branch('feat/mcp-tools', 'running', 69.8, [
           stat('ready', 84.5, 1420, 41),
-        stat('build', 76.9, 1810, 12),
       ]),
     ],
   },
@@ -187,18 +186,15 @@ export const GATE_REPOS: GateRepo[] = [
       branch('main', 'passed', 82.4, [
           stat('ready', 96.5, 1220, 305),
         stat('merge', 91.2, 1490, 171),
-        stat('build', 91.2, 1490, 171),
         stat('daily', 88.4, 9800, 33),
         stat('release', 100, 17600, 5),
       ]),
       branch('develop', 'passed', 80.9, [
           stat('ready', 94.8, 1240, 168),
-        stat('build', 89.3, 1585, 92),
         stat('daily', 86.2, 10150, 18),
       ]),
       branch('feat/data-pipeline', 'failed', 72.3, [
           stat('ready', 82.7, 1390, 33),
-        stat('build', 74.6, 1755, 9),
       ]),
     ],
   },

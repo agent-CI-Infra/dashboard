@@ -62,6 +62,15 @@ function writeJson(file, data) {
 
 const GITHUB_TOKEN =
   process.env.GITHUB_TOKEN ?? process.env.MONITOR_TOKEN ?? ''
+/** Optional local snapshot (offline runs / tests); CI fetches over the network. */
+const SNAPSHOT_FILE = process.env.GATE_SNAPSHOT_FILE ?? ''
+
+async function loadSnapshot(url) {
+  if (SNAPSHOT_FILE && existsSync(SNAPSHOT_FILE)) {
+    return JSON.parse(readFileSync(SNAPSHOT_FILE, 'utf8'))
+  }
+  return fetchJson(url)
+}
 
 async function fetchJson(url) {
   const headers = { accept: 'application/json' }
@@ -246,7 +255,8 @@ function attachCasesAndCoverage(branch, source, cases, coverage) {
  * simply have no stat and render empty.
  */
 const LANE_TO_COLUMN = {
-  main: 'build',
+  // SD's 主干 lane (main push / manual) is the post-merge gate.
+  main: 'merge',
   pr: 'ready',
   daily: 'daily',
   release: 'release',
@@ -705,7 +715,7 @@ for (const source of config.sources ?? []) {
     if (source.type === 'status-board-lanes') {
       // Numbers come from the board's own lane data, so the dashboard shows
       // exactly what the SD board shows.
-      const snapshot = await fetchJson(source.url)
+      const snapshot = await loadSnapshot(source.url)
       const laneBranches = extractLaneBranches(snapshot)
       let coverage = null
       try {
@@ -715,8 +725,17 @@ for (const source of config.sources ?? []) {
           `[gate] ${source.owner}/${source.name} coverage unavailable: ${error?.message ?? error}`
         )
       }
-      const runs = await fetchRunsForCaseCounts(source, now)
-      const cases = await collectCaseCounts(source, runs)
+      let cases = {}
+      try {
+        const runs = await fetchRunsForCaseCounts(source, now)
+        cases = await collectCaseCounts(source, runs)
+      } catch (error) {
+        // Case counts are supplementary; a GitHub API hiccup must not block
+        // the lane data the board publishes.
+        console.warn(
+          `[gate] ${source.owner}/${source.name} case counts unavailable: ${error?.message ?? error}`
+        )
+      }
       const branchData = laneBranches
         .map((lanes) => lanesToBranch(lanes, source))
         .filter(Boolean)
