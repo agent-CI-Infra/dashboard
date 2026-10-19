@@ -11,7 +11,8 @@ export type GateHealth = 'pass' | 'warn' | 'fail'
 
 export interface RepoCategoryStat {
   category: GateCategory
-  passRate7d: number
+  /** null when every run in the window is undecided (skipped/cancelled). */
+  passRate7d: number | null
   avgDurationSec: number | null
   /** Canary-style runs still in progress → renders "2h 51m+". */
   ongoing?: boolean
@@ -23,8 +24,8 @@ export interface RepoCategoryStat {
 export interface RepoBranchStat {
   name: string
   gateStatus: GateRunStatus
-  /** UT coverage %, red below the 75% threshold. */
-  coverage: number
+  /** UT coverage %, red below the 75% threshold; null when unavailable. */
+  coverage: number | null
   stats: RepoCategoryStat[]
 }
 
@@ -37,6 +38,8 @@ export interface GateRepo {
   branchData: RepoBranchStat[]
   /** Optional external dashboard opened when the repo name is clicked. */
   url?: string
+  /** True for repositories whose numbers are still design placeholders. */
+  demo?: boolean
 }
 
 export interface GateCategoryMeta {

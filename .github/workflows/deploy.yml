@@ -46,6 +46,12 @@ jobs:
           MONITOR_BOTS: ${{ vars.MONITOR_BOTS }}
         run: npm run collect
 
+      - name: Refresh gate data
+        # Pulls run-level CI data for the monitored repositories (public
+        # GitHub API + the published status-board snapshot) and derives the
+        # per-branch / per-category gate aggregates served by the dashboard.
+        run: npm run collect:gate
+
       - name: Build static site
         # Relative base (./) keeps assets and ./data/*.json working both for
         # project pages (/<repo>/) and for a <user>.github.io root site.

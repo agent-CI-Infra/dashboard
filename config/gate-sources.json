@@ -1,0 +1,76 @@
+{
+  "windowDays": 7,
+  "sources": [
+    {
+      "id": "sciencediscovery",
+      "name": "sciencediscovery",
+      "owner": "openJiuwen-ai",
+      "defaultBranch": "main",
+      "type": "actions-api",
+      "url": "https://sciencediscovery.github.io/github-status-board/data/snapshot.json",
+      "dashboardUrl": "https://sciencediscovery.github.io/github-status-board/#overview",
+      "categoryMap": {
+        "build": {
+          "channel": [
+            "gate"
+          ],
+          "event": [
+            "push"
+          ]
+        },
+        "ready": {
+          "channel": [
+            "gate"
+          ],
+          "event": [
+            "pull_request"
+          ],
+          "scope": "repo"
+        },
+        "merge": {
+          "channel": [
+            "gate"
+          ],
+          "event": [
+            "merge_group"
+          ]
+        },
+        "daily": {
+          "channel": [
+            "daily"
+          ]
+        },
+        "release": {
+          "channel": [
+            "release"
+          ],
+          "scope": "repo"
+        }
+      },
+      "branches": [
+        "main"
+      ],
+      "channelMap": [
+        {
+          "channel": "gate",
+          "workflow": [
+            "CI"
+          ]
+        },
+        {
+          "channel": "daily",
+          "workflow": [
+            "Nightly"
+          ]
+        },
+        {
+          "channel": "release",
+          "workflow": [
+            "Release"
+          ]
+        }
+      ],
+      "snapshotUrl": "https://sciencediscovery.github.io/github-status-board/data/snapshot.json"
+    }
+  ]
+}

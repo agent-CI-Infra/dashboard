@@ -1,8 +1,10 @@
+import { useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { GATE_REPOS } from '@/features/gate/data/gate'
+import { useGateRepos } from '@/features/gate/data/gate-api'
 import { GateLanguageSwitch } from '@/features/gate/components/gate-language-switch'
 import { RepoGateTable } from '@/features/gate/overview/repo-gate-table'
 import { useLang } from '@/lib/i18n'
@@ -17,6 +19,21 @@ export const Route = createFileRoute('/_authenticated/gate')({
  */
 function GatePage() {
   const { t } = useLang()
+  const { data: collectedRepos } = useGateRepos()
+
+  /** Collected datasets win; demo entries fill repositories without one. */
+  const repos = useMemo(() => {
+    const collected = collectedRepos ?? []
+    const collectedIds = new Set(collected.map((repo) => repo.id))
+    return [
+      ...collected,
+      ...GATE_REPOS.filter((r) => !collectedIds.has(r.id)).map((r) => ({
+        ...r,
+        demo: true,
+      })),
+    ]
+  }, [collectedRepos])
+
   return (
     <>
       <Header>
@@ -34,7 +51,7 @@ function GatePage() {
           </p>
         </div>
 
-        <RepoGateTable repos={GATE_REPOS} />
+        <RepoGateTable repos={repos} />
       </Main>
     </>
   )

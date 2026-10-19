@@ -74,7 +74,7 @@ function sortValue(
 
 /** Pass rate as a soft status pill tinted by health tier. */
 function RateCell({ stat }: { stat?: RepoCategoryStat }) {
-  if (!stat) {
+  if (!stat || stat.passRate7d == null) {
     return <span className='text-sm text-gate-faint'>–</span>
   }
   return (
@@ -90,7 +90,10 @@ function RateCell({ stat }: { stat?: RepoCategoryStat }) {
   )
 }
 
-function CoverageCell({ coverage }: { coverage: number }) {
+function CoverageCell({ coverage }: { coverage: number | null }) {
+  if (coverage == null) {
+    return <span className='text-sm text-gate-faint'>–</span>
+  }
   const low = coverage < COVERAGE_THRESHOLD
   return (
     <span
@@ -308,6 +311,14 @@ export function RepoGateTable({ repos }: { repos: GateRepo[] }) {
                   {repo.name}
                 </span>
               )}
+              {repo.demo ? (
+                <span
+                  title={t('gate.demoHint')}
+                  className='inline-flex h-5 shrink-0 items-center rounded-md border border-gate-line bg-gate-track px-1.5 text-[11px] font-medium text-gate-faint'
+                >
+                  {t('gate.demo')}
+                </span>
+              ) : null}
               <BranchPicker
                 repo={repo}
                 selected={branch}

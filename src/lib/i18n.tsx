@@ -108,6 +108,11 @@ const DICT = {
   'gate.col.coverage': { zh: '覆盖率', en: 'Coverage' },
   'gate.live': { zh: '实时 · 30s', en: 'Live · 30s' },
   'gate.branches': { zh: '分支', en: 'Branches' },
+  'gate.demo': { zh: '演示', en: 'Demo' },
+  'gate.demoHint': {
+    zh: '该仓库尚未接入真实门禁数据，数值为设计占位',
+    en: 'Real gate data is not wired in yet — these numbers are placeholders',
+  },
   'gate.switchBranch': { zh: '切换分支', en: 'Switch branch' },
   'gate.synced': {
     zh: '数据同步自 GitHub · 2 分钟前',
