@@ -25,7 +25,8 @@
           "event": [
             "pull_request"
           ],
-          "scope": "repo"
+          "scope": "repo",
+          "line": "main"
         },
         "merge": {
           "channel": [
@@ -44,12 +45,10 @@
           "channel": [
             "release"
           ],
-          "scope": "repo"
+          "scope": "repo",
+          "line": "releases/v0.3.0.beta"
         }
       },
-      "branches": [
-        "main"
-      ],
       "channelMap": [
         {
           "channel": "gate",
@@ -85,6 +84,10 @@
           "coverage/summary.json",
           "python/summary.json"
         ]
+      },
+      "branchLines": {
+        "main": "主干",
+        "releases/v0.3.0.beta": "发布线"
       }
     }
   ]

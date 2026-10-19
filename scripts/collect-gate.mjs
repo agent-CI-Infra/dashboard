@@ -87,11 +87,15 @@ function conclusionKind(conclusion) {
   return 'ignored'
 }
 
-/** Rule match: every non-scope key must contain the run's value. */
+/**
+ * Rule match: every array-valued field must contain the run's value.
+ * Non-array fields (`scope`, `line`, ...) are routing metadata, not
+ * matching conditions.
+ */
 function matchesRule(rule, run) {
-  return Object.entries(rule)
-    .filter(([field]) => field !== 'scope')
-    .every(([field, allowed]) => allowed.includes(run[field]))
+  return Object.entries(rule).every(
+    ([field, allowed]) => !Array.isArray(allowed) || allowed.includes(run[field])
+  )
 }
 
 /** Categories whose runs are not tied to one branch (e.g. PR gates). */
@@ -101,12 +105,9 @@ function repoScopedCategories(source) {
     .map(([id]) => id)
 }
 
-/** Branch whitelist: explicit config, or every branch with runs. */
-function branchAllowed(source, branch) {
-  if (Array.isArray(source.branches) && source.branches.length > 0) {
-    return branch === source.defaultBranch || source.branches.includes(branch)
-  }
-  return true
+/** Branch line a repo-scoped category belongs to (defaults to the default branch). */
+function repoScopedLine(source, category) {
+  return source.categoryMap[category]?.line ?? source.defaultBranch
 }
 
 function median(values) {
@@ -326,8 +327,6 @@ function aggregateSource(source, runs, coverage, now) {
   const repoScoped = repoScopedCategories(source)
   /** branch → category → bucket (branch-scoped categories) */
   const buckets = new Map()
-  /** repo-wide buckets for repo-scoped categories (e.g. the PR gate) */
-  const repoBuckets = new Map()
   /** branch → latest run (by created_at) */
   const latestByBranch = new Map()
 
@@ -336,9 +335,8 @@ function aggregateSource(source, runs, coverage, now) {
     if (!branch) continue
 
     if (
-      branchAllowed(source, branch) &&
-      (!latestByBranch.has(branch) ||
-        run.created_at > latestByBranch.get(branch).created_at)
+      !latestByBranch.has(branch) ||
+      run.created_at > latestByBranch.get(branch).created_at
     ) {
       latestByBranch.set(branch, run)
     }
@@ -349,32 +347,24 @@ function aggregateSource(source, runs, coverage, now) {
     if (!category) continue
 
     if (repoScoped.includes(category)) {
-      if (!repoBuckets.has(category)) repoBuckets.set(category, emptyBucket())
-      addRunToBucket(repoBuckets.get(category), run)
+      // Repo-scoped gates render on their configured branch line
+      // (e.g. the PR gate on main, the release gate on the release line).
+      const line = repoScopedLine(source, category)
+      if (!buckets.has(line)) buckets.set(line, new Map())
+      const byLine = buckets.get(line)
+      if (!byLine.has(category)) byLine.set(category, emptyBucket())
+      addRunToBucket(byLine.get(category), run)
       continue
     }
 
-    if (!branchAllowed(source, branch)) continue
     if (!buckets.has(branch)) buckets.set(branch, new Map())
     const byCategory = buckets.get(branch)
     if (!byCategory.has(category)) byCategory.set(category, emptyBucket())
     addRunToBucket(byCategory.get(category), run)
   }
 
-  // Repo-scoped gates (PR) always pair with the default branch row.
-  if (repoBuckets.size > 0) {
-    if (!buckets.has(source.defaultBranch)) {
-      buckets.set(source.defaultBranch, new Map())
-    }
-    const byCategory = buckets.get(source.defaultBranch)
-    for (const [category, bucket] of repoBuckets) {
-      byCategory.set(category, bucket)
-    }
-  }
 
-  const branchNames = [...buckets.keys()]
-    .filter((branch) => branchAllowed(source, branch))
-    .sort((a, b) => {
+  const branchNames = [...buckets.keys()].sort((a, b) => {
     if (a === source.defaultBranch) return -1
     if (b === source.defaultBranch) return 1
     const runsA = [...buckets.get(a).values()].reduce((n, c) => n + c.runs, 0)
@@ -421,9 +411,11 @@ function aggregateSource(source, runs, coverage, now) {
       // UT line coverage of this branch, when the CI publishes summary
       // artifacts; null renders as an empty cell.
       coverage:
-        coverage && branch === source.defaultBranch ? coverage.coverage : null,
+        coverage && branch === (source.coverageLine ?? source.defaultBranch)
+          ? coverage.coverage
+          : null,
       coverageDetail:
-        coverage && branch === source.defaultBranch
+        coverage && branch === (source.coverageLine ?? source.defaultBranch)
           ? coverage.coverageDetail
           : undefined,
       stats,
