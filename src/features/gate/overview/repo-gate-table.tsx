@@ -85,53 +85,50 @@ function casesTooltip(stat: RepoCategoryStat, plannedLabel: string): string | nu
   return `${parts.join(' · ')}${when ? ` — ${when}` : ''}`
 }
 
-/** Shared chip shell: one or two stacked lines inside the tinted block. */
-const CHIP_BASE =
-  'flex h-9 w-full flex-col items-center justify-center rounded-md px-1 leading-tight'
-
 /**
- * Pass rate as a soft status chip tinted by health tier, with the latest run's
- * case count on a second line. Chips link to the matching view of the source
- * dashboard when one is known.
+ * Pass rate as a soft status chip tinted by health tier (single line, same
+ * look for every repository). When the latest run's case count is known it is
+ * pinned to the cell's bottom-right corner without shifting the chip.
  */
 function RateCell({ stat }: { stat?: RepoCategoryStat }) {
   const { t } = useLang()
   if (!stat || stat.passRate == null) {
     return <span className='text-sm text-gate-faint'>–</span>
   }
-  const tone = cn(TONE_BG[stat.health], TONE_TEXT[stat.health])
+  const pillClass = cn(
+    'flex h-7 w-full items-center justify-center rounded-md text-[13px] font-medium tabular-nums',
+    TONE_BG[stat.health],
+    TONE_TEXT[stat.health]
+  )
   const value = formatPercent(stat.passRate)
   const cases = stat.cases
   const tooltip = casesTooltip(stat, t('gate.casesPlanned'))
 
-  const inner = (
-    <>
-      <span className='text-[13px] font-medium tabular-nums'>{value}</span>
-      {cases ? (
-        <span className='font-mono text-[9px] tabular-nums opacity-75'>
-          {cases.totalPlanned}
-        </span>
-      ) : null}
-    </>
-  )
-
-  if (!stat.link) {
-    return <span className={cn(CHIP_BASE, tone)}>{inner}</span>
-  }
-  return (
+  const pill = stat.link ? (
     <a
       href={stat.link}
       target='_blank'
       rel='noreferrer'
       title={tooltip ?? t('gate.openSource')}
       className={cn(
-        CHIP_BASE,
-        tone,
+        pillClass,
         'transition-shadow hover:ring-2 hover:ring-gate-accent/40'
       )}
     >
-      {inner}
+      {value}
     </a>
+  ) : (
+    <span className={cn(pillClass, 'shrink-0')}>{value}</span>
+  )
+
+  if (!cases) return pill
+  return (
+    <div className='relative flex h-full w-full items-center' title={tooltip ?? undefined}>
+      {pill}
+      <span className='pointer-events-none absolute right-0 bottom-0.5 font-mono text-[10px] leading-none tabular-nums text-gate-faint'>
+        {cases.totalPlanned}
+      </span>
+    </div>
   )
 }
 
@@ -147,21 +144,15 @@ function CoverageCell({
     return <span className='text-sm text-gate-faint'>–</span>
   }
   const low = coverage < COVERAGE_THRESHOLD
-  const tone = low
-    ? 'bg-gate-fail-soft text-gate-fail'
-    : 'bg-gate-accent-soft text-gate-accent'
-  const inner = (
-    <>
-      <span className='text-[13px] font-medium tabular-nums'>
-        {formatPercent(coverage)}
-      </span>
-      <span className='font-mono text-[9px] tabular-nums opacity-75'>
-        ≥{COVERAGE_THRESHOLD}%
-      </span>
-    </>
+  const pillClass = cn(
+    'flex h-7 w-full items-center justify-center rounded-md text-[13px] font-medium tabular-nums',
+    low
+      ? 'bg-gate-fail-soft text-gate-fail'
+      : 'bg-gate-accent-soft text-gate-accent'
   )
+  const value = formatPercent(coverage)
   if (!link) {
-    return <span className={cn(CHIP_BASE, tone)}>{inner}</span>
+    return <span className={cn(pillClass, 'shrink-0')}>{value}</span>
   }
   return (
     <a
@@ -170,12 +161,11 @@ function CoverageCell({
       rel='noreferrer'
       title={t('gate.openSource')}
       className={cn(
-        CHIP_BASE,
-        tone,
+        pillClass,
         'transition-shadow hover:ring-2 hover:ring-gate-accent/40'
       )}
     >
-      {inner}
+      {value}
     </a>
   )
 }
