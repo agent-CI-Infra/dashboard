@@ -95,7 +95,7 @@ function CoverageCell({ coverage }: { coverage: number }) {
   return (
     <span
       className={cn(
-        'flex h-7 items-center justify-center rounded-md text-[13px] font-medium tabular-nums',
+        'flex h-7 w-full items-center justify-center rounded-md text-[13px] font-medium tabular-nums',
         // Coverage is its own metric: accent blue — never the green/orange
         // CI pass-rate scale — and red only below the gate threshold.
         low
@@ -158,11 +158,16 @@ function SortHeader({
   active,
   dir,
   onClick,
+  centered,
+  accent,
 }: {
   labelKey: I18nKey
   active: boolean
   dir: SortDir
   onClick: () => void
+  centered?: boolean
+  /** Coverage is a separate metric — its header carries the accent hue. */
+  accent?: boolean
 }) {
   const { t } = useLang()
   const label = t(labelKey)
@@ -171,8 +176,13 @@ function SortHeader({
       type='button'
       onClick={onClick}
       className={cn(
-        'group flex items-center gap-1 text-left text-[11px] font-semibold tracking-[0.06em] uppercase outline-none focus-visible:ring-2 focus-visible:ring-gate-accent/30',
-        active ? 'text-gate-ink' : 'text-gate-faint hover:text-gate-dim'
+        'group flex items-center gap-1 text-[11px] font-semibold tracking-[0.06em] uppercase outline-none focus-visible:ring-2 focus-visible:ring-gate-accent/30',
+        centered ? 'justify-center text-center' : 'text-left',
+        active
+          ? 'text-gate-ink'
+          : accent
+            ? 'text-gate-accent hover:text-gate-accent/80'
+            : 'text-gate-faint hover:text-gate-dim'
       )}
     >
       {label}
@@ -257,14 +267,19 @@ export function RepoGateTable({ repos }: { repos: GateRepo[] }) {
             active={sortKey === c.id}
             dir={sortDir}
             onClick={() => onSort(c.id)}
+            centered
           />
         ))}
-        <SortHeader
-          labelKey='gate.col.coverage'
-          active={sortKey === 'coverage'}
-          dir={sortDir}
-          onClick={() => onSort('coverage')}
-        />
+        <div className='flex h-full items-center self-stretch border-l border-gate-grid pl-2.5'>
+          <SortHeader
+            labelKey='gate.col.coverage'
+            active={sortKey === 'coverage'}
+            dir={sortDir}
+            onClick={() => onSort('coverage')}
+            centered
+            accent
+          />
+        </div>
       </div>
 
       {/* Rows */}
@@ -313,7 +328,9 @@ export function RepoGateTable({ repos }: { repos: GateRepo[] }) {
             />
           ))}
 
-          <CoverageCell coverage={branch.coverage} />
+          <div className='flex h-full items-center self-stretch border-l border-gate-grid pl-2.5'>
+            <CoverageCell coverage={branch.coverage} />
+          </div>
         </div>
       ))}
 
