@@ -4,7 +4,7 @@
  * per-branch gate results.
  */
 
-export type GateCategory = 'pr' | 'main' | 'daily' | 'release' | 'called'
+export type GateCategory = 'build' | 'ready' | 'merge' | 'daily' | 'release'
 export type GateRunStatus = 'passed' | 'failed' | 'running'
 /** Per-category health derived from pass rate thresholds. */
 export type GateHealth = 'pass' | 'warn' | 'fail'
@@ -83,11 +83,26 @@ export interface GateCategoryMeta {
 }
 
 export const GATE_CATEGORIES: GateCategoryMeta[] = [
-  { id: 'pr', description: 'PR Gate (L1+L2)', warnBelow: 90, failBelow: 80 },
-  { id: 'main', description: 'Trunk (main push / manual)', warnBelow: 90, failBelow: 80 },
+  {
+    id: 'build',
+    description: 'Trunk gate (main push / manual)',
+    warnBelow: 90,
+    failBelow: 80,
+  },
+  { id: 'ready', description: 'PR gate', warnBelow: 90, failBelow: 80 },
+  {
+    id: 'merge',
+    description: 'Merge gate',
+    warnBelow: 90,
+    failBelow: 80,
+  },
   { id: 'daily', description: 'Nightly (L4)', warnBelow: 90, failBelow: 80 },
-  { id: 'release', description: 'Release (L5)', warnBelow: 95, failBelow: 80 },
-  { id: 'called', description: 'Reusable workflow calls', warnBelow: 90, failBelow: 80 },
+  {
+    id: 'release',
+    description: 'Release (L5)',
+    warnBelow: 95,
+    failBelow: 80,
+  },
 ]
 
 const CATEGORY_MAP = new Map(GATE_CATEGORIES.map((c) => [c.id, c]))
@@ -146,20 +161,20 @@ export const GATE_REPOS: GateRepo[] = [
     url: 'https://sciencediscovery.github.io/github-status-board/#overview',
     branchData: [
       branch('main', 'failed', 71.2, [
-          stat('pr', 93.8, 1300, 298),
-        stat('main', 88.6, 1565, 164),
+          stat('ready', 93.8, 1300, 298),
+        stat('build', 88.6, 1565, 164),
         stat('daily', 85.1, 10260, 32, true),
         stat('release', 100, 18720, 4),
       ]),
       branch('release/v1.4', 'passed', 78.6, [
-          stat('pr', 96.1, 1265, 96),
-        stat('main', 92.4, 1502, 48),
+          stat('ready', 96.1, 1265, 96),
+        stat('build', 92.4, 1502, 48),
         stat('daily', 88.9, 9980, 12),
         stat('release', 96.7, 17600, 2),
       ]),
       branch('feat/mcp-tools', 'running', 69.8, [
-          stat('pr', 84.5, 1420, 41),
-        stat('main', 76.9, 1810, 12),
+          stat('ready', 84.5, 1420, 41),
+        stat('build', 76.9, 1810, 12),
       ]),
     ],
   },
@@ -170,19 +185,20 @@ export const GATE_REPOS: GateRepo[] = [
     defaultBranch: 'main',
     branchData: [
       branch('main', 'passed', 82.4, [
-          stat('pr', 96.5, 1220, 305),
-        stat('main', 91.2, 1490, 171),
+          stat('ready', 96.5, 1220, 305),
+        stat('merge', 91.2, 1490, 171),
+        stat('build', 91.2, 1490, 171),
         stat('daily', 88.4, 9800, 33),
         stat('release', 100, 17600, 5),
       ]),
       branch('develop', 'passed', 80.9, [
-          stat('pr', 94.8, 1240, 168),
-        stat('main', 89.3, 1585, 92),
+          stat('ready', 94.8, 1240, 168),
+        stat('build', 89.3, 1585, 92),
         stat('daily', 86.2, 10150, 18),
       ]),
       branch('feat/data-pipeline', 'failed', 72.3, [
-          stat('pr', 82.7, 1390, 33),
-        stat('main', 74.6, 1755, 9),
+          stat('ready', 82.7, 1390, 33),
+        stat('build', 74.6, 1755, 9),
       ]),
     ],
   },

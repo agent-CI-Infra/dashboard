@@ -203,17 +203,16 @@ async function collectCaseCounts(source, runs) {
   const latest = new Map()
   for (const run of runs) {
     if (run.status !== 'completed') continue
-    const lane = lanes.find((id) =>
-      matchesRule(source.laneRules[id], run)
-    )
+    const lane = lanes.find((id) => matchesRule(source.laneRules[id], run))
     if (!lane) continue
     const prev = latest.get(lane)
     if (!prev || run.created_at > prev.created_at) latest.set(lane, run)
   }
   const cases = {}
   for (const [lane, run] of latest) {
+    const column = LANE_TO_COLUMN[lane] ?? lane
     const counts = await fetchCaseCounts(source, run)
-    if (counts) cases[lane] = counts
+    if (counts) cases[column] = counts
   }
   const line = Object.entries(cases)
     .map(([c, v]) => `${c} ${v.passed}/${v.planned}`)
@@ -241,8 +240,18 @@ function attachCasesAndCoverage(branch, source, cases, coverage) {
 
 /** ---------- SD lane model (numbers taken from the board's own data) ---------- */
 
-/** SD lane key → dashboard category id (other/unknown lanes are dropped). */
-const LANE_IDS = ['pr', 'main', 'daily', 'release', 'called']
+/**
+ * SD lane key → the dashboard's gate column id. Columns without a matching
+ * lane (e.g. the merge queue, which the board does not present as a lane)
+ * simply have no stat and render empty.
+ */
+const LANE_TO_COLUMN = {
+  main: 'build',
+  pr: 'ready',
+  daily: 'daily',
+  release: 'release',
+}
+const LANE_IDS = Object.keys(LANE_TO_COLUMN)
 
 /** SD lane → a day-indexed bucket list, in the dashboard's daily shape. */
 function lanesToBranch(laneData, source) {
@@ -276,7 +285,7 @@ function lanesToBranch(laneData, source) {
     })
     if (byDay.size === 0) continue
     stats.push({
-      category: lane.key,
+      category: LANE_TO_COLUMN[lane.key],
       daily: [...byDay.values()].sort((a, b) => (a.date < b.date ? -1 : 1)),
       link: `${source.boardBaseUrl}#ci`,
     })
