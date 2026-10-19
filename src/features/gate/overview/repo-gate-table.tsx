@@ -35,10 +35,11 @@ import { useLang, type I18nKey } from '@/lib/i18n'
  */
 type SortKey =
   | 'repo'
-  | 'ready'
-  | 'merge'
+  | 'pr'
+  | 'main'
   | 'daily'
   | 'release'
+  | 'called'
   | 'coverage'
 type SortDir = 'asc' | 'desc'
 
@@ -47,10 +48,11 @@ const ROW_COLS =
 
 const COL_LABEL: Record<string, I18nKey> = {
   repo: 'gate.col.repo',
-  ready: 'gate.col.ready',
-  merge: 'gate.col.merge',
+  pr: 'gate.col.pr',
+  main: 'gate.col.main',
   daily: 'gate.col.daily',
   release: 'gate.col.release',
+  called: 'gate.col.called',
   coverage: 'gate.col.coverage',
 }
 

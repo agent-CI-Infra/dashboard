@@ -6,44 +6,9 @@
       "name": "sciencediscovery",
       "owner": "openJiuwen-ai",
       "defaultBranch": "main",
-      "type": "actions-api",
+      "type": "status-board-lanes",
       "url": "https://sciencediscovery.github.io/github-status-board/data/snapshot.json",
       "dashboardUrl": "https://sciencediscovery.github.io/github-status-board/#overview",
-      "categoryMap": {
-        "ready": {
-          "channel": [
-            "gate"
-          ],
-          "event": [
-            "pull_request"
-          ],
-          "scope": "repo",
-          "line": "main"
-        },
-        "merge": {
-          "channel": [
-            "gate"
-          ],
-          "event": [
-            "merge_group"
-          ]
-        },
-        "daily": {
-          "channel": [
-            "daily"
-          ],
-          "event": [
-            "schedule"
-          ]
-        },
-        "release": {
-          "channel": [
-            "release"
-          ],
-          "scope": "repo",
-          "line": "releases/v0.3.0.beta"
-        }
-      },
       "channelMap": [
         {
           "channel": "gate",
@@ -85,12 +50,6 @@
         "releases/v0.3.0.beta": "发布线"
       },
       "boardBaseUrl": "https://sciencediscovery.github.io/github-status-board/",
-      "categoryTabs": {
-        "ready": "ci",
-        "merge": "ci",
-        "daily": "ci",
-        "release": "ci"
-      },
       "coverageTab": "coverage",
       "caseLayers": [
         {
@@ -140,7 +99,41 @@
             "e2e-real/tagged/summary.json"
           ]
         }
-      ]
+      ],
+      "laneRules": {
+        "pr": {
+          "channel": [
+            "gate"
+          ],
+          "event": [
+            "pull_request"
+          ]
+        },
+        "main": {
+          "channel": [
+            "gate"
+          ],
+          "event": [
+            "push",
+            "workflow_dispatch"
+          ]
+        },
+        "daily": {
+          "channel": [
+            "daily"
+          ]
+        },
+        "release": {
+          "channel": [
+            "release"
+          ]
+        },
+        "called": {
+          "event": [
+            "workflow_call"
+          ]
+        }
+      }
     }
   ],
   "defaultWindowDays": 7

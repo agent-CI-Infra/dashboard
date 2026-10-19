@@ -191,6 +191,122 @@ async function fetchActionsApiRuns(source, now) {
     }))
 }
 
+
+/** Recent runs used to locate each lane's latest completed run. */
+async function fetchRunsForCaseCounts(source, now) {
+  return fetchActionsApiRuns(source, now)
+}
+
+/** Latest completed run per lane → per-layer case counts. */
+async function collectCaseCounts(source, runs) {
+  const lanes = Object.keys(source.laneRules ?? {})
+  const latest = new Map()
+  for (const run of runs) {
+    if (run.status !== 'completed') continue
+    const lane = lanes.find((id) =>
+      matchesRule(source.laneRules[id], run)
+    )
+    if (!lane) continue
+    const prev = latest.get(lane)
+    if (!prev || run.created_at > prev.created_at) latest.set(lane, run)
+  }
+  const cases = {}
+  for (const [lane, run] of latest) {
+    const counts = await fetchCaseCounts(source, run)
+    if (counts) cases[lane] = counts
+  }
+  const line = Object.entries(cases)
+    .map(([c, v]) => `${c} ${v.passed}/${v.planned}`)
+    .join(', ')
+  if (line) console.log(`[gate]   cases@latest: ${line}`)
+  return cases
+}
+
+/** Attach per-lane case counts and the branch coverage to one branch line. */
+function attachCasesAndCoverage(branch, source, cases, coverage) {
+  const isCoverageLine =
+    branch.name === (source.coverageLine ?? source.defaultBranch)
+  return {
+    ...branch,
+    coverage: isCoverageLine && coverage ? coverage.coverage : null,
+    coverageDetail:
+      isCoverageLine && coverage ? coverage.coverageDetail : undefined,
+    coverageLink: isCoverageLine && coverage ? coverageLink(source) : undefined,
+    stats: branch.stats.map((stat) => {
+      const counts = cases?.[stat.category]
+      return counts ? { ...stat, cases: counts } : stat
+    }),
+  }
+}
+
+/** ---------- SD lane model (numbers taken from the board's own data) ---------- */
+
+/** SD lane key → dashboard category id (other/unknown lanes are dropped). */
+const LANE_IDS = ['pr', 'main', 'daily', 'release', 'called']
+
+/** SD lane → a day-indexed bucket list, in the dashboard's daily shape. */
+function lanesToBranch(laneData, source) {
+  const days = laneData?.days ?? []
+  const stats = []
+  for (const lane of laneData?.lanes ?? []) {
+    if (!LANE_IDS.includes(lane.key)) continue
+    const byDay = new Map()
+    lane.days?.forEach((cells, index) => {
+      const date = days[index]
+      if (!date || !Array.isArray(cells) || cells.length === 0) return
+      const bucket = {
+        date,
+        pass: 0,
+        fail: 0,
+        ignored: 0,
+        retries: 0,
+        durations: [],
+      }
+      for (const run of cells) {
+        const outcome = run?.outcome ?? run?.conclusion
+        if (outcome === 'success') bucket.pass += 1
+        else if (outcome === 'failure') bucket.fail += 1
+        else bucket.ignored += 1
+        if ((run?.attempt ?? 1) > 1) bucket.retries += 1
+        if (typeof run?.duration_s === 'number' && run.duration_s > 0) {
+          bucket.durations.push(run.duration_s)
+        }
+      }
+      byDay.set(date, bucket)
+    })
+    if (byDay.size === 0) continue
+    stats.push({
+      category: lane.key,
+      daily: [...byDay.values()].sort((a, b) => (a.date < b.date ? -1 : 1)),
+      link: `${source.boardBaseUrl}#ci`,
+    })
+  }
+  if (stats.length === 0) return null
+  // Lane order follows SD's own lane order.
+  const order = new Map(LANE_IDS.map((key, index) => [key, index]))
+  stats.sort((a, b) => order.get(a.category) - order.get(b.category))
+  const latest = laneData?.lanes?.find((l) => l.key === 'main') ??
+    laneData?.lanes?.find((l) => l.summary?.total)
+  const rate = latest?.summary?.success_rate
+  return {
+    name: laneData?.branch ?? source.defaultBranch,
+    gateStatus: rate == null ? 'passed' : rate >= 50 ? 'passed' : 'failed',
+    coverage: null,
+    stats,
+  }
+}
+
+/** All branch lines the board publishes (main + line_sections). */
+function extractLaneBranches(snapshot) {
+  const main = snapshot?.sections?.ci?.data?.lanes
+  const branches = []
+  if (main?.lanes?.length) branches.push(main)
+  for (const line of Object.values(snapshot?.line_sections ?? {})) {
+    const lanes = line?.ci?.data?.lanes
+    if (lanes?.lanes?.length) branches.push(lanes)
+  }
+  return branches
+}
 /** ---------- case counts (per test layer, same source as the SD board) ---------- */
 
 function matchesPattern(file, pattern) {
@@ -577,6 +693,61 @@ for (const source of config.sources ?? []) {
   const file = `${source.owner}/${source.name}.json`
   const outPath = path.join(OUT_DIR, file)
   try {
+    if (source.type === 'status-board-lanes') {
+      // Numbers come from the board's own lane data, so the dashboard shows
+      // exactly what the SD board shows.
+      const snapshot = await fetchJson(source.url)
+      const laneBranches = extractLaneBranches(snapshot)
+      let coverage = null
+      try {
+        coverage = await fetchCoverage(source)
+      } catch (error) {
+        console.warn(
+          `[gate] ${source.owner}/${source.name} coverage unavailable: ${error?.message ?? error}`
+        )
+      }
+      const runs = await fetchRunsForCaseCounts(source, now)
+      const cases = await collectCaseCounts(source, runs)
+      const branchData = laneBranches
+        .map((lanes) => lanesToBranch(lanes, source))
+        .filter(Boolean)
+        .map((branch) => attachCasesAndCoverage(branch, source, cases, coverage))
+      writeJson(outPath, {
+        id: source.id,
+        name: source.name,
+        owner: source.owner,
+        defaultBranch: source.defaultBranch,
+        url: source.dashboardUrl ?? null,
+        generatedAt: now.toISOString(),
+        sourceUrl: source.url,
+        windowDays,
+        branchData,
+      })
+      indexEntries.push({
+        id: source.id,
+        name: source.name,
+        owner: source.owner,
+        file,
+        sourceUrl: source.url,
+        windowDays,
+      })
+      console.log(
+        `[gate] ${source.owner}/${source.name}: ${branchData
+          .map(
+            (b) =>
+              `${b.name}(${b.stats
+                .map((st) => {
+                  const p = st.daily.reduce((n, d) => n + d.pass, 0)
+                  const f = st.daily.reduce((n, d) => n + d.fail, 0)
+                  return `${st.category} ${f || p ? Math.round((p / (p + f)) * 1000) / 10 : '–'}%`
+                })
+                .join(', ')})`
+          )
+          .join(' ')}`
+      )
+      continue
+    }
+
     const runs =
       source.type === 'actions-api'
         ? await fetchActionsApiRuns(source, now)
