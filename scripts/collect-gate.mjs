@@ -338,14 +338,15 @@ const now = new Date()
 
 const indexEntries = []
 for (const source of config.sources ?? []) {
+  const file = `${source.owner}/${source.name}.json`
+  const outPath = path.join(OUT_DIR, file)
   try {
     const runs =
       source.type === 'actions-api'
         ? await fetchActionsApiRuns(source, now)
         : extractRuns(await fetchJson(source.url))
     const data = aggregateSource(source, runs, now)
-    const file = `${source.owner}/${source.name}.json`
-    writeJson(path.join(OUT_DIR, file), data)
+    writeJson(outPath, data)
     indexEntries.push({
       id: source.id,
       name: source.name,
@@ -359,10 +360,27 @@ for (const source of config.sources ?? []) {
       .join(' ')
     console.log(`[gate] ${source.owner}/${source.name}: ${summary}`)
   } catch (error) {
-    // Keep the previous published dataset instead of failing the build.
-    console.warn(
-      `[gate] ${source.owner}/${source.name} failed: ${error?.message ?? error}`
-    )
+    // Never overwrite the last valid dataset with an empty one: keep the
+    // previously published file and flag it as stale in the index.
+    const message = error?.message ?? String(error)
+    if (existsSync(outPath)) {
+      console.warn(
+        `[gate] ${source.owner}/${source.name} failed (${message}); keeping the previously published dataset`
+      )
+      indexEntries.push({
+        id: source.id,
+        name: source.name,
+        owner: source.owner,
+        file,
+        sourceUrl: source.url,
+        windowDays,
+        stale: true,
+      })
+    } else {
+      console.warn(
+        `[gate] ${source.owner}/${source.name} failed (${message}); no previous dataset to keep`
+      )
+    }
   }
 }
 
