@@ -55,8 +55,17 @@ function writeJson(file, data) {
   renameSync(tmp, file)
 }
 
+const GITHUB_TOKEN =
+  process.env.GITHUB_TOKEN ?? process.env.MONITOR_TOKEN ?? ''
+
 async function fetchJson(url) {
-  const res = await fetch(url, { headers: { accept: 'application/json' } })
+  const headers = { accept: 'application/json' }
+  // Authenticated API calls get a much higher rate limit; only needed for
+  // the GitHub API (public sites work anonymously).
+  if (GITHUB_TOKEN && url.startsWith('https://api.github.com/')) {
+    headers.authorization = `Bearer ${GITHUB_TOKEN}`
+  }
+  const res = await fetch(url, { headers })
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`)
   return res.json()
 }

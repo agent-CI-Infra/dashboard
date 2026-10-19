@@ -50,6 +50,8 @@ jobs:
         # Pulls run-level CI data for the monitored repositories (public
         # GitHub API + the published status-board snapshot) and derives the
         # per-branch / per-category gate aggregates served by the dashboard.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run collect:gate
 
       - name: Build static site
