@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import {
   passRateHealth,
   type GateCategory,
+  type GateCaseCounts,
   type GateHealth,
   type GateRepo,
   type GateRunStatus,
@@ -42,6 +43,7 @@ type RawStat = {
   category: GateCategory
   daily: DayBucket[]
   link?: string | null
+  cases?: GateCaseCounts | null
 }
 
 type RawBranch = {
@@ -104,6 +106,7 @@ function toStat(stat: RawStat, cutoff: string): RepoCategoryStat {
     runs,
     health,
     link: stat.link ?? undefined,
+    cases: stat.cases ?? undefined,
   }
 }
 

@@ -72,6 +72,22 @@ function sortValue(
   }
 }
 
+/** Compact "passed/planned" line + per-layer tooltip for a gate cell. */
+function caseCountsLabel(stat: RepoCategoryStat, t: (k: 'gate.casesPlanned') => string) {
+  const cases = stat.cases
+  if (!cases || cases.planned === 0) return null
+  const parts = cases.layers.map((layer) =>
+    layer.planOnly
+      ? `${layer.name} ${t('gate.casesPlanned')} ${layer.planned}`
+      : `${layer.name} ${layer.passed}/${layer.planned}`
+  )
+  const when = cases.runAt ? cases.runAt.slice(0, 16).replace('T', ' ') : ''
+  return {
+    text: `${cases.passed}/${cases.planned}`,
+    title: `${parts.join(' · ')}${when ? ` — ${when}` : ''}`,
+  }
+}
+
 /**
  * Pass rate as a soft status pill tinted by health tier. Pills link to the
  * matching view of the source dashboard when one is known.
@@ -82,24 +98,33 @@ function RateCell({ stat }: { stat?: RepoCategoryStat }) {
     return <span className='text-sm text-gate-faint'>–</span>
   }
   const pillClass = cn(
-    'flex h-7 items-center justify-center rounded-md text-[13px] font-medium tabular-nums',
+    'flex h-6 items-center justify-center rounded-md text-[13px] font-medium tabular-nums',
     TONE_BG[stat.health],
     TONE_TEXT[stat.health]
   )
   const value = formatPercent(stat.passRate)
-  if (!stat.link) {
-    return <span className={pillClass}>{value}</span>
-  }
-  return (
+  const cases = caseCountsLabel(stat, t)
+  const pill = stat.link ? (
     <a
       href={stat.link}
       target='_blank'
       rel='noreferrer'
-      title={t('gate.openSource')}
+      title={cases ? `${cases.title}` : t('gate.openSource')}
       className={cn(pillClass, 'transition-shadow hover:ring-2 hover:ring-gate-accent/40')}
     >
       {value}
     </a>
+  ) : (
+    <span className={pillClass}>{value}</span>
+  )
+  if (!cases) return pill
+  return (
+    <div className='flex flex-col items-center gap-0.5' title={cases.title}>
+      {pill}
+      <span className='font-mono text-[10px] leading-3 text-gate-faint'>
+        {cases.text}
+      </span>
+    </div>
   )
 }
 
@@ -117,7 +142,7 @@ function CoverageCell({
   const low = coverage < COVERAGE_THRESHOLD
   const content = formatPercent(coverage)
   const pillClass = cn(
-        'flex h-7 w-full items-center justify-center rounded-md text-[13px] font-medium tabular-nums',
+        'flex h-6 w-full items-center justify-center rounded-md text-[13px] font-medium tabular-nums',
         // Coverage is its own metric: accent blue — never the green/orange
         // CI pass-rate scale — and red only below the gate threshold.
         low

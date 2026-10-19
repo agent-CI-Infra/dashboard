@@ -100,7 +100,56 @@
         "daily": "ci",
         "release": "ci"
       },
-      "coverageTab": "coverage"
+      "coverageTab": "coverage",
+      "caseLayers": [
+        {
+          "name": "L1",
+          "artifacts": [
+            "l1-results"
+          ],
+          "summaries": [
+            "l1/tagged/summary.json"
+          ]
+        },
+        {
+          "name": "UT",
+          "artifacts": [
+            "ut-results"
+          ],
+          "summaries": [
+            "ut/tagged/group-*/summary.json"
+          ]
+        },
+        {
+          "name": "ST",
+          "artifacts": [
+            "st-results"
+          ],
+          "summaries": [
+            "st/tagged/group-*/summary.json"
+          ]
+        },
+        {
+          "name": "E2E (mocked)",
+          "artifacts": [
+            "mocked-e2e-plan"
+          ],
+          "summaries": [
+            "plan.json"
+          ],
+          "planOnly": true
+        },
+        {
+          "name": "E2E (real)",
+          "artifacts": [
+            "real-e2e-results",
+            "real-e2e-results-*"
+          ],
+          "summaries": [
+            "e2e-real/tagged/summary.json"
+          ]
+        }
+      ]
     }
   ],
   "defaultWindowDays": 7

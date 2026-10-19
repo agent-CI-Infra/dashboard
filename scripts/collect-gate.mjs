@@ -23,6 +23,8 @@ import { execFileSync } from 'node:child_process'
 import {
   existsSync,
   mkdirSync,
+  mkdtempSync,
+  readdirSync,
   readFileSync,
   renameSync,
   rmSync,
@@ -189,6 +191,120 @@ async function fetchActionsApiRuns(source, now) {
     }))
 }
 
+/** ---------- case counts (per test layer, same source as the SD board) ---------- */
+
+function matchesPattern(file, pattern) {
+  const escaped = pattern
+    .split('*')
+    .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('.*')
+  return new RegExp(`^${escaped}$`).test(file)
+}
+
+function walkFiles(root, base = root) {
+  const out = []
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    const full = path.join(root, entry.name)
+    if (entry.isDirectory()) out.push(...walkFiles(full, base))
+    else out.push(path.relative(base, full))
+  }
+  return out
+}
+
+async function extractArtifact(owner, name, artifactId, dir) {
+  const url = `https://api.github.com/repos/${owner}/${name}/actions/artifacts/${artifactId}/zip`
+  const res = await fetch(url, {
+    headers: {
+      accept: 'application/vnd.github+json',
+      ...(GITHUB_TOKEN ? { authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
+    },
+    redirect: 'follow',
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status} downloading artifact ${artifactId}`)
+  const zipPath = path.join(tmpdir(), `gate-cases-${artifactId}.zip`)
+  writeFileSync(zipPath, Buffer.from(await res.arrayBuffer()))
+  try {
+    execFileSync('unzip', ['-o', '-q', zipPath, '-d', dir], {
+      maxBuffer: 256 * 1024 * 1024,
+    })
+  } finally {
+    rmSync(zipPath, { force: true })
+  }
+}
+
+/**
+ * Case counts for one gate category: the latest completed run's per-layer
+ * summaries (planned / executed / passed) — the same numbers the SD board
+ * shows in its "门禁用例" card.
+ */
+async function fetchCaseCounts(source, run) {
+  const layers = source.caseLayers ?? []
+  if (layers.length === 0 || !run) return null
+
+  const artifactsUrl = `https://api.github.com/repos/${source.owner}/${source.name}/actions/runs/${run.id}/artifacts?per_page=100`
+  const artifacts = (await fetchJson(artifactsUrl)).artifacts ?? []
+  const result = { runUrl: run.html_url, runAt: run.created_at, layers: [] }
+  const tmp = mkdtempSync(path.join(tmpdir(), 'gate-cases-'))
+
+  try {
+    for (const layer of layers) {
+      const matched = artifacts.filter(
+        (a) =>
+          !a.expired &&
+          layer.artifacts.some((prefix) => a.name.startsWith(prefix))
+      )
+      let planned = 0
+      let executed = 0
+      let passed = 0
+      let planOnly = false
+      for (const artifact of matched) {
+        const dir = path.join(tmp, String(artifact.id))
+        await extractArtifact(source.owner, source.name, artifact.id, dir)
+        const files = walkFiles(dir)
+        for (const summaryPath of layer.summaries) {
+          for (const file of files.filter((f) => matchesPattern(f, summaryPath))) {
+            const data = JSON.parse(readFileSync(path.join(dir, file), 'utf8'))
+            if (Array.isArray(data.entries)) {
+              // e2e plan artifacts: the entry list is the planned case set
+              planned += data.entries.length
+              planOnly = true
+            } else {
+              planned += data.planned ?? 0
+              executed += data.executed ?? 0
+              passed += data.passed ?? 0
+            }
+          }
+        }
+      }
+      if (planned > 0 || executed > 0) {
+        result.layers.push({
+          name: layer.name,
+          planned,
+          executed,
+          passed,
+          ...(planOnly ? { planOnly: true } : {}),
+        })
+      }
+    }
+  } finally {
+    rmSync(tmp, { recursive: true, force: true })
+  }
+
+  if (result.layers.length === 0) return null
+  // Layers published as plans only (mocked E2E) carry no per-case outcome in
+  // the small artifacts, so they are reported separately instead of skewing
+  // the passed/planned ratio.
+  const measured = result.layers.filter((l) => !l.planOnly)
+  result.passed = measured.reduce((n, l) => n + l.passed, 0)
+  result.planned = measured.reduce((n, l) => n + l.planned, 0)
+  result.executed = measured.reduce((n, l) => n + l.executed, 0)
+  result.planOnlyPlanned = result.layers
+    .filter((l) => l.planOnly)
+    .reduce((n, l) => n + l.planned, 0)
+  result.totalPlanned = result.planned + result.planOnlyPlanned
+  return result
+}
+
 /** ---------- coverage extraction ---------- */
 
 function extractUtLines(summary, lang) {
@@ -328,7 +444,7 @@ function bucketToStat(source, category, days) {
   }
 }
 
-function aggregateSource(source, runs, coverage, now) {
+function aggregateSource(source, runs, coverage, cases, now) {
   const windowStart = new Date(now.getTime() - windowDays * DAY_MS).toISOString()
 
   const categories = Object.keys(source.categoryMap)
@@ -384,7 +500,11 @@ function aggregateSource(source, runs, coverage, now) {
     const byCategory = buckets.get(branch)
     const stats = categories
       .filter((id) => byCategory.has(id))
-      .map((id) => bucketToStat(source, id, byCategory.get(id)))
+      .map((id) => {
+        const stat = bucketToStat(source, id, byCategory.get(id))
+        const caseCounts = cases?.[id]
+        return caseCounts ? { ...stat, cases: caseCounts } : stat
+      })
 
     const latest = latestByBranch.get(branch)
     const latestKind = latest ? conclusionKind(latest.conclusion) : 'ignored'
@@ -469,7 +589,34 @@ for (const source of config.sources ?? []) {
         `[gate] ${source.owner}/${source.name} coverage unavailable: ${error?.message ?? error}`
       )
     }
-    const data = aggregateSource(source, runs, coverage, now)
+    // Case counts per category: latest completed run of that category.
+    const cases = {}
+    try {
+      const categories = Object.keys(source.categoryMap)
+      const latest = new Map()
+      for (const run of runs) {
+        if (run.status !== 'completed') continue
+        const category = categories.find((id) =>
+          matchesRule(source.categoryMap[id], run)
+        )
+        if (!category) continue
+        const prev = latest.get(category)
+        if (!prev || run.created_at > prev.created_at) latest.set(category, run)
+      }
+      for (const [category, run] of latest) {
+        const counts = await fetchCaseCounts(source, run)
+        if (counts) cases[category] = counts
+      }
+      const line = Object.entries(cases)
+        .map(([c, v]) => `${c} ${v.passed}/${v.planned}`)
+        .join(', ')
+      if (line) console.log(`[gate]   cases@latest: ${line}`)
+    } catch (error) {
+      console.warn(
+        `[gate] ${source.owner}/${source.name} case counts unavailable: ${error?.message ?? error}`
+      )
+    }
+    const data = aggregateSource(source, runs, coverage, cases, now)
     writeJson(outPath, data)
     indexEntries.push({
       id: source.id,

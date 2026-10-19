@@ -4,7 +4,7 @@
   "owner": "openJiuwen-ai",
   "defaultBranch": "main",
   "url": "https://sciencediscovery.github.io/github-status-board/#overview",
-  "generatedAt": "2026-10-19T06:12:05.408Z",
+  "generatedAt": "2026-10-19T06:52:26.136Z",
   "sourceUrl": "https://sciencediscovery.github.io/github-status-board/data/snapshot.json",
   "windowDays": 30,
   "branchData": [
@@ -23,19 +23,16 @@
           "daily": [
             {
               "date": "2026-09-19",
-              "pass": 3,
+              "pass": 2,
               "fail": 0,
-              "ignored": 5,
+              "ignored": 3,
               "retries": 0,
               "durations": [
                 575,
                 18,
                 582,
                 15,
-                504,
-                540,
-                19,
-                20
+                504
               ]
             },
             {
@@ -329,21 +326,55 @@
               ]
             }
           ],
-          "link": "https://sciencediscovery.github.io/github-status-board/#ci"
+          "link": "https://sciencediscovery.github.io/github-status-board/#ci",
+          "cases": {
+            "runAt": "2026-10-19T05:51:19Z",
+            "layers": [
+              {
+                "name": "L1",
+                "planned": 4,
+                "executed": 4,
+                "passed": 4
+              },
+              {
+                "name": "UT",
+                "planned": 4246,
+                "executed": 4246,
+                "passed": 4246
+              },
+              {
+                "name": "ST",
+                "planned": 14,
+                "executed": 14,
+                "passed": 14
+              },
+              {
+                "name": "E2E (mocked)",
+                "planned": 89,
+                "executed": 0,
+                "passed": 0,
+                "planOnly": true
+              }
+            ],
+            "passed": 4264,
+            "planned": 4264,
+            "executed": 4264,
+            "planOnlyPlanned": 89,
+            "totalPlanned": 4353
+          }
         },
         {
           "category": "ready",
           "daily": [
             {
               "date": "2026-09-19",
-              "pass": 3,
+              "pass": 2,
               "fail": 0,
               "ignored": 0,
               "retries": 0,
               "durations": [
                 502,
-                580,
-                573
+                580
               ]
             },
             {
@@ -1110,7 +1141,42 @@
               ]
             }
           ],
-          "link": "https://sciencediscovery.github.io/github-status-board/#ci"
+          "link": "https://sciencediscovery.github.io/github-status-board/#ci",
+          "cases": {
+            "runAt": "2026-10-19T05:14:29Z",
+            "layers": [
+              {
+                "name": "L1",
+                "planned": 4,
+                "executed": 4,
+                "passed": 4
+              },
+              {
+                "name": "UT",
+                "planned": 4246,
+                "executed": 4246,
+                "passed": 4246
+              },
+              {
+                "name": "ST",
+                "planned": 14,
+                "executed": 14,
+                "passed": 14
+              },
+              {
+                "name": "E2E (mocked)",
+                "planned": 89,
+                "executed": 0,
+                "passed": 0,
+                "planOnly": true
+              }
+            ],
+            "passed": 4264,
+            "planned": 4264,
+            "executed": 4264,
+            "planOnlyPlanned": 89,
+            "totalPlanned": 4353
+          }
         },
         {
           "category": "merge",
@@ -1284,7 +1350,48 @@
               ]
             }
           ],
-          "link": "https://sciencediscovery.github.io/github-status-board/#ci"
+          "link": "https://sciencediscovery.github.io/github-status-board/#ci",
+          "cases": {
+            "runAt": "2026-10-19T05:29:43Z",
+            "layers": [
+              {
+                "name": "L1",
+                "planned": 4,
+                "executed": 4,
+                "passed": 4
+              },
+              {
+                "name": "UT",
+                "planned": 4246,
+                "executed": 4246,
+                "passed": 4246
+              },
+              {
+                "name": "ST",
+                "planned": 14,
+                "executed": 14,
+                "passed": 14
+              },
+              {
+                "name": "E2E (mocked)",
+                "planned": 89,
+                "executed": 0,
+                "passed": 0,
+                "planOnly": true
+              },
+              {
+                "name": "E2E (real)",
+                "planned": 18,
+                "executed": 18,
+                "passed": 18
+              }
+            ],
+            "passed": 4282,
+            "planned": 4282,
+            "executed": 4282,
+            "planOnlyPlanned": 89,
+            "totalPlanned": 4371
+          }
         },
         {
           "category": "daily",
@@ -1561,16 +1668,57 @@
             },
             {
               "date": "2026-10-18",
-              "pass": 0,
+              "pass": 1,
               "fail": 0,
-              "ignored": 1,
+              "ignored": 0,
               "retries": 1,
               "durations": [
-                6
+                363
               ]
             }
           ],
-          "link": "https://sciencediscovery.github.io/github-status-board/#ci"
+          "link": "https://sciencediscovery.github.io/github-status-board/#ci",
+          "cases": {
+            "runAt": "2026-10-18T18:33:11Z",
+            "layers": [
+              {
+                "name": "L1",
+                "planned": 4,
+                "executed": 4,
+                "passed": 4
+              },
+              {
+                "name": "UT",
+                "planned": 4016,
+                "executed": 4016,
+                "passed": 4016
+              },
+              {
+                "name": "ST",
+                "planned": 2,
+                "executed": 2,
+                "passed": 2
+              },
+              {
+                "name": "E2E (mocked)",
+                "planned": 80,
+                "executed": 0,
+                "passed": 0,
+                "planOnly": true
+              },
+              {
+                "name": "E2E (real)",
+                "planned": 63,
+                "executed": 54,
+                "passed": 54
+              }
+            ],
+            "passed": 4076,
+            "planned": 4085,
+            "executed": 4076,
+            "planOnlyPlanned": 80,
+            "totalPlanned": 4165
+          }
         }
       ],
       "recentRuns": [
@@ -1735,7 +1883,48 @@
               ]
             }
           ],
-          "link": "https://sciencediscovery.github.io/github-status-board/#ci"
+          "link": "https://sciencediscovery.github.io/github-status-board/#ci",
+          "cases": {
+            "runAt": "2026-10-16T09:03:49Z",
+            "layers": [
+              {
+                "name": "L1",
+                "planned": 4,
+                "executed": 4,
+                "passed": 4
+              },
+              {
+                "name": "UT",
+                "planned": 3812,
+                "executed": 3812,
+                "passed": 3812
+              },
+              {
+                "name": "ST",
+                "planned": 2,
+                "executed": 2,
+                "passed": 2
+              },
+              {
+                "name": "E2E (mocked)",
+                "planned": 74,
+                "executed": 0,
+                "passed": 0,
+                "planOnly": true
+              },
+              {
+                "name": "E2E (real)",
+                "planned": 64,
+                "executed": 63,
+                "passed": 62
+              }
+            ],
+            "passed": 3880,
+            "planned": 3882,
+            "executed": 3881,
+            "planOnlyPlanned": 74,
+            "totalPlanned": 3956
+          }
         }
       ],
       "recentRuns": [

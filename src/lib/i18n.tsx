@@ -113,6 +113,11 @@ const DICT = {
   'gate.live': { zh: '实时 · 30s', en: 'Live · 30s' },
   'gate.branches': { zh: '分支', en: 'Branches' },
   'gate.demo': { zh: '演示', en: 'Demo' },
+  'gate.casesPlanned': { zh: '计划', en: 'planned' },
+  'gate.casesHint': {
+    zh: '用例数：通过/计划（最近一次运行）',
+    en: 'Cases passed/planned in the latest run',
+  },
   'gate.openSource': {
     zh: '在数据来源看板中查看',
     en: 'View on the source dashboard',

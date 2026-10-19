@@ -9,6 +9,28 @@ export type GateRunStatus = 'passed' | 'failed' | 'running'
 /** Per-category health derived from pass rate thresholds. */
 export type GateHealth = 'pass' | 'warn' | 'fail'
 
+/** One test layer inside the latest run of a gate category. */
+export interface GateCaseLayer {
+  name: string
+  planned: number
+  executed: number
+  passed: number
+  /** True when only the plan (case list) is published, not per-case results. */
+  planOnly?: boolean
+}
+
+/** Case counts of the latest run of a gate category (SD-board aligned). */
+export interface GateCaseCounts {
+  passed: number
+  planned: number
+  executed: number
+  planOnlyPlanned: number
+  totalPlanned: number
+  runUrl?: string
+  runAt?: string
+  layers: GateCaseLayer[]
+}
+
 export interface RepoCategoryStat {
   category: GateCategory
   /**
@@ -24,6 +46,8 @@ export interface RepoCategoryStat {
   health: GateHealth
   /** Deep link to where this metric is presented on the source dashboard. */
   link?: string
+  /** Test-case counts of the newest run of this category. */
+  cases?: GateCaseCounts
 }
 
 /** Gate metrics for one branch of a repository. */
