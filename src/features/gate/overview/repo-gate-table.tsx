@@ -85,6 +85,15 @@ function casesTooltip(stat: RepoCategoryStat, plannedLabel: string): string | nu
   return `${parts.join(' · ')}${when ? ` — ${when}` : ''}`
 }
 
+/** Empty slot with the same footprint as a chip, so columns stay aligned. */
+function EmptyCell() {
+  return (
+    <span className='flex h-7 w-full items-center justify-center text-[13px] text-gate-faint'>
+      –
+    </span>
+  )
+}
+
 /**
  * Pass rate as a soft status chip tinted by health tier (single line, same
  * look for every repository). When the latest run's case count is known it is
@@ -93,7 +102,7 @@ function casesTooltip(stat: RepoCategoryStat, plannedLabel: string): string | nu
 function RateCell({ stat }: { stat?: RepoCategoryStat }) {
   const { t } = useLang()
   if (!stat || stat.passRate == null) {
-    return <span className='text-sm text-gate-faint'>–</span>
+    return <EmptyCell />
   }
   const pillClass = cn(
     'flex h-7 w-full items-center justify-center rounded-md text-[13px] font-medium tabular-nums',
@@ -141,7 +150,7 @@ function CoverageCell({
 }) {
   const { t } = useLang()
   if (coverage == null) {
-    return <span className='text-sm text-gate-faint'>–</span>
+    return <EmptyCell />
   }
   const low = coverage < COVERAGE_THRESHOLD
   const pillClass = cn(
