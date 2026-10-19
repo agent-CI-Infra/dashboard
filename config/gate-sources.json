@@ -70,7 +70,22 @@
           ]
         }
       ],
-      "snapshotUrl": "https://sciencediscovery.github.io/github-status-board/data/snapshot.json"
+      "snapshotUrl": "https://sciencediscovery.github.io/github-status-board/data/snapshot.json",
+      "coverage": {
+        "artifacts": [
+          "node-coverage-summary",
+          "python-coverage-summary"
+        ],
+        "languageByArtifact": {
+          "node-coverage-summary": "node",
+          "python-coverage-summary": "python"
+        },
+        "summaryPaths": [
+          "summary.json",
+          "coverage/summary.json",
+          "python/summary.json"
+        ]
+      }
     }
   ]
 }

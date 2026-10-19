@@ -19,13 +19,16 @@
  *   dashboard renders an empty cell.
  */
 
+import { execFileSync } from 'node:child_process'
 import {
   existsSync,
   mkdirSync,
   readFileSync,
   renameSync,
+  rmSync,
   writeFileSync,
 } from 'node:fs'
+import { tmpdir } from 'node:os'
 import path from 'node:path'
 
 const CONFIG_FILE = path.join(process.cwd(), 'config', 'gate-sources.json')
@@ -182,6 +185,110 @@ async function fetchActionsApiRuns(source, now) {
     }))
 }
 
+/** ---------- coverage extraction ---------- */
+
+function extractUtLines(summary, lang) {
+  const layers = summary?.layers?.ut
+  const byLang = lang && layers?.[lang]?.totals?.lines
+  const utLines = layers?.totals?.lines
+  const topLines = summary?.totals?.lines
+  const lines = byLang ?? utLines ?? topLines
+  if (!lines || typeof lines.covered !== 'number' || typeof lines.total !== 'number') {
+    return null
+  }
+  return { covered: lines.covered, total: lines.total }
+}
+
+async function downloadArtifactSummary(owner, name, artifactId, fileCandidates) {
+  const url = `https://api.github.com/repos/${owner}/${name}/actions/artifacts/${artifactId}/zip`
+  const res = await fetch(url, {
+    headers: {
+      accept: 'application/vnd.github+json',
+      ...(GITHUB_TOKEN ? { authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
+    },
+    redirect: 'follow',
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status} downloading artifact ${artifactId}`)
+  const buffer = Buffer.from(await res.arrayBuffer())
+  const tmpZip = path.join(tmpdir(), `gate-coverage-${artifactId}.zip`)
+  writeFileSync(tmpZip, buffer)
+  try {
+    for (const candidate of fileCandidates) {
+      try {
+        const out = execFileSync('unzip', ['-p', tmpZip, candidate], {
+          maxBuffer: 64 * 1024 * 1024,
+        })
+        return JSON.parse(out.toString('utf8'))
+      } catch {
+        // try the next candidate path inside the archive
+      }
+    }
+    return null
+  } finally {
+    rmSync(tmpZip, { force: true })
+  }
+}
+
+/**
+ * Latest UT line coverage for the default branch, merged across the
+ * configured summary artifacts (e.g. node + python). Returns null when the
+ * artifacts are unavailable (no token, older runs, ...) — the dashboard then
+ * renders an empty cell.
+ */
+async function fetchCoverage(source) {
+  const coverage = source.coverage
+  if (!coverage?.artifacts?.length) return null
+
+  const runsUrl =
+    `https://api.github.com/repos/${source.owner}/${source.name}/actions/runs` +
+    `?branch=${encodeURIComponent(source.defaultBranch)}&status=completed&per_page=5`
+  const { workflow_runs: runs = [] } = await fetchJson(runsUrl)
+
+  for (const run of runs) {
+    const artifactsUrl = `https://api.github.com/repos/${source.owner}/${source.name}/actions/runs/${run.id}/artifacts?per_page=100`
+    let artifacts = []
+    try {
+      artifacts = (await fetchJson(artifactsUrl)).artifacts ?? []
+    } catch {
+      continue
+    }
+
+    let covered = 0
+    let total = 0
+    const detail = {}
+    let found = false
+    for (const prefix of coverage.artifacts) {
+      const artifact = artifacts
+        .filter((a) => a.name.startsWith(prefix) && !a.expired)
+        .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0]
+      if (!artifact) continue
+      const summary = await downloadArtifactSummary(
+        source.owner,
+        source.name,
+        artifact.id,
+        coverage.summaryPaths ?? ['summary.json']
+      )
+      if (!summary) continue
+      const lines = extractUtLines(summary, coverage.languageByArtifact?.[prefix])
+      if (!lines) continue
+      covered += lines.covered
+      total += lines.total
+      detail[prefix] = Math.round((lines.covered / lines.total) * 1000) / 10
+      found = true
+    }
+
+    if (found && total > 0) {
+      return {
+        coverage: Math.round((covered / total) * 1000) / 10,
+        coverageDetail: detail,
+        coverageRunId: run.id,
+        coverageSha: run.head_sha,
+      }
+    }
+  }
+  return null
+}
+
 function emptyBucket() {
   return { pass: 0, fail: 0, runs: 0, retries: 0, durations: [] }
 }
@@ -212,7 +319,7 @@ function bucketToStat(category, bucket) {
   }
 }
 
-function aggregateSource(source, runs, now) {
+function aggregateSource(source, runs, coverage, now) {
   const windowStart = new Date(now.getTime() - windowDays * DAY_MS).toISOString()
 
   const categories = Object.keys(source.categoryMap)
@@ -311,9 +418,14 @@ function aggregateSource(source, runs, now) {
     return {
       name: branch,
       gateStatus,
-      // Status-board snapshots carry no coverage (plan A) — the dashboard
-      // renders an empty cell until a coverage source is wired in.
-      coverage: null,
+      // UT line coverage of this branch, when the CI publishes summary
+      // artifacts; null renders as an empty cell.
+      coverage:
+        coverage && branch === source.defaultBranch ? coverage.coverage : null,
+      coverageDetail:
+        coverage && branch === source.defaultBranch
+          ? coverage.coverageDetail
+          : undefined,
       stats,
       recentRuns,
     }
@@ -345,7 +457,15 @@ for (const source of config.sources ?? []) {
       source.type === 'actions-api'
         ? await fetchActionsApiRuns(source, now)
         : extractRuns(await fetchJson(source.url))
-    const data = aggregateSource(source, runs, now)
+    let coverage = null
+    try {
+      coverage = await fetchCoverage(source)
+    } catch (error) {
+      console.warn(
+        `[gate] ${source.owner}/${source.name} coverage unavailable: ${error?.message ?? error}`
+      )
+    }
+    const data = aggregateSource(source, runs, coverage, now)
     writeJson(outPath, data)
     indexEntries.push({
       id: source.id,
