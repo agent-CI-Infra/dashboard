@@ -22,7 +22,6 @@ export const TONE_BG: Record<GateHealth, string> = {
 }
 
 export const CATEGORY_DOT: Record<GateCategory, string> = {
-  build: 'bg-gate-cat-build',
   ready: 'bg-gate-cat-ready',
   merge: 'bg-gate-cat-merge',
   daily: 'bg-gate-cat-daily',

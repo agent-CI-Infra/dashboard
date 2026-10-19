@@ -35,7 +35,6 @@ import { useLang, type I18nKey } from '@/lib/i18n'
  */
 type SortKey =
   | 'repo'
-  | 'build'
   | 'ready'
   | 'merge'
   | 'daily'
@@ -48,7 +47,6 @@ const ROW_COLS =
 
 const COL_LABEL: Record<string, I18nKey> = {
   repo: 'gate.col.repo',
-  build: 'gate.col.build',
   ready: 'gate.col.ready',
   merge: 'gate.col.merge',
   daily: 'gate.col.daily',
