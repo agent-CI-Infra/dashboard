@@ -109,6 +109,10 @@ const DICT = {
   'gate.live': { zh: '实时 · 30s', en: 'Live · 30s' },
   'gate.branches': { zh: '分支', en: 'Branches' },
   'gate.demo': { zh: '演示', en: 'Demo' },
+  'gate.openSource': {
+    zh: '在数据来源看板中查看',
+    en: 'View on the source dashboard',
+  },
   'gate.demoHint': {
     zh: '该仓库尚未接入真实门禁数据，数值为设计占位',
     en: 'Real gate data is not wired in yet — these numbers are placeholders',

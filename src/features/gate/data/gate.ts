@@ -18,6 +18,8 @@ export interface RepoCategoryStat {
   ongoing?: boolean
   runs7d: number
   health: GateHealth
+  /** Deep link to where this metric is presented on the source dashboard. */
+  link?: string
 }
 
 /** Gate metrics for one branch of a repository. */
@@ -26,6 +28,8 @@ export interface RepoBranchStat {
   gateStatus: GateRunStatus
   /** UT coverage %, red below the 75% threshold; null when unavailable. */
   coverage: number | null
+  /** Deep link to the coverage view of the source dashboard. */
+  coverageLink?: string
   stats: RepoCategoryStat[]
 }
 

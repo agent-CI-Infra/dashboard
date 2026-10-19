@@ -72,42 +72,71 @@ function sortValue(
   }
 }
 
-/** Pass rate as a soft status pill tinted by health tier. */
+/**
+ * Pass rate as a soft status pill tinted by health tier. Pills link to the
+ * matching view of the source dashboard when one is known.
+ */
 function RateCell({ stat }: { stat?: RepoCategoryStat }) {
+  const { t } = useLang()
   if (!stat || stat.passRate7d == null) {
     return <span className='text-sm text-gate-faint'>–</span>
   }
+  const pillClass = cn(
+    'flex h-7 items-center justify-center rounded-md text-[13px] font-medium tabular-nums',
+    TONE_BG[stat.health],
+    TONE_TEXT[stat.health]
+  )
+  const value = formatPercent(stat.passRate7d)
+  if (!stat.link) {
+    return <span className={pillClass}>{value}</span>
+  }
   return (
-    <span
-      className={cn(
-        'flex h-7 items-center justify-center rounded-md text-[13px] font-medium tabular-nums',
-        TONE_BG[stat.health],
-        TONE_TEXT[stat.health]
-      )}
+    <a
+      href={stat.link}
+      target='_blank'
+      rel='noreferrer'
+      title={t('gate.openSource')}
+      className={cn(pillClass, 'transition-shadow hover:ring-2 hover:ring-gate-accent/40')}
     >
-      {formatPercent(stat.passRate7d)}
-    </span>
+      {value}
+    </a>
   )
 }
 
-function CoverageCell({ coverage }: { coverage: number | null }) {
+function CoverageCell({
+  coverage,
+  link,
+}: {
+  coverage: number | null
+  link?: string
+}) {
+  const { t } = useLang()
   if (coverage == null) {
     return <span className='text-sm text-gate-faint'>–</span>
   }
   const low = coverage < COVERAGE_THRESHOLD
-  return (
-    <span
-      className={cn(
+  const content = formatPercent(coverage)
+  const pillClass = cn(
         'flex h-7 w-full items-center justify-center rounded-md text-[13px] font-medium tabular-nums',
         // Coverage is its own metric: accent blue — never the green/orange
         // CI pass-rate scale — and red only below the gate threshold.
         low
           ? 'bg-gate-fail-soft text-gate-fail'
           : 'bg-gate-accent-soft text-gate-accent'
-      )}
+  )
+  if (!link) {
+    return <span className={pillClass}>{content}</span>
+  }
+  return (
+    <a
+      href={link}
+      target='_blank'
+      rel='noreferrer'
+      title={t('gate.openSource')}
+      className={cn(pillClass, 'transition-shadow hover:ring-2 hover:ring-gate-accent/40')}
     >
-      {formatPercent(coverage)}
-    </span>
+      {content}
+    </a>
   )
 }
 
@@ -340,7 +369,10 @@ export function RepoGateTable({ repos }: { repos: GateRepo[] }) {
           ))}
 
           <div className='flex h-full items-center self-stretch border-l border-gate-grid pl-2.5'>
-            <CoverageCell coverage={branch.coverage} />
+            <CoverageCell
+              coverage={branch.coverage}
+              link={branch.coverageLink}
+            />
           </div>
         </div>
       ))}

@@ -105,6 +105,18 @@ function repoScopedCategories(source) {
     .map(([id]) => id)
 }
 
+/** Deep link into the source dashboard's tab for a category. */
+function categoryLink(source, category) {
+  if (!source.boardBaseUrl) return null
+  const tab = source.categoryTabs?.[category] ?? 'overview'
+  return `${source.boardBaseUrl}#${tab}`
+}
+
+function coverageLink(source) {
+  if (!source.boardBaseUrl) return null
+  return `${source.boardBaseUrl}#${source.coverageTab ?? 'overview'}`
+}
+
 /** Branch line a repo-scoped category belongs to (defaults to the default branch). */
 function repoScopedLine(source, category) {
   return source.categoryMap[category]?.line ?? source.defaultBranch
@@ -305,7 +317,7 @@ function addRunToBucket(bucket, run) {
   }
 }
 
-function bucketToStat(category, bucket) {
+function bucketToStat(source, category, bucket) {
   const decided = bucket.pass + bucket.fail
   return {
     category,
@@ -317,6 +329,8 @@ function bucketToStat(category, bucket) {
       bucket.runs > 0
         ? Math.round((bucket.retries / bucket.runs) * 1000) / 10
         : 0,
+    // Where this metric is presented on the source dashboard.
+    link: categoryLink(source, category),
   }
 }
 
@@ -376,7 +390,7 @@ function aggregateSource(source, runs, coverage, now) {
     const byCategory = buckets.get(branch)
     const stats = categories
       .filter((id) => byCategory.has(id))
-      .map((id) => bucketToStat(id, byCategory.get(id)))
+      .map((id) => bucketToStat(source, id, byCategory.get(id)))
 
     const latest = latestByBranch.get(branch)
     const latestKind = latest ? conclusionKind(latest.conclusion) : 'ignored'
@@ -417,6 +431,10 @@ function aggregateSource(source, runs, coverage, now) {
       coverageDetail:
         coverage && branch === (source.coverageLine ?? source.defaultBranch)
           ? coverage.coverageDetail
+          : undefined,
+      coverageLink:
+        coverage && branch === (source.coverageLine ?? source.defaultBranch)
+          ? coverageLink(source)
           : undefined,
       stats,
       recentRuns,

@@ -35,12 +35,14 @@ type RawStat = {
   avgDurationSec: number | null
   runs7d: number
   retryRate?: number
+  link?: string | null
 }
 
 type RawBranch = {
   name: string
   gateStatus: GateRunStatus
   coverage: number | null
+  coverageLink?: string | null
   stats: RawStat[]
   recentRuns?: unknown[]
 }
@@ -63,6 +65,7 @@ function toGateRepo(raw: RawRepo): GateRepo & { generatedAt?: string } {
     name: branch.name,
     gateStatus: branch.gateStatus,
     coverage: branch.coverage ?? null,
+    coverageLink: branch.coverageLink ?? undefined,
     stats: branch.stats.map((stat): RepoCategoryStat => {
       const health: GateHealth =
         stat.passRate7d == null
@@ -74,6 +77,7 @@ function toGateRepo(raw: RawRepo): GateRepo & { generatedAt?: string } {
         avgDurationSec: stat.avgDurationSec,
         runs7d: stat.runs7d,
         health,
+        link: stat.link ?? undefined,
       }
     }),
   }))
