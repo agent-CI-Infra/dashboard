@@ -83,7 +83,8 @@ function caseCountsLabel(stat: RepoCategoryStat, t: (k: 'gate.casesPlanned') => 
   )
   const when = cases.runAt ? cases.runAt.slice(0, 16).replace('T', ' ') : ''
   return {
-    text: `${cases.passed}/${cases.planned}`,
+    // One number: the cases this gate ran in its latest run.
+    text: `${cases.totalPlanned}`,
     title: `${parts.join(' · ')}${when ? ` — ${when}` : ''}`,
   }
 }
@@ -121,7 +122,7 @@ function RateCell({ stat }: { stat?: RepoCategoryStat }) {
   return (
     <div className='flex flex-col items-center gap-0.5' title={cases.title}>
       {pill}
-      <span className='font-mono text-[10px] leading-3 text-gate-faint'>
+      <span className='self-end pr-0.5 font-mono text-[10px] leading-3 text-gate-faint tabular-nums'>
         {cases.text}
       </span>
     </div>
