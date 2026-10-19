@@ -1,5 +1,5 @@
 {
-  "windowDays": 7,
+  "windowDays": 30,
   "sources": [
     {
       "id": "sciencediscovery",
@@ -39,6 +39,9 @@
         "daily": {
           "channel": [
             "daily"
+          ],
+          "event": [
+            "schedule"
           ]
         },
         "release": {
@@ -99,5 +102,6 @@
       },
       "coverageTab": "coverage"
     }
-  ]
+  ],
+  "defaultWindowDays": 7
 }

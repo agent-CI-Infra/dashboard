@@ -68,7 +68,7 @@ function sortValue(
     case 'coverage':
       return branch.coverage
     default:
-      return branch.stats.find((s) => s.category === key)?.passRate7d ?? null
+      return branch.stats.find((s) => s.category === key)?.passRate ?? null
   }
 }
 
@@ -78,7 +78,7 @@ function sortValue(
  */
 function RateCell({ stat }: { stat?: RepoCategoryStat }) {
   const { t } = useLang()
-  if (!stat || stat.passRate7d == null) {
+  if (!stat || stat.passRate == null) {
     return <span className='text-sm text-gate-faint'>–</span>
   }
   const pillClass = cn(
@@ -86,7 +86,7 @@ function RateCell({ stat }: { stat?: RepoCategoryStat }) {
     TONE_BG[stat.health],
     TONE_TEXT[stat.health]
   )
-  const value = formatPercent(stat.passRate7d)
+  const value = formatPercent(stat.passRate)
   if (!stat.link) {
     return <span className={pillClass}>{value}</span>
   }

@@ -11,12 +11,16 @@ export type GateHealth = 'pass' | 'warn' | 'fail'
 
 export interface RepoCategoryStat {
   category: GateCategory
-  /** null when every run in the window is undecided (skipped/cancelled). */
-  passRate7d: number | null
+  /**
+   * Pass rate over the selected window (success / decided runs);
+   * null when every run in the window is undecided (skipped/cancelled).
+   */
+  passRate: number | null
   avgDurationSec: number | null
   /** Canary-style runs still in progress → renders "2h 51m+". */
   ongoing?: boolean
-  runs7d: number
+  /** All matched runs in the selected window. */
+  runs: number
   health: GateHealth
   /** Deep link to where this metric is presented on the source dashboard. */
   link?: string
@@ -112,9 +116,9 @@ function stat(
 ): RepoCategoryStat {
   return {
     category,
-    passRate7d,
+    passRate: passRate7d,
     avgDurationSec,
-    runs7d,
+    runs: runs7d,
     ongoing,
     health: passRateHealth(category, passRate7d),
   }

@@ -122,15 +122,6 @@ function repoScopedLine(source, category) {
   return source.categoryMap[category]?.line ?? source.defaultBranch
 }
 
-function median(values) {
-  if (values.length === 0) return null
-  const sorted = [...values].sort((a, b) => a - b)
-  const mid = Math.floor(sorted.length / 2)
-  return sorted.length % 2 === 0
-    ? Math.round((sorted[mid - 1] + sorted[mid]) / 2)
-    : sorted[mid]
-}
-
 function extractRuns(snapshot) {
   const runs = snapshot?.quality?.runs
   if (!Array.isArray(runs)) return []
@@ -302,33 +293,36 @@ async function fetchCoverage(source) {
   return null
 }
 
+/**
+ * Buckets are keyed by UTC day so the dashboard can aggregate any window
+ * (24h / 7d / 30d) client-side instead of shipping one fixed window.
+ */
 function emptyBucket() {
-  return { pass: 0, fail: 0, runs: 0, retries: 0, durations: [] }
+  return new Map()
 }
 
-function addRunToBucket(bucket, run) {
-  bucket.runs += 1
+function addRunToBucket(days, run) {
+  const day = run.created_at.slice(0, 10)
+  if (!days.has(day)) {
+    days.set(day, { date: day, pass: 0, fail: 0, ignored: 0, retries: 0, durations: [] })
+  }
+  const bucket = days.get(day)
   if ((run.attempt ?? 1) > 1) bucket.retries += 1
   const kind = conclusionKind(run.conclusion)
   if (kind === 'pass') bucket.pass += 1
-  if (kind === 'fail') bucket.fail += 1
+  else if (kind === 'fail') bucket.fail += 1
+  else bucket.ignored += 1
   if (typeof run.duration_s === 'number' && run.duration_s > 0) {
     bucket.durations.push(run.duration_s)
   }
 }
 
-function bucketToStat(source, category, bucket) {
-  const decided = bucket.pass + bucket.fail
+function bucketToStat(source, category, days) {
   return {
     category,
-    passRate7d:
-      decided > 0 ? Math.round((bucket.pass / decided) * 1000) / 10 : null,
-    avgDurationSec: median(bucket.durations),
-    runs7d: bucket.runs,
-    retryRate:
-      bucket.runs > 0
-        ? Math.round((bucket.retries / bucket.runs) * 1000) / 10
-        : 0,
+    // Per-day counts; the dashboard sums the selected window and derives
+    // pass rate / runs / median duration from these buckets.
+    daily: [...days.values()].sort((a, b) => (a.date < b.date ? -1 : 1)),
     // Where this metric is presented on the source dashboard.
     link: categoryLink(source, category),
   }
@@ -485,8 +479,10 @@ for (const source of config.sources ?? []) {
       sourceUrl: source.url,
       windowDays,
     })
+    const runCount = (stat) =>
+      stat.daily.reduce((n, d) => n + d.pass + d.fail + d.ignored, 0)
     const summary = data.branchData
-      .map((b) => `${b.name}(${b.stats.map((s) => `${s.category} ${s.passRate7d ?? '–'}%/${s.runs7d}`).join(', ')})`)
+      .map((b) => `${b.name}(${b.stats.map((s) => `${s.category} ${s.daily.length}d/${runCount(s)}runs`).join(', ')})`)
       .join(' ')
     console.log(`[gate] ${source.owner}/${source.name}: ${summary}`)
   } catch (error) {

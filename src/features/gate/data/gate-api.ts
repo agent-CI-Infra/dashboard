@@ -5,7 +5,6 @@ import {
   type GateHealth,
   type GateRepo,
   type GateRunStatus,
-  type RepoBranchStat,
   type RepoCategoryStat,
 } from '@/features/gate/data/gate'
 
@@ -29,12 +28,19 @@ type GateIndex = {
   sources: { id: string; owner: string; name: string; file: string }[]
 }
 
+/** One UTC day of runs for a category (what the collector publishes). */
+type DayBucket = {
+  date: string
+  pass: number
+  fail: number
+  ignored: number
+  retries: number
+  durations: number[]
+}
+
 type RawStat = {
   category: GateCategory
-  passRate7d: number | null
-  avgDurationSec: number | null
-  runs7d: number
-  retryRate?: number
+  daily: DayBucket[]
   link?: string | null
 }
 
@@ -59,51 +65,79 @@ type RawRepo = {
   branchData: RawBranch[]
 }
 
-/** Dataset shape on the wire → the dashboard's GateRepo shape. */
-function toGateRepo(raw: RawRepo): GateRepo & { generatedAt?: string } {
-  const branchData: RepoBranchStat[] = raw.branchData.map((branch) => ({
-    name: branch.name,
-    gateStatus: branch.gateStatus,
-    coverage: branch.coverage ?? null,
-    coverageLink: branch.coverageLink ?? undefined,
-    stats: branch.stats.map((stat): RepoCategoryStat => {
-      const health: GateHealth =
-        stat.passRate7d == null
-          ? 'warn'
-          : passRateHealth(stat.category, stat.passRate7d)
-      return {
-        category: stat.category,
-        passRate7d: stat.passRate7d,
-        avgDurationSec: stat.avgDurationSec,
-        runs7d: stat.runs7d,
-        health,
-        link: stat.link ?? undefined,
-      }
-    }),
-  }))
+function median(values: number[]): number | null {
+  if (values.length === 0) return null
+  const sorted = [...values].sort((a, b) => a - b)
+  const mid = Math.floor(sorted.length / 2)
+  return sorted.length % 2 === 0
+    ? Math.round((sorted[mid - 1] + sorted[mid]) / 2)
+    : sorted[mid]
+}
 
+/** First UTC day included in a `windowDays`-long window ending today. */
+function windowCutoff(windowDays: number): string {
+  const cutoff = new Date(Date.now() - (windowDays - 1) * 24 * 60 * 60 * 1000)
+  return cutoff.toISOString().slice(0, 10)
+}
+
+/** Aggregate the published daily buckets over the selected window. */
+function toStat(stat: RawStat, cutoff: string): RepoCategoryStat {
+  const days = stat.daily.filter((day) => day.date >= cutoff)
+  let pass = 0
+  let fail = 0
+  let runs = 0
+  const durations: number[] = []
+  for (const day of days) {
+    pass += day.pass
+    fail += day.fail
+    runs += day.pass + day.fail + day.ignored
+    durations.push(...day.durations)
+  }
+  const decided = pass + fail
+  const passRate = decided > 0 ? Math.round((pass / decided) * 1000) / 10 : null
+  const health: GateHealth =
+    passRate == null ? 'warn' : passRateHealth(stat.category, passRate)
   return {
+    category: stat.category,
+    passRate,
+    avgDurationSec: median(durations),
+    runs,
+    health,
+    link: stat.link ?? undefined,
+  }
+}
+
+/** Raw datasets → dashboard shape, aggregated for the selected window. */
+export function deriveGateRepos(
+  datasets: RawRepo[],
+  windowDays: number
+): GateRepo[] {
+  const cutoff = windowCutoff(windowDays)
+  return datasets.map((raw) => ({
     id: raw.id,
     name: raw.name,
     owner: raw.owner,
     defaultBranch: raw.defaultBranch,
     url: raw.url ?? undefined,
-    branchData,
-    generatedAt: raw.generatedAt,
-  }
+    branchData: raw.branchData.map((branch) => ({
+      name: branch.name,
+      gateStatus: branch.gateStatus,
+      coverage: branch.coverage ?? null,
+      coverageLink: branch.coverageLink ?? undefined,
+      stats: branch.stats.map((stat) => toStat(stat, cutoff)),
+    })),
+  }))
 }
 
-export function useGateRepos() {
+/** Raw published datasets (aggregation happens per selected window). */
+export function useGateDatasets() {
   return useQuery({
-    queryKey: ['gate', 'repos'],
-    queryFn: async (): Promise<GateRepo[]> => {
+    queryKey: ['gate', 'datasets'],
+    queryFn: async (): Promise<RawRepo[]> => {
       const index = await fetchJson<GateIndex>('index.json')
-      const datasets = await Promise.all(
-        (index.sources ?? []).map((source) =>
-          fetchJson<RawRepo>(source.file).then(toGateRepo)
-        )
+      return Promise.all(
+        (index.sources ?? []).map((source) => fetchJson<RawRepo>(source.file))
       )
-      return datasets
     },
     staleTime: 5 * 60 * 1000,
     retry: 1,

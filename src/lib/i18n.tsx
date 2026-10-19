@@ -96,8 +96,12 @@ const DICT = {
 
   'gate.title': { zh: '门禁总览', en: 'Gate Overview' },
   'gate.subtitle': {
-    zh: '各仓库门禁通过率 · 近 7 天',
-    en: 'Per-repository gate performance · last 7 days',
+    zh: '各仓库门禁通过率',
+    en: 'Per-repository gate performance',
+  },
+  'gate.windowSelect': {
+    zh: '切换统计窗口',
+    en: 'Change the measurement window',
   },
   'gate.col.repo': { zh: '仓库', en: 'Repository' },
   'gate.col.build': { zh: '构建', en: 'Build' },
