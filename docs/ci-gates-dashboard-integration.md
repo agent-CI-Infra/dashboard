@@ -1,7 +1,7 @@
 # ci-gates × 双看板联合方案 v1.1
 
 > 关联文档：`public-ci-repo-design-v3.md`（以下简称 **v3**，ci-gates 公仓设计方案）
-> 关联站点：公开汇总看板 <https://agent-ci-infra.github.io/dashboard/>；单仓看板模板（源自 SD board）
+> 关联站点：公开汇总看板 <https://agent-ci-infra.github.io/dashboard/>；单仓看板模板 <https://github.com/haowenz001/github-status-board>
 > 状态：**草案，待评审**（2026-10-22）
 > 范围：模板接入 → 门禁运行 → 用例填写 → 私有 board → 公开 dashboard 的端到端闭环
 
@@ -79,7 +79,7 @@ v3 解决了「门禁长什么样」和「门禁怎么自动生成」，但没�
 |---|---|---|
 | 规范与引擎 | `agent-dashboard-ai/ci-gates` | 五条 reusable workflow、生成器、报告 schema、用例契约校验器 |
 | 门禁模板 | `agent-dashboard-ai/ci-gates-template` | 一键创建起点：薄 workflow + 配置 + 用例骨架 + 填用例指南 |
-| 看板模板 | `agent-dashboard-ai/ci-gates-board-template`（由 SD board 泛化） | 单仓/单组织私有看板：采集、聚合、展示、发布 summary |
+| 看板模板 | `haowenz001/github-status-board`（由 SD board 泛化，公开模板） | 单仓看板：Setup dashboard 填源仓 + JSON，采集、聚合、展示、发布 Pages |
 | 消费方 | 用户自己的仓库 | 填用例、改业务代码；门禁由模板提供，不手改 |
 | 公开汇总 | `agent-CI-Infra/dashboard`（本仓） | 发现仓库、拉 summary、跨仓聚合、发布 Pages |
 
@@ -1105,7 +1105,7 @@ test/cases/case-catalog.yaml      # dashboard 自己的用例目录（当前全 
 - **报告 artifact**：每个 lane 写 `gate-reports/<lane>.json`，符合 `ci-gates/gate-report@1`，上传为 `ci-gates-reports`。
 - **用例校验**：`verify-cases` 校验 `ready` 用例必须有 `file` + `owner` + `@case` 标记；`todo` 不要求；未知标记直接失败。
 - **分支保护**：管理员把 `CI Gates / gate` 设为 required check；启用 merge queue 后 `merge_group` 自动跑 build + pr-merge。
-- **站内入口**：`/gate` 页头「接入门禁」→ `/#/gate-onboarding`；教程页包含复制、配置、用例、required check 四步，并链接模板 README 与 GitHub 接入申请 issue 模板。
+- **站内入口**：`/gate` 页头「接入门禁」→ `/#/gate-onboarding`；教程页包含复制、配置、用例、required check 四步，并链接模板 README、单仓看板模板与 GitHub 接入申请 issue 模板。
 
 本地验证：
 

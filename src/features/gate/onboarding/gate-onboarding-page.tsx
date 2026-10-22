@@ -17,6 +17,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 
 const GITHUB_REPO = 'https://github.com/agent-CI-Infra/dashboard'
 const TEMPLATE_GUIDE = `${GITHUB_REPO}/blob/main/templates/ci-gates/README.md`
+const BOARD_TEMPLATE = 'https://github.com/haowenz001/github-status-board'
 const ONBOARDING_ISSUE = `${GITHUB_REPO}/issues/new?template=gate-onboarding.yml`
 
 const COPY_BLOCK = `mkdir -p .github scripts test
@@ -165,13 +166,24 @@ export function GateOnboardingPage() {
           <p className='mt-2 max-w-3xl text-sm leading-relaxed text-gate-dim'>
             {t('gate.onboarding.boardNote')}
           </p>
-          <Link
-            to='/gate'
-            className='mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-gate-accent hover:underline'
-          >
-            {t('gate.onboarding.boardLink')}
-            <ArrowRight className='size-4' />
-          </Link>
+          <div className='mt-3 flex flex-wrap items-center gap-4'>
+            <a
+              href={BOARD_TEMPLATE}
+              target='_blank'
+              rel='noreferrer'
+              className='inline-flex items-center gap-1.5 text-sm font-medium text-gate-accent hover:underline'
+            >
+              {t('gate.onboarding.boardTemplate')}
+              <ExternalLink className='size-3.5 opacity-70' />
+            </a>
+            <Link
+              to='/gate'
+              className='inline-flex items-center gap-1.5 text-sm font-medium text-gate-accent hover:underline'
+            >
+              {t('gate.onboarding.boardLink')}
+              <ArrowRight className='size-4' />
+            </Link>
+          </div>
         </section>
 
         <div className='flex flex-wrap items-center gap-2'>

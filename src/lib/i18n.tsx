@@ -211,12 +211,16 @@ const DICT = {
     en: 'With merge queue enabled, merge_group runs build + pr-merge automatically.',
   },
   'gate.onboarding.board.title': {
-    zh: '门禁跑起来之后，看板还差一步',
-    en: 'One more step before the board shows it',
+    zh: '把仓库放进单仓看板',
+    en: 'Put the repository on its own board',
   },
   'gate.onboarding.boardNote': {
-    zh: '门禁跑起来不等于看板自动出现：还需要生成 board summary，并在 config/gate-sources.json 中启用数据源；这一步目前是运维动作。',
-    en: 'Gates running does not automatically put a repo on the board: it still needs a board summary and an enabled source in config/gate-sources.json; that step is currently operator-managed.',
+    zh: '复制单仓看板模板，在 Setup dashboard 里填源仓和一份 JSON；采集工作流每天刷新，Pages 自动发布。门禁报告会显示 lane 结论与用例数。',
+    en: 'Copy the per-repository board template, fill the source repository and one JSON in Setup dashboard; collection refreshes daily and Pages deploys automatically. Gate reports show lane verdicts and case counts.',
+  },
+  'gate.onboarding.boardTemplate': {
+    zh: '打开单仓看板模板',
+    en: 'Open the per-repository board template',
   },
   'gate.onboarding.boardLink': {
     zh: '查看当前门禁看板',
