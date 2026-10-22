@@ -1,5 +1,11 @@
 {
   "windowDays": 30,
+  "discovery": {
+    "orgs": [],
+    "topic": "ci-gates",
+    "marker": ".github/ci-gates.json5",
+    "maxRepos": 200
+  },
   "sources": [
     {
       "id": "sciencediscovery",
@@ -134,6 +140,17 @@
           ]
         }
       }
+    },
+    {
+      "id": "acme/web",
+      "name": "web",
+      "owner": "acme",
+      "type": "board-summary",
+      "defaultBranch": "main",
+      "summaryUrl": "https://acme.github.io/web/data/summary.json",
+      "enabled": false,
+      "comment": "Example federated source; set enabled=true after a real board publishes data/summary.json",
+      "boardUrl": "https://acme.github.io/web/"
     }
   ],
   "defaultWindowDays": 7

@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "level": "C1",
+  "preset": "auto",
+  "caseCatalog": "test/cases/case-catalog.yaml",
+  "caseRoot": "test",
+  "lanes": {
+    "build": {
+      "commands": ["npm run build"]
+    },
+    "pr-ready": {
+      "commands": [
+        "npm run lint",
+        "node \"$CI_GATES_CLI\" verify-cases"
+      ]
+    },
+    "pr-merge": {
+      "commands": ["npm run build"]
+    },
+    "daily": {
+      "commands": ["npm run test"]
+    },
+    "release": {
+      "commands": ["npm run build"]
+    }
+  }
+}

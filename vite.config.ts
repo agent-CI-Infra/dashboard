@@ -1,10 +1,10 @@
-/// <reference types="vitest/config" />
 import path from 'path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import { playwright } from '@vitest/browser-playwright'
+import { configDefaults } from 'vitest/config'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -28,6 +28,9 @@ export default defineConfig({
   test: {
     silent: 'passed-only',
     unstubEnvs: true,
+    // scripts/** contains Node's built-in test runner suites (collector
+    // adapters); Vitest's browser runner must not pick them up.
+    exclude: [...configDefaults.exclude, 'scripts/**', 'templates/**'],
     browser: {
       enabled: true,
       provider: playwright(),

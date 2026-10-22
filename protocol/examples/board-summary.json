@@ -1,0 +1,157 @@
+{
+  "schema": "ci-gates/board-summary@1",
+  "repo": "acme/web",
+  "owner": "acme",
+  "name": "web",
+  "defaultBranch": "main",
+  "generatedAt": "2026-10-22T09:00:00Z",
+  "windowDays": 30,
+  "level": "C1",
+  "preset": "node-web",
+  "gatesVersion": "v1.4.0",
+  "stage": "cases-pending",
+  "boardUrl": "https://acme.github.io/web/",
+  "coverage": 72.4,
+  "openWaivers": 0,
+  "observeUntil": "2026-11-03",
+  "caseSummary": {
+    "total": 20,
+    "ready": 8,
+    "todo": 12,
+    "skipped": 0,
+    "executed": 8,
+    "passed": 7,
+    "notRun": 1
+  },
+  "lanes": [
+    {
+      "id": "build",
+      "verdict": "pass",
+      "trust": "trusted",
+      "passRate": 87.5,
+      "runs": 8,
+      "avgDurationSec": 185,
+      "lastRunAt": "2026-10-22T08:10:00Z",
+      "lastRunUrl": "https://github.com/acme/web/actions/runs/18273645",
+      "lastRunId": 18273645,
+      "lastEvent": "merge_group",
+      "lastSha": "3f9c2a1b7d4e5f60718293a4b5c6d7e8f9012345",
+      "cases": {
+        "total": 20,
+        "ready": 8,
+        "todo": 12,
+        "skipped": 0,
+        "executed": 8,
+        "passed": 7,
+        "notRun": 1
+      },
+      "history": [
+        {
+          "date": "2026-10-21",
+          "pass": 3,
+          "fail": 1,
+          "ignored": 0,
+          "retries": 0,
+          "durations": [
+            180,
+            192,
+            176
+          ]
+        },
+        {
+          "date": "2026-10-22",
+          "pass": 4,
+          "fail": 0,
+          "ignored": 0,
+          "retries": 1,
+          "durations": [
+            182,
+            190
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pr-ready",
+      "verdict": "pass",
+      "trust": "trusted",
+      "passRate": 93.3,
+      "runs": 15,
+      "avgDurationSec": 42,
+      "lastRunAt": "2026-10-22T08:09:00Z",
+      "lastRunUrl": "https://github.com/acme/web/actions/runs/18273644",
+      "lastRunId": 18273644,
+      "lastEvent": "merge_group",
+      "history": [
+        {
+          "date": "2026-10-21",
+          "pass": 8,
+          "fail": 0,
+          "ignored": 0,
+          "retries": 0,
+          "durations": [
+            40,
+            43
+          ]
+        },
+        {
+          "date": "2026-10-22",
+          "pass": 6,
+          "fail": 1,
+          "ignored": 0,
+          "retries": 0,
+          "durations": [
+            41,
+            44
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pr-merge",
+      "verdict": "not_applicable",
+      "trust": "trusted",
+      "reason": "envVerify disabled"
+    },
+    {
+      "id": "daily",
+      "verdict": "pass",
+      "trust": "trusted",
+      "passRate": 100,
+      "runs": 2,
+      "avgDurationSec": 620,
+      "lastRunAt": "2026-10-22T02:17:00Z",
+      "lastRunUrl": "https://github.com/acme/web/actions/runs/18270000",
+      "lastRunId": 18270000,
+      "lastEvent": "schedule",
+      "history": [
+        {
+          "date": "2026-10-21",
+          "pass": 1,
+          "fail": 0,
+          "ignored": 0,
+          "retries": 0,
+          "durations": [
+            618
+          ]
+        },
+        {
+          "date": "2026-10-22",
+          "pass": 1,
+          "fail": 0,
+          "ignored": 0,
+          "retries": 0,
+          "durations": [
+            622
+          ]
+        }
+      ]
+    },
+    {
+      "id": "release",
+      "verdict": "not_applicable",
+      "trust": "trusted",
+      "reason": "no tag run in window"
+    }
+  ]
+}

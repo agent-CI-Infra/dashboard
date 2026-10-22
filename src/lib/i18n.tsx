@@ -113,6 +113,22 @@ const DICT = {
   'gate.branches': { zh: '分支', en: 'Branches' },
   'gate.demo': { zh: '演示', en: 'Demo' },
   'gate.casesPlanned': { zh: '计划', en: 'planned' },
+  'gate.level': { zh: '等级', en: 'Level' },
+  'gate.levelHint': { zh: '合规等级 C0–C4', en: 'Compliance level C0–C4' },
+  'gate.stage.discovered': { zh: '已发现', en: 'Discovered' },
+  'gate.stage.gatesRunning': { zh: '运行中', en: 'Running' },
+  'gate.stage.casesPending': { zh: '待填用例', en: 'Cases pending' },
+  'gate.stage.observing': { zh: '观察中', en: 'Observing' },
+  'gate.stage.enforced': { zh: '已生效', en: 'Enforced' },
+  'gate.stage.failing': { zh: '失败', en: 'Failing' },
+  'gate.cases.todo': { zh: '待填 {n}', en: '{n} to fill' },
+  'gate.cases.notRun': { zh: '未执行 {n}', en: '{n} not run' },
+  'gate.cases.ready': {
+    zh: '用例 {ready}/{total}',
+    en: 'Cases {ready}/{total}',
+  },
+  'gate.openBoard': { zh: '打开完整看板', en: 'Open full board' },
+  'gate.funnel.title': { zh: '接入漏斗', en: 'Onboarding funnel' },
   'gate.casesHint': {
     zh: '用例数：通过/计划（最近一次运行）',
     en: 'Cases passed/planned in the latest run',
@@ -133,6 +149,78 @@ const DICT = {
   'gate.summary': {
     zh: '{total} 个仓库 · {passed} 通过 · {failed} 失败 · {running} 运行中',
     en: '{total} repositories · {passed} passing · {failed} failing · {running} running',
+  },
+  'gate.onboarding.entry': { zh: '接入门禁', en: 'Add gates' },
+  'gate.onboarding.title': { zh: '接入门禁', en: 'Add gates to your repo' },
+  'gate.onboarding.subtitle': {
+    zh: '把 ci-gates 模板复制到你的仓库，四步跑通五条 lane。',
+    en: 'Copy the ci-gates template into your repository and run five lanes in four steps.',
+  },
+  'gate.onboarding.back': {
+    zh: '返回质量门禁',
+    en: 'Back to Quality Gates',
+  },
+  'gate.onboarding.hero.title': {
+    zh: '从模板到自动门禁',
+    en: 'From template to automatic gates',
+  },
+  'gate.onboarding.hero.desc': {
+    zh: '接入发生在用户自己的代码仓；dashboard 负责汇总和展示，不是配置表单。',
+    en: 'Onboarding happens in the user repository; the dashboard aggregates and displays, it is not a configuration form.',
+  },
+  'gate.onboarding.issueHint': {
+    zh: '不确定怎么配？提交接入申请，附上仓库和门禁命令。',
+    en: 'Not sure how to configure it? Open an onboarding request with your repo and gate commands.',
+  },
+  'gate.onboarding.tutorial': {
+    zh: '打开模板教程',
+    en: 'Open template guide',
+  },
+  'gate.onboarding.request': {
+    zh: '提交接入申请',
+    en: 'Request onboarding',
+  },
+  'gate.onboarding.step1.title': { zh: '复制模板', en: 'Copy the template' },
+  'gate.onboarding.step1.body': {
+    zh: '在仓库根目录执行；如果已有 .github 或 scripts，合并而不是覆盖。',
+    en: 'Run from the repository root; merge instead of overwriting existing .github or scripts.',
+  },
+  'gate.onboarding.step2.title': {
+    zh: '配置 lane 命令',
+    en: 'Configure lane commands',
+  },
+  'gate.onboarding.step2.body': {
+    zh: '编辑 .github/ci-gates.json，把 build / lint / test 换成项目真实命令。',
+    en: 'Edit .github/ci-gates.json and replace build / lint / test with your real commands.',
+  },
+  'gate.onboarding.step3.title': { zh: '登记用例', en: 'Register cases' },
+  'gate.onboarding.step3.body': {
+    zh: '在 test/cases/case-catalog.yaml 中加用例；ready 用例需要 file、owner 和 @case 标记。',
+    en: 'Add cases to test/cases/case-catalog.yaml; ready cases need file, owner and an @case marker.',
+  },
+  'gate.onboarding.step4.title': {
+    zh: '设置 required check',
+    en: 'Require the check',
+  },
+  'gate.onboarding.step4.body': {
+    zh: '管理员在 Rulesets / Branch protection 中把 CI Gates / gate 设为必需检查。',
+    en: 'An admin makes CI Gates / gate a required check in Rulesets / Branch protection.',
+  },
+  'gate.onboarding.step4.mergeQueue': {
+    zh: '启用 merge queue 后，merge_group 会自动跑 build + pr-merge。',
+    en: 'With merge queue enabled, merge_group runs build + pr-merge automatically.',
+  },
+  'gate.onboarding.board.title': {
+    zh: '门禁跑起来之后，看板还差一步',
+    en: 'One more step before the board shows it',
+  },
+  'gate.onboarding.boardNote': {
+    zh: '门禁跑起来不等于看板自动出现：还需要生成 board summary，并在 config/gate-sources.json 中启用数据源；这一步目前是运维动作。',
+    en: 'Gates running does not automatically put a repo on the board: it still needs a board summary and an enabled source in config/gate-sources.json; that step is currently operator-managed.',
+  },
+  'gate.onboarding.boardLink': {
+    zh: '查看当前门禁看板',
+    en: 'View the current gate board',
   },
   'gate.empty': {
     zh: '没有匹配的仓库',
@@ -191,7 +279,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t])
   return (
-    <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
+    <LanguageContext.Provider value={value}>
+      {children}
+    </LanguageContext.Provider>
   )
 }
 

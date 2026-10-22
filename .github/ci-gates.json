@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "level": "C1",
+  "preset": "node-web",
+  "caseCatalog": "test/cases/case-catalog.yaml",
+  "caseRoot": [
+    "test",
+    "scripts",
+    "src"
+  ],
+  "lanes": {
+    "build": {
+      "commands": [
+        "npm run build"
+      ]
+    },
+    "pr-ready": {
+      "commands": [
+        "npm run lint",
+        "npm run test:collector",
+        "node \"$CI_GATES_CLI\" verify-cases"
+      ]
+    },
+    "pr-merge": {
+      "commands": [
+        "npm run build"
+      ]
+    },
+    "daily": {
+      "enforcement": "observe",
+      "continueOnError": true,
+      "commands": [
+        "npm test",
+        "npm run build"
+      ]
+    },
+    "release": {
+      "commands": [
+        "npm run build"
+      ]
+    }
+  }
+}

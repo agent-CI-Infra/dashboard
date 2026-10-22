@@ -1,5 +1,6 @@
 import {
   Activity,
+  BookOpen,
   CircleDot,
   GitPullRequest,
   Globe,
@@ -56,6 +57,13 @@ export const sidebarData: SidebarData = {
           title: '质量门禁',
           url: '/gate',
           icon: ShieldCheck,
+          items: [
+            {
+              title: '接入门禁',
+              url: '/gate-onboarding',
+              icon: BookOpen,
+            },
+          ],
         },
         {
           title: '关于本站',

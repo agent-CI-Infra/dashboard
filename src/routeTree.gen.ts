@@ -25,6 +25,7 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
 import { Route as AuthenticatedEcosystemRouteImport } from './routes/_authenticated/ecosystem'
 import { Route as AuthenticatedGateRouteImport } from './routes/_authenticated/gate'
+import { Route as AuthenticatedGateOnboardingRouteImport } from './routes/_authenticated/gate-onboarding'
 import { Route as AuthenticatedGrowthRouteImport } from './routes/_authenticated/growth'
 import { Route as AuthenticatedIssuesRouteImport } from './routes/_authenticated/issues'
 import { Route as AuthenticatedPullsRouteImport } from './routes/_authenticated/pulls'
@@ -121,6 +122,12 @@ const AuthenticatedGateRoute = AuthenticatedGateRouteImport.update({
   path: '/gate',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGateOnboardingRoute =
+  AuthenticatedGateOnboardingRouteImport.update({
+    id: '/gate-onboarding',
+    path: '/gate-onboarding',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedGrowthRoute = AuthenticatedGrowthRouteImport.update({
   id: '/growth',
   path: '/growth',
@@ -222,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AuthenticatedAboutRoute
   '/ecosystem': typeof AuthenticatedEcosystemRoute
   '/gate': typeof AuthenticatedGateRoute
+  '/gate-onboarding': typeof AuthenticatedGateOnboardingRoute
   '/growth': typeof AuthenticatedGrowthRoute
   '/issues': typeof AuthenticatedIssuesRoute
   '/pulls': typeof AuthenticatedPullsRoute
@@ -251,6 +259,7 @@ export interface FileRoutesByTo {
   '/about': typeof AuthenticatedAboutRoute
   '/ecosystem': typeof AuthenticatedEcosystemRoute
   '/gate': typeof AuthenticatedGateRoute
+  '/gate-onboarding': typeof AuthenticatedGateOnboardingRoute
   '/growth': typeof AuthenticatedGrowthRoute
   '/issues': typeof AuthenticatedIssuesRoute
   '/pulls': typeof AuthenticatedPullsRoute
@@ -286,6 +295,7 @@ export interface FileRoutesById {
   '/_authenticated/about': typeof AuthenticatedAboutRoute
   '/_authenticated/ecosystem': typeof AuthenticatedEcosystemRoute
   '/_authenticated/gate': typeof AuthenticatedGateRoute
+  '/_authenticated/gate-onboarding': typeof AuthenticatedGateOnboardingRoute
   '/_authenticated/growth': typeof AuthenticatedGrowthRoute
   '/_authenticated/issues': typeof AuthenticatedIssuesRoute
   '/_authenticated/pulls': typeof AuthenticatedPullsRoute
@@ -320,6 +330,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/ecosystem'
     | '/gate'
+    | '/gate-onboarding'
     | '/growth'
     | '/issues'
     | '/pulls'
@@ -349,6 +360,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/ecosystem'
     | '/gate'
+    | '/gate-onboarding'
     | '/growth'
     | '/issues'
     | '/pulls'
@@ -383,6 +395,7 @@ export interface FileRouteTypes {
     | '/_authenticated/about'
     | '/_authenticated/ecosystem'
     | '/_authenticated/gate'
+    | '/_authenticated/gate-onboarding'
     | '/_authenticated/growth'
     | '/_authenticated/issues'
     | '/_authenticated/pulls'
@@ -528,6 +541,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGateRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/gate-onboarding': {
+      id: '/_authenticated/gate-onboarding'
+      path: '/gate-onboarding'
+      fullPath: '/gate-onboarding'
+      preLoaderRoute: typeof AuthenticatedGateOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/growth': {
       id: '/_authenticated/growth'
       path: '/growth'
@@ -664,6 +684,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAboutRoute: typeof AuthenticatedAboutRoute
   AuthenticatedEcosystemRoute: typeof AuthenticatedEcosystemRoute
   AuthenticatedGateRoute: typeof AuthenticatedGateRoute
+  AuthenticatedGateOnboardingRoute: typeof AuthenticatedGateOnboardingRoute
   AuthenticatedGrowthRoute: typeof AuthenticatedGrowthRoute
   AuthenticatedIssuesRoute: typeof AuthenticatedIssuesRoute
   AuthenticatedPullsRoute: typeof AuthenticatedPullsRoute
@@ -680,6 +701,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAboutRoute: AuthenticatedAboutRoute,
   AuthenticatedEcosystemRoute: AuthenticatedEcosystemRoute,
   AuthenticatedGateRoute: AuthenticatedGateRoute,
+  AuthenticatedGateOnboardingRoute: AuthenticatedGateOnboardingRoute,
   AuthenticatedGrowthRoute: AuthenticatedGrowthRoute,
   AuthenticatedIssuesRoute: AuthenticatedIssuesRoute,
   AuthenticatedPullsRoute: AuthenticatedPullsRoute,

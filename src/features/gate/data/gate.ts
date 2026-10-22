@@ -9,6 +9,49 @@ export type GateRunStatus = 'passed' | 'failed' | 'running'
 /** Per-category health derived from pass rate thresholds. */
 export type GateHealth = 'pass' | 'warn' | 'fail'
 
+/** ci-gates compliance level. */
+export type GateLevel = 'C0' | 'C1' | 'C2' | 'C3' | 'C4'
+
+/** Onboarding stage derived from the latest trusted reports. */
+export type GateStage =
+  | 'discovered'
+  | 'gates-running'
+  | 'cases-pending'
+  | 'observing'
+  | 'enforced'
+  | 'failing'
+
+/** Whether a report comes from a trusted lane event or a PR (provisional). */
+export type GateTrust = 'trusted' | 'provisional' | 'unknown'
+
+/**
+ * Case catalog + execution counters (ci-gates `case-catalog@1`).
+ * `todo` / `notRun` are onboarding signals, never "pass".
+ */
+export interface GateCaseSummary {
+  total: number
+  ready: number
+  todo: number
+  skipped: number
+  executed: number
+  passed: number
+  notRun: number
+}
+
+/** Latest lane verdict / run metadata (from a board summary). */
+export interface GateLatest {
+  verdict: string
+  trust?: GateTrust
+  event?: string
+  runId?: number
+  runAt?: string
+  runUrl?: string
+  sha?: string
+  observe?: unknown[]
+  waivers?: unknown[]
+  results?: unknown[]
+}
+
 /** One test layer inside the latest run of a gate category. */
 export interface GateCaseLayer {
   name: string
@@ -29,10 +72,17 @@ export interface GateCaseCounts {
   runUrl?: string
   runAt?: string
   layers: GateCaseLayer[]
+  /** Catalog/onboarding counters when the source is ci-gates. */
+  todo?: number
+  notRun?: number
+  ready?: number
+  total?: number
 }
 
 export interface RepoCategoryStat {
   category: GateCategory
+  /** Latest lane verdict / run metadata when a board summary is available. */
+  latest?: GateLatest
   /**
    * Pass rate over the selected window (success / decided runs);
    * null when every run in the window is undecided (skipped/cancelled).
@@ -58,6 +108,8 @@ export interface RepoBranchStat {
   coverage: number | null
   /** Deep link to the coverage view of the source dashboard. */
   coverageLink?: string
+  /** Repository-level case counters for this branch. */
+  caseSummary?: GateCaseSummary
   stats: RepoCategoryStat[]
 }
 
@@ -72,6 +124,14 @@ export interface GateRepo {
   url?: string
   /** True for repositories whose numbers are still design placeholders. */
   demo?: boolean
+  /** ci-gates compliance level (C0–C4). */
+  level?: GateLevel
+  /** Onboarding stage derived from the latest trusted reports. */
+  stage?: GateStage
+  /** Per-repository board (deep view), when the repo publishes one. */
+  boardUrl?: string
+  /** Repository-level case counters (merged across lanes). */
+  caseSummary?: GateCaseSummary
 }
 
 export interface GateCategoryMeta {
@@ -81,6 +141,26 @@ export interface GateCategoryMeta {
   warnBelow: number
   failBelow: number
 }
+
+export const GATE_LEVELS: GateLevel[] = ['C0', 'C1', 'C2', 'C3', 'C4']
+
+export function isGateLevel(value: unknown): value is GateLevel {
+  return GATE_LEVELS.includes(value as GateLevel)
+}
+
+export function isGateStage(value: unknown): value is GateStage {
+  return GATE_STAGES.includes(value as GateStage)
+}
+
+/** Funnel order: onboarding first, failure last. */
+export const GATE_STAGES: GateStage[] = [
+  'discovered',
+  'gates-running',
+  'cases-pending',
+  'observing',
+  'enforced',
+  'failing',
+]
 
 export const GATE_CATEGORIES: GateCategoryMeta[] = [
   {
@@ -163,17 +243,17 @@ export const GATE_REPOS: GateRepo[] = [
     url: 'https://sciencediscovery.github.io/github-status-board/#overview',
     branchData: [
       branch('main', 'failed', 71.2, [
-          stat('ready', 93.8, 1300, 298),
+        stat('ready', 93.8, 1300, 298),
         stat('daily', 85.1, 10260, 32, true),
         stat('release', 100, 18720, 4),
       ]),
       branch('release/v1.4', 'passed', 78.6, [
-          stat('ready', 96.1, 1265, 96),
+        stat('ready', 96.1, 1265, 96),
         stat('daily', 88.9, 9980, 12),
         stat('release', 96.7, 17600, 2),
       ]),
       branch('feat/mcp-tools', 'running', 69.8, [
-          stat('ready', 84.5, 1420, 41),
+        stat('ready', 84.5, 1420, 41),
       ]),
     ],
   },
@@ -184,17 +264,17 @@ export const GATE_REPOS: GateRepo[] = [
     defaultBranch: 'main',
     branchData: [
       branch('main', 'passed', 82.4, [
-          stat('ready', 96.5, 1220, 305),
+        stat('ready', 96.5, 1220, 305),
         stat('merge', 91.2, 1490, 171),
         stat('daily', 88.4, 9800, 33),
         stat('release', 100, 17600, 5),
       ]),
       branch('develop', 'passed', 80.9, [
-          stat('ready', 94.8, 1240, 168),
+        stat('ready', 94.8, 1240, 168),
         stat('daily', 86.2, 10150, 18),
       ]),
       branch('feat/data-pipeline', 'failed', 72.3, [
-          stat('ready', 82.7, 1390, 33),
+        stat('ready', 82.7, 1390, 33),
       ]),
     ],
   },

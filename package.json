@@ -18,7 +18,9 @@
     "test:browser": "vitest",
     "test:coverage": "vitest run --coverage --browser.headless",
     "test:browser:install": "playwright install chromium --with-deps",
-    "collect:gate": "node scripts/collect-gate.mjs"
+    "collect:gate": "node scripts/collect-gate.mjs",
+    "test:collector": "node --test scripts/lib/ci-gates.test.mjs",
+    "test:gate": "node --test templates/ci-gates/scripts/gate/gate.test.mjs"
   },
   "dependencies": {
     "@clerk/react": "^6.4.3",

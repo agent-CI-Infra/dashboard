@@ -4,9 +4,11 @@ import {
   ArrowUp,
   Check,
   ChevronDown,
+  ExternalLink,
   GitBranch,
   SearchX,
 } from 'lucide-react'
+import { useLang, type I18nKey } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 import {
   DropdownMenu,
@@ -15,17 +17,24 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  STAGE_LABEL,
+  STAGE_TONE,
+  type StageTone,
+} from '@/features/gate/components/gate-stage-meta'
 import { TONE_BG, TONE_TEXT } from '@/features/gate/components/gate-styles'
 import {
   COVERAGE_THRESHOLD,
   GATE_CATEGORIES,
   countReposByStatus,
+  type GateCaseSummary,
+  type GateLevel,
   type GateRepo,
+  type GateStage,
   type RepoBranchStat,
   type RepoCategoryStat,
 } from '@/features/gate/data/gate'
 import { formatPercent } from '@/features/gate/lib/format'
-import { useLang, type I18nKey } from '@/lib/i18n'
 
 /**
  * Flat gate overview table (spec v1.9): repository (with branch picker) ·
@@ -34,13 +43,7 @@ import { useLang, type I18nKey } from '@/lib/i18n'
  * asc for repository names); branches without a category always sink.
  */
 type SortKey =
-  | 'repo'
-  | 'build'
-  | 'ready'
-  | 'merge'
-  | 'daily'
-  | 'release'
-  | 'coverage'
+  'repo' | 'build' | 'ready' | 'merge' | 'daily' | 'release' | 'coverage'
 type SortDir = 'asc' | 'desc'
 
 const ROW_COLS =
@@ -73,10 +76,15 @@ function sortValue(
 }
 
 /** Per-layer tooltip for a gate cell (SD-board format). */
-function casesTooltip(stat: RepoCategoryStat, plannedLabel: string): string | null {
+function casesTooltip(
+  stat: RepoCategoryStat,
+  plannedLabel: string
+): string | null {
   const cases = stat.cases
   if (!cases) return null
-  const parts = cases.layers.map((layer) =>
+  const layers = cases.layers ?? []
+  if (layers.length === 0) return null
+  const parts = layers.map((layer) =>
     layer.planOnly
       ? `${layer.name} ${plannedLabel} ${layer.planned}`
       : `${layer.name} ${layer.passed}/${layer.planned}`
@@ -90,6 +98,76 @@ function EmptyCell() {
   return (
     <span className='flex h-7 w-full items-center justify-center text-[13px] text-gate-faint'>
       –
+    </span>
+  )
+}
+
+const TONE_CHIP: Record<StageTone, string> = {
+  pass: cn(TONE_BG.pass, TONE_TEXT.pass),
+  warn: cn(TONE_BG.warn, TONE_TEXT.warn),
+  fail: cn(TONE_BG.fail, TONE_TEXT.fail),
+  neutral: 'bg-gate-track text-gate-dim',
+}
+
+/** Compliance level badge (C0–C4) next to the owner. */
+function LevelBadge({ level }: { level: GateLevel }) {
+  const { t } = useLang()
+  return (
+    <span
+      title={t('gate.levelHint')}
+      className='inline-flex h-4 shrink-0 items-center rounded border border-gate-line bg-gate-track px-1 font-mono text-[10px] leading-none text-gate-dim'
+    >
+      {level}
+    </span>
+  )
+}
+
+/**
+ * Onboarding stage chip. Pending cases and unexecuted cases take precedence
+ * over the generic stage label so "not green" is always explicit.
+ */
+function StageChip({
+  stage,
+  cases,
+}: {
+  stage?: GateStage
+  cases?: GateCaseSummary
+}) {
+  const { t } = useLang()
+  if (!stage) return null
+
+  const notRun = cases?.notRun ?? 0
+  const todo = cases?.todo ?? 0
+  let label = t(STAGE_LABEL[stage])
+  let tone = STAGE_TONE[stage]
+
+  if (notRun > 0) {
+    label = t('gate.cases.notRun', { n: notRun })
+    tone = 'fail'
+  } else if (stage === 'cases-pending' && todo > 0) {
+    label = t('gate.cases.todo', { n: todo })
+    tone = 'warn'
+  } else if (stage === 'enforced' && cases && cases.ready > 0) {
+    label = t('gate.cases.ready', { ready: cases.ready, total: cases.total })
+  }
+
+  const details = [
+    t(STAGE_LABEL[stage]),
+    todo > 0 ? t('gate.cases.todo', { n: todo }) : null,
+    notRun > 0 ? t('gate.cases.notRun', { n: notRun }) : null,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+
+  return (
+    <span
+      title={details}
+      className={cn(
+        'inline-flex h-4 shrink-0 items-center rounded px-1 text-[10px] leading-none font-medium',
+        TONE_CHIP[tone]
+      )}
+    >
+      {label}
     </span>
   )
 }
@@ -132,9 +210,12 @@ function RateCell({ stat }: { stat?: RepoCategoryStat }) {
 
   if (!cases) return pill
   return (
-    <div className='relative flex h-full w-full items-center' title={tooltip ?? undefined}>
+    <div
+      className='relative flex h-full w-full items-center'
+      title={tooltip ?? undefined}
+    >
       {pill}
-      <span className='pointer-events-none absolute right-0 bottom-0.5 font-mono text-[10px] leading-none tabular-nums text-gate-faint'>
+      <span className='pointer-events-none absolute right-0 bottom-0.5 font-mono text-[10px] leading-none text-gate-faint tabular-nums'>
         {cases.totalPlanned}
       </span>
     </div>
@@ -395,8 +476,24 @@ export function RepoGateTable({ repos }: { repos: GateRepo[] }) {
                 }
               />
             </div>
-            <div className='truncate text-xs leading-4 text-gate-dim'>
-              {repo.owner}
+            <div className='flex min-w-0 items-center gap-1.5 text-xs leading-4 text-gate-dim'>
+              <span className='truncate'>{repo.owner}</span>
+              {repo.level ? <LevelBadge level={repo.level} /> : null}
+              <StageChip
+                stage={repo.stage}
+                cases={branch.caseSummary ?? repo.caseSummary}
+              />
+              {repo.boardUrl ? (
+                <a
+                  href={repo.boardUrl}
+                  target='_blank'
+                  rel='noreferrer'
+                  title={t('gate.openBoard')}
+                  className='inline-flex shrink-0 items-center text-gate-faint hover:text-gate-accent'
+                >
+                  <ExternalLink className='size-3' />
+                </a>
+              ) : null}
             </div>
           </div>
 

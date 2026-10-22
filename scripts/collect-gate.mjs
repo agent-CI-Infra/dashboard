@@ -4,7 +4,9 @@
  * board snapshot and derives per-branch / per-category gate aggregates.
  *
  * Input : config/gate-sources.json (source list + category mapping rules)
- *         <source.url>            public status-board snapshot JSON
+ *         type=board-summary       <source.summaryUrl> public board summary
+ *         type=ci-gates            GitHub Actions artifacts (future)
+ *         type=status-board-lanes  <source.url> public status-board snapshot
  * Output: public/data/gate/index.json                dataset list
  *         public/data/gate/<owner>/<name>.json       per-repository aggregates
  *
@@ -32,6 +34,13 @@ import {
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
+
+import {
+  buildDatasetFromSummary,
+  defaultSummaryUrl,
+  summaryIndexEntry,
+  validateSummary,
+} from './lib/ci-gates.mjs'
 
 const CONFIG_FILE = path.join(process.cwd(), 'config', 'gate-sources.json')
 const OUT_DIR = path.join(process.cwd(), 'public', 'data', 'gate')
@@ -68,6 +77,21 @@ const SNAPSHOT_FILE = process.env.GATE_SNAPSHOT_FILE ?? ''
 async function loadSnapshot(url) {
   if (SNAPSHOT_FILE && existsSync(SNAPSHOT_FILE)) {
     return JSON.parse(readFileSync(SNAPSHOT_FILE, 'utf8'))
+  }
+  return fetchJson(url)
+}
+
+/**
+ * Board summaries are small, public and whitelisted. `GATE_SUMMARY_FILE` lets
+ * tests and local previews use a fixture without network access.
+ */
+async function loadSummary(source) {
+  if (process.env.GATE_SUMMARY_FILE && existsSync(process.env.GATE_SUMMARY_FILE)) {
+    return JSON.parse(readFileSync(process.env.GATE_SUMMARY_FILE, 'utf8'))
+  }
+  const url = source.summaryUrl ?? defaultSummaryUrl(source.owner, source.name)
+  if (!url) {
+    throw new Error('board-summary source needs summaryUrl or owner/name')
   }
   return fetchJson(url)
 }
@@ -709,9 +733,36 @@ const now = new Date()
 
 const indexEntries = []
 for (const source of config.sources ?? []) {
+  // `enabled: false` keeps example / not-yet-live sources in the config
+  // without producing empty datasets or failing the collection run.
+  if (source.enabled === false) continue
   const file = `${source.owner}/${source.name}.json`
   const outPath = path.join(OUT_DIR, file)
   try {
+    if (source.type === 'board-summary') {
+      // Preferred federated path: the per-repository board already aggregated
+      // this repository and published a whitelisted summary.
+      const summary = await loadSummary(source)
+      validateSummary(summary, source)
+      const data = buildDatasetFromSummary(source, summary, { now, windowDays })
+      writeJson(outPath, data)
+      indexEntries.push(summaryIndexEntry(source, data))
+      const lanes = data.branchData[0]?.stats.map((stat) => stat.category) ?? []
+      console.log(
+        `[gate] ${source.owner}/${source.name}: board-summary level=${data.level ?? '?'} stage=${data.stage} lanes=${lanes.join(',') || '–'}`
+      )
+      continue
+    }
+
+    if (source.type === 'ci-gates') {
+      // Direct artifact mode is intentionally deferred: the same-repository
+      // board is the primary path, and a loud failure is better than silently
+      // falling through to the snapshot adapter.
+      throw new Error(
+        'ci-gates artifact adapter is not implemented yet; use board-summary or status-board-lanes'
+      )
+    }
+
     if (source.type === 'status-board-lanes') {
       // Numbers come from the board's own lane data, so the dashboard shows
       // exactly what the SD board shows.
@@ -839,12 +890,23 @@ for (const source of config.sources ?? []) {
       console.warn(
         `[gate] ${source.owner}/${source.name} failed (${message}); keeping the previously published dataset`
       )
+      let previous = null
+      try {
+        previous = readJson(outPath)
+      } catch {
+        // The published file is corrupt; keep it on disk but do not trust it
+        // for index metadata.
+      }
       indexEntries.push({
-        id: source.id,
+        id: source.id ?? `${source.owner}/${source.name}`,
         name: source.name,
         owner: source.owner,
         file,
-        sourceUrl: source.url,
+        sourceUrl: source.url ?? source.summaryUrl,
+        ...(source.type ? { sourceType: source.type } : {}),
+        ...(previous?.level ? { level: previous.level } : {}),
+        ...(previous?.stage ? { stage: previous.stage } : {}),
+        ...(previous?.boardUrl ? { boardUrl: previous.boardUrl } : {}),
         windowDays,
         stale: true,
       })

@@ -1,3 +1,4 @@
+import { useLang, type I18nKey } from '@/lib/i18n'
 import { useLayout } from '@/context/layout-provider'
 import {
   Sidebar,
@@ -5,7 +6,6 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar'
-import { useLang, type I18nKey } from '@/lib/i18n'
 import { sidebarData } from './data/sidebar-data'
 import { NavGroup } from './nav-group'
 import { TeamSwitcher } from './team-switcher'
@@ -19,6 +19,7 @@ const NAV_LABEL: Record<string, I18nKey> = {
   '/ecosystem': 'nav.community.ecosystem',
   '/about': 'nav.about',
   '/gate': 'nav.qualityGates',
+  '/gate-onboarding': 'gate.onboarding.entry',
 }
 
 /** Fallback for group titles when no route-specific label applies. */

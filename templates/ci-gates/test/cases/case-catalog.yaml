@@ -1,0 +1,20 @@
+schema: ci-gates/case-catalog@1
+version: 1
+updatedAt: '2026-10-22T00:00:00Z'
+cases:
+  - id: build.example
+    lane: build
+    layer: L0
+    title: 示例：构建通过
+    status: ready
+    file: test/cases/example.test.ts
+    owner: '@your-team'
+    source: generated
+
+  - id: pr-ready.lint
+    lane: pr-ready
+    layer: L0
+    title: 示例：lint 通过
+    status: todo
+    file: test/cases/lint.test.ts
+    source: generated

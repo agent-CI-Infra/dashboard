@@ -1,0 +1,27 @@
+schema: ci-gates/case-catalog@1
+version: 1
+updatedAt: '2026-10-22T00:00:00Z'
+cases:
+  - id: gate.collector.contract
+    lane: build
+    layer: L1
+    title: 采集器契约测试通过
+    status: todo
+    file: scripts/lib/ci-gates.test.mjs
+    source: generated
+
+  - id: gate.dashboard.ui
+    lane: pr-ready
+    layer: L2
+    title: 门禁页 UI 冒烟
+    status: todo
+    file: src/features/gate/overview/repo-gate-table.tsx
+    source: generated
+
+  - id: gate.daily.full-suite
+    lane: daily
+    layer: L3
+    title: 每日全量测试
+    status: todo
+    file: src/features/tasks/components/tasks-mutate-drawer.test.tsx
+    source: generated

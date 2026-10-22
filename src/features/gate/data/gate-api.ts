@@ -1,9 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import {
+  isGateLevel,
+  isGateStage,
   passRateHealth,
-  type GateCategory,
   type GateCaseCounts,
+  type GateCaseSummary,
+  type GateCategory,
   type GateHealth,
+  type GateLatest,
   type GateRepo,
   type GateRunStatus,
   type RepoCategoryStat,
@@ -26,7 +30,15 @@ async function fetchJson<T>(file: string): Promise<T> {
 type GateIndex = {
   generatedAt: string
   windowDays: number
-  sources: { id: string; owner: string; name: string; file: string }[]
+  sources: {
+    id: string
+    owner: string
+    name: string
+    file: string
+    level?: string
+    stage?: string
+    boardUrl?: string
+  }[]
 }
 
 /** One UTC day of runs for a category (what the collector publishes). */
@@ -44,6 +56,7 @@ type RawStat = {
   daily: DayBucket[]
   link?: string | null
   cases?: GateCaseCounts | null
+  latest?: GateLatest | null
 }
 
 type RawBranch = {
@@ -51,6 +64,7 @@ type RawBranch = {
   gateStatus: GateRunStatus
   coverage: number | null
   coverageLink?: string | null
+  caseSummary?: GateCaseSummary | null
   stats: RawStat[]
   recentRuns?: unknown[]
 }
@@ -63,7 +77,12 @@ type RawRepo = {
   url?: string | null
   generatedAt?: string
   sourceUrl?: string
+  sourceType?: string
   windowDays?: number
+  level?: string | null
+  stage?: string | null
+  boardUrl?: string | null
+  caseSummary?: GateCaseSummary | null
   branchData: RawBranch[]
 }
 
@@ -82,6 +101,15 @@ function windowCutoff(windowDays: number): string {
   return cutoff.toISOString().slice(0, 10)
 }
 
+/** Latest verdict overrides the pass-rate tier for non-green states. */
+function latestHealth(verdict: string | undefined): GateHealth | null {
+  if (verdict === 'fail' || verdict === 'error' || verdict === 'not_run') {
+    return 'fail'
+  }
+  if (verdict === 'waived' || verdict === 'observe_fail') return 'warn'
+  return null
+}
+
 /** Aggregate the published daily buckets over the selected window. */
 function toStat(stat: RawStat, cutoff: string): RepoCategoryStat {
   const days = stat.daily.filter((day) => day.date >= cutoff)
@@ -98,7 +126,8 @@ function toStat(stat: RawStat, cutoff: string): RepoCategoryStat {
   const decided = pass + fail
   const passRate = decided > 0 ? Math.round((pass / decided) * 1000) / 10 : null
   const health: GateHealth =
-    passRate == null ? 'warn' : passRateHealth(stat.category, passRate)
+    latestHealth(stat.latest?.verdict) ??
+    (passRate == null ? 'warn' : passRateHealth(stat.category, passRate))
   return {
     category: stat.category,
     passRate,
@@ -107,6 +136,7 @@ function toStat(stat: RawStat, cutoff: string): RepoCategoryStat {
     health,
     link: stat.link ?? undefined,
     cases: stat.cases ?? undefined,
+    latest: stat.latest ?? undefined,
   }
 }
 
@@ -122,11 +152,16 @@ export function deriveGateRepos(
     owner: raw.owner,
     defaultBranch: raw.defaultBranch,
     url: raw.url ?? undefined,
+    level: isGateLevel(raw.level) ? raw.level : undefined,
+    stage: isGateStage(raw.stage) ? raw.stage : undefined,
+    boardUrl: raw.boardUrl ?? undefined,
+    caseSummary: raw.caseSummary ?? undefined,
     branchData: raw.branchData.map((branch) => ({
       name: branch.name,
       gateStatus: branch.gateStatus,
       coverage: branch.coverage ?? null,
       coverageLink: branch.coverageLink ?? undefined,
+      caseSummary: branch.caseSummary ?? raw.caseSummary ?? undefined,
       stats: branch.stats.map((stat) => toStat(stat, cutoff)),
     })),
   }))

@@ -2,7 +2,7 @@
 
 开源社区运营与健康度监控平台，动态展示社区规模、活跃度、健康度与影响力。
 
-**在线访问：** https://nanzhaogang.github.io/community-ecosystem/
+**在线访问：** https://agent-ci-infra.github.io/dashboard/
 
 当前监控仓库（共 15 个）：
 
@@ -17,6 +17,7 @@
 | `/pulls` | PR 分析 | PR 累计数量曲线（近 7 天 / 30 天 / 全部）与明细表 |
 | `/issues` | Issue 分析 | Issue 累计数量曲线（近 7 天 / 30 天 / 全部）与明细表（已排除 PR） |
 | `/growth` | 社区成长 | 每社区一行：左侧贡献者增长曲线（全部 / 外部），右侧 Star History |
+| `/gate` | 质量门禁 | 五条 lane 的通过率与覆盖率、分支切换、C0–C4 等级、接入阶段与用例缺口 |
 | `/ecosystem` | 生态影响力 | 暂未开放 |
 
 ## 本地运行
@@ -29,6 +30,31 @@ npm run build      # 生产构建
 
 > 需要 Node.js 20.19+（或 22.12+）。
 > Windows 上若启动报 `Cannot find native binding`，执行 `npm install @rolldown/binding-win32-x64-msvc@1.2.13 --no-save`。
+
+## 自动门禁（MVP）
+
+仓库内置了一套最小可用的门禁模板，用户复制 `templates/ci-gates/` 后即可在 PR / merge queue / push / schedule / release 上自动跑 lane，并产出 `gate-report` artifact：
+
+- 模板与接入说明：[`templates/ci-gates/README.md`](templates/ci-gates/README.md)
+- dashboard 自举工作流：[`.github/workflows/gate.yml`](.github/workflows/gate.yml)
+- lane 配置：[`.github/ci-gates.json`](.github/ci-gates.json)
+- 用例目录：[`test/cases/case-catalog.yaml`](test/cases/case-catalog.yaml)
+
+接入入口：
+
+- 站内：`/gate` 页头「接入门禁」→ `/#/gate-onboarding`
+- 直接访问：https://agent-ci-infra.github.io/dashboard/#/gate-onboarding
+- 接入申请：GitHub issue 模板 `gate-onboarding.yml`
+
+本地运行：
+
+```bash
+npm run test:gate
+node templates/ci-gates/scripts/gate/gate.mjs run --lane build --config .github/ci-gates.json
+node templates/ci-gates/scripts/gate/gate.mjs verify-cases --config .github/ci-gates.json
+```
+
+当前 MVP 只负责“自动触发 + 自动裁决 + 报告 artifact”；`CI Gates / gate` 设为 required check、开启 merge queue 需要管理员在 GitHub 设置里手动完成。dashboard 自举的 `daily` 以 observe 模式跑全量 Vitest，现有 4 个与门禁无关的 UI 测试只记 `observe_fail`，不阻断。
 
 ## 数据采集
 
