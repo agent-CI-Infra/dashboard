@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
+import { LanguageSwitch } from '@/components/language-switch'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ForbiddenError } from '@/features/errors/forbidden'
 import { GeneralError } from '@/features/errors/general-error'
@@ -28,6 +29,7 @@ function RouteComponent() {
     <>
       <Header fixed className='border-b'>
         <div className='me-auto' />
+        <LanguageSwitch />
         <ThemeSwitch />
       </Header>
       <div className='flex-1 [&>div]:h-full'>

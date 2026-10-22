@@ -1,6 +1,6 @@
 import { Check, Languages } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { useLang, type Lang } from '@/lib/i18n'
+import { cn } from '@/lib/utils'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,8 +13,8 @@ const OPTIONS: { value: Lang; labelKey: 'lang.zh' | 'lang.en' }[] = [
   { value: 'en', labelKey: 'lang.en' },
 ]
 
-/** 中文 / English language switch for the topbar. */
-export function GateLanguageSwitch() {
+/** Chinese / English language switch for the topbar. */
+export function LanguageSwitch() {
   const { lang, setLang, t } = useLang()
 
   return (
@@ -22,7 +22,7 @@ export function GateLanguageSwitch() {
       <DropdownMenuTrigger
         aria-label={t('lang.switch')}
         title={t('lang.switch')}
-        className='flex size-9 items-center justify-center rounded-lg text-gate-dim outline-none hover:bg-gate-track hover:text-gate-ink focus-visible:ring-2 focus-visible:ring-gate-accent/30'
+        className='flex size-9 items-center justify-center rounded-lg text-muted-foreground outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/50'
       >
         <Languages className='size-[18px]' />
       </DropdownMenuTrigger>

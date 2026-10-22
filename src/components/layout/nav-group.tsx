@@ -1,5 +1,5 @@
-import { type ReactNode } from 'react'
-import { Link, useLocation } from '@tanstack/react-router'
+import { useState, type ReactNode } from 'react'
+import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
 import {
   Collapsible,
@@ -91,22 +91,46 @@ function SidebarMenuCollapsible({
   href: string
 }) {
   const { setOpenMobile } = useSidebar()
+  const hasActiveChild = item.items.some((subItem) =>
+    checkIsActive(href, subItem)
+  )
+  const [open, setOpen] = useState(hasActiveChild)
+
   return (
     <Collapsible
       asChild
-      // Collapsed by default so the sidebar initially shows only the
-      // group titles; users expand a group manually.
-      defaultOpen={false}
+      open={open}
+      onOpenChange={setOpen}
       className='group/collapsible'
     >
-      <SidebarMenuItem>
-        <CollapsibleTrigger asChild>
-          <SidebarMenuButton tooltip={item.title}>
+      <SidebarMenuItem className='relative'>
+        <SidebarMenuButton
+          asChild
+          isActive={checkIsActive(href, item)}
+          tooltip={item.title}
+        >
+          <Link
+            to={item.url}
+            onClick={() => {
+              setOpen(true)
+              setOpenMobile(false)
+            }}
+          >
             {item.icon && <item.icon />}
             <span>{item.title}</span>
             {item.badge && <NavBadge>{item.badge}</NavBadge>}
-            <ChevronRight className='ms-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 rtl:rotate-180' />
-          </SidebarMenuButton>
+            <span className='ms-auto size-6 shrink-0' aria-hidden='true' />
+          </Link>
+        </SidebarMenuButton>
+        <CollapsibleTrigger asChild>
+          <button
+            type='button'
+            aria-label={item.title}
+            aria-expanded={open}
+            className='absolute end-1 top-4 z-10 flex size-6 -translate-y-1/2 items-center justify-center rounded-md text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none'
+          >
+            <ChevronRight className='size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 rtl:rotate-180' />
+          </button>
         </CollapsibleTrigger>
         <CollapsibleContent className='CollapsibleContent'>
           <SidebarMenuSub>
@@ -138,13 +162,21 @@ function SidebarMenuCollapsedDropdown({
   item: NavCollapsible
   href: string
 }) {
+  const navigate = useNavigate()
+  const { setOpenMobile } = useSidebar()
+
   return (
     <SidebarMenuItem>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <SidebarMenuButton
-            tooltip={item.title}
+            title={item.title}
             isActive={checkIsActive(href, item)}
+            onPointerDown={(event) => {
+              if (event.button !== 0) return
+              navigate({ to: item.url })
+              setOpenMobile(false)
+            }}
           >
             {item.icon && <item.icon />}
             <span>{item.title}</span>

@@ -5,7 +5,7 @@ import { Main } from '@/components/layout/main'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { GATE_REPOS } from '@/features/gate/data/gate'
 import { deriveGateRepos, useGateDatasets } from '@/features/gate/data/gate-api'
-import { GateLanguageSwitch } from '@/features/gate/components/gate-language-switch'
+import { LanguageSwitch } from '@/components/language-switch'
 import { GateWindowSelect } from '@/features/gate/components/gate-window-select'
 import { useGateWindow } from '@/features/gate/stores/gate-window'
 import { RepoGateTable } from '@/features/gate/overview/repo-gate-table'
@@ -16,7 +16,7 @@ export const Route = createFileRoute('/_authenticated/gate')({
 })
 
 /**
- * CI gate monitor: per-branch gate performance for the monitored
+ * Quality gate monitor: per-branch gate performance for the monitored
  * repositories, rendered inside the existing platform shell.
  */
 function GatePage() {
@@ -41,7 +41,7 @@ function GatePage() {
     <>
       <Header>
         <div className='me-auto' />
-        <GateLanguageSwitch />
+        <LanguageSwitch />
         <ThemeSwitch />
       </Header>
       <Main className='flex flex-1 flex-col gap-6'>

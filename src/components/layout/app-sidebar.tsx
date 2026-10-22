@@ -12,16 +12,16 @@ import { TeamSwitcher } from './team-switcher'
 
 /** Sidebar labels by route so titles follow the active language. */
 const NAV_LABEL: Record<string, I18nKey> = {
-  '/': 'nav.community.overview',
+  '/': 'nav.community.group',
   '/pulls': 'nav.community.pulls',
   '/issues': 'nav.community.issues',
   '/growth': 'nav.community.growth',
   '/ecosystem': 'nav.community.ecosystem',
-  '/about': 'nav.community.about',
-  '/gate': 'nav.ciGate',
+  '/about': 'nav.about',
+  '/gate': 'nav.qualityGates',
 }
 
-/** Fallback for group titles (collapsible parents carry no url). */
+/** Fallback for group titles when no route-specific label applies. */
 const NAV_TITLE_LABEL: Record<string, I18nKey> = {
   社区概览: 'nav.community.group',
 }

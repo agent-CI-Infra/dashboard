@@ -16,17 +16,16 @@ const LANG_COOKIE = 'vite-ui-lang'
 /** zh/en string pairs for every UI string. */
 const DICT = {
   'app.tagline': {
-    zh: '社区运营与 CI 门禁监控平台',
-    en: 'Community ops & CI gate monitoring',
+    zh: '社区运营与质量门禁',
+    en: 'Community & quality gates',
   },
   'nav.community.group': { zh: '社区概览', en: 'Community' },
-  'nav.community.overview': { zh: '社区总览', en: 'Overview' },
   'nav.community.pulls': { zh: 'Pull Requests', en: 'Pull Requests' },
   'nav.community.issues': { zh: 'Issues', en: 'Issues' },
   'nav.community.growth': { zh: '社区成长', en: 'Growth' },
   'nav.community.ecosystem': { zh: '生态影响力', en: 'Ecosystem' },
-  'nav.community.about': { zh: '关于本站', en: 'About' },
-  'nav.ciGate': { zh: 'CI GATE', en: 'CI GATE' },
+  'nav.about': { zh: '关于本站', en: 'About' },
+  'nav.qualityGates': { zh: '质量门禁', en: 'Quality Gates' },
 
   'search.placeholder': {
     zh: '搜索仓库 / PR / 运行 ID',
@@ -94,10 +93,10 @@ const DICT = {
   },
   'state.retry': { zh: '重试', en: 'Retry' },
 
-  'gate.title': { zh: '门禁总览', en: 'Gate Overview' },
+  'gate.title': { zh: '质量门禁', en: 'Quality Gates' },
   'gate.subtitle': {
     zh: '各仓库门禁通过率',
-    en: 'Per-repository gate performance',
+    en: 'Per-repository quality gate performance',
   },
   'gate.windowSelect': {
     zh: '切换统计窗口',

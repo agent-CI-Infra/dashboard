@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
+import { LanguageSwitch } from '@/components/language-switch'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { IconGithub } from '@/assets/brand-icons'
@@ -144,6 +145,7 @@ export function GrowthTrends() {
       <>
         <Header>
           <div className='me-auto' />
+          <LanguageSwitch />
           <ThemeSwitch />
         </Header>
         <Main>
@@ -158,6 +160,7 @@ export function GrowthTrends() {
       <>
         <Header>
           <div className='me-auto' />
+          <LanguageSwitch />
           <ThemeSwitch />
         </Header>
         <Main>
@@ -171,6 +174,7 @@ export function GrowthTrends() {
     <>
       <Header>
         <div className='me-auto' />
+        <LanguageSwitch />
         <ThemeSwitch />
       </Header>
 

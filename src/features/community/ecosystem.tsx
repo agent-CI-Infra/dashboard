@@ -1,5 +1,6 @@
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
+import { LanguageSwitch } from '@/components/language-switch'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { EmptyState } from './components/states'
 
@@ -8,6 +9,7 @@ export function EcosystemInfluence() {
     <>
       <Header>
         <div className='me-auto' />
+        <LanguageSwitch />
         <ThemeSwitch />
       </Header>
 

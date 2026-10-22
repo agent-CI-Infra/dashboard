@@ -23,16 +23,13 @@ export const sidebarData: SidebarData = {
       title: '',
       items: [
         {
-          // Collapsible group: collapsed by default, expands to the
-          // community sub-sections (see nav-group's SidebarMenuCollapsible).
+          // Collapsible group: its header links to the Overview page and
+          // the sub-sections expand on click (see nav-group's
+          // SidebarMenuCollapsible).
           title: '社区概览',
+          url: '/',
           icon: LayoutDashboard,
           items: [
-            {
-              title: '社区总览',
-              url: '/',
-              icon: LayoutDashboard,
-            },
             {
               title: 'Pull Requests',
               url: '/pulls',
@@ -53,17 +50,17 @@ export const sidebarData: SidebarData = {
               url: '/ecosystem',
               icon: Globe,
             },
-            {
-              title: '关于本站',
-              url: '/about',
-              icon: Info,
-            },
           ],
         },
         {
-          title: 'CI GATE',
+          title: '质量门禁',
           url: '/gate',
           icon: ShieldCheck,
+        },
+        {
+          title: '关于本站',
+          url: '/about',
+          icon: Info,
         },
       ],
     },

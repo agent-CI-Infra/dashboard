@@ -3,6 +3,7 @@ import { Palette } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
+import { LanguageSwitch } from '@/components/language-switch'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { SidebarNav } from './components/sidebar-nav'
 
@@ -20,6 +21,7 @@ export function Settings() {
       {/* ===== Top Heading ===== */}
       <Header>
         <div className='me-auto' />
+        <LanguageSwitch />
         <ThemeSwitch />
       </Header>
 

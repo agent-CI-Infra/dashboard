@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
+import { LanguageSwitch } from '@/components/language-switch'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -117,6 +118,7 @@ export function PullsAnalysis() {
       <>
         <Header>
           <div className='me-auto' />
+          <LanguageSwitch />
           <ThemeSwitch />
         </Header>
         <Main>
@@ -131,6 +133,7 @@ export function PullsAnalysis() {
       <>
         <Header>
           <div className='me-auto' />
+          <LanguageSwitch />
           <ThemeSwitch />
         </Header>
         <Main>
@@ -145,6 +148,7 @@ export function PullsAnalysis() {
       <>
         <Header>
           <div className='me-auto' />
+          <LanguageSwitch />
           <ThemeSwitch />
         </Header>
         <Main>
@@ -161,6 +165,7 @@ export function PullsAnalysis() {
     <>
       <Header>
         <div className='me-auto' />
+        <LanguageSwitch />
         <ThemeSwitch />
       </Header>
 

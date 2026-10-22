@@ -55,7 +55,7 @@ import { ErrorState, LoadingState } from './components/states'
 import { useMonitorBase } from './use-monitor'
 import type { TimeRangeSearch } from '@/lib/monitor/ranges'
 import { useLang, type I18nKey } from '@/lib/i18n'
-import { GateLanguageSwitch } from '@/features/gate/components/gate-language-switch'
+import { LanguageSwitch } from '@/components/language-switch'
 import type { Composition, RepoSummary } from '@/lib/monitor/types'
 
 const route = getRouteApi('/_authenticated/')
@@ -482,7 +482,7 @@ export function CommunityOverview() {
     <>
       <Header>
         <div className='me-auto' />
-        <GateLanguageSwitch />
+        <LanguageSwitch />
         <ThemeSwitch />
       </Header>
       <Main className='flex flex-1 flex-col gap-6'>{children}</Main>
