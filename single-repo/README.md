@@ -60,7 +60,7 @@ cp -R ../dashboard/single-repo/. .
 
 单仓看板只消费源仓的 `ci-gates-reports` artifact，不负责运行门禁。源仓需要先接入：
 
-- 门禁模板仓：<https://github.com/agent-CI-Infra/CI-workflow>
+- CI-workflow 仓：<https://github.com/agent-CI-Infra/CI-workflow>
 - 操作手册：[`CI-workflow/AGENT.md`](https://github.com/agent-CI-Infra/CI-workflow/blob/main/AGENT.md)
 
 源仓的 `CI` 运行上传 `ci-gates-reports` 后，看板 CI 页出现「质量门禁」卡片，显示每个 lane 的结论、命令通过数和用例 catalog 的 ready/todo/skipped 数量。

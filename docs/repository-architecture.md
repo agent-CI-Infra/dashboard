@@ -55,7 +55,7 @@ agent-CI-Infra/CI-workflow/
                  └─ /gate 跨仓门禁视图
 ```
 
-公共 Dashboard 不运行用户 CI；单仓看板不定义门禁协议；门禁仓不发布站点。
+公共 Dashboard 不运行用户 CI；单仓看板不定义门禁协议；`CI-workflow` 仓不发布站点。
 
 ## 4. 数据契约
 
@@ -154,5 +154,5 @@ python3 server.py
 
 - 公共 Dashboard：`npm run build`、`npm run test:collector`、`npm run collect:gate`。
 - 单仓模板：`cd single-repo && python3 -m unittest discover -s tests -v`。
-- 门禁仓：`node --test scripts/gate/gate.test.mjs`。
+- `CI-workflow` 仓：`node --test scripts/gate/gate.test.mjs`。
 - 线上：`/` 是公共多仓；`single-repo/README.md` 是单仓入口；`CI-workflow` 是 CI workflow（含门禁）入口。
