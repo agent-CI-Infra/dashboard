@@ -9,7 +9,7 @@
 | --- | --- |
 | 公共多仓 Dashboard | <https://agent-ci-infra.github.io/dashboard/> |
 | 单仓/私仓 Dashboard 模板 | 本目录 [`single-repo/`](.) |
-| 单仓看板在线示例 | <https://haowenz001.github.io/github-status-board/> |
+| 单仓看板在线示例 | <https://agent-ci-infra.github.io/dashboard/single-repo/> |
 
 ## 适用场景
 

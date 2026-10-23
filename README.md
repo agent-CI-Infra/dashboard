@@ -9,7 +9,7 @@
 | --- | --- |
 | 公共多仓 Dashboard | <https://agent-ci-infra.github.io/dashboard/> |
 | 单仓 / 私仓 Dashboard 模板 | [`single-repo/README.md`](single-repo/README.md) |
-| 单仓看板在线示例 | <https://haowenz001.github.io/github-status-board/> |
+| 单仓看板在线示例 | <https://agent-ci-infra.github.io/dashboard/single-repo/> |
 
 当前监控仓库（共 15 个）：
 
