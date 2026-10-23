@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Read the [template guide](https://github.com/agent-CI-Infra/dashboard/blob/main/templates/ci-gates/README.md) first. It covers copying the workflow, configuring lanes and registering cases.
+        Read the [template guide](https://github.com/agent-CI-Infra/ci-gates/blob/main/README.md) first. It covers copying the workflow, configuring lanes and registering cases.
 
   - type: input
     id: repo
@@ -48,6 +48,6 @@ body:
     attributes:
       label: Checklist
       options:
-        - label: I copied templates/ci-gates into the repository.
+        - label: I copied the ci-gates template into the repository.
         - label: I can add @case markers to tests.
         - label: I understand the dashboard source still needs a board summary.

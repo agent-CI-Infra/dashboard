@@ -1,0 +1,36 @@
+name: Dashboard checks
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['site/**', '.sync/**']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python3 -m unittest discover -s tests -v
+      - run: node test/sync-e2e.mjs
+      - name: Install E2E dependencies
+        run: |
+          mkdir -p .e2e
+          cp test/e2e.package.json .e2e/package.json
+          npm install --prefix .e2e --no-audit --no-fund
+          (cd .e2e && PLAYWRIGHT_BROWSERS_PATH="$GITHUB_WORKSPACE/.e2e/browsers" npx playwright install chromium)
+      - run: node .e2e/node_modules/playwright/cli.js test --config test/playwright.config.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-results
+          path: .e2e/results.json
+          if-no-files-found: warn

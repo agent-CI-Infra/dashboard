@@ -1,9 +1,15 @@
 # Multi-Repo Community Dashboard
 
 > **这是多个代码仓的公共 Dashboard，不是单仓看板。**  
-> 它聚合展示多个社区的规模、活跃度、健康度和质量门禁；单个仓库的深度视图由 `github-status-board` 模板提供。
+> 它聚合展示多个社区的规模、活跃度、健康度和质量门禁；单个仓库的深度视图由本仓 `single-repo/` 模板提供。
 
-**在线访问：** <https://agent-ci-infra.github.io/dashboard/>
+**两个入口：**
+
+| 入口 | 链接 |
+| --- | --- |
+| 公共多仓 Dashboard | <https://agent-ci-infra.github.io/dashboard/> |
+| 单仓 / 私仓 Dashboard 模板 | [`single-repo/README.md`](single-repo/README.md) |
+| 单仓看板在线示例 | <https://haowenz001.github.io/github-status-board/> |
 
 当前监控仓库（共 15 个）：
 
@@ -18,8 +24,8 @@
 
 | 层 | 仓库 | 负责 | 不负责 |
 | --- | --- | --- | --- |
-| 门禁层 | `agent-CI-Infra/ci-gates`（建议新增，当前过渡为两份模板） | reusable workflow、`gate.mjs`、报告/用例 schema、starter、`AGENT.md` | Dashboard UI、站点发布 |
-| 单仓层 | [`haowenz001/github-status-board`](https://github.com/haowenz001/github-status-board) | 单仓采集、单仓 Dashboard、公开 Pages 或私仓本地模式 | 跨仓聚合、门禁协议定义 |
+| 门禁层 | [`agent-CI-Infra/ci-gates`](https://github.com/agent-CI-Infra/ci-gates) | workflow 模板、`gate.mjs`、报告/用例 schema、starter、`AGENT.md` | Dashboard UI、站点发布 |
+| 单仓层 | **本仓** [`single-repo/`](single-repo/) | 单仓采集、单仓 Dashboard、公开 Pages 或私仓本地模式 | 跨仓聚合、门禁协议定义 |
 | 汇总层 | **本仓** `agent-CI-Infra/dashboard` | 多仓聚合、`/gate`、来源登记、公开 Pages、接入入口 | 执行用户 CI、保存私仓数据 |
 
 ```text
@@ -27,7 +33,7 @@
   └─ CI（ci-gates）─► ci-gates-reports artifact
                          │
                          ▼
-              github-status-board（单仓）
+              dashboard/single-repo（单仓）
                  ├─ data/snapshot.json  单仓页面
                  └─ data/summary.json   公开白名单摘要
                          │
@@ -40,8 +46,8 @@
 
 - 本仓已经有 15 个社区的指标采集和公开 Dashboard。
 - 本仓已经支持 `board-summary` 和 `status-board-lanes` 两种门禁来源；`ci-gates` 直连 artifact 适配器尚未实现。
-- 门禁模板目前保留在 `templates/ci-gates/`，同时单仓看板有 `source-template/`，属于过渡期重复。
-- **建议新增 `agent-CI-Infra/ci-gates` 门禁仓**，作为唯一权威模板；原因和迁移顺序见 [`docs/repository-architecture.md`](docs/repository-architecture.md)。
+- 门禁模板已经迁到 [`agent-CI-Infra/ci-gates`](https://github.com/agent-CI-Infra/ci-gates)，本仓不再保留 `templates/ci-gates`。
+- 单仓/私仓代码已收进 [`single-repo/`](single-repo/)；它仍是一个可复制到新仓的模板目录，不是独立 GitHub Template 仓库。
 
 ---
 
@@ -77,13 +83,14 @@
 
 #### 第一步：源仓接入门禁
 
-从 [`templates/ci-gates/`](templates/ci-gates/) 或单仓模板的 [`source-template/`](https://github.com/haowenz001/github-status-board/tree/main/source-template) 复制：
+从 [`ci-gates`](https://github.com/agent-CI-Infra/ci-gates) 复制：
 
-```text
-.github/workflows/ci.yml
-.github/ci-gates.json
-scripts/gate/gate.mjs
-test/cases/case-catalog.yaml
+```bash
+git clone --depth 1 https://github.com/agent-CI-Infra/ci-gates.git /tmp/ci-gates
+mkdir -p .github scripts/gate test/cases
+cp -R /tmp/ci-gates/template/.github/. .github/
+cp /tmp/ci-gates/scripts/gate/gate.mjs scripts/gate/
+cp -R /tmp/ci-gates/template/test/. ./test/
 ```
 
 要求：
@@ -93,14 +100,15 @@ test/cases/case-catalog.yaml
 - 先不填用例时，用空 catalog 并去掉 `pr-ready` 的 `verify-cases`；
 - 填用例时，`ready` 需要 `file` + `owner` + `@case <id>`。
 
-完整操作手册（面向用户 AI）：[`AGENT.md`](AGENT.md)。
+完整操作手册（面向用户 AI）：[`ci-gates/AGENT.md`](https://github.com/agent-CI-Infra/ci-gates/blob/main/AGENT.md)。
 
 #### 第二步：建单仓 Dashboard
 
-1. 打开 <https://github.com/haowenz001/github-status-board>
-2. **Use this template** 创建 `owner/repo-board`（public）
-3. **Settings → Pages → Source: GitHub Actions**
-4. **Actions → Setup dashboard** 填：
+1. 打开 [`single-repo/`](single-repo/) 目录
+2. 把 `single-repo/` 的内容复制到一个新仓的**根目录**（不要保留 `single-repo/` 这层）
+3. 新仓命名例如 `owner/repo-board`，可见性 **Public**
+4. **Settings → Pages → Source: GitHub Actions**
+5. **Actions → Setup dashboard** 填：
 
    ```json
    {
@@ -112,7 +120,7 @@ test/cases/case-catalog.yaml
    }
    ```
 
-5. 等待 `Collect dashboard data (PAT)` → `Deploy dashboard Pages`，打开：
+6. 等待 `Collect dashboard data (PAT)` → `Deploy dashboard Pages`，打开：
 
    ```text
    https://owner.github.io/repo-board/
@@ -155,7 +163,7 @@ npm run dev
 
 打开 `/#/gate`。
 
-> **当前缺口**：`github-status-board` 还没有生成 `data/summary.json`。在补上 `board-summary@1` 生成器之前，公共 Dashboard 只能用 `status-board-lanes` 读取公开 snapshot；`ci-gates` 直连 artifact 适配器也尚未实现。
+> **当前缺口**：`single-repo/` 还没有生成 `data/summary.json`。在补上 `board-summary@1` 生成器之前，公共 Dashboard 只能用 `status-board-lanes` 读取公开 snapshot；`ci-gates` 直连 artifact 适配器也尚未实现。
 
 ### 2.3 接入申请
 
@@ -194,9 +202,10 @@ npm run build      # 生产构建
 门禁本地验证：
 
 ```bash
-npm run test:gate
-node templates/ci-gates/scripts/gate/gate.mjs run --lane build --config .github/ci-gates.json
-node templates/ci-gates/scripts/gate/gate.mjs verify-cases --config .github/ci-gates.json
+git clone --depth 1 https://github.com/agent-CI-Infra/ci-gates.git /tmp/ci-gates
+node --test /tmp/ci-gates/scripts/gate/gate.test.mjs
+node /tmp/ci-gates/scripts/gate/gate.mjs run --lane build --config .github/ci-gates.json
+node /tmp/ci-gates/scripts/gate/gate.mjs verify-cases --config .github/ci-gates.json
 ```
 
 ---

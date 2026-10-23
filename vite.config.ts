@@ -30,7 +30,7 @@ export default defineConfig({
     unstubEnvs: true,
     // scripts/** contains Node's built-in test runner suites (collector
     // adapters); Vitest's browser runner must not pick them up.
-    exclude: [...configDefaults.exclude, 'scripts/**', 'templates/**'],
+    exclude: [...configDefaults.exclude, 'scripts/**', 'single-repo/**'],
     browser: {
       enabled: true,
       provider: playwright(),

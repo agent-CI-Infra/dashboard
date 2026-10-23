@@ -1,7 +1,7 @@
 name: CI Gates
 
-# Dogfood of the ci-gates MVP. The runner lives in templates/ci-gates so the
-# same file is what users copy; this workflow is the dashboard-specific wiring.
+# Dogfood of ci-gates. The runner lives in agent-CI-Infra/ci-gates and is
+# checked out at the v1 tag; this workflow is the dashboard-specific wiring.
 #
 # Required check for branch protection / merge queue:
 #   CI Gates / gate
@@ -36,6 +36,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Checkout ci-gates
+        uses: actions/checkout@v4
+        with:
+          repository: agent-CI-Infra/ci-gates
+          ref: v1
+          path: .ci-gates
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -53,7 +60,7 @@ jobs:
       - name: Run gate lanes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node templates/ci-gates/scripts/gate/gate.mjs run --config .github/ci-gates.json --event "$GITHUB_EVENT_NAME"
+        run: node .ci-gates/scripts/gate/gate.mjs run --config .github/ci-gates.json --event "$GITHUB_EVENT_NAME"
 
       - name: Upload gate reports
         if: always()

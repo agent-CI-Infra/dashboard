@@ -37,9 +37,6 @@ jobs:
       - name: Test gate collectors
         run: npm run test:collector
 
-      - name: Test ci-gates runner
-        run: npm run test:gate
-
       - name: Run tests
         run: npm test
 
