@@ -151,6 +151,24 @@
       "enabled": false,
       "comment": "Example federated source; set enabled=true after a real board publishes data/summary.json",
       "boardUrl": "https://acme.github.io/web/"
+    },
+    {
+      "id": "haowenz001/onboarding-demo",
+      "name": "onboarding-demo",
+      "owner": "haowenz001",
+      "defaultBranch": "main",
+      "type": "status-board-lanes",
+      "url": "https://haowenz001.github.io/onboarding-demo-board/data/snapshot.json",
+      "dashboardUrl": "https://haowenz001.github.io/onboarding-demo-board/",
+      "boardUrl": "https://haowenz001.github.io/onboarding-demo-board/",
+      "channelMap": [
+        {
+          "channel": "gate",
+          "workflow": [
+            "CI"
+          ]
+        }
+      ]
     }
   ],
   "defaultWindowDays": 7
