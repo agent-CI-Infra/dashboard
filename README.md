@@ -24,13 +24,13 @@
 
 | 层 | 仓库 | 负责 | 不负责 |
 | --- | --- | --- | --- |
-| 门禁层 | [`agent-CI-Infra/ci-gates`](https://github.com/agent-CI-Infra/ci-gates) | workflow 模板、`gate.mjs`、报告/用例 schema、starter、`AGENT.md` | Dashboard UI、站点发布 |
+| CI 层 | [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow) | CI workflow（含门禁）模板、`gate.mjs`、报告/用例 schema、starter、`AGENT.md` | Dashboard UI、站点发布 |
 | 单仓层 | **本仓** [`single-repo/`](single-repo/) | 单仓采集、单仓 Dashboard、公开 Pages 或私仓本地模式 | 跨仓聚合、门禁协议定义 |
 | 汇总层 | **本仓** `agent-CI-Infra/dashboard` | 多仓聚合、`/gate`、来源登记、公开 Pages、接入入口 | 执行用户 CI、保存私仓数据 |
 
 ```text
 用户源仓
-  └─ CI（ci-gates）─► ci-gates-reports artifact
+  └─ CI（CI-workflow）─► ci-gates-reports artifact
                          │
                          ▼
               dashboard/single-repo（单仓）
@@ -45,9 +45,10 @@
 ### 1.2 当前状态
 
 - 本仓已经有 15 个社区的指标采集和公开 Dashboard。
-- 本仓已经支持 `board-summary` 和 `status-board-lanes` 两种门禁来源；`ci-gates` 直连 artifact 适配器尚未实现。
-- 门禁模板已经迁到 [`agent-CI-Infra/ci-gates`](https://github.com/agent-CI-Infra/ci-gates)，本仓不再保留 `templates/ci-gates`。
+- 本仓已经支持 `board-summary` 和 `status-board-lanes` 两种门禁来源；`CI-workflow` 直连 artifact 适配器尚未实现。
+- CI workflow（含门禁）模板已经迁到 [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow)，本仓不再保留 `templates/ci-gates`。
 - 单仓/私仓代码已收进 [`single-repo/`](single-repo/)；它仍是一个可复制到新仓的模板目录，不是独立 GitHub Template 仓库。
+- **命名兼容**：仓名已改为 `CI-workflow`；协议标识 `ci-gates/*`、artifact `ci-gates-reports`、配置 `.github/ci-gates.json` 暂保持不变，避免已接入仓失效。
 
 ---
 
@@ -83,14 +84,14 @@
 
 #### 第一步：源仓接入门禁
 
-从 [`ci-gates`](https://github.com/agent-CI-Infra/ci-gates) 复制：
+从 [`CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow) 复制：
 
 ```bash
-git clone --depth 1 https://github.com/agent-CI-Infra/ci-gates.git /tmp/ci-gates
+git clone --depth 1 https://github.com/agent-CI-Infra/CI-workflow.git /tmp/ci-workflow
 mkdir -p .github scripts/gate test/cases
-cp -R /tmp/ci-gates/template/.github/. .github/
-cp /tmp/ci-gates/scripts/gate/gate.mjs scripts/gate/
-cp -R /tmp/ci-gates/template/test/. ./test/
+cp -R /tmp/ci-workflow/template/.github/. .github/
+cp /tmp/ci-workflow/scripts/gate/gate.mjs scripts/gate/
+cp -R /tmp/ci-workflow/template/test/. ./test/
 ```
 
 要求：
@@ -100,7 +101,7 @@ cp -R /tmp/ci-gates/template/test/. ./test/
 - 先不填用例时，用空 catalog 并去掉 `pr-ready` 的 `verify-cases`；
 - 填用例时，`ready` 需要 `file` + `owner` + `@case <id>`。
 
-完整操作手册（面向用户 AI）：[`ci-gates/AGENT.md`](https://github.com/agent-CI-Infra/ci-gates/blob/main/AGENT.md)。
+完整操作手册（面向用户 AI）：[`CI-workflow/AGENT.md`](https://github.com/agent-CI-Infra/CI-workflow/blob/main/AGENT.md)。
 
 #### 第二步：建单仓 Dashboard
 
@@ -163,7 +164,7 @@ npm run dev
 
 打开 `/#/gate`。
 
-> **当前缺口**：`single-repo/` 还没有生成 `data/summary.json`。在补上 `board-summary@1` 生成器之前，公共 Dashboard 只能用 `status-board-lanes` 读取公开 snapshot；`ci-gates` 直连 artifact 适配器也尚未实现。
+> **当前缺口**：`single-repo/` 还没有生成 `data/summary.json`。在补上 `board-summary@1` 生成器之前，公共 Dashboard 只能用 `status-board-lanes` 读取公开 snapshot；`CI-workflow` 直连 artifact 适配器也尚未实现。
 
 ### 2.3 接入申请
 
@@ -202,10 +203,10 @@ npm run build      # 生产构建
 门禁本地验证：
 
 ```bash
-git clone --depth 1 https://github.com/agent-CI-Infra/ci-gates.git /tmp/ci-gates
-node --test /tmp/ci-gates/scripts/gate/gate.test.mjs
-node /tmp/ci-gates/scripts/gate/gate.mjs run --lane build --config .github/ci-gates.json
-node /tmp/ci-gates/scripts/gate/gate.mjs verify-cases --config .github/ci-gates.json
+git clone --depth 1 https://github.com/agent-CI-Infra/CI-workflow.git /tmp/ci-workflow
+node --test /tmp/ci-workflow/scripts/gate/gate.test.mjs
+node /tmp/ci-workflow/scripts/gate/gate.mjs run --lane build --config .github/ci-gates.json
+node /tmp/ci-workflow/scripts/gate/gate.mjs verify-cases --config .github/ci-gates.json
 ```
 
 ---

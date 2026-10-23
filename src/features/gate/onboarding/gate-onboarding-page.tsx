@@ -16,16 +16,16 @@ import { Main } from '@/components/layout/main'
 import { ThemeSwitch } from '@/components/theme-switch'
 
 const GITHUB_REPO = 'https://github.com/agent-CI-Infra/dashboard'
-const CI_GATES_REPO = 'https://github.com/agent-CI-Infra/ci-gates'
-const TEMPLATE_GUIDE = `${CI_GATES_REPO}/blob/main/README.md`
+const CI_WORKFLOW_REPO = 'https://github.com/agent-CI-Infra/CI-workflow'
+const TEMPLATE_GUIDE = `${CI_WORKFLOW_REPO}/blob/main/README.md`
 const BOARD_TEMPLATE = `${GITHUB_REPO}/tree/main/single-repo`
 const ONBOARDING_ISSUE = `${GITHUB_REPO}/issues/new?template=gate-onboarding.yml`
 
-const COPY_BLOCK = `git clone --depth 1 https://github.com/agent-CI-Infra/ci-gates.git /tmp/ci-gates
+const COPY_BLOCK = `git clone --depth 1 https://github.com/agent-CI-Infra/CI-workflow.git /tmp/ci-workflow
 mkdir -p .github scripts/gate test/cases
-cp -R /tmp/ci-gates/template/.github/. .github/
-cp /tmp/ci-gates/scripts/gate/gate.mjs scripts/gate/
-cp -R /tmp/ci-gates/template/test/. ./test/`
+cp -R /tmp/ci-workflow/template/.github/. .github/
+cp /tmp/ci-workflow/scripts/gate/gate.mjs scripts/gate/
+cp -R /tmp/ci-workflow/template/test/. ./test/`
 
 const CONFIG_BLOCK = `{
   "version": 1,

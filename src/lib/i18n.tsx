@@ -153,8 +153,8 @@ const DICT = {
   'gate.onboarding.entry': { zh: '接入门禁', en: 'Add gates' },
   'gate.onboarding.title': { zh: '接入门禁', en: 'Add gates to your repo' },
   'gate.onboarding.subtitle': {
-    zh: '把 ci-gates 模板复制到你的仓库，四步跑通五条 lane。',
-    en: 'Copy the ci-gates template into your repository and run five lanes in four steps.',
+    zh: '把 CI-workflow 模板复制到你的仓库，四步跑通五条 lane。',
+    en: 'Copy the CI-workflow template into your repository and run five lanes in four steps.',
   },
   'gate.onboarding.back': {
     zh: '返回质量门禁',

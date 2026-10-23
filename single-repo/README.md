@@ -1,7 +1,7 @@
 # 单仓 / 私仓 Dashboard 模板
 
 > 本目录是 `agent-CI-Infra/dashboard` 里的**单仓看板模板**，用于一个代码仓的深度视图。
-> 公共多仓聚合在仓库根目录；门禁模板在 [`agent-CI-Infra/ci-gates`](https://github.com/agent-CI-Infra/ci-gates)。
+> 公共多仓聚合在仓库根目录；门禁模板在 [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow)。
 
 ## 两个链接
 
@@ -60,8 +60,8 @@ cp -R ../dashboard/single-repo/. .
 
 单仓看板只消费源仓的 `ci-gates-reports` artifact，不负责运行门禁。源仓需要先接入：
 
-- 门禁模板仓：<https://github.com/agent-CI-Infra/ci-gates>
-- 操作手册：[`ci-gates/AGENT.md`](https://github.com/agent-CI-Infra/ci-gates/blob/main/AGENT.md)
+- 门禁模板仓：<https://github.com/agent-CI-Infra/CI-workflow>
+- 操作手册：[`CI-workflow/AGENT.md`](https://github.com/agent-CI-Infra/CI-workflow/blob/main/AGENT.md)
 
 源仓的 `CI` 运行上传 `ci-gates-reports` 后，看板 CI 页出现「质量门禁」卡片，显示每个 lane 的结论、命令通过数和用例 catalog 的 ready/todo/skipped 数量。
 

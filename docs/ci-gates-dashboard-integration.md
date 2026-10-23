@@ -1,8 +1,9 @@
-# ci-gates × 双看板联合方案 v1.1
+# CI-workflow × 双看板联合方案 v1.1
 
-> 关联文档：`public-ci-repo-design-v3.md`（以下简称 **v3**，ci-gates 公仓设计方案）
-> 关联站点：公开汇总看板 <https://agent-ci-infra.github.io/dashboard/>；单仓看板模板 <https://github.com/agent-CI-Infra/dashboard/tree/main/single-repo>；门禁模板 <https://github.com/agent-CI-Infra/ci-gates>
+> 关联文档：`public-ci-repo-design-v3.md`（以下简称 **v3**，CI-workflow 公仓设计方案）
+> 关联站点：公开汇总看板 <https://agent-ci-infra.github.io/dashboard/>；单仓看板模板 <https://github.com/agent-CI-Infra/dashboard/tree/main/single-repo>；门禁模板 <https://github.com/agent-CI-Infra/CI-workflow>
 > 状态：**历史设计文档**；当前布局以 [`repository-architecture.md`](repository-architecture.md) 为准。
+> 命名：仓名已从 `ci-gates` 改为 `CI-workflow`；协议标识 `ci-gates/*`、artifact `ci-gates-reports`、配置 `.github/ci-gates.json` 保留兼容。
 > 范围：模板接入 → 门禁运行 → 用例填写 → 私有 board → 公开 dashboard 的端到端闭环
 
 ---
@@ -1067,9 +1068,9 @@ jobs:
 | `config/gate-sources.json` 的 `discovery` 骨架 + 禁用示例源 | ✅ 已落地 | `config/gate-sources.json` |
 | 类型 / API 映射（level / stage / caseSummary / latest） | ✅ 已落地 | `src/features/gate/data/gate.ts`、`gate-api.ts` |
 | 等级 badge、阶段 chip、待填/未执行、接入漏斗 | ✅ 已落地 | `repo-gate-table.tsx`、`gate-stage-meta.ts`、`gate.tsx`、`i18n.tsx` |
-| MVP 门禁运行器 + 五 lane 事件映射 + `gate-report` artifact | ✅ 已落地 | `agent-CI-Infra/ci-gates`、`.github/workflows/gate.yml` |
-| 用例目录解析 + `@case` 校验 + `verify-cases` | ✅ 已落地 | `ci-gates/scripts/gate/gate.mjs` |
-| MVP 运行器测试（7 条） | ✅ 已落地 | `ci-gates/scripts/gate/gate.test.mjs` |
+| MVP 门禁运行器 + 五 lane 事件映射 + `gate-report` artifact | ✅ 已落地 | `agent-CI-Infra/CI-workflow`、`.github/workflows/gate.yml` |
+| 用例目录解析 + `@case` 校验 + `verify-cases` | ✅ 已落地 | `CI-workflow/scripts/gate/gate.mjs` |
+| MVP 运行器测试（7 条） | ✅ 已落地 | `CI-workflow/scripts/gate/gate.test.mjs` |
 | 分支保护 / merge queue 自动配置 | ⏳ 需管理员手动 | GitHub Rulesets |
 | 独立 `collect-gate.yml`、详情抽屉、直连 artifact 模式 | ⏳ 待做 | — |
 | board 模板（`single-repo/`）与 `summary.json` 生成 | 🚧 模板已收进本仓；summary 生成待做 | `single-repo/` |
@@ -1089,7 +1090,7 @@ npm run test:collector
 ```text
 .github/workflows/gate.yml        # dashboard 自举：一个 job 按事件跑对应 lane
 .github/ci-gates.json             # dashboard 自己的 lane 命令
-agent-CI-Infra/ci-gates/
+agent-CI-Infra/CI-workflow/
   template/.github/workflows/ci.yml
   template/.github/ci-gates.json
   scripts/gate/gate.mjs
@@ -1111,10 +1112,10 @@ test/cases/case-catalog.yaml      # dashboard 自己的用例目录（当前全 
 本地验证：
 
 ```bash
-git clone --depth 1 https://github.com/agent-CI-Infra/ci-gates.git /tmp/ci-gates
-node --test /tmp/ci-gates/scripts/gate/gate.test.mjs
-node /tmp/ci-gates/scripts/gate/gate.mjs run --lane build --config .github/ci-gates.json
-node /tmp/ci-gates/scripts/gate/gate.mjs verify-cases --config .github/ci-gates.json
+git clone --depth 1 https://github.com/agent-CI-Infra/CI-workflow.git /tmp/ci-workflow
+node --test /tmp/ci-workflow/scripts/gate/gate.test.mjs
+node /tmp/ci-workflow/scripts/gate/gate.mjs run --lane build --config .github/ci-gates.json
+node /tmp/ci-workflow/scripts/gate/gate.mjs verify-cases --config .github/ci-gates.json
 ```
 
 边界：运行器只负责跑命令和出报告，不自动改 Rulesets、不自动填用例、不接 board；workflow 的 Node 安装步骤对其他技术栈需要替换。dashboard 自举的 `daily` 以 `observe` 模式跑全量 `npm test` + `build`，现有 4 个与门禁无关的 UI 测试失败只记 `observe_fail`、不阻断；修绿后改成 `enforce`。

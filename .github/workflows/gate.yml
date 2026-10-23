@@ -1,6 +1,6 @@
 name: CI Gates
 
-# Dogfood of ci-gates. The runner lives in agent-CI-Infra/ci-gates and is
+# Dogfood of CI-workflow. The runner lives in agent-CI-Infra/CI-workflow and is
 # checked out at the v1 tag; this workflow is the dashboard-specific wiring.
 #
 # Required check for branch protection / merge queue:
@@ -22,7 +22,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-gates-${{ github.workflow }}-${{ github.ref }}
+  group: ci-workflow-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -36,12 +36,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Checkout ci-gates
+      - name: Checkout CI-workflow
         uses: actions/checkout@v4
         with:
-          repository: agent-CI-Infra/ci-gates
+          repository: agent-CI-Infra/CI-workflow
           ref: v1
-          path: .ci-gates
+          path: .ci-workflow
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -60,7 +60,7 @@ jobs:
       - name: Run gate lanes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node .ci-gates/scripts/gate/gate.mjs run --config .github/ci-gates.json --event "$GITHUB_EVENT_NAME"
+        run: node .ci-workflow/scripts/gate/gate.mjs run --config .github/ci-gates.json --event "$GITHUB_EVENT_NAME"
 
       - name: Upload gate reports
         if: always()

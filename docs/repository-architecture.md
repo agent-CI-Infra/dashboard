@@ -1,13 +1,13 @@
 # 仓库分工与接入架构
 
 > 状态：已落地。
-> 目标：两个 Dashboard 形态放在一个代码仓，门禁模板独立成仓。
+> 目标：两个 Dashboard 形态放在一个代码仓，CI workflow（含门禁）独立成仓。
 
 ## 1. 三个仓库
 
 | 仓库 | 定位 | 负责 | 不负责 |
 | --- | --- | --- | --- |
-| [`agent-CI-Infra/ci-gates`](https://github.com/agent-CI-Infra/ci-gates) | 门禁契约与模板 | workflow 模板、`gate.mjs`、报告/用例 schema、starter、`AGENT.md`、版本 tag | Dashboard UI、站点发布 |
+| [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow) | CI workflow（含门禁）契约与模板 | workflow 模板、`gate.mjs`、报告/用例 schema、starter、`AGENT.md`、版本 tag | Dashboard UI、站点发布 |
 | [`agent-CI-Infra/dashboard`](https://github.com/agent-CI-Infra/dashboard) | 两个 Dashboard 的代码仓 | 根目录公共多仓聚合；`single-repo/` 单仓/私仓模板；来源登记；公开 Pages | 执行用户 CI、保存私仓数据、复制门禁实现 |
 | `single-repo/`（本仓目录） | 单仓/私仓 Dashboard 模板 | 单仓采集、单仓页面、Setup/Collect/Pages、本地私仓模式 | 跨仓聚合、门禁协议定义 |
 
@@ -29,7 +29,7 @@ agent-CI-Infra/dashboard/
 ```
 
 ```text
-agent-CI-Infra/ci-gates/
+agent-CI-Infra/CI-workflow/
   scripts/gate/gate.mjs
   scripts/gate/gate.test.mjs
   template/.github/workflows/ci.yml
@@ -43,7 +43,7 @@ agent-CI-Infra/ci-gates/
 
 ```text
 用户源仓
-  └─ CI（ci-gates）─► ci-gates-reports artifact
+  └─ CI（CI-workflow）─► ci-gates-reports artifact
                          │
                          ▼
               dashboard/single-repo（单仓）
@@ -74,7 +74,7 @@ agent-CI-Infra/ci-gates/
 
 不得包含源码、日志、Issue/PR 正文、token、私有测试数据。
 
-**当前缺口**：`single-repo/` 还没有生成 `data/summary.json`。在补上之前，公共 Dashboard 用 `status-board-lanes` 读取公开 snapshot；`ci-gates` 直连 artifact 适配器也尚未实现。
+**当前缺口**：`single-repo/` 还没有生成 `data/summary.json`。在补上之前，公共 Dashboard 用 `status-board-lanes` 读取公开 snapshot；`CI-workflow` 直连 artifact 适配器也尚未实现。
 
 ## 5. 公共 Dashboard 接入
 
@@ -84,7 +84,7 @@ agent-CI-Infra/ci-gates/
 
 ### 5.2 接门禁 + 单仓看板
 
-1. 源仓接入 `ci-gates`。
+1. 源仓接入 `CI-workflow`。
 2. 从本仓 `single-repo/` 复制到新仓，运行 Setup。
 3. 单仓看板发布公开 snapshot（当前）或 summary（目标）。
 4. 在 `config/gate-sources.json` 增加：
@@ -145,7 +145,7 @@ python3 server.py
 
 ## 7. 版本与迁移
 
-- `ci-gates` 打 `v1`；Dashboard 的 `.github/workflows/gate.yml` checkout `agent-CI-Infra/ci-gates@v1`。
+- `CI-workflow` 打 `v1`；Dashboard 的 `.github/workflows/gate.yml` checkout `agent-CI-Infra/CI-workflow@v1`。
 - 用户仓引用 `v1`，不要跟踪 `main`。
 - 破坏性 schema 变更升 `v2`。
 - 历史文档中的 `templates/ci-gates` / `source-template` 路径已废弃。
@@ -155,4 +155,4 @@ python3 server.py
 - 公共 Dashboard：`npm run build`、`npm run test:collector`、`npm run collect:gate`。
 - 单仓模板：`cd single-repo && python3 -m unittest discover -s tests -v`。
 - 门禁仓：`node --test scripts/gate/gate.test.mjs`。
-- 线上：`/` 是公共多仓；`single-repo/README.md` 是单仓入口；`ci-gates` 是门禁模板入口。
+- 线上：`/` 是公共多仓；`single-repo/README.md` 是单仓入口；`CI-workflow` 是 CI workflow（含门禁）入口。

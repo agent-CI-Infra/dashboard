@@ -1,7 +1,7 @@
 # AGENT.md — Dashboard 仓的 AI 操作入口
 
 > 这是 `agent-CI-Infra/dashboard` 的仓库级说明。
-> **门禁模板的完整操作手册在 [`agent-CI-Infra/ci-gates/AGENT.md`](https://github.com/agent-CI-Infra/ci-gates/blob/main/AGENT.md)。**
+> **CI workflow（含门禁）的完整操作手册在 [`agent-CI-Infra/CI-workflow/AGENT.md`](https://github.com/agent-CI-Infra/CI-workflow/blob/main/AGENT.md)。**
 > 用户 AI 做门禁接入时，先读那一份；做公共/单仓 Dashboard 时，读本文件。
 
 ## 1. 仓库地图
@@ -16,10 +16,10 @@ agent-CI-Infra/dashboard/
   docs/repository-architecture.md
 ```
 
-另有门禁仓：
+另有 CI-workflow 仓：
 
 ```text
-agent-CI-Infra/ci-gates/
+agent-CI-Infra/CI-workflow/
   scripts/gate/gate.mjs
   template/
   protocol/
@@ -46,7 +46,7 @@ agent-CI-Infra/ci-gates/
 
 ### 3.2 接门禁
 
-1. 源仓按 `ci-gates` 接入，产出 `ci-gates-reports`。
+1. 源仓按 `CI-workflow` 接入，产出 `ci-gates-reports`。
 2. 单仓看板发布公开 snapshot 或 summary。
 3. 在 `config/gate-sources.json` 增加来源：
    - 推荐：`type: "board-summary"` + `summaryUrl`；
@@ -56,7 +56,7 @@ agent-CI-Infra/ci-gates/
 
 当前限制：
 
-- `ci-gates` 直连 artifact 适配器未实现；
+- `CI-workflow` 直连 artifact 适配器未实现；
 - `single-repo` 还没有 `data/summary.json` 生成器；
 - 因此当前公开接入优先用 `status-board-lanes` 读取公开 snapshot。
 
@@ -84,7 +84,7 @@ python3 server.py
 
 - 根目录是 Vite 公共 Dashboard；`single-repo/` 是独立 Python 模板，不要把两者的构建混在一起。
 - `single-repo/` 下的 `.github/workflows` 是给复制出去的新仓用的，不会在本仓运行。
-- 不要在根目录重新添加 `templates/ci-gates`；门禁模板只维护在 `ci-gates`。
+- 不要在根目录重新添加 `templates/ci-gates`；门禁模板只维护在 `CI-workflow`。
 - 改动 `config/gate-sources.json` 后必须跑 `npm run collect:gate` 验证。
 - 不要提交 token、私仓 snapshot、`.sync` 运行时数据。
 
