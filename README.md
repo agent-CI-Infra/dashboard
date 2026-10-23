@@ -1,15 +1,173 @@
-# Community Ecosystem Monitor
+# Multi-Repo Community Dashboard
 
-开源社区运营与健康度监控平台，动态展示社区规模、活跃度、健康度与影响力。
+> **这是多个代码仓的公共 Dashboard，不是单仓看板。**  
+> 它聚合展示多个社区的规模、活跃度、健康度和质量门禁；单个仓库的深度视图由 `github-status-board` 模板提供。
 
-**在线访问：** https://agent-ci-infra.github.io/dashboard/
+**在线访问：** <https://agent-ci-infra.github.io/dashboard/>
 
 当前监控仓库（共 15 个）：
 
 - `openJiuwen-ai/sciencediscovery`
 - ThinkFlowLab：`system1-agents`、`vllm-rlt`、`system1-omni`、`nanodot`、`vllm-omni-mlx`、`OmniRSI`、`nanoMuse`、`mobilegym`、`OpenMinis`、`orbit_tests`、`pi`、`mlx-perf`、`agentic-video-generation`、`agent-core`
 
-## 功能页面
+---
+
+## 一、它是什么
+
+### 1.1 三个层次
+
+| 层 | 仓库 | 负责 | 不负责 |
+| --- | --- | --- | --- |
+| 门禁层 | `agent-CI-Infra/ci-gates`（建议新增，当前过渡为两份模板） | reusable workflow、`gate.mjs`、报告/用例 schema、starter、`AGENT.md` | Dashboard UI、站点发布 |
+| 单仓层 | [`haowenz001/github-status-board`](https://github.com/haowenz001/github-status-board) | 单仓采集、单仓 Dashboard、公开 Pages 或私仓本地模式 | 跨仓聚合、门禁协议定义 |
+| 汇总层 | **本仓** `agent-CI-Infra/dashboard` | 多仓聚合、`/gate`、来源登记、公开 Pages、接入入口 | 执行用户 CI、保存私仓数据 |
+
+```text
+用户源仓
+  └─ CI（ci-gates）─► ci-gates-reports artifact
+                         │
+                         ▼
+              github-status-board（单仓）
+                 ├─ data/snapshot.json  单仓页面
+                 └─ data/summary.json   公开白名单摘要
+                         │
+                         ▼
+              dashboard（本仓，多仓）
+                 └─ /gate 跨仓门禁视图
+```
+
+### 1.2 当前状态
+
+- 本仓已经有 15 个社区的指标采集和公开 Dashboard。
+- 本仓已经支持 `board-summary` 和 `status-board-lanes` 两种门禁来源；`ci-gates` 直连 artifact 适配器尚未实现。
+- 门禁模板目前保留在 `templates/ci-gates/`，同时单仓看板有 `source-template/`，属于过渡期重复。
+- **建议新增 `agent-CI-Infra/ci-gates` 门禁仓**，作为唯一权威模板；原因和迁移顺序见 [`docs/repository-architecture.md`](docs/repository-architecture.md)。
+
+---
+
+## 二、如何接入
+
+接入分三条路径。先确认源仓是 **public** 还是 **private**：公开看板只能接 public 源仓。
+
+### 2.1 只接入社区指标（不接门禁）
+
+适合只想被公共 Dashboard 统计 Stars / PR / Issue / 贡献者的仓库。
+
+1. 在 [`config/internal-contributors.json`](config/internal-contributors.json) 增加仓库键：
+
+   ```json
+   {
+     "owner/repo": []
+   }
+   ```
+
+2. 运行采集：
+
+   ```bash
+   GITHUB_TOKEN=... npm run collect
+   ```
+
+3. 打开 <https://agent-ci-infra.github.io/dashboard/>，确认仓库出现。
+
+新增一个社区只需要改这个配置；内部贡献者名单也在这里维护。
+
+### 2.2 接入门禁 + 单仓 Dashboard
+
+适合需要门禁详情、用例进度、单仓深视图的仓库。
+
+#### 第一步：源仓接入门禁
+
+从 [`templates/ci-gates/`](templates/ci-gates/) 或单仓模板的 [`source-template/`](https://github.com/haowenz001/github-status-board/tree/main/source-template) 复制：
+
+```text
+.github/workflows/ci.yml
+.github/ci-gates.json
+scripts/gate/gate.mjs
+test/cases/case-catalog.yaml
+```
+
+要求：
+
+- workflow name 为 `CI`；
+- 上传 artifact `ci-gates-reports`；
+- 先不填用例时，用空 catalog 并去掉 `pr-ready` 的 `verify-cases`；
+- 填用例时，`ready` 需要 `file` + `owner` + `@case <id>`。
+
+完整操作手册（面向用户 AI）：[`AGENT.md`](AGENT.md)。
+
+#### 第二步：建单仓 Dashboard
+
+1. 打开 <https://github.com/haowenz001/github-status-board>
+2. **Use this template** 创建 `owner/repo-board`（public）
+3. **Settings → Pages → Source: GitHub Actions**
+4. **Actions → Setup dashboard** 填：
+
+   ```json
+   {
+     "label": "repo",
+     "workflows": { "gate": ["^CI$"] },
+     "branch_lines": [{ "key": "main", "ref": "main" }],
+     "review_sla_days": 3,
+     "stale_days": 30
+   }
+   ```
+
+5. 等待 `Collect dashboard data (PAT)` → `Deploy dashboard Pages`，打开：
+
+   ```text
+   https://owner.github.io/repo-board/
+   ```
+
+**私仓**：不要接公开 Pages；用本机 `GSB_ALLOW_PRIVATE=1 python3 publish.py --repo owner/private-repo` + `python3 server.py`。
+
+#### 第三步：让公共 Dashboard 收录门禁数据
+
+当前在 [`config/gate-sources.json`](config/gate-sources.json) 增加来源：
+
+```json
+{
+  "id": "owner/repo",
+  "name": "repo",
+  "owner": "owner",
+  "type": "board-summary",
+  "summaryUrl": "https://owner.github.io/repo-board/data/summary.json",
+  "boardUrl": "https://owner.github.io/repo-board/",
+  "defaultBranch": "main"
+}
+```
+
+过渡期也可以读取单仓 snapshot：
+
+```json
+{
+  "id": "owner/repo",
+  "type": "status-board-lanes",
+  "url": "https://owner.github.io/repo-board/data/snapshot.json"
+}
+```
+
+然后：
+
+```bash
+npm run collect:gate
+npm run dev
+```
+
+打开 `/#/gate`。
+
+> **当前缺口**：`github-status-board` 还没有生成 `data/summary.json`。在补上 `board-summary@1` 生成器之前，公共 Dashboard 只能用 `status-board-lanes` 读取公开 snapshot；`ci-gates` 直连 artifact 适配器也尚未实现。
+
+### 2.3 接入申请
+
+- 站内教程：<https://agent-ci-infra.github.io/dashboard/#/gate-onboarding>
+- 接入 issue：本仓 `gate-onboarding.yml` 模板
+- 目标自动化：issue 提交 repo + summary URL → 校验 public/schema/仓库匹配 → 自动开 PR 修改 `gate-sources.json` → 人工合并 → 采集
+
+不要让用户直接提交任意 gate JSON/任意 URL；公共 Dashboard 只接受受 schema 约束的 summary。
+
+---
+
+## 三、功能页面
 
 | 路由 | 页面 | 说明 |
 | --- | --- | --- |
@@ -20,7 +178,9 @@
 | `/gate` | 质量门禁 | 五条 lane 的通过率与覆盖率、分支切换、C0–C4 等级、接入阶段与用例缺口 |
 | `/ecosystem` | 生态影响力 | 暂未开放 |
 
-## 本地运行
+---
+
+## 四、本地运行
 
 ```bash
 npm install
@@ -31,22 +191,7 @@ npm run build      # 生产构建
 > 需要 Node.js 20.19+（或 22.12+）。
 > Windows 上若启动报 `Cannot find native binding`，执行 `npm install @rolldown/binding-win32-x64-msvc@1.2.13 --no-save`。
 
-## 自动门禁（MVP）
-
-仓库内置了一套最小可用的门禁模板，用户复制 `templates/ci-gates/` 后即可在 PR / merge queue / push / schedule / release 上自动跑 lane，并产出 `gate-report` artifact：
-
-- 模板与接入说明：[`templates/ci-gates/README.md`](templates/ci-gates/README.md)
-- dashboard 自举工作流：[`.github/workflows/gate.yml`](.github/workflows/gate.yml)
-- lane 配置：[`.github/ci-gates.json`](.github/ci-gates.json)
-- 用例目录：[`test/cases/case-catalog.yaml`](test/cases/case-catalog.yaml)
-
-接入入口：
-
-- 站内：`/gate` 页头「接入门禁」→ `/#/gate-onboarding`
-- 直接访问：https://agent-ci-infra.github.io/dashboard/#/gate-onboarding
-- 接入申请：GitHub issue 模板 `gate-onboarding.yml`
-
-本地运行：
+门禁本地验证：
 
 ```bash
 npm run test:gate
@@ -54,9 +199,9 @@ node templates/ci-gates/scripts/gate/gate.mjs run --lane build --config .github/
 node templates/ci-gates/scripts/gate/gate.mjs verify-cases --config .github/ci-gates.json
 ```
 
-当前 MVP 只负责“自动触发 + 自动裁决 + 报告 artifact”；`CI Gates / gate` 设为 required check、开启 merge queue 需要管理员在 GitHub 设置里手动完成。dashboard 自举的 `daily` 以 observe 模式跑全量 Vitest，现有 4 个与门禁无关的 UI 测试只记 `observe_fail`，不阻断。
+---
 
-## 数据采集
+## 五、数据采集
 
 ```bash
 npm run collect
@@ -107,7 +252,9 @@ npm run collect
 | `MONITOR_LONG_OPEN_DAYS` | `30` | Issue 长期未解决阈值（天） |
 | `MONITOR_MAX_LIST_PAGES` | `20` | 列表分页上限 |
 
-## 指标口径
+---
+
+## 六、指标口径
 
 - **PR 状态**：Open / 已合入（`merged_at` 非空）/ 关闭未合入（关闭且未合入）；累计量与周期增量分开统计。
 - **Issue**：统计时排除 PR（GitHub 的 PR 也占用 Issue 编号）；区分 Open / Closed 与周期内新增、关闭。
@@ -115,6 +262,17 @@ npm run collect
 - **概览**：社区概览只展示最新现状，不提供时间范围选择（增量统计不使用该数据）。
 - **时间**：统一 UTC 存储，历史点按 UTC 天切分。
 - **内 / 外部**：白名单制，按仓库区分。`config/internal-contributors.json` 中该仓库列出的登录名记为 internal，其余非 bot 作者记为 external，bot 记为 unknown 且不计入内 / 外部；各页面口径一致。
+
+---
+
+## 七、安全边界
+
+- 公共 Dashboard 只展示公开数据；私仓不要配置公开 snapshot/summary。
+- 私仓 Dashboard 使用本机/私有部署，不发布到公开 GitHub Pages。
+- 不把 token、PAT、私钥写入仓库或配置。
+- 接入配置只接受受 schema 约束的公开 summary，不接受任意 gate JSON 或任意 URL。
+
+---
 
 ## License
 
