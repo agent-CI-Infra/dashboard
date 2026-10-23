@@ -151,6 +151,24 @@
       "enabled": false,
       "comment": "Example federated source; set enabled=true after a real board publishes data/summary.json",
       "boardUrl": "https://acme.github.io/web/"
+    },
+    {
+      "id": "haowenz001/ci-gates-smoke-20261022",
+      "name": "ci-gates-smoke-20261022",
+      "owner": "haowenz001",
+      "defaultBranch": "main",
+      "type": "status-board-lanes",
+      "url": "https://haowenz001.github.io/ci-gates-smoke-20261022-board/data/snapshot.json",
+      "dashboardUrl": "https://haowenz001.github.io/ci-gates-smoke-20261022-board/",
+      "boardUrl": "https://haowenz001.github.io/ci-gates-smoke-20261022-board/",
+      "channelMap": [
+        {
+          "channel": "gate",
+          "workflow": [
+            "CI"
+          ]
+        }
+      ]
     }
   ],
   "defaultWindowDays": 7
