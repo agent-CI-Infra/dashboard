@@ -195,8 +195,8 @@ const DICT = {
   },
   'gate.onboarding.step3.title': { zh: '登记用例', en: 'Register cases' },
   'gate.onboarding.step3.body': {
-    zh: '在 test/cases/case-catalog.yaml 中加用例；ready 用例需要 file、owner 和 @case 标记。',
-    en: 'Add cases to test/cases/case-catalog.yaml; ready cases need file, owner and an @case marker.',
+    zh: '在 test/cases/case-catalog.yaml 中加用例；ready 用例需要 file、owner 和 case 标记。',
+    en: 'Add cases to test/cases/case-catalog.yaml; ready cases need file, owner and a case marker.',
   },
   'gate.onboarding.step4.title': {
     zh: '设置 required check',
