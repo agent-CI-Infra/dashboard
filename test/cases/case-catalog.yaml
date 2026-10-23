@@ -25,3 +25,11 @@ cases:
     status: todo
     file: src/features/tasks/components/tasks-mutate-drawer.test.tsx
     source: generated
+
+  - id: auth.login.success
+    lane: pr-ready
+    layer: L2
+    title: 登录成功跳转
+    status: todo
+    file: src/features/gate/onboarding/gate-onboarding-page.tsx
+    source: generated
