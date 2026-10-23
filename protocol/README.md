@@ -1,13 +1,13 @@
 # CI gate protocol contracts
 
-These schemas are the contract between **ci-gates** (producer), the **per-repository board** (edge aggregator) and this **public dashboard** (federation consumer). They are deliberately versioned and append-only: dashboards must keep working when a producer only emits an older subset.
+These schemas are the contract between **CI-workflow** (producer), the **per-repository board** (edge aggregator) and this **public dashboard** (federation consumer). They are deliberately versioned and append-only: dashboards must keep working when a producer only emits an older subset.
 
-> The `ci-gates` repository does not exist yet, so this directory is the temporary home of the shared contract. When `ci-gates` is created, `gate-report.schema.json` and `case-catalog.schema.json` move to its `schema/` directory and this directory keeps a copy only for the dashboard validator. Do not fork the definitions: copy, don't rewrite.
+> Canonical schemas live in [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow); this directory keeps the dashboard validator copy. Protocol identifiers remain `ci-gates/*` for backward compatibility. Do not fork the definitions: copy, don't rewrite.
 
 | File | Contract | Producer | Consumers |
 |---|---|---|---|
-| `gate-report.schema.json` | `ci-gates/gate-report@1` (v1.1 fields are optional) | ci-gates `verdict` job | board, dashboard artifact mode |
-| `case-catalog.schema.json` | `ci-gates/case-catalog@1` | generator + repository owner | ci-gates `case-contract`, board |
+| `gate-report.schema.json` | `ci-gates/gate-report@1` (v1.1 fields are optional) | CI-workflow `verdict` job | board, dashboard artifact mode |
+| `case-catalog.schema.json` | `ci-gates/case-catalog@1` | generator + repository owner | CI-workflow `case-contract`, board |
 | `board-summary.schema.json` | `ci-gates/board-summary@1` | per-repository board | public dashboard |
 
 ## Trust rules encoded by the contract
