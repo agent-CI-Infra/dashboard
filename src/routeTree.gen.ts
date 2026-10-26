@@ -23,6 +23,7 @@ import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
+import { Route as AuthenticatedContributorsRouteImport } from './routes/_authenticated/contributors'
 import { Route as AuthenticatedEcosystemRouteImport } from './routes/_authenticated/ecosystem'
 import { Route as AuthenticatedGateRouteImport } from './routes/_authenticated/gate'
 import { Route as AuthenticatedGateOnboardingRouteImport } from './routes/_authenticated/gate-onboarding'
@@ -112,6 +113,12 @@ const AuthenticatedAboutRoute = AuthenticatedAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedContributorsRoute =
+  AuthenticatedContributorsRouteImport.update({
+    id: '/contributors',
+    path: '/contributors',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEcosystemRoute = AuthenticatedEcosystemRouteImport.update({
   id: '/ecosystem',
   path: '/ecosystem',
@@ -227,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/about': typeof AuthenticatedAboutRoute
+  '/contributors': typeof AuthenticatedContributorsRoute
   '/ecosystem': typeof AuthenticatedEcosystemRoute
   '/gate': typeof AuthenticatedGateRoute
   '/gate-onboarding': typeof AuthenticatedGateOnboardingRoute
@@ -257,6 +265,7 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/about': typeof AuthenticatedAboutRoute
+  '/contributors': typeof AuthenticatedContributorsRoute
   '/ecosystem': typeof AuthenticatedEcosystemRoute
   '/gate': typeof AuthenticatedGateRoute
   '/gate-onboarding': typeof AuthenticatedGateOnboardingRoute
@@ -293,6 +302,7 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/about': typeof AuthenticatedAboutRoute
+  '/_authenticated/contributors': typeof AuthenticatedContributorsRoute
   '/_authenticated/ecosystem': typeof AuthenticatedEcosystemRoute
   '/_authenticated/gate': typeof AuthenticatedGateRoute
   '/_authenticated/gate-onboarding': typeof AuthenticatedGateOnboardingRoute
@@ -328,6 +338,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/about'
+    | '/contributors'
     | '/ecosystem'
     | '/gate'
     | '/gate-onboarding'
@@ -358,6 +369,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/about'
+    | '/contributors'
     | '/ecosystem'
     | '/gate'
     | '/gate-onboarding'
@@ -393,6 +405,7 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/about'
+    | '/_authenticated/contributors'
     | '/_authenticated/ecosystem'
     | '/_authenticated/gate'
     | '/_authenticated/gate-onboarding'
@@ -525,6 +538,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AuthenticatedAboutRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/contributors': {
+      id: '/_authenticated/contributors'
+      path: '/contributors'
+      fullPath: '/contributors'
+      preLoaderRoute: typeof AuthenticatedContributorsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/ecosystem': {
@@ -682,6 +702,7 @@ const AuthenticatedSettingsRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedAboutRoute: typeof AuthenticatedAboutRoute
+  AuthenticatedContributorsRoute: typeof AuthenticatedContributorsRoute
   AuthenticatedEcosystemRoute: typeof AuthenticatedEcosystemRoute
   AuthenticatedGateRoute: typeof AuthenticatedGateRoute
   AuthenticatedGateOnboardingRoute: typeof AuthenticatedGateOnboardingRoute
@@ -699,6 +720,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedAboutRoute: AuthenticatedAboutRoute,
+  AuthenticatedContributorsRoute: AuthenticatedContributorsRoute,
   AuthenticatedEcosystemRoute: AuthenticatedEcosystemRoute,
   AuthenticatedGateRoute: AuthenticatedGateRoute,
   AuthenticatedGateOnboardingRoute: AuthenticatedGateOnboardingRoute,

@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   LineChart,
   ShieldCheck,
+  Users,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -40,6 +41,11 @@ export const sidebarData: SidebarData = {
               title: 'Issues',
               url: '/issues',
               icon: CircleDot,
+            },
+            {
+              title: '贡献者',
+              url: '/contributors',
+              icon: Users,
             },
             {
               title: '社区成长',

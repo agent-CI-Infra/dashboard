@@ -22,6 +22,7 @@ const DICT = {
   'nav.community.group': { zh: '社区概览', en: 'Community' },
   'nav.community.pulls': { zh: 'Pull Requests', en: 'Pull Requests' },
   'nav.community.issues': { zh: 'Issues', en: 'Issues' },
+  'nav.community.contributors': { zh: '贡献者', en: 'Contributors' },
   'nav.community.growth': { zh: '社区成长', en: 'Growth' },
   'nav.community.ecosystem': { zh: '生态影响力', en: 'Ecosystem' },
   'nav.about': { zh: '关于本站', en: 'About' },
@@ -45,7 +46,7 @@ const DICT = {
 
   'community.title': { zh: '社区概览', en: 'Community Overview' },
   'community.description': {
-    zh: '开源社区运营与健康度监控平台，动态展示社区规模、活跃度、健康度与影响力。',
+    zh: '开源社区运营与健康度监控平台，动态展示社区规模、健康度、影响力与活跃度。',
     en: 'Open-source community operations and health monitoring — community scale, activity, health and influence at a glance.',
   },
   'community.dataUpdatedAt': { zh: '数据更新时间', en: 'Data updated' },
