@@ -1,0 +1,25 @@
+# Runtime state, never committed.
+# .cache/ snapshot.json + parsed Actions artifacts; .data/ board.json (local
+# board fields, columns, rules, aliases); .run/ server.pid + server.log.
+.cache/
+.data/
+.run/
+.tmp/
+dist/
+.e2e/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Credentials. The board reads its token from the environment or the gh CLI,
+# so no secret file belongs in this tree.
+.env
+.env.*
+*.pem
+*.key
+*_token
+*.token

@@ -1,0 +1,18 @@
+{
+  "review_sla_days": 3,
+  "stale_days": 30,
+  "workflows": {
+    "gate": ["^CI$", "gate", "门禁"],
+    "daily": ["nightly", "daily", "每日"],
+    "release": ["release", "version", "版本"]
+  },
+  "branch_lines": [
+    { "key": "main", "ref": "main", "historical_refs": [
+      { "ref": "feat/jiuwenswarm", "before": "2026-09-27T00:00:00Z" }
+    ] },
+    { "key": "legacy", "ref": "legacy", "historical_refs": [
+      { "ref": "main", "before": "2026-09-27T00:00:00Z" }
+    ] },
+    { "key": "release", "ref": "releases/v0.3.0.beta" }
+  ]
+}

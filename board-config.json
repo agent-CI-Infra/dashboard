@@ -1,0 +1,22 @@
+{
+  "review_sla_days": 3,
+  "stale_days": 30,
+  "workflows": {
+    "gate": ["^Code Check$", "^UT$"],
+    "daily": ["^Nightly$"],
+    "release": ["release", "version"]
+  },
+  "branch_lines": [
+    {
+      "key": "main",
+      "ref": "main"
+    }
+  ],
+  "deployments": {
+    "openJiuwen-ai/DigitalMate": {
+      "environment": "production",
+      "label": "digitalmate",
+      "repository": "haowenz001/digitalmate-board"
+    }
+  }
+}
