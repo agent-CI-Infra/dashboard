@@ -151,6 +151,7 @@ const DICT = {
     zh: '{total} 个仓库 · {passed} 通过 · {failed} 失败 · {running} 运行中',
     en: '{total} repositories · {passed} passing · {failed} failing · {running} running',
   },
+  'gate.boards.entry': { zh: '单仓看板', en: 'Repo boards' },
   'gate.onboarding.entry': { zh: '接入门禁', en: 'Add gates' },
   'gate.onboarding.title': { zh: '接入门禁', en: 'Add gates to your repo' },
   'gate.onboarding.subtitle': {
@@ -166,8 +167,8 @@ const DICT = {
     en: 'From template to automatic gates',
   },
   'gate.onboarding.hero.desc': {
-    zh: '接入发生在用户自己的代码仓；dashboard 负责汇总和展示，不是配置表单。',
-    en: 'Onboarding happens in the user repository; the dashboard aggregates and displays, it is not a configuration form.',
+    zh: '门禁接入发生在源仓；单仓看板由本仓统一托管和汇总，不需要另建看板仓。',
+    en: 'Gate onboarding happens in the source repository; this site hosts and aggregates repository boards, with no separate board repository.',
   },
   'gate.onboarding.issueHint': {
     zh: '不确定怎么配？提交接入申请，附上仓库和门禁命令。',
@@ -212,16 +213,20 @@ const DICT = {
     en: 'With merge queue enabled, merge_group runs build + pr-merge automatically.',
   },
   'gate.onboarding.board.title': {
-    zh: '把仓库放进单仓看板',
-    en: 'Put the repository on its own board',
+    zh: '单仓看板由公仓托管',
+    en: 'Repository boards are hosted here',
   },
   'gate.onboarding.boardNote': {
-    zh: '复制单仓看板模板，在 Setup dashboard 里填源仓和一份 JSON；采集工作流每天刷新，Pages 自动发布。门禁报告会显示 lane 结论与用例数。',
-    en: 'Copy the per-repository board template, fill the source repository and one JSON in Setup dashboard; collection refreshes daily and Pages deploys automatically. Gate reports show lane verdicts and case counts.',
+    zh: '不需要复制模板或新建仓库。维护者运行 Create board 并填写源仓，数据写入 board/<owner>/<repo> 分支，Deploy 汇总发布到 /boards/<owner>/<repo>/；每天自动刷新。门禁报告会显示 lane 结论与用例数。',
+    en: 'No template copy and no extra repository. A maintainer runs Create board with the source repository; data lands on a board/<owner>/<repo> branch and Deploy publishes it at /boards/<owner>/<repo>/ with a daily refresh. Gate reports show lane verdicts and case counts.',
   },
   'gate.onboarding.boardTemplate': {
-    zh: '打开单仓看板模板',
-    en: 'Open the per-repository board template',
+    zh: '查看单仓看板',
+    en: 'Browse repository boards',
+  },
+  'gate.onboarding.boardCreate': {
+    zh: '创建单仓看板',
+    en: 'Create a board',
   },
   'gate.onboarding.boardLink': {
     zh: '查看当前门禁看板',

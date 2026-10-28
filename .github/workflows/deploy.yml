@@ -6,6 +6,9 @@ on:
   schedule:
     # Refresh data and redeploy every hour.
     - cron: '0 * * * *'
+  workflow_run:
+    workflows: ["Collect board data"]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -19,10 +22,13 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion != 'cancelled'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -60,6 +66,13 @@ jobs:
         env:
           VITE_BASE: './'
         run: npm run build
+
+      - name: Assemble repository boards
+        # Each board branch stores only data; the public site is assembled
+        # from all board/* branches after the Vite build.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/assemble-boards.mjs
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

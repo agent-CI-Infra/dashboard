@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { BookOpen } from 'lucide-react'
+import { BookOpen, LayoutGrid } from 'lucide-react'
 import { useLang } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -70,6 +70,12 @@ function GatePage() {
     <>
       <Header>
         <div className='me-auto' />
+        <Button asChild variant='outline' size='sm' className='me-1'>
+          <a href='./boards/' aria-label={t('gate.boards.entry')}>
+            <LayoutGrid className='size-4' />
+            <span className='hidden sm:inline'>{t('gate.boards.entry')}</span>
+          </a>
+        </Button>
         <Button asChild variant='outline' size='sm' className='me-1'>
           <Link to='/gate-onboarding' aria-label={t('gate.onboarding.entry')}>
             <BookOpen className='size-4' />

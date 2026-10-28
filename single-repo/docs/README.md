@@ -10,6 +10,7 @@
 | [CI 分层历史](ci-history-lanes.md) | PR / 主干 / Daily / 版本分层、共同日期轴、同日纵向排列及 PR 号推断 |
 | [标签化测试](tagged-tests.md) | 标签维度与用例数、PR / Daily / Release 组合规则、覆盖与从未覆盖的用例 |
 | [分支线](branch-lines.md) | CI、测试、Coverage 在 main、legacy 与 release 分支之间切换，按 PR 目标分支归类，数据互不混合 |
+| [独立仓部署工作流（历史）](standalone-workflows/) | 旧“复制模板到新仓”的 Setup / Collect / Pages 工作流，仅作追溯 |
 | [GitCode 同步记录](gitcode-sync.md) | GitHub PR 同步到 GitCode MR 的当前状态与记录、CodeCheck 结论、失败与过期提示、经 OIDC 读取和发布前校验 |
 
 独立功能分别维护文档；新增／改变配置、数据或交互时，同次更新相关说明与本目录。

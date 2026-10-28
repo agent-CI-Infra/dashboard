@@ -18,7 +18,8 @@ import { ThemeSwitch } from '@/components/theme-switch'
 const GITHUB_REPO = 'https://github.com/agent-CI-Infra/dashboard'
 const CI_WORKFLOW_REPO = 'https://github.com/agent-CI-Infra/CI-workflow'
 const TEMPLATE_GUIDE = `${CI_WORKFLOW_REPO}/blob/main/README.md`
-const BOARD_TEMPLATE = `${GITHUB_REPO}/tree/main/single-repo`
+const BOARD_INDEX = 'https://agent-ci-infra.github.io/dashboard/boards/'
+const CREATE_BOARD = `${GITHUB_REPO}/actions/workflows/board-create.yml`
 const ONBOARDING_ISSUE = `${GITHUB_REPO}/issues/new?template=gate-onboarding.yml`
 
 const COPY_BLOCK = `git clone --depth 1 https://github.com/agent-CI-Infra/CI-workflow.git /tmp/ci-workflow
@@ -170,12 +171,21 @@ export function GateOnboardingPage() {
           </p>
           <div className='mt-3 flex flex-wrap items-center gap-4'>
             <a
-              href={BOARD_TEMPLATE}
+              href={BOARD_INDEX}
               target='_blank'
               rel='noreferrer'
               className='inline-flex items-center gap-1.5 text-sm font-medium text-gate-accent hover:underline'
             >
               {t('gate.onboarding.boardTemplate')}
+              <ExternalLink className='size-3.5 opacity-70' />
+            </a>
+            <a
+              href={CREATE_BOARD}
+              target='_blank'
+              rel='noreferrer'
+              className='inline-flex items-center gap-1.5 text-sm font-medium text-gate-accent hover:underline'
+            >
+              {t('gate.onboarding.boardCreate')}
               <ExternalLink className='size-3.5 opacity-70' />
             </a>
             <Link

@@ -1,5 +1,7 @@
 # Actions 看板采集
 
+> 托管模式说明（当前）：公开看板由本仓根目录的 `.github/workflows/board-collect.yml` 采集、`deploy.yml` 统一发布；不需要在看板仓内配置 `collect.yml` / `pages.yml`。本文保留上游独立仓设计，作为采集器行为参考。
+
 ## 功能
 
 `.github/workflows/collect.yml` 将已有 Python 采集器放到 GitHub Actions 运行。Node／Compose 或 Cloudflare Worker Bot 只接收／记录 Webhook、合并更新并触发该工作流；采集后的 App 提交继续触发 `pages.yml` 发布 GitHub Pages。现有本机 `publish.py` 用法保持兼容。

@@ -1,17 +1,17 @@
 # 仓库分工与接入架构
 
 > 状态：已落地。
-> 目标：两个 Dashboard 形态放在一个代码仓，CI workflow（含门禁）独立成仓。
+> 目标：两个 Dashboard 形态放在一个代码仓；公开单仓看板不复制模板、不新建看板仓。
 
-## 1. 三个仓库
+## 1. 三个层次
 
-| 仓库 | 定位 | 负责 | 不负责 |
+| 仓库 / 目录 | 定位 | 负责 | 不负责 |
 | --- | --- | --- | --- |
 | [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow) | CI workflow（含门禁）契约与模板 | workflow 模板、`gate.mjs`、报告/用例 schema、starter、`AGENT.md`、版本 tag | Dashboard UI、站点发布 |
-| [`agent-CI-Infra/dashboard`](https://github.com/agent-CI-Infra/dashboard) | 两个 Dashboard 的代码仓 | 根目录公共多仓聚合；`single-repo/` 单仓/私仓模板；来源登记；公开 Pages | 执行用户 CI、保存私仓数据、复制门禁实现 |
-| `single-repo/`（本仓目录） | 单仓/私仓 Dashboard 模板 | 单仓采集、单仓页面、Setup/Collect/Pages、本地私仓模式 | 跨仓聚合、门禁协议定义 |
+| [`agent-CI-Infra/dashboard`](https://github.com/agent-CI-Infra/dashboard) | 公共与单仓 Dashboard 的代码仓 | 多仓聚合、`/gate`、`/boards/`、`board/*` 数据分支、公开 Pages、接入入口 | 执行用户 CI、保存私仓数据、复制门禁实现 |
+| `agent-CI-Infra/dashboard/single-repo/` | 单仓/私仓采集器 | 单仓采集、静态页面、本地私仓模式 | 跨仓聚合、门禁协议定义、独立站点部署 |
 
-原独立仓库 `haowenz001/github-status-board` 的代码已收进本仓 `single-repo/`；它不再作为新的独立模板仓维护。
+原独立仓库 `haowenz001/github-status-board` 的代码已收进 `single-repo/`；不再作为独立模板仓维护。
 
 ## 2. 代码布局
 
@@ -19,13 +19,17 @@
 agent-CI-Infra/dashboard/
   src/                        公共多仓 Dashboard（React/Vite）
   scripts/                    公共 Dashboard 采集
+  scripts/assemble-boards.mjs 汇总 board/* 分支到 Pages artifact
   config/                     社区列表、门禁来源
-  single-repo/                单仓 / 私仓 Dashboard 模板
-    .github/workflows/        复制到新仓后使用的 Setup/Collect/Pages
+  single-repo/                单仓 / 私仓采集器
     gsb/                      采集与快照
-    site/                     静态页面
-    setup.py / publish.py
-    README.md
+    static/                   单仓静态页面
+    publish.py / server.py    采集与本地预览
+    setup.py                  生成 board-config.json
+  .github/workflows/
+    board-create.yml          创建 board/<owner>/<repo>
+    board-collect.yml         采集并写回 board/*
+    deploy.yml                构建公共站 + 汇总分支 + 发布 Pages
 ```
 
 ```text
@@ -39,25 +43,52 @@ agent-CI-Infra/CI-workflow/
   AGENT.md
 ```
 
-## 3. 数据流
+## 3. 分支模型与 Pages 约束
+
+**GitHub Pages 一个仓库只能发布一个站点。** 因此 `board/*` 分支不是独立站点，也不能各自配置 Pages。
+
+```text
+main
+  ├─ src/、single-repo/、scripts/、workflows/    代码与静态资源
+  └─ board/<owner>/<repo>                        数据分支（orphan）
+       ├─ board-config.json
+       ├─ site/data/...                          snapshot、history、E2E 索引
+       └─ .sync/...                              增量采集状态
+```
+
+- 一个源仓对应一个 `board/<owner>/<repo>` 分支；分支名统一小写，避免大小写重复。
+- 分支只存配置和生成数据，不放采集器代码、静态资源或 workflow。
+- `board-collect.yml` 从 `main` 取采集器和静态资源，并以 `--publish-data-only` 只写回数据；缓存/静态资源不会进入分支。
+- `deploy.yml` 构建 Vite 后运行 `scripts/assemble-boards.mjs`，把每个分支的 `site/data/` 复制到：
+
+```text
+dist/boards/<owner>/<repo>/
+```
+
+- 最终只有一套 Pages 站点：`/` 是多仓聚合，`/boards/` 是单仓列表，`/boards/<owner>/<repo>/` 是单仓页面。
+- 不复制 `single-repo/` 到新仓，也不要在源仓里加看板代码。
+
+## 4. 数据流
 
 ```text
 用户源仓
   └─ CI（CI-workflow）─► ci-gates-reports artifact
                          │
                          ▼
-              dashboard/single-repo（单仓）
-                 ├─ data/snapshot.json  单仓页面
-                 └─ data/summary.json   公开白名单摘要（待补）
+       dashboard/board/<owner>/<repo> 分支
+         ├─ site/data/snapshot.json  单仓页面
+         └─ site/data/summary.json   公开白名单摘要（待补）
+                         │  Deploy 汇总
+                         ▼
+       /boards/<owner>/<repo>/  单仓页面
                          │
                          ▼
-              dashboard（根目录，多仓）
-                 └─ /gate 跨仓门禁视图
+       /gate                    跨仓门禁视图
 ```
 
 公共 Dashboard 不运行用户 CI；单仓看板不定义门禁协议；`CI-workflow` 仓不发布站点。
 
-## 4. 数据契约
+## 5. 数据契约
 
 - `ci-gates/gate-report@1`：源仓 CI 上传的 `ci-gates-reports/*.json`。
 - `ci-gates/case-catalog@1`：`test/cases/case-catalog.yaml`。
@@ -76,18 +107,21 @@ agent-CI-Infra/CI-workflow/
 
 **当前缺口**：`single-repo/` 还没有生成 `data/summary.json`。在补上之前，公共 Dashboard 用 `status-board-lanes` 读取公开 snapshot；`CI-workflow` 直连 artifact 适配器也尚未实现。
 
-## 5. 公共 Dashboard 接入
+## 6. 接入
 
-### 5.1 只接社区指标
+### 6.1 只接社区指标
 
 修改 `config/internal-contributors.json`，运行 `npm run collect`。
 
-### 5.2 接门禁 + 单仓看板
+### 6.2 接门禁 + 单仓看板
 
 1. 源仓接入 `CI-workflow`。
-2. 从本仓 `single-repo/` 复制到新仓，运行 Setup。
-3. 单仓看板发布公开 snapshot（当前）或 summary（目标）。
-4. 在 `config/gate-sources.json` 增加：
+2. 在本仓 Actions 运行 **Create board**：
+   - `source_repository`：公开源仓 `owner/repo`；
+   - `config_json`：可选，支持 `label`、`workflows`、`branch_lines`、`review_sla_days`、`stale_days`。
+3. 工作流创建 `board/<owner>/<repo>` 分支并触发 `Collect board data`。
+4. `Deploy to GitHub Pages` 发布到 `https://agent-ci-infra.github.io/dashboard/boards/<owner>/<repo>/`。
+5. 在 `config/gate-sources.json` 增加来源：
 
 ```jsonc
 // 当前可用：公开 snapshot
@@ -96,7 +130,7 @@ agent-CI-Infra/CI-workflow/
   "name": "repo",
   "owner": "owner",
   "type": "status-board-lanes",
-  "url": "https://owner.github.io/repo-board/data/snapshot.json"
+  "url": "https://agent-ci-infra.github.io/dashboard/boards/owner/repo/data/snapshot.json"
 }
 ```
 
@@ -107,31 +141,30 @@ agent-CI-Infra/CI-workflow/
   "name": "repo",
   "owner": "owner",
   "type": "board-summary",
-  "summaryUrl": "https://owner.github.io/repo-board/data/summary.json",
-  "boardUrl": "https://owner.github.io/repo-board/",
+  "summaryUrl": "https://agent-ci-infra.github.io/dashboard/boards/owner/repo/data/summary.json",
+  "boardUrl": "https://agent-ci-infra.github.io/dashboard/boards/owner/repo/",
   "defaultBranch": "main"
 }
 ```
 
-5. 运行 `npm run collect:gate`，打开 `/#/gate`。
+6. 运行 `npm run collect:gate`，打开 `/#/gate`。
 
-### 5.3 自动接入目标
+### 6.3 自动接入目标
 
-1. 用户提交 issue，提供 repo + board + summary URL + 默认分支。
+1. 用户提交 issue，提供公开源仓；维护者运行 Create board。
 2. workflow 校验：
-   - 源仓 public；
-   - summary 可访问；
-   - schema 为 `ci-gates/board-summary@1`；
-   - `repository` 匹配；
-   - 字段在白名单内。
-3. 自动开 PR 修改 `config/gate-sources.json`，人工合并。
-4. 采集后 `/gate` 出现该仓。
+   - 源仓 public、未归档；
+   - 不能是 dashboard 仓自身；
+   - 分支不存在（避免覆盖已有看板）。
+3. 采集后校验 snapshot/summary 可访问且仓库匹配。
+4. 自动开 PR 修改 `config/gate-sources.json`，人工合并。
+5. 采集后 `/gate` 出现该仓。
 
 不要接受任意 gate JSON 或任意 URL。
 
-## 6. 私仓
+## 7. 私仓
 
-- 不进入公共 Dashboard。
+- 不进入公共 Dashboard，不创建 `board/*` 分支。
 - 使用 `single-repo/` 本地模式：
 
 ```bash
@@ -141,18 +174,20 @@ python3 server.py
 ```
 
 - 公开 GitHub Pages 不可以发布私仓数据。
-- `publish.py --publish-repo` 会拒绝私有源仓。
+- `publish.py --publish-repo` 会同时校验源仓和发布目标必须是公开仓。
 
-## 7. 版本与迁移
+## 8. 版本与迁移
 
 - `CI-workflow` 打 `v1`；Dashboard 的 `.github/workflows/gate.yml` checkout `agent-CI-Infra/CI-workflow@v1`。
 - 用户仓引用 `v1`，不要跟踪 `main`。
 - 破坏性 schema 变更升 `v2`。
 - 历史文档中的 `templates/ci-gates` / `source-template` 路径已废弃。
+- “复制 `single-repo/` 到新仓 + Setup dashboard”的路径已废弃；旧 workflow 仅保留在 [`single-repo/docs/standalone-workflows/`](../single-repo/docs/standalone-workflows/) 供追溯。
 
-## 8. 验收
+## 9. 验收
 
 - 公共 Dashboard：`npm run build`、`npm run test:collector`、`npm run collect:gate`。
-- 单仓模板：`cd single-repo && python3 -m unittest discover -s tests -v`。
+- 分支汇总：`node --test scripts/assemble-boards.test.mjs`。
+- 单仓采集器：`cd single-repo && python3 -m unittest discover -s tests -v`。
 - `CI-workflow` 仓：`node --test scripts/gate/gate.test.mjs`。
-- 线上：`/` 是公共多仓；`single-repo/README.md` 是单仓入口；`CI-workflow` 是 CI workflow（含门禁）入口。
+- 线上：`/` 是公共多仓；`/boards/` 是单仓列表；`/boards/<owner>/<repo>/` 是单仓看板；`CI-workflow` 是 CI workflow（含门禁）入口。

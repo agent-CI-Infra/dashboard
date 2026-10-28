@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -16,6 +17,7 @@ from gsb.github import GitHub, GitHubError, discover_token
 from gsb.project import REPO_RE, build_project
 
 ROOT = Path(__file__).resolve().parent
+BRANCH_RE = re.compile(r"[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*\Z")
 STATIC_FILES = ("index.html", "app.js", "style.css", "board.js", "board-local.js", "gitcode-sync.js",
                 "real-e2e.html", "real-e2e.js", "e2e-report.html")
 # Written only when the collect workflow fetched GitCode sync records from the bot.
@@ -28,6 +30,14 @@ def deployment_for(repo, settings, target=None):
     if deployment and target and target.lower() != deployment["repository"].lower():
         raise ValueError("source repository does not match publishing destination")
     return deployment
+
+
+def ensure_public_repository(gh, repository, *, role="repository"):
+    if not REPO_RE.fullmatch(repository):
+        raise ValueError(f"invalid {role}: {repository!r}")
+    meta = gh.get(f"/repos/{repository}")
+    if meta.get("private") or meta.get("visibility", "public") != "public":
+        raise ValueError(f"{role} must be public; private boards are local-only")
 
 
 def export_site(output, snapshot):
@@ -43,8 +53,8 @@ def export_site(output, snapshot):
     (output / ".nojekyll").write_text("")
 
 
-def publish(gh, site, repository, branch="main", *, source_token=None):
-    if not REPO_RE.fullmatch(repository) or not REPO_RE.fullmatch("owner/" + branch):
+def publish(gh, site, repository, branch="main", *, source_token=None, data_only=False):
+    if not REPO_RE.fullmatch(repository) or not BRANCH_RE.fullmatch(branch):
         raise ValueError("invalid publishing target")
     prefix = f"/repos/{repository}"
     if gh.get(prefix).get("private"):
@@ -54,6 +64,8 @@ def publish(gh, site, repository, branch="main", *, source_token=None):
     old = gh.get(prefix + "/git/ref/heads/" + branch)["object"]["sha"]
     base_tree = gh.get(prefix + "/git/commits/" + old)["tree"]["sha"]
     files = [*STATIC_FILES, "data/snapshot.json", ".nojekyll", *([SYNC_DATA] if (Path(site) / SYNC_DATA).exists() else [])]
+    if data_only:
+        files = [name for name in files if name.startswith("data/")]
     tree = [{"path": "site/" + p, "mode": "100644", "type": "blob", "content": (Path(site) / p).read_text(encoding="utf-8")} for p in files]
     for entry in tree:
         if any(token and token in entry["content"] for token in (gh.token, source_token)):
@@ -87,11 +99,13 @@ def e2e_run_records(sync, snapshot):
         return None
 
 
-def publish_batch(gh, repository, branch, base, files, *, source_token=None):
+def publish_batch(gh, repository, branch, base, files, *, source_token=None, data_only=False):
     """Commit checkpoints and public data on the exact checkout we collected."""
-    import re
-    if not REPO_RE.fullmatch(repository) or not REPO_RE.fullmatch("owner/" + branch) or not re.fullmatch("[0-9a-f]{40}", base):
+    if not REPO_RE.fullmatch(repository) or not BRANCH_RE.fullmatch(branch) or not re.fullmatch("[0-9a-f]{40}", base):
         raise ValueError("invalid publication base")
+    if data_only:
+        files = {path: content for path, content in files.items()
+                 if path.startswith(".sync/") or path.startswith("site/data/")}
     prefix = f"/repos/{repository}"
     if gh.get(prefix).get("private"):
         raise ValueError("publishing target must be public")
@@ -137,6 +151,8 @@ def main():
     parser.add_argument("--publish-repo")
     parser.add_argument("--branch", default="main")
     parser.add_argument("--incremental", action="store_true", help="resume .sync/ from this checkout")
+    parser.add_argument("--publish-data-only", action="store_true",
+                        help="publish only board data; static assets come from main at deploy time")
     parser.add_argument("--request-budget", type=int, default=180)
     args = parser.parse_args()
     token, _ = discover_token()
@@ -146,10 +162,9 @@ def main():
     try:
         settings = json.loads(Path(args.settings).read_text())
         deployment = deployment_for(args.repo, settings, args.publish_repo)
-        if args.publish_repo and os.environ.get("GSB_ALLOW_PRIVATE", "").strip().lower() in ("1", "true", "yes", "on"):
-            source_meta = gh.get(f"/repos/{args.repo}")
-            if source_meta.get("private") or source_meta.get("visibility", "public") != "public":
-                raise ValueError("private source cannot be published to public Pages; use the local server")
+        if args.publish_repo:
+            ensure_public_repository(gh, args.repo, role="source repository")
+            ensure_public_repository(gh, args.publish_repo, role="publishing target")
         sync = records = None
         if args.incremental:
             from gsb.sync import Sync
@@ -190,13 +205,18 @@ def main():
                     records.write_bundle(ROOT / BUNDLE_DIR)
                 files = {path: content for path, content in files.items()
                          if ((ROOT / path).exists() if content is None else not (ROOT / path).exists() or (ROOT / path).read_text() != content)}
+                if args.publish_data_only:
+                    files = {path: content for path, content in files.items()
+                             if path.startswith(".sync/") or path.startswith("site/data/")}
                 base = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
-                result["commit"] = publish_batch(publisher, args.publish_repo, args.branch, base, files, source_token=token)
+                result["commit"] = publish_batch(publisher, args.publish_repo, args.branch, base, files,
+                                                 source_token=token, data_only=args.publish_data_only)
                 result["sync"] = sync.progress()
                 result["changed_files"] = len(files)
                 run_changes.write_receipt(os.environ.get("GSB_RUN_CHANGES_RECEIPT"), args.repo, sync.completed_changes(), result["commit"] or base)
             else:
-                result["commit"] = publish(publisher, args.output, args.publish_repo, args.branch, source_token=token)
+                result["commit"] = publish(publisher, args.output, args.publish_repo, args.branch,
+                                           source_token=token, data_only=args.publish_data_only)
             result["requests"] = {"source": getattr(gh, "calls", None), "publish": getattr(publisher, "calls", None)}
         else:
             result["requests"] = {"source": getattr(gh, "calls", None)}

@@ -1,15 +1,17 @@
 # Multi-Repo Community Dashboard
 
-> **这是多个代码仓的公共 Dashboard，不是单仓看板。**  
-> 它聚合展示多个社区的规模、活跃度、健康度和质量门禁；单个仓库的深度视图由本仓 `single-repo/` 模板提供。
+> **这是多个代码仓的公共 Dashboard，也是单仓看板的托管入口。**
+>
+> 它聚合展示多个社区的规模、活跃度、健康度和质量门禁；单个仓库的深度视图由本仓 `board/*` 数据分支托管，发布在 `/boards/<owner>/<repo>/`。
 
-**两个入口：**
+**入口：**
 
-| 入口 | 链接 |
-| --- | --- |
-| 公共多仓 Dashboard | <https://agent-ci-infra.github.io/dashboard/> |
-| 单仓 / 私仓 Dashboard 模板 | [`single-repo/README.md`](single-repo/README.md) |
-| 单仓看板在线示例 | <https://agent-ci-infra.github.io/dashboard/single-repo/> |
+| 入口                | 链接                                                      |
+| ------------------- | --------------------------------------------------------- |
+| 公共多仓 Dashboard  | <https://agent-ci-infra.github.io/dashboard/>             |
+| 单仓看板列表        | <https://agent-ci-infra.github.io/dashboard/boards/>      |
+| 单仓/私仓采集器说明 | [`single-repo/README.md`](single-repo/README.md)          |
+| 单仓看板示例        | <https://agent-ci-infra.github.io/dashboard/single-repo/> |
 
 当前监控仓库（共 15 个）：
 
@@ -22,24 +24,27 @@
 
 ### 1.1 三个层次
 
-| 层 | 仓库 | 负责 | 不负责 |
-| --- | --- | --- | --- |
-| CI 层 | [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow) | CI workflow（含门禁）模板、`gate.mjs`、报告/用例 schema、starter、`AGENT.md` | Dashboard UI、站点发布 |
-| 单仓层 | **本仓** [`single-repo/`](single-repo/) | 单仓采集、单仓 Dashboard、公开 Pages 或私仓本地模式 | 跨仓聚合、门禁协议定义 |
-| 汇总层 | **本仓** `agent-CI-Infra/dashboard` | 多仓聚合、`/gate`、来源登记、公开 Pages、接入入口 | 执行用户 CI、保存私仓数据 |
+| 层     | 仓库                                                                          | 负责                                                                         | 不负责                    |
+| ------ | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------- |
+| CI 层  | [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow) | CI workflow（含门禁）模板、`gate.mjs`、报告/用例 schema、starter、`AGENT.md` | Dashboard UI、站点发布    |
+| 单仓层 | **本仓** [`single-repo/`](single-repo/) + `board/*` 分支                      | 单仓采集器、分支托管、`/boards/` 页面、私仓本地模式                          | 跨仓聚合、门禁协议定义    |
+| 汇总层 | **本仓** `agent-CI-Infra/dashboard`                                           | 多仓聚合、`/gate`、Deploy 汇总、公开 Pages、接入入口                         | 执行用户 CI、保存私仓数据 |
 
 ```text
 用户源仓
   └─ CI（CI-workflow）─► ci-gates-reports artifact
                          │
                          ▼
-              dashboard/single-repo（单仓）
-                 ├─ data/snapshot.json  单仓页面
-                 └─ data/summary.json   公开白名单摘要
+       dashboard/board/<owner>/<repo> 分支
+         ├─ board-config.json  源仓配置
+         ├─ site/data/         snapshot、history、E2E
+         └─ .sync/             增量状态
+                         │  Deploy 汇总
+                         ▼
+       /boards/<owner>/<repo>/  单仓页面
                          │
                          ▼
-              dashboard（本仓，多仓）
-                 └─ /gate 跨仓门禁视图
+       /gate                    跨仓门禁视图
 ```
 
 ### 1.2 当前状态
@@ -47,7 +52,8 @@
 - 本仓已经有 15 个社区的指标采集和公开 Dashboard。
 - 本仓已经支持 `board-summary` 和 `status-board-lanes` 两种门禁来源；`CI-workflow` 直连 artifact 适配器尚未实现。
 - CI workflow（含门禁）模板已经迁到 [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow)，本仓不再保留 `templates/ci-gates`。
-- 单仓/私仓代码已收进 [`single-repo/`](single-repo/)；它仍是一个可复制到新仓的模板目录，不是独立 GitHub Template 仓库。
+- 单仓看板不再要求复制模板或新建看板仓：公开源仓由本仓 `board/<owner>/<repo>` 分支托管，`Deploy` 汇总发布到 `/boards/<owner>/<repo>/`。
+- 私有源仓仍只在本地运行 `single-repo/` 采集器，不进入公开 Dashboard。
 - **命名兼容**：仓名已改为 `CI-workflow`；协议标识 `ci-gates/*`、artifact `ci-gates-reports`、配置 `.github/ci-gates.json` 暂保持不变，避免已接入仓失效。
 
 ---
@@ -103,31 +109,34 @@ cp -R /tmp/ci-workflow/template/test/. ./test/
 
 完整操作手册（面向用户 AI）：[`CI-workflow/AGENT.md`](https://github.com/agent-CI-Infra/CI-workflow/blob/main/AGENT.md)。
 
-#### 第二步：建单仓 Dashboard
+#### 第二步：创建单仓看板（公仓托管）
 
-1. 打开 [`single-repo/`](single-repo/) 目录
-2. 把 `single-repo/` 的内容复制到一个新仓的**根目录**（不要保留 `single-repo/` 这层）
-3. 新仓命名例如 `owner/repo-board`，可见性 **Public**
-4. **Settings → Pages → Source: GitHub Actions**
-5. **Actions → Setup dashboard** 填：
+**不需要复制 `single-repo/`，也不需要新建 `owner/repo-board` 仓。** 维护者在本仓操作：
 
-   ```json
-   {
-     "label": "repo",
-     "workflows": { "gate": ["^CI$"] },
-     "branch_lines": [{ "key": "main", "ref": "main" }],
-     "review_sla_days": 3,
-     "stale_days": 30
-   }
-   ```
+1. **Actions → Create board → Run workflow**：
+   - `source_repository`：要展示的公开源仓，例如 `owner/service`；
+   - `config_json`（可选）：
 
-6. 等待 `Collect dashboard data (PAT)` → `Deploy dashboard Pages`，打开：
+     ```json
+     {
+       "label": "service",
+       "workflows": { "gate": ["^CI$"] },
+       "branch_lines": [{ "key": "main", "ref": "main" }],
+       "review_sla_days": 3,
+       "stale_days": 30
+     }
+     ```
+
+2. 工作流创建 `board/owner/service` 数据分支，并触发 `Collect board data`。
+3. 等待 `Collect board data` → `Deploy to GitHub Pages`，打开：
 
    ```text
-   https://owner.github.io/repo-board/
+   https://agent-ci-infra.github.io/dashboard/boards/owner/service/
    ```
 
-**私仓**：不要接公开 Pages；用本机 `GSB_ALLOW_PRIVATE=1 python3 publish.py --repo owner/private-repo` + `python3 server.py`。
+数据分支只放 `board-config.json`、`site/data/` 和 `.sync/`，采集器代码始终来自 `main`。GitHub Pages 一个仓只能发布一个站点，所以分支不是独立站点；`Deploy` 会把所有分支汇总到同一个 Pages artifact。
+
+**私仓**：不要创建 `board/*` 分支；用本机 `GSB_ALLOW_PRIVATE=1 python3 publish.py --repo owner/private-repo` + `python3 server.py`。
 
 #### 第三步：让公共 Dashboard 收录门禁数据
 
@@ -139,8 +148,8 @@ cp -R /tmp/ci-workflow/template/test/. ./test/
   "name": "repo",
   "owner": "owner",
   "type": "board-summary",
-  "summaryUrl": "https://owner.github.io/repo-board/data/summary.json",
-  "boardUrl": "https://owner.github.io/repo-board/",
+  "summaryUrl": "https://agent-ci-infra.github.io/dashboard/boards/owner/repo/data/summary.json",
+  "boardUrl": "https://agent-ci-infra.github.io/dashboard/boards/owner/repo/",
   "defaultBranch": "main"
 }
 ```
@@ -151,7 +160,7 @@ cp -R /tmp/ci-workflow/template/test/. ./test/
 {
   "id": "owner/repo",
   "type": "status-board-lanes",
-  "url": "https://owner.github.io/repo-board/data/snapshot.json"
+  "url": "https://agent-ci-infra.github.io/dashboard/boards/owner/repo/data/snapshot.json"
 }
 ```
 
@@ -178,14 +187,14 @@ npm run dev
 
 ## 三、功能页面
 
-| 路由 | 页面 | 说明 |
-| --- | --- | --- |
-| `/` | 社区概览 | 以仓库为颗粒度展示核心指标（Stars / Forks / 贡献者 / PR / Issue）、PR 与 Issue 概览、社区运营预警；右上角可一键更新所有仓库的最新数据 |
-| `/pulls` | PR 分析 | PR 累计数量曲线（近 7 天 / 30 天 / 全部）与明细表 |
-| `/issues` | Issue 分析 | Issue 累计数量曲线（近 7 天 / 30 天 / 全部）与明细表（已排除 PR） |
-| `/growth` | 社区成长 | 每社区一行：左侧贡献者增长曲线（全部 / 外部），右侧 Star History |
-| `/gate` | 质量门禁 | 五条 lane 的通过率与覆盖率、分支切换、C0–C4 等级、接入阶段与用例缺口 |
-| `/ecosystem` | 生态影响力 | 暂未开放 |
+| 路由         | 页面       | 说明                                                                                                                                  |
+| ------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`          | 社区概览   | 以仓库为颗粒度展示核心指标（Stars / Forks / 贡献者 / PR / Issue）、PR 与 Issue 概览、社区运营预警；右上角可一键更新所有仓库的最新数据 |
+| `/pulls`     | PR 分析    | PR 累计数量曲线（近 7 天 / 30 天 / 全部）与明细表                                                                                     |
+| `/issues`    | Issue 分析 | Issue 累计数量曲线（近 7 天 / 30 天 / 全部）与明细表（已排除 PR）                                                                     |
+| `/growth`    | 社区成长   | 每社区一行：左侧贡献者增长曲线（全部 / 外部），右侧 Star History                                                                      |
+| `/gate`      | 质量门禁   | 五条 lane 的通过率与覆盖率、分支切换、C0–C4 等级、接入阶段与用例缺口                                                                  |
+| `/ecosystem` | 生态影响力 | 暂未开放                                                                                                                              |
 
 ---
 
@@ -224,15 +233,15 @@ npm run collect
 
 采集输出文件：
 
-| 文件 | 内容 |
-| --- | --- |
-| `meta.json` | 采集状态、监控启用时间、错误与声明（`notes`） |
-| `latest.json` | 当前累计快照（Star / Fork、PR / Issue / 贡献者聚合指标） |
-| `history.json` | 每日一条历史点（每日增量活动与累计计数） |
-| `pulls.json` / `issues.json` | PR / Issue 明细记录 |
-| `contributors.json` | 贡献者记录与分类 |
-| `ecosystem.json` | 站外传播数据 |
-| `config.json` | 公开的分类规则（不含任何密钥） |
+| 文件                         | 内容                                                     |
+| ---------------------------- | -------------------------------------------------------- |
+| `meta.json`                  | 采集状态、监控启用时间、错误与声明（`notes`）            |
+| `latest.json`                | 当前累计快照（Star / Fork、PR / Issue / 贡献者聚合指标） |
+| `history.json`               | 每日一条历史点（每日增量活动与累计计数）                 |
+| `pulls.json` / `issues.json` | PR / Issue 明细记录                                      |
+| `contributors.json`          | 贡献者记录与分类                                         |
+| `ecosystem.json`             | 站外传播数据                                             |
+| `config.json`                | 公开的分类规则（不含任何密钥）                           |
 
 ### 内部贡献者清单
 
@@ -240,10 +249,7 @@ npm run collect
 
 ```json
 {
-  "openJiuwen-ai/sciencediscovery": [
-    "hsliuustc0106",
-    "wyhohyw"
-  ],
+  "openJiuwen-ai/sciencediscovery": ["hsliuustc0106", "wyhohyw"],
   "ThinkFlowLab/agent-core": []
 }
 ```
@@ -254,13 +260,13 @@ npm run collect
 
 ### 可配置环境变量
 
-| 变量 | 默认 | 说明 |
-| --- | --- | --- |
-| `MONITOR_REPOS` | `config/internal-contributors.json` 的键 | 逗号分隔的监控仓库 `owner/name` 列表，仅用于临时覆盖默认列表（`MONITOR_REPO` 为单仓库的兼容写法）；平时新增社区只需修改配置文件 |
-| `GITHUB_TOKEN` | 空 | GitHub Token，仅通过环境变量注入，不写入任何产物 |
-| `MONITOR_BOTS` | 内置常见 bot | 逗号分隔的机器人账号 |
-| `MONITOR_LONG_OPEN_DAYS` | `30` | Issue 长期未解决阈值（天） |
-| `MONITOR_MAX_LIST_PAGES` | `20` | 列表分页上限 |
+| 变量                     | 默认                                     | 说明                                                                                                                            |
+| ------------------------ | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `MONITOR_REPOS`          | `config/internal-contributors.json` 的键 | 逗号分隔的监控仓库 `owner/name` 列表，仅用于临时覆盖默认列表（`MONITOR_REPO` 为单仓库的兼容写法）；平时新增社区只需修改配置文件 |
+| `GITHUB_TOKEN`           | 空                                       | GitHub Token，仅通过环境变量注入，不写入任何产物                                                                                |
+| `MONITOR_BOTS`           | 内置常见 bot                             | 逗号分隔的机器人账号                                                                                                            |
+| `MONITOR_LONG_OPEN_DAYS` | `30`                                     | Issue 长期未解决阈值（天）                                                                                                      |
+| `MONITOR_MAX_LIST_PAGES` | `20`                                     | 列表分页上限                                                                                                                    |
 
 ---
 

@@ -3,6 +3,7 @@
 > 关联文档：`public-ci-repo-design-v3.md`（以下简称 **v3**，CI-workflow 公仓设计方案）
 > 关联站点：公开汇总看板 <https://agent-ci-infra.github.io/dashboard/>；单仓看板模板 <https://github.com/agent-CI-Infra/dashboard/tree/main/single-repo>；门禁模板 <https://github.com/agent-CI-Infra/CI-workflow>
 > 状态：**历史设计文档**；当前布局以 [`repository-architecture.md`](repository-architecture.md) 为准。
+> 2026-10 更新：公开单仓看板已改为本仓 `board/*` 分支托管，不再复制模板到新仓；文中“board 模板 / 独立看板仓”的步骤属于历史设计。
 > 命名：仓名已从 `ci-gates` 改为 `CI-workflow`；协议标识 `ci-gates/*`、artifact `ci-gates-reports`、配置 `.github/ci-gates.json` 保留兼容。
 > 范围：模板接入 → 门禁运行 → 用例填写 → 私有 board → 公开 dashboard 的端到端闭环
 

@@ -174,7 +174,7 @@ def main() -> int:
     print(f"source: {source}")
     print(f"dashboard: {board}")
     if not os.environ.get("GITHUB_ACTIONS"):
-        print("next: commit board-config.json, run Collect dashboard data (PAT); for a private source use the local server")
+        print("next: commit board-config.json on the board branch, run Collect board data; for a private source use the local server")
     return 0
 
 

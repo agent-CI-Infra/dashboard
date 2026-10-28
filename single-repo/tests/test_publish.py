@@ -12,7 +12,11 @@ class DeploymentTests(unittest.TestCase):
     def test_cli_separates_source_and_destination_credentials(self):
         import publish as publisher
         from types import SimpleNamespace
-        source, destination = SimpleNamespace(token='read-token'), SimpleNamespace(token='write-token')
+        class PublicSource:
+            token = 'read-token'
+            def get(self, path):
+                return {'private': False, 'visibility': 'public'}
+        source, destination = PublicSource(), SimpleNamespace(token='write-token')
         with patch('sys.argv',['publish.py','--repo','example/source','--publish-repo','example/board']), \
              patch.dict('os.environ',{'GSB_PUBLISH_TOKEN':'write-token'}), \
              patch.object(publisher,'discover_token',return_value=('read-token','env')), \
@@ -24,6 +28,19 @@ class DeploymentTests(unittest.TestCase):
         self.assertIs(build.call_args.args[0],source)
         self.assertIs(commit.call_args.args[0],destination)
         self.assertEqual(commit.call_args.kwargs['source_token'],'read-token')
+
+    def test_private_source_is_rejected_before_publishing(self):
+        import publish as publisher
+        class PrivateSource:
+            token = 'read-token'
+            def get(self, path):
+                return {'private': True, 'visibility': 'private'}
+        with patch('sys.argv',['publish.py','--repo','example/source','--publish-repo','example/board']), \
+             patch.object(publisher,'discover_token',return_value=('read-token','env')), \
+             patch.object(publisher,'GitHub',return_value=PrivateSource()), \
+             patch.object(publisher,'publish') as commit, patch('builtins.print'):
+            self.assertEqual(publisher.main(),1)
+        commit.assert_not_called()
 
     def test_production_and_test_cannot_be_published_to_each_others_site(self):
         settings = {'deployments': {
@@ -77,6 +94,21 @@ class PublishingTests(unittest.TestCase):
         self.assertTrue(calls[2][1].endswith('/git/refs/heads/main'))
         self.assertEqual(calls[1][2]['parents'],['old'])
         self.assertEqual(calls[2][2],{'sha':'new-commit','force':False})
+    def test_data_only_publish_skips_static_assets(self):
+        calls=[]
+        class GH:
+            token=''
+            def get(self,path):
+                if '/git/commits/' in path: return {'tree':{'sha':'base-tree'}}
+                return {'object':{'sha':'old'}} if '/git/' in path else {'private':False}
+            def _url(self,path,_): return path
+            def _request(self,method,path,body):
+                calls.append((method,path,body))
+                return ({'sha':'new'},None,200)
+        publish(GH(),self.site,'example/board',data_only=True)
+        paths={entry['path'] for entry in calls[0][2]['tree']}
+        self.assertEqual(paths,{'site/data/snapshot.json'})
+
     def test_credential_in_content_prevents_remote_write(self):
         class GH:
             token='test-secret-for-publishing'
@@ -122,6 +154,37 @@ class PublishingTests(unittest.TestCase):
         self.assertEqual(tree['site/data/e2e/index.json']['content'],'{"records":[]}\n')
         for unsafe in ({'site/data/snapshot.json':None},{'site/e2e/101/report/index.html':'<html>'}):
             with self.assertRaises(ValueError): publish_batch(GH(),'example/board','main','a'*40,unsafe)
+    def test_board_branch_names_may_contain_slashes(self):
+        calls=[]
+        class GH:
+            token=''
+            def get(self,path):
+                if '/git/commits/' in path: return {'tree':{'sha':'base-tree'}}
+                return {'object':{'sha':'a'*40}} if '/git/' in path else {'private':False}
+            def _url(self,path,_): return path
+            def _request(self,method,path,body):
+                calls.append((method,path,body))
+                return ({'sha':'new'},None,200)
+        publish_batch(GH(),'example/board','board/acme/widget','a'*40,{'site/data/snapshot.json':'{}\n'})
+        self.assertTrue(calls[-1][1].endswith('/git/refs/heads/board/acme/widget'))
+        self.assertEqual(calls[-1][2],{'sha':'new','force':False})
+
+    def test_data_only_boards_skip_static_assets(self):
+        calls=[]
+        class GH:
+            token=''
+            def get(self,path):
+                if '/git/commits/' in path: return {'tree':{'sha':'base-tree'}}
+                return {'object':{'sha':'a'*40}} if '/git/' in path else {'private':False}
+            def _url(self,path,_): return path
+            def _request(self,method,path,body):
+                calls.append((method,path,body))
+                return ({'sha':'new'},None,200)
+        files={'site/index.html':'<html>','site/app.js':'js','site/data/snapshot.json':'{}\n','.sync/state.json':'{}\n'}
+        publish_batch(GH(),'example/board','board/acme/widget','a'*40,files,data_only=True)
+        tree={entry['path'] for entry in calls[0][2]['tree']}
+        self.assertEqual(tree,{'site/data/snapshot.json','.sync/state.json'})
+
     def test_private_target_refused(self):
         class GH:
             token=''

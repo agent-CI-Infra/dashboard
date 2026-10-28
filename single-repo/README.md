@@ -1,118 +1,119 @@
-# 单仓 / 私仓 Dashboard 模板
+# 单仓 / 私仓 Dashboard 采集器
 
-> 本目录是 `agent-CI-Infra/dashboard` 里的**单仓看板模板**，用于一个代码仓的深度视图。
-> 公共多仓聚合在仓库根目录；门禁模板在 [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow)。
+> 本目录是 `agent-CI-Infra/dashboard` 内的**单仓采集器 + 静态站点**。
+> 公开源仓由公仓的分支统一托管，**不需要复制本目录，也不需要新建看板仓**；
+> 私有源仓只在本机运行，不发布到公开 Pages。
 
-## 两个链接
+## 链接
 
 | 用途 | 链接 |
 | --- | --- |
 | 公共多仓 Dashboard | <https://agent-ci-infra.github.io/dashboard/> |
-| 单仓/私仓 Dashboard 模板 | 本目录 [`single-repo/`](.) |
-| 单仓看板在线示例 | <https://agent-ci-infra.github.io/dashboard/single-repo/> |
+| 单仓看板列表 | <https://agent-ci-infra.github.io/dashboard/boards/> |
+| 单仓看板示例 | <https://agent-ci-infra.github.io/dashboard/single-repo/> |
 
-## 适用场景
+## 公仓托管（推荐）
 
-- 需要看**一个仓库**的 PR、Issue、门禁、每日构建、覆盖率、E2E、标签化测试；
-- 源仓是 **public**，可以发布到公开 GitHub Pages；
-- 源仓是 **private**，只在本机/内网运行，绝不发布到公开 Pages。
+公开源仓的单仓看板直接放在本仓，一个源仓对应一个数据分支：
 
-跨多个仓的汇总看板请用仓库根目录的公共 Dashboard。
-
-## 从本目录创建单仓看板
-
-本模板不是独立 GitHub Template 仓库；需要把 `single-repo/` 的内容复制到一个新仓库的**根目录**。
-
-```bash
-git clone https://github.com/agent-CI-Infra/dashboard.git
-mkdir my-service-board
-cd my-service-board
-git init
-cp -R ../dashboard/single-repo/. .
+```text
+agent-CI-Infra/dashboard
+  board/<owner>/<repo>       数据分支，不放采集器代码
+    board-config.json        源仓与展示配置
+    site/data/               snapshot、history、E2E 索引
+    .sync/                   增量采集状态
+  /boards/<owner>/<repo>/    由 Deploy 汇总后的公开页面
 ```
 
-然后：
+维护者只需要：
 
-1. 推到新的 public 看板仓（例如 `owner/my-service-board`）。
-2. **Settings → Pages → Build and deployment → Source: GitHub Actions**。
-3. **Actions → Setup dashboard → Run workflow**：
-   - `source_repository`：要展示的代码仓，例如 `owner/service`；
-   - `config_json`（可选）：
+1. 在源仓接入 [`CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow)。
+2. 在本仓 **Actions → Create board** 填源仓 `owner/repository`，可选填配置 JSON：
 
-     ```json
-     {
-       "label": "service",
-       "workflows": { "gate": ["^CI$", "CI Gates"], "daily": ["nightly"], "release": ["release"] },
-       "branch_lines": [{ "key": "main", "ref": "main" }],
-       "review_sla_days": 3,
-       "stale_days": 30
-     }
-     ```
-
-   - `reset`：第一次配置或切换源仓时勾选。
-4. 等待 `Collect dashboard data (PAT)` → `Deploy dashboard Pages`，打开：
-
-   ```text
-   https://owner.github.io/my-service-board/
+   ```json
+   {
+     "label": "service",
+     "workflows": { "gate": ["^CI$"], "daily": ["nightly"], "release": ["release"] },
+     "branch_lines": [{ "key": "main", "ref": "main" }],
+     "review_sla_days": 3,
+     "stale_days": 30
+   }
    ```
 
-## 源仓门禁
+3. 等待 `Collect board data` 完成，再等待 `Deploy to GitHub Pages`，打开：
 
-单仓看板只消费源仓的 `ci-gates-reports` artifact，不负责运行门禁。源仓需要先接入：
+   ```text
+   https://agent-ci-infra.github.io/dashboard/boards/owner/repo/
+   ```
 
-- CI-workflow 仓：<https://github.com/agent-CI-Infra/CI-workflow>
-- 操作手册：[`CI-workflow/AGENT.md`](https://github.com/agent-CI-Infra/CI-workflow/blob/main/AGENT.md)
+工作流分工：
 
-源仓的 `CI` 运行上传 `ci-gates-reports` 后，看板 CI 页出现「质量门禁」卡片，显示每个 lane 的结论、命令通过数和用例 catalog 的 ready/todo/skipped 数量。
+- `board-create.yml` 创建 `board/<owner>/<repo>` 分支，并触发首次采集；
+- `board-collect.yml` 每天把采集结果写回对应分支（`--publish-data-only`，不写静态资源），分支之间互不影响；
+- `deploy.yml` 在构建公共 Dashboard 后，把所有分支的 `site/data/` 汇总到 `/boards/<owner>/<repo>/`。
 
-## 公开源仓 + 公开 Pages
+GitHub Pages 一个仓只能发布一个站点，所以**分支本身不是站点**；分支只存数据，由 `main` 上的 Deploy 统一发布。不要手动修改数据分支，也不要把私仓数据写进去。
 
-模板默认面向**公开源仓 + 公开 Pages**：采集使用看板仓的 `GITHUB_TOKEN` 读取源仓并提交 `site/`。
+已知限制：当前汇总部署不附带 E2E HTML 报告产物，页面会回退到源仓 artifact 链接；后续可把各 board 的 `e2e-html` 产物一起汇总。
 
-## 私有源仓
+## 本地 / 私仓
 
-私有源仓不要用 Actions 发布到公开 Pages；在本机运行：
+私有源仓不进入公开 Dashboard，也不创建 `board/*` 分支。克隆本仓后直接在 `single-repo/` 运行：
 
 ```bash
+cd single-repo
 GSB_ALLOW_PRIVATE=1 GITHUB_TOKEN=... python3 publish.py --repo owner/private-repo
 python3 server.py
 ```
 
-`GSB_ALLOW_PRIVATE=1` 只允许生成本机 `dist/`；`publish.py --publish-repo` 仍会拒绝私有源仓，避免误发到公开 Pages。私有源仓要对外发布，需要私有 Pages、内网 runner 或额外的访问控制，这不是本模板默认提供的。
+浏览器打开 <http://127.0.0.1:8790/>。`publish.py` 默认输出到 `dist/`；`--publish-repo` 只允许公开源仓发布到公开目标，私仓会被拒绝。
 
-## 本地预览
-
-Python 3.10+，凭据来自环境或已登录的 `gh`：
+公开源仓也可以本地预览：
 
 ```bash
-python3 publish.py --repo owner/service
+cd single-repo
+GITHUB_TOKEN=... python3 publish.py --repo owner/public-repo
 python3 server.py
 ```
 
-此兼容命令生成有限近期快照；完整历史由 `--incremental` 模式基于目标仓自己的 `.sync/` 续跑。两种模式不要同时写同一站点。
+## 源仓门禁
+
+单仓看板消费源仓的 `ci-gates-reports` artifact，不运行门禁。源仓接入见：
+
+- [CI-workflow](https://github.com/agent-CI-Infra/CI-workflow)
+- [CI-workflow/AGENT.md](https://github.com/agent-CI-Infra/CI-workflow/blob/main/AGENT.md)
+
+源仓 `CI` 上传 `ci-gates-reports` 后，看板 CI 页显示「质量门禁」卡片：lane 结论、命令通过数、用例 catalog 的 ready/todo/skipped 数量。
 
 ## 文档
 
 - [文档目录](docs/README.md)
 - [增量同步与历史](docs/incremental-history.md)
-- [Actions 配置](docs/actions-collection.md)
+- [Actions 采集（上游设计）](docs/actions-collection.md)
 - [测试报告契约](docs/test-reports.md)
 - [页面与交互](docs/dashboard-pages.md)
 - [CI 分层历史](docs/ci-history-lanes.md)
 - [标签化测试](docs/tagged-tests.md)
 - [分支线](docs/branch-lines.md)
+- [E2E 执行记录](docs/e2e-run-records.md)
 
 ## 验证
 
 ```bash
+cd single-repo
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
 PYTHONDONTWRITEBYTECODE=1 python3 test/journey-rerun-collection.py
 node test/sync-e2e.mjs
 node .e2e/node_modules/playwright/cli.js test --config test/playwright.config.cjs
 ```
 
-修改功能时同步更新对应文档。测试使用独立临时数据，禁止将 fixture 发布为真实看板数据。
+修改功能时同步更新对应文档。测试使用独立临时数据，禁止把 fixture 发布为真实看板数据。
+
+## 旧独立仓部署
+
+旧的「复制本目录到新仓 + Setup dashboard」工作流已移到
+[`docs/standalone-workflows/`](docs/standalone-workflows/)，仅作历史参考，不再推荐。
 
 ## 上游
 
-本模板来自 `ScienceDiscovery/github-status-board` 的单仓看板实现；`docs/upstream-workflows/` 保留上游 OIDC/Bot 采集配置作参考。
+本采集器来自 `ScienceDiscovery/github-status-board`；`docs/upstream-workflows/` 保留上游 OIDC/Bot 采集配置。

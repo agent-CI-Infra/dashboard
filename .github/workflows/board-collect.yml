@@ -1,0 +1,118 @@
+name: Collect board data
+
+# Refresh every `board/<owner>/<repo>` data branch. A board branch contains
+# only board-config.json, site/data/ and .sync/; the collector code stays on
+# main and is copied into the branch checkout for each run.
+
+on:
+  schedule:
+    # Daily after the community collection. GitHub may delay scheduled runs.
+    - cron: '37 3 * * *'
+  workflow_dispatch:
+    inputs:
+      board:
+        description: Optional board key (owner/repository); empty collects every board
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collect-boards
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.list.outputs.matrix }}
+      has_boards: ${{ steps.list.outputs.has_boards }}
+    steps:
+      - name: List board branches
+        id: list
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BOARD: ${{ github.event.inputs.board }}
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os, re, subprocess, sys
+          board = (os.environ.get("BOARD") or "").strip().lower().strip("/")
+          if board:
+              if not re.fullmatch(r"[a-z0-9_.-]+/[a-z0-9_.-]+", board):
+                  raise SystemExit(f"invalid board key: {board!r}")
+              refs = [f"refs/heads/board/{board}"]
+          else:
+              output = subprocess.check_output([
+                  "gh", "api", "--paginate",
+                  f"repos/{os.environ['GITHUB_REPOSITORY']}/git/matching-refs/heads/board/",
+                  "--jq", ".[].ref",
+              ], text=True)
+              refs = [line.strip() for line in output.splitlines() if line.strip()]
+          items = []
+          for ref in refs:
+              key = ref.removeprefix("refs/heads/board/")
+              if not re.fullmatch(r"[a-z0-9_.-]+/[a-z0-9_.-]+", key):
+                  continue
+              items.append({"board": key, "branch": ref.removeprefix("refs/heads/")})
+          has_boards = "true" if items else "false"
+          if not items:
+              # Keep the matrix non-empty; the collect job is skipped by `if`.
+              items = [{"board": "__none__", "branch": "__none__"}]
+          print("matrix=" + json.dumps({"include": items}, separators=(",", ":")))
+          print("has_boards=" + has_boards)
+          print(f"boards: {len(items) if has_boards == 'true' else 0}", file=sys.stderr)
+          PY
+
+  collect:
+    needs: prepare
+    if: needs.prepare.outputs.has_boards == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    concurrency:
+      group: board-collect-${{ matrix.board }}
+      cancel-in-progress: false
+    steps:
+      - name: Checkout collector code
+        uses: actions/checkout@v4
+        with:
+          path: code
+
+      - name: Checkout board data branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+          path: board
+
+      - name: Validate source repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE: ${{ matrix.board }}
+        run: |
+          meta=$(gh api "repos/$SOURCE")
+          printf '%s' "$meta" | python3 -c 'import json,sys; meta=json.load(sys.stdin); sys.exit(1) if meta.get("private") or meta.get("visibility","public") != "public" else print(meta["full_name"])'
+
+      - name: Prepare collector
+        run: |
+          set -euo pipefail
+          cp -R code/gsb code/static code/publish.py board/
+
+      - name: Collect and publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SOURCE: ${{ matrix.board }}
+          BRANCH: ${{ matrix.branch }}
+        run: |
+          set -euo pipefail
+          cd board
+          PYTHONDONTWRITEBYTECODE=1 python3 publish.py \
+            --repo "$SOURCE" \
+            --settings board-config.json \
+            --output site \
+            --publish-repo "${{ github.repository }}" \
+            --branch "$BRANCH" \
+            --incremental \
+            --publish-data-only
