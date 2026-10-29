@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react'
-import { Badge } from '@/components/ui/badge'
 import { IconGithub } from '@/assets/brand-icons'
-import { TimeRangeFilter } from './time-range-filter'
-import type { MonitorMeta } from '@/lib/monitor/types'
 import type { TimeRangeSearch } from '@/lib/monitor/ranges'
+import type { MonitorMeta } from '@/lib/monitor/types'
+import { Badge } from '@/components/ui/badge'
+import { TimeRangeFilter } from './time-range-filter'
 
 type MonitorHeaderProps = {
   title: string

@@ -1,11 +1,11 @@
 import { type ColumnDef } from '@tanstack/react-table'
 import { ExternalLink } from 'lucide-react'
-import { DataTableColumnHeader } from '@/components/data-table'
-import { Badge } from '@/components/ui/badge'
-import { LongText } from '@/components/long-text'
-import { cn } from '@/lib/utils'
 import { formatDate, formatDurationHours } from '@/lib/monitor/format'
 import type { PullRecord } from '@/lib/monitor/types'
+import { cn } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
+import { DataTableColumnHeader } from '@/components/data-table'
+import { LongText } from '@/components/long-text'
 
 const STATE_STYLE: Record<PullRecord['state'], string> = {
   open: 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400',
@@ -50,7 +50,7 @@ export const pullsColumns: ColumnDef<PullRecord, unknown>[] = [
       <DataTableColumnHeader column={column} title='作者' />
     ),
     cell: ({ row }) => (
-      <span className='text-nowrap text-sm'>{row.original.author}</span>
+      <span className='text-sm text-nowrap'>{row.original.author}</span>
     ),
     meta: { className: 'w-40' },
   },
@@ -94,7 +94,7 @@ export const pullsColumns: ColumnDef<PullRecord, unknown>[] = [
       <DataTableColumnHeader column={column} title='创建时间' />
     ),
     cell: ({ row }) => (
-      <span className='text-nowrap text-xs text-muted-foreground'>
+      <span className='text-xs text-nowrap text-muted-foreground'>
         {formatDate(row.original.createdAt)}
       </span>
     ),
@@ -107,7 +107,7 @@ export const pullsColumns: ColumnDef<PullRecord, unknown>[] = [
       <DataTableColumnHeader column={column} title='滞留时长' />
     ),
     cell: ({ row }) => (
-      <span className='text-nowrap text-xs tabular-nums'>
+      <span className='text-xs text-nowrap tabular-nums'>
         {formatDurationHours(row.original.waitingHours)}
       </span>
     ),

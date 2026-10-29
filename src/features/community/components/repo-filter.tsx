@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { repoKey } from '@/lib/monitor/data'
 import type { RepoSummary } from '@/lib/monitor/types'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
 type RepoFilterProps = {
   repos: RepoSummary[]

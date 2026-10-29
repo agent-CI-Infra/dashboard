@@ -1,4 +1,6 @@
 import { useState, type ReactNode } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { getRouteApi } from '@tanstack/react-router'
 import {
   AlertCircle,
   CircleDot,
@@ -8,34 +10,9 @@ import {
   Star,
   Users,
 } from 'lucide-react'
-import { getRouteApi } from '@tanstack/react-router'
-import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { IconGithub } from '@/assets/brand-icons'
-import { Header } from '@/components/layout/header'
-import { Main } from '@/components/layout/main'
-import { ThemeSwitch } from '@/components/theme-switch'
-import { Badge } from '@/components/ui/badge'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import {
-  ACTIVITY_INDICATORS,
-  ACTIVITY_WINDOW_DAYS,
-  activeContributorsSplit,
-} from '@/lib/monitor/derive'
-import {
-  fetchLiveRepoStats,
-  type LiveRepoStats,
-} from '@/lib/monitor/live'
+import { useLang, type I18nKey } from '@/lib/i18n'
 import {
   repoKey,
   useActivityScores,
@@ -44,19 +21,34 @@ import {
   useRepos,
 } from '@/lib/monitor/data'
 import {
+  ACTIVITY_INDICATORS,
+  ACTIVITY_WINDOW_DAYS,
+  activeContributorsSplit,
+} from '@/lib/monitor/derive'
+import {
   formatDateTime,
   formatExact,
   formatNumber,
   formatPercent,
 } from '@/lib/monitor/format'
+import { fetchLiveRepoStats, type LiveRepoStats } from '@/lib/monitor/live'
+import type { TimeRangeSearch } from '@/lib/monitor/ranges'
+import type { Composition, RepoSummary } from '@/lib/monitor/types'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { LanguageSwitch } from '@/components/language-switch'
+import { Header } from '@/components/layout/header'
+import { Main } from '@/components/layout/main'
+import { ThemeSwitch } from '@/components/theme-switch'
 import { MetricCard } from './components/metric-card'
 import { MonitorHeader } from './components/monitor-header'
 import { ErrorState, LoadingState } from './components/states'
 import { useMonitorBase } from './use-monitor'
-import type { TimeRangeSearch } from '@/lib/monitor/ranges'
-import { useLang, type I18nKey } from '@/lib/i18n'
-import { LanguageSwitch } from '@/components/language-switch'
-import type { Composition, RepoSummary } from '@/lib/monitor/types'
 
 const route = getRouteApi('/_authenticated/')
 
@@ -104,7 +96,10 @@ function ActivityScoreInfo() {
           <AlertCircle className='size-3.5' />
         </button>
       </PopoverTrigger>
-      <PopoverContent align='start' className='w-80 space-y-3 text-xs leading-relaxed'>
+      <PopoverContent
+        align='start'
+        className='w-80 space-y-3 text-xs leading-relaxed'
+      >
         <p className='font-medium'>{t('community.score.title')}</p>
         <p className='font-mono text-[11px] break-words'>
           C = (1 / Σαᵢ) · Σ αᵢ · ln(1 + Sᵢ) / ln(1 + max(Sᵢ, Tᵢ))
@@ -143,13 +138,7 @@ function ActivityScoreInfo() {
   )
 }
 
-function StatRow({
-  labelKey,
-  value,
-}: {
-  labelKey: I18nKey
-  value: string
-}) {
+function StatRow({ labelKey, value }: { labelKey: I18nKey; value: string }) {
   const { t } = useLang()
   return (
     <div className='flex items-center justify-between gap-3 py-1 text-sm'>
@@ -275,7 +264,9 @@ function RepoOverviewBox({
               className='size-3.5 fill-red-500 text-red-500'
             />
           ) : null}
-          <span className='text-muted-foreground'>{t('community.activity')}:</span>
+          <span className='text-muted-foreground'>
+            {t('community.activity')}:
+          </span>
           <span className='font-semibold tabular-nums'>
             {activity === null ? '—' : activity.toFixed(2)}
           </span>
@@ -332,7 +323,10 @@ function RepoOverviewBox({
                 labelKey='community.pr.total'
                 value={formatNumber(pullsData?.total)}
               />
-              <StatRow labelKey='community.internal' value={pullComp.internal} />
+              <StatRow
+                labelKey='community.internal'
+                value={pullComp.internal}
+              />
               <StatRow
                 labelKey='community.comments.total'
                 value={pullComments.total}
@@ -343,7 +337,10 @@ function RepoOverviewBox({
                 labelKey='community.pr.open'
                 value={formatExact(live?.openPulls ?? pullsData?.open)}
               />
-              <StatRow labelKey='community.external' value={pullComp.external} />
+              <StatRow
+                labelKey='community.external'
+                value={pullComp.external}
+              />
               <StatRow
                 labelKey='community.comments.avg'
                 value={pullComments.average}
@@ -365,7 +362,10 @@ function RepoOverviewBox({
                 labelKey='community.issue.total'
                 value={formatNumber(issuesData?.total)}
               />
-              <StatRow labelKey='community.internal' value={issueComp.internal} />
+              <StatRow
+                labelKey='community.internal'
+                value={issueComp.internal}
+              />
               <StatRow
                 labelKey='community.comments.total'
                 value={issueComments.total}
@@ -376,7 +376,10 @@ function RepoOverviewBox({
                 labelKey='community.pr.open'
                 value={formatExact(live?.openIssues ?? issuesData?.open)}
               />
-              <StatRow labelKey='community.external' value={issueComp.external} />
+              <StatRow
+                labelKey='community.external'
+                value={issueComp.external}
+              />
               <StatRow
                 labelKey='community.comments.avg'
                 value={issueComments.average}
@@ -408,7 +411,9 @@ export function CommunityOverview() {
       ? repoKey(ordered[0])
       : null
 
-  const [liveByRepo, setLiveByRepo] = useState<Record<string, LiveRepoStats>>({})
+  const [liveByRepo, setLiveByRepo] = useState<Record<string, LiveRepoStats>>(
+    {}
+  )
   const [, setUpdating] = useState(false)
 
   // All repositories share a single "data updated at" label: the newest live
@@ -418,8 +423,7 @@ export function CommunityOverview() {
       !latest || stats.fetchedAt > latest ? stats.fetchedAt : latest,
     null
   )
-  const sharedUpdatedAt =
-    liveFetchedAt ?? reposQuery.data?.generatedAt ?? null
+  const sharedUpdatedAt = liveFetchedAt ?? reposQuery.data?.generatedAt ?? null
 
   const onSearchChange = (next: typeof search) =>
     navigate({ search: (prev) => ({ ...prev, ...next }) })

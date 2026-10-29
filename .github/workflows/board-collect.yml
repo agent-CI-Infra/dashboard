@@ -98,7 +98,7 @@ jobs:
       - name: Prepare collector
         run: |
           set -euo pipefail
-          cp -R code/gsb code/static code/publish.py board/
+          cp -R code/single-repo/gsb code/single-repo/static code/single-repo/publish.py board/
 
       - name: Collect and publish
         env:

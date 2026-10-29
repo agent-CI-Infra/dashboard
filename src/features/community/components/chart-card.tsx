@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils'
 import {
   Card,
   CardContent,
@@ -5,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
 import { EmptyState, LoadingState } from './states'
 
 type ChartCardProps = {
