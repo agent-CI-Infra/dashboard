@@ -20,7 +20,7 @@ agent-CI-Infra/dashboard/
   src/                        公共多仓 Dashboard（React/Vite）
   scripts/                    公共 Dashboard 采集
   scripts/assemble-boards.mjs 汇总 board/* 分支到 Pages artifact
-  config/                     社区列表、门禁来源
+  config/                     社区列表、门禁来源、静态导入看板登记
   single-repo/                单仓 / 私仓采集器
     gsb/                      采集与快照
     static/                   单仓静态页面
@@ -164,7 +164,7 @@ dist/boards/<owner>/<repo>/
 
 ## 7. 私仓
 
-- 不进入公共 Dashboard，不创建 `board/*` 分支。
+- 默认不进入公共 Dashboard，不创建 `board/*` 分支。
 - 使用 `single-repo/` 本地模式：
 
 ```bash
@@ -173,8 +173,9 @@ GSB_ALLOW_PRIVATE=1 GITHUB_TOKEN=... python3 publish.py --repo owner/private-rep
 python3 server.py
 ```
 
-- 公开 GitHub Pages 不可以发布私仓数据。
+- 公开 GitHub Pages 默认不可以发布私仓数据。
 - `publish.py --publish-repo` 会同时校验源仓和发布目标必须是公开仓。
+- **显式例外：静态导入看板。** 源仓所有者明确同意公开 snapshot 后，在 `config/imported-boards.json` 登记分支和 key；该分支只保存 `board-config.json` 与 `site/data/snapshot.json`，由 `assemble-boards.mjs` 汇总发布。它不进入 `board-collect`，不会每日自动刷新；更新 snapshot 后需重新触发 `Deploy`。当前唯一登记的是 `openJiuwen-ai/digitalmate`。
 
 ## 8. 版本与迁移
 

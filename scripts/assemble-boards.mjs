@@ -9,6 +9,10 @@
  *     site/data/...       snapshot, history, E2E index
  *     .sync/...           incremental state
  *
+ * A board whose source repository cannot be collected publicly may instead be
+ * imported as a static snapshot. Imported branches are listed in
+ * config/imported-boards.json and do not need the board/<owner>/<repo> name.
+ *
  * GitHub Pages can only deploy one site per repository, so branches are not
  * independent sites. This script extracts the data from every board branch,
  * adds the current static assets from main, and writes:
@@ -28,6 +32,9 @@ const staticDir = path.resolve(root, process.env.BOARD_STATIC_DIR ?? 'single-rep
 const remote = process.env.BOARD_REMOTE ?? 'origin'
 const refPrefix = 'refs/heads/board/'
 const boardsDir = path.join(dist, 'boards')
+const importedConfig = path.join(root, 'config', 'imported-boards.json')
+const boardKeyPattern = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/
+const branchPattern = /^[A-Za-z0-9_.-]+$/
 
 function git(args, options = {}) {
   return execFileSync('git', args, {
@@ -57,12 +64,33 @@ function escapeHtml(value) {
 
 function listBoardRefs() {
   const output = git(['ls-remote', '--heads', remote, `${refPrefix}*`])
-  return output
+  const boards = output
     .split('\n')
     .filter(Boolean)
     .map((line) => line.split('\t')[1])
     .filter((ref) => ref?.startsWith(refPrefix))
-    .sort()
+    .map((ref) => ({ ref, key: ref.slice(refPrefix.length) }))
+
+  const config = readJson(importedConfig)
+  if (config && !Array.isArray(config.boards)) {
+    console.warn(`ignore ${path.relative(root, importedConfig)}: expected a boards array`)
+  }
+  for (const entry of Array.isArray(config?.boards) ? config.boards : []) {
+    if (!entry || typeof entry.branch !== 'string' || !branchPattern.test(entry.branch)) {
+      console.warn(`ignore imported board: invalid branch ${JSON.stringify(entry?.branch)}`)
+      continue
+    }
+    if (typeof entry.key !== 'string' || !boardKeyPattern.test(entry.key)) {
+      console.warn(`ignore imported board ${entry.branch}: invalid key ${JSON.stringify(entry.key)}`)
+      continue
+    }
+    const ref = `refs/heads/${entry.branch}`
+    if (!boards.some((board) => board.ref === ref || board.key === entry.key)) {
+      boards.push({ ref, key: entry.key })
+    }
+  }
+
+  return boards.sort((a, b) => a.key.localeCompare(b.key))
 }
 
 function copyDirectory(source, destination) {
@@ -75,9 +103,8 @@ function copyDirectory(source, destination) {
   }
 }
 
-function assembleBoard(branch) {
-  const key = branch.slice(refPrefix.length)
-  if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(key)) {
+function assembleBoard({ ref: branch, key }) {
+  if (!boardKeyPattern.test(key)) {
     console.warn(`skip ${branch}: expected board/<owner>/<repo>`)
     return null
   }
@@ -168,11 +195,11 @@ function renderIndex(boards) {
 <main>
   <a class="back" href="../">← 公共多仓 Dashboard</a>
   <h1>单仓看板</h1>
-  <p class="lead">每个代码仓一个看板，由本仓的 <code>board/&lt;owner&gt;/&lt;repo&gt;</code> 数据分支托管；不需要复制模板或新建仓库。</p>
+  <p class="lead">每个代码仓一个看板，由本仓的 <code>board/&lt;owner&gt;/&lt;repo&gt;</code> 数据分支托管；静态导入的看板登记在 <code>config/imported-boards.json</code>。</p>
   <div class="grid">
 ${cards || '    <div class="empty">还没有看板。维护者在本仓运行 <code>Create board</code> 工作流即可创建。</div>'}
   </div>
-  <footer>数据每天自动刷新；私有源仓只在本地运行，不发布到这里。</footer>
+  <footer>常规看板每天自动刷新；静态导入看板按导入快照更新。</footer>
 </main>
 </body>
 </html>
@@ -190,17 +217,16 @@ function main() {
   fs.writeFileSync(path.join(dist, '.nojekyll'), '')
 
   const boards = []
-  for (const branch of listBoardRefs()) {
+  for (const entry of listBoardRefs()) {
     try {
-      const board = assembleBoard(branch)
+      const board = assembleBoard(entry)
       if (board) boards.push(board)
     } catch (error) {
       // One broken board must not block the rest of the public site.
-      const key = branch.slice(refPrefix.length)
-      if (/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(key)) {
-        fs.rmSync(path.join(boardsDir, key), { recursive: true, force: true })
+      if (boardKeyPattern.test(entry.key)) {
+        fs.rmSync(path.join(boardsDir, entry.key), { recursive: true, force: true })
       }
-      console.warn(`skip ${branch}: ${error.message}`)
+      console.warn(`skip ${entry.ref}: ${error.message}`)
     }
   }
 

@@ -53,14 +53,14 @@
 - 本仓已经支持 `board-summary` 和 `status-board-lanes` 两种门禁来源；`CI-workflow` 直连 artifact 适配器尚未实现。
 - CI workflow（含门禁）模板已经迁到 [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow)，本仓不再保留 `templates/ci-gates`。
 - 单仓看板不再要求复制模板或新建看板仓：公开源仓由本仓 `board/<owner>/<repo>` 分支托管，`Deploy` 汇总发布到 `/boards/<owner>/<repo>/`。
-- 私有源仓仍只在本地运行 `single-repo/` 采集器，不进入公开 Dashboard。
+- 私有源仓默认只在本地运行 `single-repo/` 采集器，不进入公开 Dashboard；只有在源仓所有者明确同意公开 snapshot 时，才可通过 [`config/imported-boards.json`](config/imported-boards.json) 登记为静态导入看板，不自动采集。
 - **命名兼容**：仓名已改为 `CI-workflow`；协议标识 `ci-gates/*`、artifact `ci-gates-reports`、配置 `.github/ci-gates.json` 暂保持不变，避免已接入仓失效。
 
 ---
 
 ## 二、如何接入
 
-接入分三条路径。先确认源仓是 **public** 还是 **private**：公开看板只能接 public 源仓。
+接入分三条路径。公开采集要求源仓是 **public**；private 源仓默认只做本地看板，只有所有者明确同意公开 snapshot 时才走静态导入。
 
 ### 2.1 只接入社区指标（不接门禁）
 
@@ -136,7 +136,7 @@ cp -R /tmp/ci-workflow/template/test/. ./test/
 
 数据分支只放 `board-config.json`、`site/data/` 和 `.sync/`，采集器代码始终来自 `main`。GitHub Pages 一个仓只能发布一个站点，所以分支不是独立站点；`Deploy` 会把所有分支汇总到同一个 Pages artifact。
 
-**私仓**：不要创建 `board/*` 分支；用本机 `GSB_ALLOW_PRIVATE=1 python3 publish.py --repo owner/private-repo` + `python3 server.py`。
+**私仓**：默认不要创建 `board/*` 分支；用本机 `GSB_ALLOW_PRIVATE=1 python3 publish.py --repo owner/private-repo` + `python3 server.py`。如果所有者明确同意公开 snapshot，可走“静态导入”：在 [`config/imported-boards.json`](config/imported-boards.json) 登记分支和 `owner/repo` key，分支只放 `board-config.json` 和 `site/data/snapshot.json`，`board-collect` 不会采集它，更新 snapshot 后重新触发 `Deploy`。
 
 #### 第三步：让公共 Dashboard 收录门禁数据
 
