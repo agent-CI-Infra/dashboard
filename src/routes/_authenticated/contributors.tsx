@@ -1,7 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router'
 import z from 'zod'
-import { ContributorsAnalysis } from '@/features/community/contributors'
+import { createFileRoute } from '@tanstack/react-router'
 import { TIME_RANGES } from '@/lib/monitor/ranges'
+import { ContributorsAnalysis } from '@/features/community/contributors'
 
 const contributorSearchSchema = z.object({
   contributor: z.string().optional().catch(undefined),

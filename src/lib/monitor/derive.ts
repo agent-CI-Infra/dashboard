@@ -1,3 +1,4 @@
+import type { ResolvedRange } from './ranges'
 import type {
   HistoryPoint,
   IssueRecord,
@@ -5,7 +6,6 @@ import type {
   ContributionType,
   ContributorRecord,
 } from './types'
-import type { ResolvedRange } from './ranges'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 

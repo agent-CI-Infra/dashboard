@@ -10,7 +10,8 @@ export function NotFoundError() {
         <h1 className='text-[7rem] leading-tight font-bold'>404</h1>
         <span className='font-medium'>哎呀！页面未找到！</span>
         <p className='text-center text-muted-foreground'>
-          你要查找的页面似乎不存在，<br />
+          你要查找的页面似乎不存在，
+          <br />
           或已被移除。
         </p>
         <div className='mt-6 flex gap-4'>

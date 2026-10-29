@@ -1,10 +1,7 @@
 import { useMemo } from 'react'
 import { useMonitorCore } from '@/lib/monitor/data'
+import { computePeriodMetrics, previousRange } from '@/lib/monitor/derive'
 import { resolveRange, type TimeRangeSearch } from '@/lib/monitor/ranges'
-import {
-  computePeriodMetrics,
-  previousRange,
-} from '@/lib/monitor/derive'
 
 function toDate(value: string | null | undefined): Date | null {
   if (!value) return null
@@ -49,5 +46,14 @@ export function useMonitorBase(repo: string, search: TimeRangeSearch) {
     [history, prevRange]
   )
 
-  return { ...core, history, now, boundStart, range, prevRange, current, previous }
+  return {
+    ...core,
+    history,
+    now,
+    boundStart,
+    range,
+    prevRange,
+    current,
+    previous,
+  }
 }

@@ -22,7 +22,11 @@ export function DistributionChart({
   return (
     <ResponsiveContainer width='100%' height={height}>
       <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-        <CartesianGrid vertical={false} stroke='var(--border)' strokeDasharray='3 3' />
+        <CartesianGrid
+          vertical={false}
+          stroke='var(--border)'
+          strokeDasharray='3 3'
+        />
         <XAxis
           dataKey='bucket'
           stroke='var(--muted-foreground)'
@@ -49,7 +53,13 @@ export function DistributionChart({
           }}
           cursor={{ fill: 'var(--muted)', opacity: 0.4 }}
         />
-        <Bar dataKey='count' name='数量' fill={color} radius={[3, 3, 0, 0]} maxBarSize={40} />
+        <Bar
+          dataKey='count'
+          name='数量'
+          fill={color}
+          radius={[3, 3, 0, 0]}
+          maxBarSize={40}
+        />
       </BarChart>
     </ResponsiveContainer>
   )

@@ -66,9 +66,7 @@ export function formatRelative(
 }
 
 /** Humanize a duration expressed in hours. */
-export function formatDurationHours(
-  hours: number | null | undefined
-): string {
+export function formatDurationHours(hours: number | null | undefined): string {
   if (hours === null || hours === undefined || Number.isNaN(hours)) return '—'
   if (hours < 1) return `${Math.round(hours * 60)}m`
   if (hours < 48) return `${hours.toFixed(1)}h`

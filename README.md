@@ -6,13 +6,13 @@
 
 **入口：**
 
-| 入口                | 链接                                                      |
-| ------------------- | --------------------------------------------------------- |
-| 公共多仓 Dashboard  | <https://agent-ci-infra.github.io/dashboard/>             |
-| 单仓看板列表        | <https://agent-ci-infra.github.io/dashboard/boards/>      |
+| 入口                | 链接                                                                           |
+| ------------------- | ------------------------------------------------------------------------------ |
+| 公共多仓 Dashboard  | <https://agent-ci-infra.github.io/dashboard/>                                  |
+| 单仓看板列表        | <https://agent-ci-infra.github.io/dashboard/boards/>                           |
 | DigitalMate 看板    | <https://agent-ci-infra.github.io/dashboard/boards/openJiuwen-ai/digitalmate/> |
-| 单仓/私仓采集器说明 | [`single-repo/README.md`](single-repo/README.md)          |
-| 单仓看板示例        | <https://agent-ci-infra.github.io/dashboard/single-repo/> |
+| 单仓/私仓采集器说明 | [`single-repo/README.md`](single-repo/README.md)                               |
+| 单仓看板示例        | <https://agent-ci-infra.github.io/dashboard/single-repo/>                      |
 
 当前监控仓库（共 15 个）：
 
@@ -25,10 +25,10 @@
 
 ### 1.1 三个层次
 
-| 层     | 仓库                                                                          | 负责                                                                         | 不负责                    |
-| ------ | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------- |
-| CI 层  | [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow) | CI workflow（含门禁）模板、`gate.mjs`、报告/用例 schema、starter、`AGENT.md` | Dashboard UI、站点发布    |
-| 单仓层 | **本仓** [`single-repo/`](single-repo/) + `board/*` / 导入分支                | 单仓采集器、分支托管、静态导入、`/boards/` 页面、私仓本地模式                | 跨仓聚合、门禁协议定义    |
+| 层     | 仓库                                                                          | 负责                                                                         | 不负责                      |
+| ------ | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | --------------------------- |
+| CI 层  | [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow) | CI workflow（含门禁）模板、`gate.mjs`、报告/用例 schema、starter、`AGENT.md` | Dashboard UI、站点发布      |
+| 单仓层 | **本仓** [`single-repo/`](single-repo/) + `board/*` / 导入分支                | 单仓采集器、分支托管、静态导入、`/boards/` 页面、私仓本地模式                | 跨仓聚合、门禁协议定义      |
 | 汇总层 | **本仓** `agent-CI-Infra/dashboard`                                           | 多仓聚合、`/gate`、Deploy 汇总、公开 Pages、接入入口                         | 执行用户 CI、保存私仓 token |
 
 ```text
@@ -191,11 +191,11 @@ python3 server.py
 
 **工作流分工：**
 
-| 工作流 | 触发 | 职责 |
-| --- | --- | --- |
-| `Create board` | 手动 | 校验公开源仓，创建 `board/<owner>/<repo>` 数据分支 |
-| `Collect board data` | 定时 + 手动 | 采集公开源仓，写回 `board/*`，再触发 Deploy |
-| `mirror-digitalmate` | 每小时 + 手动 | 从 board 仓公开 snapshot 更新导入分支，再触发 Deploy |
+| 工作流                   | 触发                                | 职责                                                  |
+| ------------------------ | ----------------------------------- | ----------------------------------------------------- |
+| `Create board`           | 手动                                | 校验公开源仓，创建 `board/<owner>/<repo>` 数据分支    |
+| `Collect board data`     | 定时 + 手动                         | 采集公开源仓，写回 `board/*`，再触发 Deploy           |
+| `mirror-digitalmate`     | 每小时 + 手动                       | 从 board 仓公开 snapshot 更新导入分支，再触发 Deploy  |
 | `Deploy to GitHub Pages` | push main、定时、workflow_run、手动 | Vite 构建 + 汇总所有数据分支，发布一个 Pages artifact |
 
 #### 第三步：让公共 Dashboard 收录门禁数据

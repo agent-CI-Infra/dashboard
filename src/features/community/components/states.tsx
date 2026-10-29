@@ -1,8 +1,8 @@
 import { AlertTriangle, Inbox, Loader2, RefreshCw } from 'lucide-react'
+import { useLang } from '@/lib/i18n'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
-import { useLang } from '@/lib/i18n'
 
 type StateProps = {
   className?: string
@@ -26,11 +26,7 @@ export function LoadingState({ className, title }: StateProps) {
   )
 }
 
-export function EmptyState({
-  className,
-  title,
-  description,
-}: StateProps) {
+export function EmptyState({ className, title, description }: StateProps) {
   const { t } = useLang()
   title ??= t('state.empty.title')
   description ??= t('state.empty.desc')
@@ -65,7 +61,9 @@ export function ErrorState({
         <AlertTriangle className='size-6 text-destructive' />
         <div className='space-y-1'>
           <p className='text-sm font-medium'>{title}</p>
-          <p className='max-w-md text-xs text-muted-foreground'>{description}</p>
+          <p className='max-w-md text-xs text-muted-foreground'>
+            {description}
+          </p>
         </div>
         {onRetry ? (
           <Button variant='outline' size='sm' onClick={onRetry}>

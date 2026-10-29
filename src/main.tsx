@@ -14,9 +14,9 @@ import {
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { handleServerError } from '@/lib/handle-server-error'
+import { LanguageProvider } from '@/lib/i18n'
 import { MonitorAutoRefresh } from '@/components/monitor-auto-refresh'
 import { DirectionProvider } from './context/direction-provider'
-import { LanguageProvider } from '@/lib/i18n'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
 // Generated Routes
@@ -105,13 +105,13 @@ if (!rootElement.innerHTML) {
       <QueryClientProvider client={queryClient}>
         <MonitorAutoRefresh />
         <LanguageProvider>
-        <ThemeProvider>
-          <FontProvider>
-            <DirectionProvider>
-              <RouterProvider router={router} />
-            </DirectionProvider>
-          </FontProvider>
-        </ThemeProvider>
+          <ThemeProvider>
+            <FontProvider>
+              <DirectionProvider>
+                <RouterProvider router={router} />
+              </DirectionProvider>
+            </FontProvider>
+          </ThemeProvider>
         </LanguageProvider>
       </QueryClientProvider>
     </StrictMode>
