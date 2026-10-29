@@ -1,6 +1,6 @@
+import { LanguageSwitch } from '@/components/language-switch'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { LanguageSwitch } from '@/components/language-switch'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { EmptyState } from './components/states'
 
@@ -21,7 +21,10 @@ export function EcosystemInfluence() {
           </p>
         </div>
 
-        <EmptyState title='暂未开放' description='该功能正在建设中，敬请期待。' />
+        <EmptyState
+          title='暂未开放'
+          description='该功能正在建设中，敬请期待。'
+        />
       </Main>
     </>
   )

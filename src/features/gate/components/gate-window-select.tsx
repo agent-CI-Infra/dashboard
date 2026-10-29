@@ -1,13 +1,16 @@
 import { Check, ChevronDown } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { useLang } from '@/lib/i18n'
+import { cn } from '@/lib/utils'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useGateWindow, WINDOW_OPTIONS } from '@/features/gate/stores/gate-window'
+import {
+  useGateWindow,
+  WINDOW_OPTIONS,
+} from '@/features/gate/stores/gate-window'
 
 /**
  * Compact time-window selector rendered inline with the page subtitle, so the

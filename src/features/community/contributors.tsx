@@ -1,32 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react'
-import { getRouteApi } from '@tanstack/react-router'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
+import { getRouteApi } from '@tanstack/react-router'
 import { Check, ChevronDown } from 'lucide-react'
-import { Header } from '@/components/layout/header'
-import { Main } from '@/components/layout/main'
-import { LanguageSwitch } from '@/components/language-switch'
-import { ThemeSwitch } from '@/components/theme-switch'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import {
-  Command,
-  CommandEmpty,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command'
-import { ChartCard } from './components/chart-card'
-import { MonitorTable } from './components/monitor-table'
-import { EmptyState, ErrorState, LoadingState } from './components/states'
-import { TimeRangeFilter } from './components/time-range-filter'
-import { TrendChart } from './components/trend-chart'
-import { pullsColumns } from './pulls-columns'
-import { issuesColumns } from './issues-columns'
 import {
   contributorsQuery,
   issuesQuery,
@@ -36,6 +11,31 @@ import {
 } from '@/lib/monitor/data'
 import { resolveRange, type TimeRangeSearch } from '@/lib/monitor/ranges'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { LanguageSwitch } from '@/components/language-switch'
+import { Header } from '@/components/layout/header'
+import { Main } from '@/components/layout/main'
+import { ThemeSwitch } from '@/components/theme-switch'
+import { ChartCard } from './components/chart-card'
+import { MonitorTable } from './components/monitor-table'
+import { EmptyState, ErrorState, LoadingState } from './components/states'
+import { TimeRangeFilter } from './components/time-range-filter'
+import { TrendChart } from './components/trend-chart'
+import { issuesColumns } from './issues-columns'
+import { pullsColumns } from './pulls-columns'
 
 const route = getRouteApi('/_authenticated/contributors')
 
@@ -147,7 +147,10 @@ export function ContributorsAnalysis() {
     issues.isLoading ||
     contributors.isLoading
   const isError =
-    reposQuery.isError || pulls.isError || issues.isError || contributors.isError
+    reposQuery.isError ||
+    pulls.isError ||
+    issues.isError ||
+    contributors.isError
 
   const all = useMemo(() => {
     const logins = new Set<string>()
@@ -155,7 +158,8 @@ export function ContributorsAnalysis() {
       if (!c.isBot) logins.add(c.login)
     }
     const byLogin = new Map<string, ContributorOption>()
-    for (const login of logins) byLogin.set(login, { login, pulls: 0, issues: 0 })
+    for (const login of logins)
+      byLogin.set(login, { login, pulls: 0, issues: 0 })
     for (const p of pulls.items) {
       const c = byLogin.get(p.author)
       if (c) c.pulls += 1
@@ -339,7 +343,10 @@ export function ContributorsAnalysis() {
           </Card>
         </>
       ) : (
-        <EmptyState title='暂无贡献者数据' description='尚未采集到贡献者数据。' />
+        <EmptyState
+          title='暂无贡献者数据'
+          description='尚未采集到贡献者数据。'
+        />
       )}
     </>
   )

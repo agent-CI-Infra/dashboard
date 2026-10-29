@@ -1,11 +1,11 @@
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import {
   TIME_RANGES,
   TIME_RANGE_LABELS,
   type TimeRangeKey,
   type TimeRangeSearch,
 } from '@/lib/monitor/ranges'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
 type TimeRangeFilterProps = {
   value: TimeRangeSearch

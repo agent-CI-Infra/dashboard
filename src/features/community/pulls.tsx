@@ -1,10 +1,5 @@
 import { useMemo } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
-import { Header } from '@/components/layout/header'
-import { Main } from '@/components/layout/main'
-import { LanguageSwitch } from '@/components/language-switch'
-import { ThemeSwitch } from '@/components/theme-switch'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   repoKey,
   useActivityScores,
@@ -12,6 +7,11 @@ import {
   useSelectedRepo,
 } from '@/lib/monitor/data'
 import { formatDurationHours, formatNumber } from '@/lib/monitor/format'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { LanguageSwitch } from '@/components/language-switch'
+import { Header } from '@/components/layout/header'
+import { Main } from '@/components/layout/main'
+import { ThemeSwitch } from '@/components/theme-switch'
 import { ChartCard } from './components/chart-card'
 import { MonitorHeader } from './components/monitor-header'
 import { MonitorTable } from './components/monitor-table'

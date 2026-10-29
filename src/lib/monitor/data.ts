@@ -190,7 +190,10 @@ export function useActivityScores(
     queries: keys.map((key) => ({ ...pullsQuery(key), enabled: Boolean(key) })),
   })
   const issues = useQueries({
-    queries: keys.map((key) => ({ ...issuesQuery(key), enabled: Boolean(key) })),
+    queries: keys.map((key) => ({
+      ...issuesQuery(key),
+      enabled: Boolean(key),
+    })),
   })
   const contributors = useQueries({
     queries: keys.map((key) => ({

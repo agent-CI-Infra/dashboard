@@ -5,10 +5,10 @@ import {
   Info,
   XCircle,
 } from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
 import { formatDateTime, formatRelative } from '@/lib/monitor/format'
 import type { MonitorMeta } from '@/lib/monitor/types'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
 
 type DataStatusBannerProps = {
   meta: MonitorMeta | undefined
@@ -84,7 +84,10 @@ export function DataStatusBanner({ meta }: DataStatusBannerProps) {
             </p>
           ) : null}
           {meta.notes.map((note, idx) => (
-            <p key={idx} className='flex items-start gap-1 text-muted-foreground'>
+            <p
+              key={idx}
+              className='flex items-start gap-1 text-muted-foreground'
+            >
               <Info className='mt-0.5 size-3 shrink-0' />
               <span>{note}</span>
             </p>

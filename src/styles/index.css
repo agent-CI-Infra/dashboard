@@ -105,11 +105,19 @@
   /* text */
   --color-gate-ink: var(--foreground);
   --color-gate-dim: var(--muted-foreground);
-  --color-gate-faint: color-mix(in srgb, var(--muted-foreground) 72%, transparent);
+  --color-gate-faint: color-mix(
+    in srgb,
+    var(--muted-foreground) 72%,
+    transparent
+  );
 
   /* accent */
   --color-gate-accent: var(--gate-accent);
-  --color-gate-accent-soft: color-mix(in srgb, var(--gate-accent) 12%, transparent);
+  --color-gate-accent-soft: color-mix(
+    in srgb,
+    var(--gate-accent) 12%,
+    transparent
+  );
 
   /* status */
   --color-gate-pass: var(--gate-pass);

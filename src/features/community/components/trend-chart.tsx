@@ -70,7 +70,10 @@ export function TrendChart({
   const tickStyle = hasRightAxis ? { fontWeight: 'bold' } : undefined
   return (
     <ResponsiveContainer width='100%' height={height}>
-      <ComposedChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+      <ComposedChart
+        data={data}
+        margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+      >
         <CartesianGrid
           vertical={false}
           yAxisId='left'

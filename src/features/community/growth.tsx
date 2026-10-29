@@ -1,14 +1,14 @@
 import { useMemo } from 'react'
-import { Header } from '@/components/layout/header'
-import { Main } from '@/components/layout/main'
-import { LanguageSwitch } from '@/components/language-switch'
-import { ThemeSwitch } from '@/components/theme-switch'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { IconGithub } from '@/assets/brand-icons'
 import { useContributors, useRepos } from '@/lib/monitor/data'
-import { TrendChart } from './components/trend-chart'
-import { EmptyState, ErrorState, LoadingState } from './components/states'
 import type { ContributorRecord, RepoSummary } from '@/lib/monitor/types'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { LanguageSwitch } from '@/components/language-switch'
+import { Header } from '@/components/layout/header'
+import { Main } from '@/components/layout/main'
+import { ThemeSwitch } from '@/components/theme-switch'
+import { EmptyState, ErrorState, LoadingState } from './components/states'
+import { TrendChart } from './components/trend-chart'
 
 /** star-history.com external embed URLs for one repository. */
 function starHistory(repo: string) {
@@ -81,7 +81,9 @@ function RepoGrowthRow({ repo }: { repo: RepoSummary }) {
       </CardHeader>
       <CardContent className='grid gap-6 lg:grid-cols-2'>
         <div className='flex h-full flex-col gap-3'>
-          <p className='text-sm font-medium text-muted-foreground'>贡献者增长</p>
+          <p className='text-sm font-medium text-muted-foreground'>
+            贡献者增长
+          </p>
           {contributors.isError ? (
             <EmptyState
               title='无法加载贡献者数据'
@@ -118,11 +120,16 @@ function RepoGrowthRow({ repo }: { repo: RepoSummary }) {
         </div>
 
         <div className='space-y-3'>
-          <p className='text-sm font-medium text-muted-foreground'>Star History</p>
+          <p className='text-sm font-medium text-muted-foreground'>
+            Star History
+          </p>
           <a href={urls.link} target='_blank' rel='noreferrer'>
             <picture>
               <source media='(prefers-color-scheme: dark)' srcSet={urls.dark} />
-              <source media='(prefers-color-scheme: light)' srcSet={urls.light} />
+              <source
+                media='(prefers-color-scheme: light)'
+                srcSet={urls.light}
+              />
               <img
                 alt={`${repo.fullName} Star History Chart`}
                 src={urls.light}

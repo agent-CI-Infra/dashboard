@@ -1,9 +1,9 @@
 import { Outlet } from '@tanstack/react-router'
 import { Palette } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
+import { LanguageSwitch } from '@/components/language-switch'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { LanguageSwitch } from '@/components/language-switch'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { SidebarNav } from './components/sidebar-nav'
 
@@ -30,9 +30,7 @@ export function Settings() {
           <h1 className='text-2xl font-bold tracking-tight md:text-3xl'>
             设置
           </h1>
-          <p className='text-muted-foreground'>
-            管理应用的外观与显示偏好。
-          </p>
+          <p className='text-muted-foreground'>管理应用的外观与显示偏好。</p>
         </div>
         <Separator className='my-4 lg:my-6' />
         <div className='flex flex-1 flex-col space-y-2 overflow-hidden md:space-y-2 lg:flex-row lg:space-y-0 lg:space-x-12'>

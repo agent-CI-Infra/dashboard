@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { PullsAnalysis } from '@/features/community/pulls'
 import { timeRangeSearchSchema } from '@/lib/monitor/ranges'
+import { PullsAnalysis } from '@/features/community/pulls'
 
 export const Route = createFileRoute('/_authenticated/pulls')({
   validateSearch: timeRangeSearchSchema,
