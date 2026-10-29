@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
-import { useQueries } from '@tanstack/react-query'
+import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { Check, ChevronDown } from 'lucide-react'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
@@ -35,7 +35,6 @@ import {
   useRepos,
 } from '@/lib/monitor/data'
 import { resolveRange, type TimeRangeSearch } from '@/lib/monitor/ranges'
-import type { IssueRecord, PullRecord } from '@/lib/monitor/types'
 import { cn } from '@/lib/utils'
 
 const route = getRouteApi('/_authenticated/contributors')
@@ -111,58 +110,65 @@ function ContributorPicker({
 export function ContributorsAnalysis() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
+  const queryClient = useQueryClient()
   const reposQuery = useRepos()
   const repos = reposQuery.data?.repos ?? []
 
-  const pullsQueries = useQueries({
+  // `combine` memoizes the merged data structurally, so the values below are
+  // stable between renders and safe to put in dependency arrays.
+  const pulls = useQueries({
     queries: repos.map((repo) => pullsQuery(repoKey(repo))),
+    combine: (results) => ({
+      items: results.flatMap((result) => result.data ?? []),
+      isLoading: results.some((result) => result.isLoading),
+      isError: results.some((result) => result.isError),
+    }),
   })
-  const issuesQueries = useQueries({
+  const issues = useQueries({
     queries: repos.map((repo) => issuesQuery(repoKey(repo))),
+    combine: (results) => ({
+      items: results.flatMap((result) => result.data ?? []),
+      isLoading: results.some((result) => result.isLoading),
+      isError: results.some((result) => result.isError),
+    }),
   })
-  const contributorsQueries = useQueries({
+  const contributors = useQueries({
     queries: repos.map((repo) => contributorsQuery(repoKey(repo))),
+    combine: (results) => ({
+      items: results.flatMap((result) => result.data?.items ?? []),
+      isLoading: results.some((result) => result.isLoading),
+      isError: results.some((result) => result.isError),
+    }),
   })
 
   const isLoading =
     reposQuery.isLoading ||
-    pullsQueries.some((q) => q.isLoading) ||
-    issuesQueries.some((q) => q.isLoading) ||
-    contributorsQueries.some((q) => q.isLoading)
+    pulls.isLoading ||
+    issues.isLoading ||
+    contributors.isLoading
   const isError =
-    reposQuery.isError ||
-    pullsQueries.some((q) => q.isError) ||
-    issuesQueries.some((q) => q.isError) ||
-    contributorsQueries.some((q) => q.isError)
+    reposQuery.isError || pulls.isError || issues.isError || contributors.isError
 
   const all = useMemo(() => {
-    const pulls: PullRecord[] = []
-    const issues: IssueRecord[] = []
     const logins = new Set<string>()
-    repos.forEach((_, i) => {
-      for (const c of contributorsQueries[i].data?.items ?? []) {
-        if (!c.isBot) logins.add(c.login)
-      }
-    })
-    repos.forEach((_, i) => {
-      for (const p of pullsQueries[i].data ?? []) pulls.push(p)
-      for (const item of issuesQueries[i].data ?? []) issues.push(item)
-    })
+    for (const c of contributors.items) {
+      if (!c.isBot) logins.add(c.login)
+    }
     const byLogin = new Map<string, ContributorOption>()
     for (const login of logins) byLogin.set(login, { login, pulls: 0, issues: 0 })
-    for (const p of pulls) {
+    for (const p of pulls.items) {
       const c = byLogin.get(p.author)
       if (c) c.pulls += 1
     }
-    for (const item of issues) {
+    for (const item of issues.items) {
       const c = byLogin.get(item.author)
       if (c) c.issues += 1
     }
-    const contributors = [...byLogin.values()].sort(
+    const ranked = [...byLogin.values()].sort(
       (a, b) => b.pulls + b.issues - (a.pulls + a.issues)
     )
-    return { pulls, issues, contributors }
-  }, [repos, pullsQueries, issuesQueries, contributorsQueries])
+    return { pulls: pulls.items, issues: issues.items, contributors: ranked }
+  }, [pulls.items, issues.items, contributors.items])
 
   const selectedLogin = useMemo(() => {
     if (all.contributors.length === 0) return undefined
@@ -235,9 +241,7 @@ export function ContributorsAnalysis() {
 
   const retryAll = () => {
     reposQuery.refetch()
-    pullsQueries.forEach((q) => q.refetch())
-    issuesQueries.forEach((q) => q.refetch())
-    contributorsQueries.forEach((q) => q.refetch())
+    void queryClient.refetchQueries({ queryKey: ['monitor'], type: 'active' })
   }
 
   const shell = (children: ReactNode) => (
