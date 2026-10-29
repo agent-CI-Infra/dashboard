@@ -1,0 +1,71 @@
+name: Mirror DigitalMate snapshot
+
+# DigitalMate's collector runs in haowenz001/digitalmate-board and publishes a
+# public snapshot. Mirror that public snapshot into the dashboard's static
+# imported board, then redeploy. No private-source token is stored here.
+on:
+  schedule:
+    - cron: '37 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: mirror-digitalmate
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch public snapshot
+        run: |
+          set -euo pipefail
+          url='https://raw.githubusercontent.com/haowenz001/digitalmate-board/main/site/data/snapshot.json'
+          curl --fail --silent --show-error --location \
+            --retry 3 --retry-delay 2 --max-time 60 \
+            -H 'Cache-Control: no-cache' \
+            "$url?ts=$(date +%s)" -o /tmp/digitalmate-snapshot.json
+          python3 - <<'PY'
+          import json
+          with open('/tmp/digitalmate-snapshot.json', encoding='utf-8') as fh:
+              snapshot = json.load(fh)
+          repository = (snapshot.get('repository') or {}).get('name')
+          if repository != 'openJiuwen-ai/DigitalMate':
+              raise SystemExit(f'unexpected repository in snapshot: {repository!r}')
+          print('snapshot generated_at:', snapshot.get('generated_at'))
+          PY
+
+      - name: Update digitalmate branch
+        id: update
+        run: |
+          set -euo pipefail
+          git fetch origin digitalmate:refs/remotes/origin/digitalmate
+          git checkout -B digitalmate origin/digitalmate
+          cp /tmp/digitalmate-snapshot.json site/data/snapshot.json
+          if git diff --quiet -- site/data/snapshot.json; then
+            echo 'snapshot unchanged'
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site/data/snapshot.json
+          git commit -m 'chore(digitalmate): mirror public snapshot'
+          git push origin HEAD:digitalmate
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+
+      - name: Deploy dashboard
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main

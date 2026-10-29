@@ -175,7 +175,7 @@ python3 server.py
 
 - 公开 GitHub Pages 默认不可以发布私仓数据。
 - `publish.py --publish-repo` 会同时校验源仓和发布目标必须是公开仓。
-- **显式例外：静态导入看板。** 源仓所有者明确同意公开 snapshot 后，在 `config/imported-boards.json` 登记分支和 key；该分支只保存 `board-config.json` 与 `site/data/snapshot.json`，由 `assemble-boards.mjs` 汇总发布。它不进入 `board-collect`，不会每日自动刷新；更新 snapshot 后需重新触发 `Deploy`。当前唯一登记的是 `openJiuwen-ai/digitalmate`。
+- **显式例外：静态导入看板。** 源仓所有者明确同意公开 snapshot 后，在 `config/imported-boards.json` 登记分支和 key；该分支只保存 `board-config.json` 与 `site/data/snapshot.json`，由 `assemble-boards.mjs` 汇总发布。它不进入 `board-collect`；DigitalMate 由 `mirror-digitalmate.yml` 每小时从 `haowenz001/digitalmate-board` 的公开快照镜像更新，并触发 `Deploy`，因此本仓不需要私仓 token。当前唯一登记的是 `openJiuwen-ai/digitalmate`。
 
 ## 8. 版本与迁移
 
