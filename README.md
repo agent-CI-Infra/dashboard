@@ -2,7 +2,7 @@
 
 > **这是多个代码仓的公共 Dashboard，也是单仓看板的托管入口。**
 >
-> 它聚合展示多个社区的规模、活跃度、健康度和质量门禁；单个仓库的深度视图由本仓 `board/*` 数据分支托管，发布在 `/boards/<owner>/<repo>/`。
+> 它聚合展示多个社区的规模、活跃度、健康度和质量门禁；单个仓库的深度视图由本仓的数据分支托管，统一发布在 `/boards/<owner>/<repo>/`。公开源仓走 `board/*` 自动采集；私仓或已有独立 board 走“公开快照 + 镜像分支”。
 
 **入口：**
 
@@ -10,6 +10,7 @@
 | ------------------- | --------------------------------------------------------- |
 | 公共多仓 Dashboard  | <https://agent-ci-infra.github.io/dashboard/>             |
 | 单仓看板列表        | <https://agent-ci-infra.github.io/dashboard/boards/>      |
+| DigitalMate 看板    | <https://agent-ci-infra.github.io/dashboard/boards/openJiuwen-ai/digitalmate/> |
 | 单仓/私仓采集器说明 | [`single-repo/README.md`](single-repo/README.md)          |
 | 单仓看板示例        | <https://agent-ci-infra.github.io/dashboard/single-repo/> |
 
@@ -27,8 +28,8 @@
 | 层     | 仓库                                                                          | 负责                                                                         | 不负责                    |
 | ------ | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------- |
 | CI 层  | [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow) | CI workflow（含门禁）模板、`gate.mjs`、报告/用例 schema、starter、`AGENT.md` | Dashboard UI、站点发布    |
-| 单仓层 | **本仓** [`single-repo/`](single-repo/) + `board/*` 分支                      | 单仓采集器、分支托管、`/boards/` 页面、私仓本地模式                          | 跨仓聚合、门禁协议定义    |
-| 汇总层 | **本仓** `agent-CI-Infra/dashboard`                                           | 多仓聚合、`/gate`、Deploy 汇总、公开 Pages、接入入口                         | 执行用户 CI、保存私仓数据 |
+| 单仓层 | **本仓** [`single-repo/`](single-repo/) + `board/*` / 导入分支                | 单仓采集器、分支托管、静态导入、`/boards/` 页面、私仓本地模式                | 跨仓聚合、门禁协议定义    |
+| 汇总层 | **本仓** `agent-CI-Infra/dashboard`                                           | 多仓聚合、`/gate`、Deploy 汇总、公开 Pages、接入入口                         | 执行用户 CI、保存私仓 token |
 
 ```text
 用户源仓
@@ -45,6 +46,17 @@
                          │
                          ▼
        /gate                    跨仓门禁视图
+```
+
+私仓或已有独立 board 走同一条发布链，只是数据来源不同：
+
+```text
+board 仓采集 ─► 公开 snapshot ─► dashboard 导入分支（如 digitalmate）
+                                      ├─ board-config.json
+                                      └─ site/data/snapshot.json
+                                      │  Deploy 汇总
+                                      ▼
+                               /boards/<owner>/<repo>/
 ```
 
 ### 1.2 当前状态
@@ -109,9 +121,11 @@ cp -R /tmp/ci-workflow/template/test/. ./test/
 
 完整操作手册（面向用户 AI）：[`CI-workflow/AGENT.md`](https://github.com/agent-CI-Infra/CI-workflow/blob/main/AGENT.md)。
 
-#### 第二步：创建单仓看板（公仓托管）
+#### 第二步：创建单仓看板（自动化托管）
 
-**不需要复制 `single-repo/`，也不需要新建 `owner/repo-board` 仓。** 维护者在本仓操作：
+**不需要复制 `single-repo/`，也不需要新建 `owner/repo-board` 仓。** 维护者在本仓操作。按源仓可见性分两种模式：
+
+**A. 公开源仓：全自动**
 
 1. **Actions → Create board → Run workflow**：
    - `source_repository`：要展示的公开源仓，例如 `owner/service`；
@@ -136,7 +150,53 @@ cp -R /tmp/ci-workflow/template/test/. ./test/
 
 数据分支只放 `board-config.json`、`site/data/` 和 `.sync/`，采集器代码始终来自 `main`。GitHub Pages 一个仓只能发布一个站点，所以分支不是独立站点；`Deploy` 会把所有分支汇总到同一个 Pages artifact。
 
-**私仓**：默认不要创建 `board/*` 分支；用本机 `GSB_ALLOW_PRIVATE=1 python3 publish.py --repo owner/private-repo` + `python3 server.py`。如果所有者明确同意公开 snapshot，可走“静态导入”：在 [`config/imported-boards.json`](config/imported-boards.json) 登记分支和 `owner/repo` key，分支只放 `board-config.json` 和 `site/data/snapshot.json`，`board-collect` 不会采集它。DigitalMate 的 [`mirror-digitalmate.yml`](.github/workflows/mirror-digitalmate.yml) 每小时读取 `haowenz001/digitalmate-board` 的公开快照，更新 `digitalmate` 分支并触发 `Deploy`；本仓不保存私仓 token。
+**B. 私仓 / 已有独立 board：静态导入 + 自动镜像**
+
+适用：源仓是 private，但已经有一个独立 board 仓在采集并发布公开 snapshot（DigitalMate 就是这个模式）。**不要让本仓直接采集私仓，也不要把私仓 token 放进本仓。**
+
+1. 确认 board 仓是 public，且它的 `site/data/snapshot.json` 可以匿名访问。
+2. 在 [`config/imported-boards.json`](config/imported-boards.json) 登记一条：
+
+   ```json
+   {
+     "branch": "digitalmate",
+     "key": "openJiuwen-ai/digitalmate",
+     "source": "openJiuwen-ai/DigitalMate",
+     "note": "Private source; snapshot published with explicit owner approval."
+   }
+   ```
+
+   - `branch`：本仓存放该看板数据的分支，不要求 `board/` 前缀，当前不能包含 `/`；
+   - `key`：公开路径和看板 ID，必须是 `owner/repo`；
+   - `source`：源仓标识，用于审计；复制 mirror 模板时用它校验 snapshot 的 `repository.name`；
+   - 显示名读取分支里的 `board-config.json` 的 `deployments.*.label`；
+   - 这一步是一次性的人工确认，表示“同意公开该私仓 snapshot”。
+
+3. 在该分支放 `board-config.json` 和 `site/data/snapshot.json`；不要放源码、token 或 `.sync/`。`board-collect` 不会扫描它。
+4. 配置镜像：DigitalMate 使用 [`mirror-digitalmate.yml`](.github/workflows/mirror-digitalmate.yml)，每小时读取 board 仓的公开 snapshot，内容变化时更新 `digitalmate` 分支并触发 `Deploy`。新增私仓看板时复制这个工作流，替换 snapshot URL、分支名和校验仓库名即可。
+5. 等待 `Deploy to GitHub Pages`，打开：
+
+   ```text
+   https://agent-ci-infra.github.io/dashboard/boards/<owner>/<repo>/
+   ```
+
+私仓默认仍然只在本地运行：
+
+```bash
+GSB_ALLOW_PRIVATE=1 python3 publish.py --repo owner/private-repo
+python3 server.py
+```
+
+只有所有者明确同意公开 snapshot 时，才走上面的 B 流程；本仓不保存私仓 token。
+
+**工作流分工：**
+
+| 工作流 | 触发 | 职责 |
+| --- | --- | --- |
+| `Create board` | 手动 | 校验公开源仓，创建 `board/<owner>/<repo>` 数据分支 |
+| `Collect board data` | 定时 + 手动 | 采集公开源仓，写回 `board/*`，再触发 Deploy |
+| `mirror-digitalmate` | 每小时 + 手动 | 从 board 仓公开 snapshot 更新导入分支，再触发 Deploy |
+| `Deploy to GitHub Pages` | push main、定时、workflow_run、手动 | Vite 构建 + 汇总所有数据分支，发布一个 Pages artifact |
 
 #### 第三步：让公共 Dashboard 收录门禁数据
 
