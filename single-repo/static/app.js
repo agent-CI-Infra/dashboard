@@ -1261,8 +1261,9 @@
     const cov = d.coverage || {};
     if (!cov.source) {
       const steps = `<ul class="steps">${(cov.attempts || []).map((a) => `<li><span class="mark ${a.ok ? 'ok' : 'no'}">${a.ok ? '✓' : '✗'}</span><span><b>${esc(a.step)}</b> <span class="muted">${esc(a.detail)}</span></span></li>`).join('')}</ul>`;
+      const repoName = STATE.snap?.repository?.name || '本仓';
       return html + sectionHead('Coverage', '尚无可解析的覆盖率产物')
-        + (line.default ? `<div class="banner warn"><span class="icon">▲</span><div><div class="title">等待 ScienceDiscovery 覆盖率工作流首次发布摘要</div><div>每日完整基线成功后，这里会显示整仓趋势和路径明细；PR 与 main 增量随后自动叠加。</div></div></div>`
+        + (line.default ? `<div class="banner warn"><span class="icon">▲</span><div><div class="title">等待 ${esc(repoName)} 覆盖率工作流首次发布摘要</div><div>每日完整基线成功后，这里会显示整仓趋势和路径明细；PR 与 main 增量随后自动叠加。</div></div></div>`
           : `<div class="banner warn"><span class="icon">▲</span><div><div class="title"><code>${esc(line.ref)}</code> 还没有覆盖率摘要</div><div>该分支的 CI 由目标为它的 PR 和手动运行触发；PR 或手动运行上传覆盖率摘要后，这里显示该分支自己的结果，不借用主干数据。</div></div></div>`)
         + `<div class="card" style="margin-top:12px">${steps}</div>`;
     }

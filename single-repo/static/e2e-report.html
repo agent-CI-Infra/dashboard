@@ -40,11 +40,18 @@
   document.getElementById('back').href = back.href;
   const frame = document.getElementById('report-frame');
   // The local preview keeps the real index but not the large, already published HTML bundles.
-  // In that case display the same public report; deployed Pages always uses its own copy.
+  // Deployed Pages always uses its own copy; never fall back to another board's site.
   if (['127.0.0.1', 'localhost'].includes(location.hostname)) {
     fetch(report.href, { method: 'HEAD' }).then((response) => {
-      frame.src = response.ok ? report.href
-        : new URL(source, 'https://sciencediscovery.github.io/github-status-board/').href;
+      if (response.ok) {
+        frame.src = report.href;
+        return;
+      }
+      frame.remove();
+      const message = document.createElement('p');
+      message.className = 'error';
+      message.textContent = '本地预览没有该 E2E 报告副本，请打开已发布看板查看。';
+      document.body.append(message);
     }).catch(() => { frame.src = report.href; });
   } else {
     frame.src = report.href;
