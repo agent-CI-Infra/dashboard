@@ -1,0 +1,102 @@
+name: Collect DigitalMate E2E performance
+
+# Reads the latest `e2e-performance-*` artifact produced by the DigitalMate
+# nightly, merges it into the static `digitalmate` branch, and redeploys.
+# Requires a fine-grained PAT in DIGITALMATE_TOKEN with Actions: read access to
+# openJiuwen-ai/DigitalMate. Without the secret the job is a no-op, so forks and
+# the public dashboard keep working.
+on:
+  schedule:
+    # DigitalMate nightly starts at 18:00 UTC; leave time for the device run.
+    - cron: '20 20 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: collect-digitalmate-performance
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Check source token
+        id: token
+        env:
+          TOKEN: ${{ secrets.DIGITALMATE_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo 'skip=true' >> "$GITHUB_OUTPUT"
+            echo '::warning::DIGITALMATE_TOKEN is not configured; skipping DigitalMate performance collection.'
+          else
+            echo 'skip=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch latest performance artifact
+        id: artifact
+        if: steps.token.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.DIGITALMATE_TOKEN }}
+        run: |
+          set -euo pipefail
+          export GH_TOKEN
+          artifact_id=$(gh api 'repos/openJiuwen-ai/DigitalMate/actions/artifacts?per_page=100' \
+            --jq '[.artifacts[] | select(.expired == false) | select(.name | startswith("e2e-performance-"))] | sort_by(.created_at) | last | .id // empty')
+          if [ -z "$artifact_id" ]; then
+            echo 'found=false' >> "$GITHUB_OUTPUT"
+            echo '::notice::No unexpired e2e-performance-* artifact found.'
+            exit 0
+          fi
+          rm -rf /tmp/e2e-performance-artifact
+          mkdir -p /tmp/e2e-performance-artifact
+          gh api "repos/openJiuwen-ai/DigitalMate/actions/artifacts/${artifact_id}/zip" > /tmp/e2e-performance.zip
+          unzip -q /tmp/e2e-performance.zip -d /tmp/e2e-performance-artifact
+          performance_file=$(find /tmp/e2e-performance-artifact -name e2e-performance.json -type f | head -1)
+          if [ -z "$performance_file" ]; then
+            echo 'found=false' >> "$GITHUB_OUTPUT"
+            echo '::warning::artifact has no e2e-performance.json'
+            exit 0
+          fi
+          cp "$performance_file" /tmp/e2e-performance.json
+          echo 'found=true' >> "$GITHUB_OUTPUT"
+          echo "artifact_id=$artifact_id" >> "$GITHUB_OUTPUT"
+
+      - name: Merge into digitalmate branch
+        id: update
+        if: steps.artifact.outputs.found == 'true'
+        run: |
+          set -euo pipefail
+          cp scripts/merge-e2e-performance.mjs /tmp/merge-e2e-performance.mjs
+          git fetch origin digitalmate:refs/remotes/origin/digitalmate
+          git checkout -B digitalmate origin/digitalmate
+          node /tmp/merge-e2e-performance.mjs --run /tmp/e2e-performance.json --history site/data/e2e-performance/history.json
+          if git diff --quiet -- site/data/e2e-performance/history.json \
+             && git ls-files --error-unmatch site/data/e2e-performance/history.json >/dev/null 2>&1; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            echo 'performance history unchanged'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site/data/e2e-performance/history.json
+          git commit -m 'chore(digitalmate): collect nightly E2E performance'
+          # mirror-digitalmate.yml also writes this branch; rebase if it won the race.
+          git pull --rebase origin digitalmate
+          git push origin HEAD:digitalmate
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+
+      - name: Deploy dashboard
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main
