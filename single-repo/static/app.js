@@ -52,7 +52,7 @@
   const loadViews = () => { try { return { issues: 'table', prs: 'table', ...JSON.parse(localStorage.getItem(VIEW_KEY) || '{}') }; } catch (e) { return { issues: 'table', prs: 'table' }; } };
   const loadLine = () => { try { return localStorage.getItem(LINE_KEY); } catch (e) { return null; } };
   const loadCovSort = () => { try { return localStorage.getItem(COV_SORT_KEY) === 'lines' ? 'lines' : 'name'; } catch (e) { return 'name'; } };
-  const STATE = { snap: null, status: null, tab: 'overview', views: loadViews(), line: loadLine(), covOpen: new Set(), covSort: loadCovSort(), sort: {}, filters: { issueQ: '', issueLabel: '', issueAssignee: '', runBranch: '' }, ageFilter: { issues: null, prs: null }, coverageWeekOffset: 0, e2e: null, e2eSteps: {}, e2eFilter: { status: '', q: '' }, e2eLoading: new Set(), e2eErrors: new Set(), e2eCollapsed: new Set(), pollTimer: null };
+  const STATE = { snap: null, status: null, tab: 'overview', views: loadViews(), line: loadLine(), covOpen: new Set(), covSort: loadCovSort(), sort: {}, filters: { issueQ: '', issueLabel: '', issueAssignee: '', runBranch: '' }, ageFilter: { issues: null, prs: null }, coverageWeekOffset: 0, e2e: null, e2eSteps: {}, e2eFilter: { status: '', q: '' }, e2eLoading: new Set(), e2eErrors: new Set(), e2eCollapsed: new Set(), performance: null, perfCase: null, pollTimer: null };
   const returnParams = new URLSearchParams(location.search);
   const returnFocus = { line: returnParams.get('returnLine'), caseName: returnParams.get('returnCase'), pending: !!returnParams.get('returnCase'),
     e2eKey: returnParams.get('returnE2E'), e2ePending: !!returnParams.get('returnE2E') };
@@ -1169,6 +1169,169 @@
     }));
   }
 
+  // Nightly performance: one query-latency point per case per Beijing calendar day.
+  // The file is optional, so boards that do not publish it simply omit this section.
+  const PERF_STATUS = {
+    COMPLETED: ['通过', 'good'],
+    BLOCKED: ['阻塞', 'warn'],
+    FAILED: ['失败', 'bad'],
+    ERROR: ['错误', 'bad'],
+    CANCELLED: ['取消', ''],
+  };
+  const perfStatus = (status) => PERF_STATUS[String(status || '').toUpperCase()] || [status || '未知', ''];
+  const perfMs = (ms) => (ms == null ? '—' : msText(ms));
+  const perfDot = (status) => `<span class="perf-dot ${perfStatus(status)[1] || 'unknown'}" aria-hidden="true"></span>`;
+  const perfDevice = (device) => {
+    if (!device) return '—';
+    const screen = device.screen ? `${device.screen.width}×${device.screen.height}` : '';
+    return [device.model, screen].filter(Boolean).join(' · ') || '—';
+  };
+  const perfAxis = (ms) => (ms == null || ms === 0 ? '0' : ms < 1000 ? `${Math.round(ms)}ms` : ms < 60000 ? `${(ms / 1000).toFixed(1)}s` : `${(ms / 60000).toFixed(1)}m`);
+
+  function perfSparkline(points) {
+    const vals = (points || []).map((p) => p.query_ms).filter((v) => v != null);
+    if (!vals.length) return '<span class="perf-spark-empty">—</span>';
+    if (vals.length === 1) return '<svg class="perf-spark" viewBox="0 0 112 24" width="112" height="24" aria-hidden="true"><circle cx="56" cy="12" r="2.8"/></svg>';
+    const w = 112, h = 24, pad = 3;
+    const min = Math.min(...vals), max = Math.max(...vals), span = max - min || 1;
+    const step = (w - pad * 2) / (vals.length - 1);
+    const pts = vals.map((v, i) => [pad + i * step, h - pad - ((v - min) / span) * (h - pad * 2)]);
+    const d = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
+    const last = pts[pts.length - 1];
+    return `<svg class="perf-spark" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true"><path d="${d}"/><circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.4"/></svg>`;
+  }
+
+  function perfChart(points) {
+    const rows = (points || []).filter((p) => p && p.date);
+    const vals = rows.map((p) => p.query_ms).filter((v) => v != null);
+    if (!rows.length || !vals.length) return empty('还没有可绘制的查询耗时数据');
+    const W = 760, H = 230, L = 52, R = 16, T = 16, B = 30;
+    const max = Math.max(...vals);
+    const mag = Math.pow(10, Math.floor(Math.log10(max || 1)));
+    const step = Math.max(mag / 2, 1);
+    const yMax = Math.max(1, Math.ceil((max * 1.08) / step) * step);
+    const x = (i) => (rows.length === 1 ? L + (W - L - R) / 2 : L + (i / (rows.length - 1)) * (W - L - R));
+    const y = (v) => H - B - (v / yMax) * (H - T - B);
+    const grid = [0, 0.25, 0.5, 0.75, 1].map((f) => {
+      const yy = T + f * (H - T - B);
+      return `<line class="perf-grid-line" x1="${L}" y1="${yy.toFixed(1)}" x2="${W - R}" y2="${yy.toFixed(1)}"/><text class="perf-axis-text" x="${L - 8}" y="${(yy + 3).toFixed(1)}" text-anchor="end">${perfAxis(yMax * (1 - f))}</text>`;
+    }).join('');
+    let d = '', begun = false;
+    rows.forEach((p, i) => {
+      if (p.query_ms == null) { begun = false; return; }
+      d += `${begun ? 'L' : 'M'}${x(i).toFixed(1)} ${y(p.query_ms).toFixed(1)} `;
+      begun = true;
+    });
+    const dots = rows.map((p, i) => {
+      if (p.query_ms == null) return '';
+      const [label, tone] = perfStatus(p.status);
+      return `<circle class="perf-point ${tone}" cx="${x(i).toFixed(1)}" cy="${y(p.query_ms).toFixed(1)}" r="4"><title>${esc(`${p.date} · ${label} · 查询 ${perfMs(p.query_ms)} · ${p.run_id || ''}`)}</title></circle>`;
+    }).join('');
+    const labels = [...new Set([0, Math.floor((rows.length - 1) / 2), rows.length - 1])].filter((i) => i >= 0 && i < rows.length);
+    const xText = labels.map((i) => `<text class="perf-axis-text" x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle">${esc(rows[i].date.slice(5))}</text>`).join('');
+    const note = rows.length === 1 ? `<text class="perf-chart-note" x="${x(0).toFixed(1)}" y="${(y(rows[0].query_ms) - 12).toFixed(1)}" text-anchor="middle">首个数据点</text>` : '';
+    return `<div class="perf-chart-wrap"><svg class="perf-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="每日查询耗时曲线，${rows.length} 个数据点">${grid}<line class="perf-axis-line" x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}"/>${d ? `<path class="perf-line" d="${d}"/>` : ''}${dots}${xText}${note}</svg></div>`;
+  }
+
+  const PERF_STAGE_NAME = { tap: '点击', queued: '排队', dequeued: '出队', wire_send: '发送', ack: 'ACK', first_text: '首条消息', last_text: '消息接收', task_done: '任务完成', display_done: '展示完成' };
+  const perfOutcome = (outcome) => {
+    const value = String(outcome || '').toLowerCase();
+    if (value === 'completed' || value === 'ok') return ['完成', 'good'];
+    if (value === 'cancelled') return ['取消', 'warn'];
+    return [outcome || '未知', 'bad'];
+  };
+
+  function perfQueryStages(query) {
+    const stages = (Array.isArray(query?.stages) ? query.stages : [])
+      .filter((s) => s && Number.isFinite(Number(s.at_ms)) && (!s.name || s.name !== 'display_done'))
+      .sort((a, b) => Number(a.at_ms) - Number(b.at_ms));
+    if (!stages.length) return empty('这次查询没有阶段明细');
+    const base = Number(stages[0].at_ms);
+    const lastIndex = stages.map((s) => s.name).lastIndexOf('last_text');
+    const visible = lastIndex >= 0 ? stages.slice(0, lastIndex + 1) : stages;
+    const rows = visible.map((stage, index) => {
+      const start = Math.max(0, Number(stage.at_ms) - base);
+      const next = index + 1 < visible.length ? Math.max(0, Number(visible[index + 1].at_ms) - base) : start;
+      const width = Math.max(0, next - start);
+      return { name: PERF_STAGE_NAME[stage.name] || stage.name, start, width, offset: start, detail: stage.detail || '' };
+    });
+    const max = Math.max(...rows.map((row) => row.start + row.width), 1);
+    return `<div class="perf-waterfall">${rows.map((row) => `<div class="perf-step" title="${esc(row.detail)}"><span class="perf-step-id">${esc(row.name)}</span><span class="perf-step-action">+${perfMs(row.offset)}</span><span class="perf-step-track"><span class="perf-step-fill ok" style="width:${Math.max(2, (row.width / max) * 100).toFixed(1)}%"></span></span><span class="perf-step-ms">${perfMs(row.width)}</span></div>`).join('')}</div>`;
+  }
+
+  function perfQueries(latest) {
+    const queries = Array.isArray(latest?.queries) ? latest.queries : [];
+    if (!queries.length) return empty('这次运行没有 Orbit profiling 查询记录；不使用 E2E 总耗时替代');
+    const max = Math.max(...queries.map((q) => q.duration_ms || 0), 1);
+    const latestQuery = queries[queries.length - 1];
+    return `<div class="perf-query-list">${queries.map((q, i) => {
+      const [label, tone] = perfOutcome(q.outcome);
+      return `<div class="perf-query"><div class="perf-query-head"><code>Q${i + 1}</code><span class="muted">${esc(shortDateTime(q.started_at))}</span>${badge(label, tone)}<span class="perf-query-ms">${perfMs(q.duration_ms)}</span></div><div class="perf-query-track"><span class="perf-query-fill ${tone}" style="width:${Math.max(2, ((q.duration_ms || 0) / max) * 100).toFixed(1)}%"></span></div><div class="perf-query-sub">首条消息 ${perfMs(q.first_text_ms)} · 展示完成 ${perfMs(q.display_ms)} · ${n(q.text_chars)} 字</div></div>`;
+    }).join('')}</div><div class="perf-stage-title">最近一次查询阶段</div>${perfQueryStages(latestQuery)}`;
+  }
+
+  function perfHistoryTable(points) {
+    if (!points.length) return empty('还没有历史点');
+    return `<div class="table-wrap perf-table-wrap"><table class="perf-table"><thead><tr><th>日期</th><th>状态</th><th class="num">平均查询</th><th class="num">查询数</th><th>运行</th><th>commit</th></tr></thead><tbody>${points.slice().reverse().map((p) => {
+      const [label, tone] = perfStatus(p.status);
+      return `<tr><td class="nowrap">${esc(p.date)}</td><td>${badge(label, tone)}</td><td class="num nowrap">${perfMs(p.query_ms)}</td><td class="num">${n(p.query_count ?? 0)}</td><td><code>${esc(p.run_id || '—')}</code></td><td class="mono">${esc((p.commit || '').slice(0, 7) || '—')}</td></tr>`;
+    }).join('')}</tbody></table></div>`;
+  }
+
+  function performanceSection() {
+    const history = STATE.performance;
+    const cases = history?.cases && typeof history.cases === 'object' ? Object.values(history.cases) : [];
+    if (!cases.length) return '';
+    cases.sort((a, b) => String(b.latest?.finished_at || '').localeCompare(String(a.latest?.finished_at || '')) || String(a.id).localeCompare(String(b.id)));
+    if (!STATE.perfCase || !history.cases[STATE.perfCase]) {
+      STATE.perfCase = history.cases['DM-WF-BACK-01'] ? 'DM-WF-BACK-01' : cases[0].id;
+    }
+    const selected = history.cases[STATE.perfCase] || cases[0];
+    const latest = selected.latest || {};
+    const points = (Array.isArray(selected.points) ? selected.points : []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)));
+    const statuses = cases.map((c) => c.latest?.status);
+    const completed = statuses.filter((s) => String(s).toUpperCase() === 'COMPLETED').length;
+    const blocked = statuses.filter((s) => String(s).toUpperCase() === 'BLOCKED').length;
+    const failed = statuses.filter((s) => ['FAILED', 'ERROR'].includes(String(s).toUpperCase())).length;
+    const latestQueries = cases.map((c) => c.latest?.query_ms).filter((v) => v != null);
+    const avgQuery = latestQueries.length ? Math.round(latestQueries.reduce((sum, value) => sum + value, 0) / latestQueries.length) : null;
+    const values = points.map((p) => p.query_ms).filter((v) => v != null).sort((a, b) => a - b);
+    const median = values.length ? (values.length % 2 ? values[(values.length - 1) / 2] : Math.round((values[values.length / 2 - 1] + values[values.length / 2]) / 2)) : null;
+    const [selectedLabel, selectedTone] = perfStatus(latest.status);
+    const activeDays = new Set(points.map((p) => p.date)).size;
+    const queryCount = latest.query_count ?? (Array.isArray(latest.queries) ? latest.queries.length : 0);
+    const title = selected.title || latest.title || selected.id;
+    const caseButtons = cases.map((c) => {
+      const active = c.id === selected.id;
+      return `<button type="button" class="perf-case${active ? ' active' : ''}" data-perf-case="${esc(c.id)}" aria-pressed="${active}"><span class="perf-case-top">${perfDot(c.latest?.status)}<code>${esc(c.id)}</code><span class="perf-case-dur" title="本轮 query 平均耗时">${perfMs(c.latest?.query_ms)}</span></span><span class="perf-case-title">${esc(c.title || '')}</span>${perfSparkline(c.points)}</button>`;
+    }).join('');
+    const updated = history.updated_at ? shortDateTime(history.updated_at) : '—';
+    return `<div class="perf-section" data-perf-section>
+      ${sectionHead('Nightly 用例性能', `真机 / 模拟器 nightly · 每用例每天一个查询耗时点 · 从发出 query 到收到最后一条消息 · 同日重跑取最新 · 数据 ${esc(updated)}`)}
+      ${tiles([
+        { label: '用例', value: n(cases.length), sub: `最新一轮 ${n(completed)} 通过` },
+        { label: '最新通过', value: `${n(completed)}<small>/ ${n(cases.length)}</small>`, sub: `${Math.round((completed / cases.length) * 100)}%`, tone: completed === cases.length ? 'good' : '' },
+        { label: '阻塞 / 失败', value: `${n(blocked)} / ${n(failed)}`, sub: '阻塞不等于失败', tone: blocked || failed ? 'warn' : 'good' },
+        { label: '最新平均查询耗时', value: perfMs(avgQuery), sub: '各用例最近一次 · 不含 E2E 等待' },
+      ])}
+      <div class="perf-layout">
+        <div class="card perf-list-card"><h3>用例 <span class="sub">${n(cases.length)} 个 · 点击切换</span></h3><div class="perf-list">${caseButtons}</div></div>
+        <div class="perf-detail">
+          <div class="card perf-detail-head"><div class="perf-detail-title"><div class="perf-title-row"><h3><code>${esc(selected.id)}</code></h3>${badge(selectedLabel, selectedTone)}</div><p class="perf-case-name">${esc(title)}</p><p class="muted">完成于 ${esc(shortDateTime(latest.finished_at))} · run <code>${esc(latest.run_id || '—')}</code> · commit <span class="mono">${esc((latest.commit || '').slice(0, 7) || '—')}</span> · ${esc(perfDevice(latest.device))} · E2E 总耗时 ${perfMs(latest.duration_ms)}</p></div></div>
+          <div class="perf-kpis">
+            <div><span>本轮平均查询</span><strong>${perfMs(latest.query_ms)}</strong></div>
+            <div><span>历史中位数</span><strong>${perfMs(median)}</strong></div>
+            <div><span>查询次数</span><strong>${n(queryCount)}</strong></div>
+            <div><span>记录天数</span><strong>${n(activeDays)}</strong></div>
+          </div>
+          <div class="card perf-card"><h3>最近一次 Profiling · 查询耗时 <span class="sub">${n(queryCount)} 次查询 · 以最后一条消息到达计 · E2E ${perfMs(latest.duration_ms)}</span></h3>${perfQueries(latest)}</div>
+          <div class="card perf-card"><h3>每日平均查询耗时 <span class="sub">一天一个点 · 从 query 到消息接收 · Asia/Shanghai</span></h3>${perfChart(points)}<p class="perf-note">当前 ${n(activeDays)} 个执行日；每点为当轮 query 平均耗时，仅 profiling，不含 E2E 步骤等待；缺失日期不补 0。</p></div>
+          <details class="card perf-card perf-history"><summary>执行历史 <span class="sub">${n(points.length)} 天</span></summary>${perfHistoryTable(points)}</details>
+        </div>
+      </div>
+    </div>`;
+  }
+
   function renderTests(sec, line) {
     const d = sec?.data;
     let html = sectionState(sec, 'E2E');
@@ -1182,6 +1345,7 @@
       { label: 'CI 最近 UT 用例', value: n(ut?.totals?.tests), sub: ut?.totals ? `${ut.totals.passed} 通过 · ${ut.totals.failed} 失败 · ${ut.totals.skipped} 跳过` : ut ? '产物存在但没有解析出用例数' : '无产物', tone: ut?.totals?.failed ? 'bad' : ut?.totals ? 'good' : '' },
       { label: 'CI 最近 E2E 用例', value: n(e2e?.totals?.tests), sub: e2e?.totals ? `${e2e.totals.passed} 通过 · ${e2e.totals.failed} 失败/超时 · ${e2e.totals.skipped} 跳过 · ${e2e.totals.flaky} 重试通过` : e2e ? '产物存在但没有解析出用例数' : '无产物', tone: e2e?.totals?.failed ? 'bad' : e2e?.totals ? 'good' : '' },
     ]);
+    html += performanceSection();
     html += e2eRecordsSection();
     html += realScoresSection(d.executed, d.score_history, d.score_runs, d.mock_real_e2e, d.local_artifact_preview, d.score_report);
     html += taggedSection(d.tagged, line);
@@ -1462,6 +1626,8 @@
       STATE.clientError = null;
       // Run records are optional: a missing index only hides that section.
       STATE.e2e = await fetchJson('./data/e2e/index.json?ts='+Date.now()).catch(() => null);
+      // Optional nightly performance history; a missing file hides the section on other boards.
+      STATE.performance = await fetchJson('./data/e2e-performance/history.json?ts='+Date.now()).catch(() => null);
       STATE.e2eErrors.clear();
     } catch (err) {
       STATE.clientError = err.name === 'AbortError'
@@ -1504,6 +1670,13 @@
     renderE2EHistory();
   });
   document.addEventListener('click', (ev) => {
+    const perfCase = ev.target.closest('[data-perf-case]');
+    if (perfCase) {
+      STATE.perfCase = perfCase.dataset.perfCase;
+      const section = document.querySelector('[data-perf-section]');
+      if (section) section.outerHTML = performanceSection();
+      return;
+    }
     const category = ev.target.closest('[data-e2e-category]');
     if (category) {
       const open = category.getAttribute('aria-expanded') !== 'true';
