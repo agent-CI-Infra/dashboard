@@ -28,20 +28,27 @@ export function MonitorHeader({
 }: MonitorHeaderProps) {
   return (
     <div className='flex flex-col gap-4'>
-      <div className='flex flex-wrap items-end justify-between gap-3'>
+      <div className='flex flex-wrap items-center justify-between gap-3'>
         <div className='space-y-1'>
           <h1 className='text-2xl font-bold tracking-tight'>{title}</h1>
           {description ? (
             <p className='text-sm text-muted-foreground'>{description}</p>
           ) : null}
         </div>
-        <div className='flex flex-wrap items-center gap-2'>
+        <div className='flex flex-wrap items-center gap-3'>
+          {showRange ? (
+            <TimeRangeFilter
+              value={search}
+              onChange={onSearchChange}
+              size='lg'
+            />
+          ) : null}
           {meta?.repo ? (
             <a
               href={meta.repo.htmlUrl}
               target='_blank'
               rel='noreferrer'
-              className='inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm transition-colors hover:bg-muted'
+              className='inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm transition-colors hover:bg-muted'
             >
               <IconGithub className='size-4' />
               <span className='font-medium'>{meta.repo.fullName}</span>
@@ -53,9 +60,6 @@ export function MonitorHeader({
           {actions}
         </div>
       </div>
-      {showRange ? (
-        <TimeRangeFilter value={search} onChange={onSearchChange} />
-      ) : null}
     </div>
   )
 }

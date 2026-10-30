@@ -273,3 +273,17 @@ export function issueAgeBuckets(
     .map((i) => (now.getTime() - new Date(i.createdAt).getTime()) / DAY_MS)
   return bucketValues(ages, edges, labels)
 }
+
+/**
+ * The `p`-th percentile (0–1) of numeric values, using the nearest-rank
+ * method. Returns `null` for an empty list.
+ */
+export function percentile(values: number[], p: number): number | null {
+  if (values.length === 0) return null
+  const sorted = [...values].sort((a, b) => a - b)
+  const rank = Math.min(
+    sorted.length - 1,
+    Math.max(0, Math.ceil(p * sorted.length) - 1)
+  )
+  return sorted[rank]
+}

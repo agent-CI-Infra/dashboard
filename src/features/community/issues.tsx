@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import {
   repoKey,
@@ -6,18 +6,21 @@ import {
   useIssues,
   useSelectedRepo,
 } from '@/lib/monitor/data'
+import { percentile } from '@/lib/monitor/derive'
 import { formatDurationHours, formatNumber } from '@/lib/monitor/format'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { LanguageSwitch } from '@/components/language-switch'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { ChartCard } from './components/chart-card'
+import {
+  ChartLayoutGrid,
+  type ChartLayout,
+} from './components/chart-layout'
 import { MonitorHeader } from './components/monitor-header'
 import { MonitorTable } from './components/monitor-table'
 import { RepoFilter } from './components/repo-filter'
 import { ErrorState, LoadingState } from './components/states'
-import { TimeRangeFilter } from './components/time-range-filter'
 import { TrendChart } from './components/trend-chart'
 import { issuesColumns } from './issues-columns'
 import { useMonitorBase } from './use-monitor'
@@ -25,6 +28,7 @@ import { useMonitorBase } from './use-monitor'
 const route = getRouteApi('/_authenticated/issues')
 
 export function IssuesAnalysis() {
+  const [layout, setLayout] = useState<ChartLayout>('vertical')
   const search = route.useSearch()
   const navigate = route.useNavigate()
   const repoList = useSelectedRepo(search)
@@ -49,6 +53,19 @@ export function IssuesAnalysis() {
   const scoresReady = [...scores.values()].every((value) => value !== null)
 
   const records = issues.data ?? []
+
+  // Records restricted to the selected time window, used by the stats and the
+  // detail table. The trend charts keep using the full set and slice internally.
+  const rangeRecords = useMemo(() => {
+    const { from, to } = base.range
+    if (!from) return records
+    const fromMs = from.getTime()
+    const toMs = to.getTime()
+    return records.filter((r) => {
+      const t = new Date(r.createdAt).getTime()
+      return t >= fromMs && t <= toMs
+    })
+  }, [records, base.range])
 
   // Cumulative Issue count and cumulative comment count as of each day, counted
   // from the full record set (not the young daily history). Comments are summed
@@ -84,31 +101,52 @@ export function IssuesAnalysis() {
     return points
   }, [records, base.range])
 
+  // Daily new Issue count within the same window, for the bar chart below.
+  const daily = useMemo(() => {
+    const { from, to, key } = base.range
+    const opened = [...records].sort((a, b) =>
+      a.createdAt.localeCompare(b.createdAt)
+    )
+    const startDay =
+      key === 'all'
+        ? opened[0]?.createdAt.slice(0, 10)
+        : from?.toISOString().slice(0, 10)
+    const endDay = to.toISOString().slice(0, 10)
+    if (!startDay || startDay > endDay) return []
+    const counts = new Map<string, number>()
+    for (const r of records) {
+      const day = r.createdAt.slice(0, 10)
+      if (day < startDay || day > endDay) continue
+      counts.set(day, (counts.get(day) ?? 0) + 1)
+    }
+    const points: { date: string; count: number }[] = []
+    const cursor = new Date(`${startDay}T00:00:00.000Z`)
+    while (cursor.toISOString().slice(0, 10) <= endDay) {
+      const day = cursor.toISOString().slice(0, 10)
+      points.push({ date: day.slice(5), count: counts.get(day) ?? 0 })
+      cursor.setUTCDate(cursor.getUTCDate() + 1)
+    }
+    return points
+  }, [records, base.range])
+
   // Summary stats shown between the trend chart and the detail table.
   const stats = useMemo(() => {
-    const total = records.length
-    const commentTotal = records.reduce((sum, r) => sum + (r.comments ?? 0), 0)
-    const openIssues = records.filter((r) => r.state === 'open')
-    const externalMax = openIssues
-      .filter((r) => r.contributionType === 'external')
-      .reduce<number | null>(
-        (max, r) =>
-          r.waitingHours === null
-            ? max
-            : max === null || r.waitingHours > max
-              ? r.waitingHours
-              : max,
-        null
-      )
-    const waiting = openIssues
+    const total = rangeRecords.length
+    const commentTotal = rangeRecords.reduce(
+      (sum, r) => sum + (r.comments ?? 0),
+      0
+    )
+    const waiting = rangeRecords
+      .filter((r) => r.state === 'open')
       .map((r) => r.waitingHours)
       .filter((h): h is number => h !== null)
-    const avgWaiting =
-      waiting.length === 0
-        ? null
-        : waiting.reduce((sum, h) => sum + h, 0) / waiting.length
-    return { total, commentTotal, externalMax, avgWaiting }
-  }, [records])
+    return {
+      total,
+      commentTotal,
+      p50: percentile(waiting, 0.5),
+      p90: percentile(waiting, 0.9),
+    }
+  }, [rangeRecords])
 
   const onSearchChange = (next: typeof search) =>
     navigate({ search: (prev) => ({ ...prev, ...next }) })
@@ -176,7 +214,6 @@ export function IssuesAnalysis() {
           meta={base.meta.data}
           search={search}
           onSearchChange={onSearchChange}
-          showRange={false}
         />
 
         <RepoFilter
@@ -185,35 +222,62 @@ export function IssuesAnalysis() {
           onChange={(key) => onSearchChange({ repo: key })}
         />
 
-        <ChartCard
-          title='Issue 累计总数与评论累计数增长趋势'
-          description=''
-          action={<TimeRangeFilter value={search} onChange={onSearchChange} />}
-          empty={cumulative.length === 0}
-          emptyMessage='暂无历史数据。'
-        >
-          <TrendChart
-            data={cumulative}
-            xKey='date'
-            series={[
-              {
-                key: 'total',
-                label: 'Issue 累计',
-                color: 'var(--chart-1)',
-                type: 'line',
-              },
-              {
-                key: 'comments',
-                label: '评论累计',
-                color: 'var(--chart-2)',
-                type: 'line',
-                yAxis: 'right',
-              },
-            ]}
-            yDomain={['auto', 'auto']}
-            y2Domain={['auto', 'auto']}
-          />
-        </ChartCard>
+        <ChartLayoutGrid
+          layout={layout}
+          onLayoutChange={setLayout}
+          items={[
+            {
+              id: 'cumulative',
+              title: 'Issue 累计总数与评论累计数增长趋势',
+              empty: cumulative.length === 0,
+              emptyMessage: '暂无历史数据。',
+              chart: (
+                <TrendChart
+                  data={cumulative}
+                  xKey='date'
+                  series={[
+                    {
+                      key: 'total',
+                      label: 'Issue 累计',
+                      color: 'var(--chart-1)',
+                      type: 'line',
+                    },
+                    {
+                      key: 'comments',
+                      label: '评论累计',
+                      color: 'var(--chart-2)',
+                      type: 'line',
+                      yAxis: 'right',
+                    },
+                  ]}
+                  yDomain={['auto', 'auto']}
+                  y2Domain={['auto', 'auto']}
+                />
+              ),
+            },
+            {
+              id: 'daily',
+              title: 'Issue 每日新增数量',
+              empty: daily.length === 0,
+              emptyMessage: '暂无历史数据。',
+              chart: (
+                <TrendChart
+                  data={daily}
+                  xKey='date'
+                  series={[
+                    {
+                      key: 'count',
+                      label: '每日数量',
+                      color: 'var(--chart-1)',
+                      type: 'bar',
+                    },
+                  ]}
+                  yDomain={['auto', 'auto']}
+                />
+              ),
+            },
+          ]}
+        />
 
         <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
           {[
@@ -223,20 +287,20 @@ export function IssuesAnalysis() {
               value: formatNumber(stats.commentTotal),
             },
             {
-              label: '外部贡献者 Issue 最大滞留时长',
-              value: formatDurationHours(stats.externalMax),
+              label: 'Issue 滞留时长 P90',
+              value: formatDurationHours(stats.p90),
             },
             {
-              label: 'Issue 平均滞留时长',
-              value: formatDurationHours(stats.avgWaiting),
+              label: 'Issue 滞留时长 P50',
+              value: formatDurationHours(stats.p50),
             },
           ].map((item) => (
             <Card key={item.label}>
-              <CardContent className='flex flex-col gap-1 p-4'>
+              <CardContent className='flex flex-col gap-0.5 p-2'>
                 <span className='text-xs text-muted-foreground'>
                   {item.label}
                 </span>
-                <span className='text-2xl font-semibold tabular-nums'>
+                <span className='text-lg font-semibold tabular-nums'>
                   {item.value}
                 </span>
               </CardContent>
@@ -250,7 +314,7 @@ export function IssuesAnalysis() {
           </CardHeader>
           <CardContent>
             <MonitorTable
-              data={records}
+              data={rangeRecords}
               columns={issuesColumns}
               searchPlaceholder='按标题、作者或编号搜索 Issue…'
               filters={[

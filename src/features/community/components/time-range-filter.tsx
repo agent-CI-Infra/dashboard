@@ -11,19 +11,24 @@ type TimeRangeFilterProps = {
   value: TimeRangeSearch
   onChange: (next: TimeRangeSearch) => void
   className?: string
+  /** Larger, wider control for placement in page headers. */
+  size?: 'sm' | 'lg'
 }
 
 export function TimeRangeFilter({
   value,
   onChange,
   className,
+  size = 'sm',
 }: TimeRangeFilterProps) {
   const range: TimeRangeKey = value.range ?? '30d'
+  const lg = size === 'lg'
 
   return (
     <div
       className={cn(
-        'inline-flex flex-wrap items-center gap-1 rounded-lg border p-1',
+        'inline-flex flex-wrap items-center rounded-lg border',
+        lg ? 'gap-1.5 p-1.5' : 'gap-1 p-1',
         className
       )}
     >
@@ -33,7 +38,7 @@ export function TimeRangeFilter({
           type='button'
           size='sm'
           variant={range === key ? 'secondary' : 'ghost'}
-          className='h-7 px-2.5 text-xs'
+          className={lg ? 'h-9 px-5 text-sm' : 'h-7 px-2.5 text-xs'}
           onClick={() => onChange({ ...value, range: key })}
         >
           {TIME_RANGE_LABELS[key]}
