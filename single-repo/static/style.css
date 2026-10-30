@@ -688,3 +688,23 @@ td.nowrap { white-space: nowrap; }
 .perf-query-fill.bad { background: var(--critical); }
 .perf-query-sub { margin-top: 2px; color: var(--muted); font-size: 11.5px; overflow-wrap: anywhere; }
 .perf-stage-title { margin: 13px 0 4px; color: var(--ink-2); font-size: 12px; font-weight: 600; }
+.perf-cloud-note { margin: 2px 0 8px; padding: 7px 9px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface-2); color: var(--ink-2); font-size: 11.5px; line-height: 1.45; overflow-wrap: anywhere; }
+.perf-cloud-note.matched { border-color: color-mix(in srgb, var(--good) 40%, var(--border)); }
+.perf-cloud-note.unmatched { border-left: 3px solid var(--warning); }
+.perf-cloud-stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.perf-cloud-stats > div { min-width: 0; padding: 7px 9px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); }
+.perf-cloud-stats span { display: block; color: var(--muted); font-size: 10.5px; }
+.perf-cloud-stats strong { display: block; color: var(--ink); font-size: 16px; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.perf-cloud-stats em { display: block; margin-top: 1px; color: var(--muted); font-size: 10.5px; font-style: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.perf-model-wrap { max-height: 440px; overflow: auto; margin-top: 9px; border: 1px solid var(--border); border-radius: 7px; }
+.perf-model-table { width: 100%; min-width: 620px; border-collapse: collapse; font-size: 11.5px; }
+.perf-model-table th { position: sticky; top: 0; z-index: 1; padding: 5px 7px; border-bottom: 1px solid var(--border); background: var(--surface-2); color: var(--muted); font-weight: 600; text-align: left; white-space: nowrap; }
+.perf-model-table td { padding: 5px 7px; border-bottom: 1px solid var(--border); color: var(--ink-2); vertical-align: middle; }
+.perf-model-table tr:last-child td { border-bottom: 0; }
+.perf-model-table tbody tr:hover { background: var(--surface-2); }
+.perf-model-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.perf-model-table .model { max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; }
+@media (max-width: 860px) { .perf-cloud-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .perf-cloud-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.perf-model-scroll-hint { display: none; margin-top: 8px; color: var(--muted); font-size: 10.5px; }
+@media (max-width: 560px) { .perf-model-scroll-hint { display: block; } }
