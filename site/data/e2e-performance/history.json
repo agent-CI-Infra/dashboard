@@ -1,0 +1,3201 @@
+{
+  "schema": "digitalmate/e2e-performance-history@1",
+  "repository": "openJiuwen-ai/DigitalMate",
+  "updated_at": "2026-10-30T08:08:34.892Z",
+  "cases": {
+    "DM-WF-CHROME-01": {
+      "id": "DM-WF-CHROME-01",
+      "title": "对话固定页脚与状态栏：生成前即有 AI 提示，长回复滚动不穿透系统区域",
+      "mode": "single-turn",
+      "points": [
+        {
+          "date": "2026-10-30",
+          "status": "COMPLETED",
+          "query_ms": null,
+          "query_count": 0,
+          "duration_ms": 89842,
+          "run_id": "real-nightly-123730",
+          "commit": "d225633",
+          "finished_at": "2026-10-30T04:56:23.351Z"
+        }
+      ],
+      "latest": {
+        "id": "DM-WF-CHROME-01",
+        "title": "对话固定页脚与状态栏：生成前即有 AI 提示，长回复滚动不穿透系统区域",
+        "mode": "single-turn",
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-10-30T04:54:53.509Z",
+        "finished_at": "2026-10-30T04:56:23.351Z",
+        "duration_ms": 89842,
+        "query_count": 0,
+        "query_ms": null,
+        "first_text_ms": null,
+        "display_ms": null,
+        "queries": [],
+        "device": {
+          "model": "JUY-AL50",
+          "screen": {
+            "width": 1280,
+            "height": 2832,
+            "measured": false
+          }
+        },
+        "step_count": 16,
+        "steps": [
+          {
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-10-30T04:55:01.489Z",
+            "duration_ms": 14172,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-10-30T04:55:15.661Z",
+            "duration_ms": 1725,
+            "detail": "Orbit 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S00",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:55:17.386Z",
+            "duration_ms": 17100,
+            "detail": "截图 00-before-send"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T04:55:34.486Z",
+            "duration_ms": 1822,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S02",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:55:36.308Z",
+            "duration_ms": 1224,
+            "detail": "截图 01-after-send"
+          },
+          {
+            "id": "S03",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T04:55:37.532Z",
+            "duration_ms": 3840,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S04",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T04:55:41.372Z",
+            "duration_ms": 1451,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S05",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:55:42.823Z",
+            "duration_ms": 13215,
+            "detail": "截图 02-complete"
+          },
+          {
+            "id": "S06",
+            "action": "scroll.up",
+            "status": "ok",
+            "started_at": "2026-10-30T04:55:56.038Z",
+            "duration_ms": 1774,
+            "detail": "上滑 3 次"
+          },
+          {
+            "id": "S07",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:55:57.812Z",
+            "duration_ms": 9219,
+            "detail": "截图 03-scroll-up"
+          },
+          {
+            "id": "S08",
+            "action": "scroll.down",
+            "status": "ok",
+            "started_at": "2026-10-30T04:56:07.031Z",
+            "duration_ms": 1548,
+            "detail": "下滑 2 次"
+          },
+          {
+            "id": "S09",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:56:08.579Z",
+            "duration_ms": 7775,
+            "detail": "截图 04-scroll-down"
+          },
+          {
+            "id": "S10",
+            "action": "chat.draft",
+            "status": "ok",
+            "started_at": "2026-10-30T04:56:16.354Z",
+            "duration_ms": 1760,
+            "detail": "已输入草稿并保留键盘，未点击发送"
+          },
+          {
+            "id": "S11",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:56:18.114Z",
+            "duration_ms": 3570,
+            "detail": "截图 05-keyboard"
+          },
+          {
+            "id": "S12",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T04:56:21.684Z",
+            "duration_ms": 1667,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S13",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:56:23.351Z",
+            "duration_ms": 0,
+            "detail": "截图 06-keyboard-hidden"
+          }
+        ],
+        "screenshots": 7,
+        "profiling_files": 22,
+        "run_id": "real-nightly-123730",
+        "commit": "d225633",
+        "generated_at": "2026-10-30T08:08:34.734Z"
+      }
+    },
+    "DM-WF-BACK-01": {
+      "id": "DM-WF-BACK-01",
+      "title": "系统返回：先关闭子页，根页面退后台并保留对话与草稿",
+      "mode": "single-turn",
+      "points": [
+        {
+          "date": "2026-10-30",
+          "status": "COMPLETED",
+          "query_ms": 9192,
+          "query_count": 1,
+          "duration_ms": 106122,
+          "run_id": "real-perf-150218",
+          "commit": "9b2e7bb",
+          "finished_at": "2026-10-30T07:06:50.250Z"
+        }
+      ],
+      "latest": {
+        "id": "DM-WF-BACK-01",
+        "title": "系统返回：先关闭子页，根页面退后台并保留对话与草稿",
+        "mode": "single-turn",
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-10-30T07:05:04.128Z",
+        "finished_at": "2026-10-30T07:06:50.250Z",
+        "duration_ms": 106122,
+        "query_count": 1,
+        "query_ms": 9192,
+        "first_text_ms": 9190,
+        "display_ms": 13668,
+        "queries": [
+          {
+            "started_at": "2026-10-30T07:05:41.245Z",
+            "duration_ms": 9192,
+            "first_text_ms": 9190,
+            "display_ms": 13668,
+            "outcome": "completed",
+            "text_chars": 24,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1793343941245,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1793343941245,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1793343941272,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1793343941294,
+                "detail": "encode=0 send=2 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1793343945787,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1793343950435,
+                "detail": "chars=24"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1793343950437,
+                "detail": "chars=24 events=2"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1793343954913,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1793343954913,
+                "detail": "no-reveal"
+              }
+            ]
+          }
+        ],
+        "device": {
+          "model": "JUY-AL50",
+          "screen": {
+            "width": 1080,
+            "height": 2406,
+            "measured": true
+          }
+        },
+        "step_count": 23,
+        "steps": [
+          {
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-10-30T07:05:04.129Z",
+            "duration_ms": 8039,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-10-30T07:05:12.168Z",
+            "duration_ms": 14307,
+            "detail": "Orbit 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S00",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T07:05:26.475Z",
+            "duration_ms": 1786,
+            "detail": "截图 00-home"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T07:05:28.261Z",
+            "duration_ms": 17236,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S02",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T07:05:45.497Z",
+            "duration_ms": 1433,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S03",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T07:05:46.930Z",
+            "duration_ms": 4036,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S04",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T07:05:50.966Z",
+            "duration_ms": 1668,
+            "detail": "截图 01-before-back"
+          },
+          {
+            "id": "S05",
+            "action": "tap.id",
+            "status": "ok",
+            "started_at": "2026-10-30T07:05:52.634Z",
+            "duration_ms": 5044,
+            "detail": "点击id「digitalmate-settings」"
+          },
+          {
+            "id": "S06",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T07:05:57.678Z",
+            "duration_ms": 1625,
+            "detail": "截图 02-settings"
+          },
+          {
+            "id": "S07",
+            "action": "ui.systemBack",
+            "status": "ok",
+            "started_at": "2026-10-30T07:05:59.303Z",
+            "duration_ms": 4223,
+            "detail": "已从左边缘滑动返回，页面发生变化"
+          },
+          {
+            "id": "S08",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T07:06:03.526Z",
+            "duration_ms": 1868,
+            "detail": "截图 03-settings-back"
+          },
+          {
+            "id": "S09",
+            "action": "tap.id",
+            "status": "ok",
+            "started_at": "2026-10-30T07:06:05.394Z",
+            "duration_ms": 5096,
+            "detail": "点击id「digitalmate-live-activity」"
+          },
+          {
+            "id": "S10",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T07:06:10.490Z",
+            "duration_ms": 1840,
+            "detail": "截图 04-activity"
+          },
+          {
+            "id": "S11",
+            "action": "ui.systemBack",
+            "status": "ok",
+            "started_at": "2026-10-30T07:06:12.330Z",
+            "duration_ms": 4542,
+            "detail": "已从左边缘滑动返回，页面发生变化"
+          },
+          {
+            "id": "S12",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T07:06:16.872Z",
+            "duration_ms": 1755,
+            "detail": "截图 05-activity-back"
+          },
+          {
+            "id": "S13",
+            "action": "chat.draft",
+            "status": "ok",
+            "started_at": "2026-10-30T07:06:18.627Z",
+            "duration_ms": 8030,
+            "detail": "已输入草稿并保留键盘，未点击发送"
+          },
+          {
+            "id": "S14",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T07:06:26.657Z",
+            "duration_ms": 1865,
+            "detail": "截图 06-keyboard"
+          },
+          {
+            "id": "S15",
+            "action": "ui.systemBack",
+            "status": "ok",
+            "started_at": "2026-10-30T07:06:28.522Z",
+            "duration_ms": 4366,
+            "detail": "已从左边缘滑动返回，页面发生变化"
+          },
+          {
+            "id": "S16",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T07:06:32.888Z",
+            "duration_ms": 1770,
+            "detail": "截图 07-keyboard-back"
+          },
+          {
+            "id": "S17",
+            "action": "ui.systemBack",
+            "status": "ok",
+            "started_at": "2026-10-30T07:06:34.658Z",
+            "duration_ms": 4512,
+            "detail": "已从左边缘滑动返回，页面发生变化"
+          },
+          {
+            "id": "S18",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T07:06:39.170Z",
+            "duration_ms": 1978,
+            "detail": "截图 08-root-background"
+          },
+          {
+            "id": "S19",
+            "action": "app.foreground",
+            "status": "ok",
+            "started_at": "2026-10-30T07:06:41.148Z",
+            "duration_ms": 7442,
+            "detail": "已从后台回到前台"
+          },
+          {
+            "id": "S20",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T07:06:48.590Z",
+            "duration_ms": 1660,
+            "detail": "截图 09-resumed"
+          }
+        ],
+        "screenshots": 10,
+        "profiling_files": 25,
+        "run_id": "real-perf-150218",
+        "commit": "9b2e7bb",
+        "generated_at": "2026-10-30T08:08:34.892Z"
+      }
+    },
+    "DM-WF-BACKGROUND-01": {
+      "id": "DM-WF-BACKGROUND-01",
+      "title": "后台多任务：切到后台任务继续跑，回来能看到进展并正常收尾",
+      "mode": "single-turn",
+      "points": [
+        {
+          "date": "2026-10-30",
+          "status": "COMPLETED",
+          "query_ms": null,
+          "query_count": 0,
+          "duration_ms": 285520,
+          "run_id": "real-nightly-123730",
+          "commit": "d225633",
+          "finished_at": "2026-10-30T04:46:41.469Z"
+        }
+      ],
+      "latest": {
+        "id": "DM-WF-BACKGROUND-01",
+        "title": "后台多任务：切到后台任务继续跑，回来能看到进展并正常收尾",
+        "mode": "single-turn",
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-10-30T04:41:55.949Z",
+        "finished_at": "2026-10-30T04:46:41.469Z",
+        "duration_ms": 285520,
+        "query_count": 0,
+        "query_ms": null,
+        "first_text_ms": null,
+        "display_ms": null,
+        "queries": [],
+        "device": {
+          "model": "JUY-AL50",
+          "screen": {
+            "width": 1280,
+            "height": 2832,
+            "measured": false
+          }
+        },
+        "step_count": 15,
+        "steps": [
+          {
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-10-30T04:42:04.022Z",
+            "duration_ms": 14344,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-10-30T04:42:18.366Z",
+            "duration_ms": 164633,
+            "detail": "Orbit 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S-reset",
+            "action": "app.resetState",
+            "status": "ok",
+            "started_at": "2026-10-30T04:45:02.999Z",
+            "duration_ms": 2072,
+            "detail": "已重置到初始状态（10-30 12:42:27.564 50393 50393 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=6 databases=1 tables=0 files=3 notifications=cancelled room=room-f2ba03b0e01345a0b84c3e4ffb425997）"
+          },
+          {
+            "id": "S00",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:45:05.071Z",
+            "duration_ms": 20741,
+            "detail": "截图 00-before"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T04:45:25.812Z",
+            "duration_ms": 4259,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S02",
+            "action": "wait.settled",
+            "status": "ok",
+            "started_at": "2026-10-30T04:45:30.071Z",
+            "duration_ms": 2108,
+            "detail": null
+          },
+          {
+            "id": "S03",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:45:32.179Z",
+            "duration_ms": 1877,
+            "detail": "截图 01-task-started"
+          },
+          {
+            "id": "S04",
+            "action": "app.background",
+            "status": "ok",
+            "started_at": "2026-10-30T04:45:34.056Z",
+            "duration_ms": 45001,
+            "detail": "已按 HOME 切到后台"
+          },
+          {
+            "id": "S05",
+            "action": "wait.sleep",
+            "status": "ok",
+            "started_at": "2026-10-30T04:46:19.057Z",
+            "duration_ms": 8685,
+            "detail": "等待 45000ms"
+          },
+          {
+            "id": "S06",
+            "action": "app.foreground",
+            "status": "ok",
+            "started_at": "2026-10-30T04:46:27.742Z",
+            "duration_ms": 4006,
+            "detail": "已从后台回到前台"
+          },
+          {
+            "id": "S07",
+            "action": "wait.settled",
+            "status": "ok",
+            "started_at": "2026-10-30T04:46:31.748Z",
+            "duration_ms": 2139,
+            "detail": null
+          },
+          {
+            "id": "S08",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:46:33.887Z",
+            "duration_ms": 1540,
+            "detail": "截图 02-after-resume"
+          },
+          {
+            "id": "S09",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T04:46:35.427Z",
+            "duration_ms": 4153,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S09H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T04:46:39.580Z",
+            "duration_ms": 1889,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S10",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:46:41.469Z",
+            "duration_ms": 0,
+            "detail": "截图 03-completed"
+          }
+        ],
+        "screenshots": 4,
+        "profiling_files": 22,
+        "run_id": "real-nightly-123730",
+        "commit": "d225633",
+        "generated_at": "2026-10-30T08:08:34.734Z"
+      }
+    },
+    "DM-WF-CHAT-01": {
+      "id": "DM-WF-CHAT-01",
+      "title": "单轮问候：你好 → 有回复、不调工具、不弹卡",
+      "mode": "single-turn",
+      "points": [
+        {
+          "date": "2026-10-30",
+          "status": "COMPLETED",
+          "query_ms": 6650,
+          "query_count": 1,
+          "duration_ms": 62856,
+          "run_id": "real-nightly-123730",
+          "commit": "d225633",
+          "finished_at": "2026-10-30T04:48:13.322Z"
+        }
+      ],
+      "latest": {
+        "id": "DM-WF-CHAT-01",
+        "title": "单轮问候：你好 → 有回复、不调工具、不弹卡",
+        "mode": "single-turn",
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-10-30T04:47:10.466Z",
+        "finished_at": "2026-10-30T04:48:13.322Z",
+        "duration_ms": 62856,
+        "query_count": 1,
+        "query_ms": 6650,
+        "first_text_ms": 6572,
+        "display_ms": 8742,
+        "queries": [
+          {
+            "started_at": "2026-10-30T04:47:51.736Z",
+            "duration_ms": 6650,
+            "first_text_ms": 6572,
+            "display_ms": 8742,
+            "outcome": "completed",
+            "text_chars": 51,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1793335671736,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1793335671737,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1793335671764,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1793335671783,
+                "detail": "encode=0 send=1 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1793335674295,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1793335678308,
+                "detail": "chars=51"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1793335678386,
+                "detail": "chars=51 events=2"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1793335680207,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1793335680478,
+                "detail": null
+              }
+            ]
+          }
+        ],
+        "device": {
+          "model": "JUY-AL50",
+          "screen": {
+            "width": 1280,
+            "height": 2832,
+            "measured": false
+          }
+        },
+        "step_count": 10,
+        "steps": [
+          {
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-10-30T04:47:18.395Z",
+            "duration_ms": 15241,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-10-30T04:47:33.636Z",
+            "duration_ms": 2139,
+            "detail": "Orbit 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S00",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:47:35.775Z",
+            "duration_ms": 20034,
+            "detail": "截图 00-before"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T04:47:55.809Z",
+            "duration_ms": 6578,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S01A",
+            "action": "approval.allow",
+            "status": "skipped",
+            "started_at": "2026-10-30T04:48:02.387Z",
+            "duration_ms": 1315,
+            "detail": "没有出现工具审批卡"
+          },
+          {
+            "id": "S02",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T04:48:03.702Z",
+            "duration_ms": 4030,
+            "detail": "完成行 0 → 0（new-text）"
+          },
+          {
+            "id": "S02H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T04:48:07.732Z",
+            "duration_ms": 2067,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S03",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:48:09.799Z",
+            "duration_ms": 1499,
+            "detail": "截图 01-reply"
+          },
+          {
+            "id": "S04",
+            "action": "expand.execution",
+            "status": "ok",
+            "started_at": "2026-10-30T04:48:11.298Z",
+            "duration_ms": 2024,
+            "detail": "展开 0 处执行细节"
+          },
+          {
+            "id": "S05",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:48:13.322Z",
+            "duration_ms": 0,
+            "detail": "截图 02-details"
+          }
+        ],
+        "screenshots": 3,
+        "profiling_files": 23,
+        "run_id": "real-nightly-123730",
+        "commit": "d225633",
+        "generated_at": "2026-10-30T08:08:34.734Z"
+      }
+    },
+    "DM-WF-CHAT-02": {
+      "id": "DM-WF-CHAT-02",
+      "title": "单轮工具调用：现在几点 → 真实取时并展示执行细节",
+      "mode": "single-turn",
+      "points": [
+        {
+          "date": "2026-10-30",
+          "status": "COMPLETED",
+          "query_ms": null,
+          "query_count": 0,
+          "duration_ms": 59493,
+          "run_id": "real-nightly-123730",
+          "commit": "d225633",
+          "finished_at": "2026-10-30T04:52:04.015Z"
+        }
+      ],
+      "latest": {
+        "id": "DM-WF-CHAT-02",
+        "title": "单轮工具调用：现在几点 → 真实取时并展示执行细节",
+        "mode": "single-turn",
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-10-30T04:51:04.522Z",
+        "finished_at": "2026-10-30T04:52:04.015Z",
+        "duration_ms": 59493,
+        "query_count": 0,
+        "query_ms": null,
+        "first_text_ms": null,
+        "display_ms": null,
+        "queries": [],
+        "device": {
+          "model": "JUY-AL50",
+          "screen": {
+            "width": 1280,
+            "height": 2832,
+            "measured": false
+          }
+        },
+        "step_count": 10,
+        "steps": [
+          {
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-10-30T04:51:12.374Z",
+            "duration_ms": 15062,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-10-30T04:51:27.436Z",
+            "duration_ms": 2048,
+            "detail": "Orbit 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S00",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:51:29.484Z",
+            "duration_ms": 18443,
+            "detail": "截图 00-before"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T04:51:47.927Z",
+            "duration_ms": 6719,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S01A",
+            "action": "approval.allow",
+            "status": "skipped",
+            "started_at": "2026-10-30T04:51:54.646Z",
+            "duration_ms": 1139,
+            "detail": "没有出现工具审批卡"
+          },
+          {
+            "id": "S02",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T04:51:55.785Z",
+            "duration_ms": 3743,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S02H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T04:51:59.528Z",
+            "duration_ms": 1626,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S03",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:52:01.154Z",
+            "duration_ms": 1137,
+            "detail": "截图 01-reply"
+          },
+          {
+            "id": "S04",
+            "action": "expand.execution",
+            "status": "ok",
+            "started_at": "2026-10-30T04:52:02.291Z",
+            "duration_ms": 1724,
+            "detail": "展开 0 处执行细节"
+          },
+          {
+            "id": "S05",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:52:04.015Z",
+            "duration_ms": 0,
+            "detail": "截图 02-details"
+          }
+        ],
+        "screenshots": 3,
+        "profiling_files": 22,
+        "run_id": "real-nightly-123730",
+        "commit": "d225633",
+        "generated_at": "2026-10-30T08:08:34.734Z"
+      }
+    },
+    "DM-WF-FILE-01": {
+      "id": "DM-WF-FILE-01",
+      "title": "单轮生成文件：生成 Markdown → 产物列表 → 预览",
+      "mode": "single-turn",
+      "points": [
+        {
+          "date": "2026-10-30",
+          "status": "COMPLETED",
+          "query_ms": 10777,
+          "query_count": 1,
+          "duration_ms": 134363,
+          "run_id": "real-nightly-123730",
+          "commit": "d225633",
+          "finished_at": "2026-10-30T05:01:27.949Z"
+        }
+      ],
+      "latest": {
+        "id": "DM-WF-FILE-01",
+        "title": "单轮生成文件：生成 Markdown → 产物列表 → 预览",
+        "mode": "single-turn",
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-10-30T04:59:13.586Z",
+        "finished_at": "2026-10-30T05:01:27.949Z",
+        "duration_ms": 134363,
+        "query_count": 1,
+        "query_ms": 10777,
+        "first_text_ms": 10777,
+        "display_ms": 32393,
+        "queries": [
+          {
+            "started_at": "2026-10-30T04:59:54.523Z",
+            "duration_ms": 10777,
+            "first_text_ms": 10777,
+            "display_ms": 32393,
+            "outcome": "completed",
+            "text_chars": 74,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1793336394523,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1793336394523,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1793336394561,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1793336394581,
+                "detail": "encode=0 send=1 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1793336397405,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1793336405300,
+                "detail": "chars=74"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1793336405300,
+                "detail": "chars=74 events=1"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1793336408416,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1793336426916,
+                "detail": null
+              }
+            ]
+          }
+        ],
+        "device": {
+          "model": "JUY-AL50",
+          "screen": {
+            "width": 1280,
+            "height": 2832,
+            "measured": false
+          }
+        },
+        "step_count": 16,
+        "steps": [
+          {
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-10-30T04:59:21.871Z",
+            "duration_ms": 14568,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-10-30T04:59:36.439Z",
+            "duration_ms": 2071,
+            "detail": "Orbit 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S00",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T04:59:38.510Z",
+            "duration_ms": 20639,
+            "detail": "截图 00-before"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T04:59:59.149Z",
+            "duration_ms": 61686,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S02",
+            "action": "approval.allow",
+            "status": "skipped",
+            "started_at": "2026-10-30T05:01:00.835Z",
+            "duration_ms": 1620,
+            "detail": "没有出现工具审批卡"
+          },
+          {
+            "id": "S03",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T05:01:02.455Z",
+            "duration_ms": 4619,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S03H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T05:01:07.074Z",
+            "duration_ms": 2120,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S04",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:01:09.194Z",
+            "duration_ms": 1482,
+            "detail": "截图 01-reply"
+          },
+          {
+            "id": "S05",
+            "action": "expand.execution",
+            "status": "ok",
+            "started_at": "2026-10-30T05:01:10.676Z",
+            "duration_ms": 2069,
+            "detail": "展开 0 处执行细节"
+          },
+          {
+            "id": "S06",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:01:12.745Z",
+            "duration_ms": 4554,
+            "detail": "截图 02-details"
+          },
+          {
+            "id": "S07",
+            "action": "artifacts.open",
+            "status": "skipped",
+            "started_at": "2026-10-30T05:01:17.299Z",
+            "duration_ms": 3145,
+            "detail": "找不到产物入口（digitalmate-artifacts / 产物中心）"
+          },
+          {
+            "id": "S08",
+            "action": "wait.settled",
+            "status": "ok",
+            "started_at": "2026-10-30T05:01:20.444Z",
+            "duration_ms": 1623,
+            "detail": null
+          },
+          {
+            "id": "S09",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:01:22.067Z",
+            "duration_ms": 1117,
+            "detail": "截图 03-artifacts"
+          },
+          {
+            "id": "S10",
+            "action": "tap.artifact",
+            "status": "skipped",
+            "started_at": "2026-10-30T05:01:23.184Z",
+            "duration_ms": 3110,
+            "detail": "未找到产物「digitalmate-e2e-real-nightly-123730.md」"
+          },
+          {
+            "id": "S11",
+            "action": "wait.settled",
+            "status": "ok",
+            "started_at": "2026-10-30T05:01:26.294Z",
+            "duration_ms": 1654,
+            "detail": null
+          },
+          {
+            "id": "S12",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:01:27.948Z",
+            "duration_ms": 1,
+            "detail": "截图 04-preview"
+          }
+        ],
+        "screenshots": 5,
+        "profiling_files": 23,
+        "run_id": "real-nightly-123730",
+        "commit": "d225633",
+        "generated_at": "2026-10-30T08:08:34.734Z"
+      }
+    },
+    "DM-WF-FILE-02": {
+      "id": "DM-WF-FILE-02",
+      "title": "文件覆盖发布：单一卡片、最新内容与后台恢复",
+      "mode": "single-turn",
+      "points": [
+        {
+          "date": "2026-10-30",
+          "status": "BLOCKED",
+          "query_ms": 13402,
+          "query_count": 1,
+          "duration_ms": 202292,
+          "run_id": "real-retry-142454",
+          "commit": "9b2e7bb",
+          "finished_at": "2026-10-30T06:31:01.255Z"
+        }
+      ],
+      "latest": {
+        "id": "DM-WF-FILE-02",
+        "title": "文件覆盖发布：单一卡片、最新内容与后台恢复",
+        "mode": "single-turn",
+        "status": "BLOCKED",
+        "failure": "S21 tap.artifact 失败：未找到产物「novel-real-retry-142454.txt」",
+        "started_at": "2026-10-30T06:27:38.963Z",
+        "finished_at": "2026-10-30T06:31:01.255Z",
+        "duration_ms": 202292,
+        "query_count": 1,
+        "query_ms": 13402,
+        "first_text_ms": 13402,
+        "display_ms": 16548,
+        "queries": [
+          {
+            "started_at": "2026-10-30T06:28:15.893Z",
+            "duration_ms": 13402,
+            "first_text_ms": 13402,
+            "display_ms": 16548,
+            "outcome": "completed",
+            "text_chars": 4,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1793341695893,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1793341695893,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1793341695919,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1793341695941,
+                "detail": "encode=0 send=2 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1793341700604,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1793341709295,
+                "detail": "chars=4"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1793341709295,
+                "detail": "chars=4 events=1"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1793341712441,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1793341712441,
+                "detail": "no-reveal"
+              }
+            ]
+          }
+        ],
+        "device": {
+          "model": "JUY-AL50",
+          "screen": {
+            "width": 1080,
+            "height": 2406,
+            "measured": true
+          }
+        },
+        "step_count": 27,
+        "steps": [
+          {
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-10-30T06:27:38.963Z",
+            "duration_ms": 8085,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-10-30T06:27:47.048Z",
+            "duration_ms": 14129,
+            "detail": "Orbit 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S00",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T06:28:01.177Z",
+            "duration_ms": 1636,
+            "detail": "截图 00-before"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T06:28:02.813Z",
+            "duration_ms": 17069,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S02",
+            "action": "approval.allow",
+            "status": "skipped",
+            "started_at": "2026-10-30T06:28:19.882Z",
+            "duration_ms": 60854,
+            "detail": "没有出现工具审批卡"
+          },
+          {
+            "id": "S03",
+            "action": "approval.allow",
+            "status": "skipped",
+            "started_at": "2026-10-30T06:29:20.736Z",
+            "duration_ms": 6572,
+            "detail": "没有出现工具审批卡"
+          },
+          {
+            "id": "S04",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T06:29:27.308Z",
+            "duration_ms": 1206,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S05",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T06:29:28.514Z",
+            "duration_ms": 3586,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S06",
+            "action": "scroll.down",
+            "status": "ok",
+            "started_at": "2026-10-30T06:29:32.100Z",
+            "duration_ms": 7780,
+            "detail": "下滑 2 次"
+          },
+          {
+            "id": "S07",
+            "action": "wait.settled",
+            "status": "ok",
+            "started_at": "2026-10-30T06:29:39.880Z",
+            "duration_ms": 3118,
+            "detail": null
+          },
+          {
+            "id": "S07X",
+            "action": "expand.execution",
+            "status": "ok",
+            "started_at": "2026-10-30T06:29:42.998Z",
+            "duration_ms": 1081,
+            "detail": "展开 0 处执行细节"
+          },
+          {
+            "id": "S07E",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T06:29:44.079Z",
+            "duration_ms": 1643,
+            "detail": "截图 01a-tool-log"
+          },
+          {
+            "id": "S08",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T06:29:45.722Z",
+            "duration_ms": 1674,
+            "detail": "截图 01-single-card"
+          },
+          {
+            "id": "S09",
+            "action": "tap.artifact",
+            "status": "ok",
+            "started_at": "2026-10-30T06:29:47.396Z",
+            "duration_ms": 3262,
+            "detail": "打开产物「novel-real-retry-142454.txt」"
+          },
+          {
+            "id": "S10",
+            "action": "wait.settled",
+            "status": "ok",
+            "started_at": "2026-10-30T06:29:50.658Z",
+            "duration_ms": 3136,
+            "detail": null
+          },
+          {
+            "id": "S11",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T06:29:53.794Z",
+            "duration_ms": 1644,
+            "detail": "截图 02-latest-preview"
+          },
+          {
+            "id": "S12",
+            "action": "ui.systemBack",
+            "status": "ok",
+            "started_at": "2026-10-30T06:29:55.438Z",
+            "duration_ms": 4132,
+            "detail": "已从左边缘滑动返回，页面发生变化"
+          },
+          {
+            "id": "S13",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T06:29:59.570Z",
+            "duration_ms": 1605,
+            "detail": "截图 03-before-background"
+          },
+          {
+            "id": "S14",
+            "action": "app.background",
+            "status": "ok",
+            "started_at": "2026-10-30T06:30:01.175Z",
+            "duration_ms": 1880,
+            "detail": "已按 HOME 切到后台"
+          },
+          {
+            "id": "S15",
+            "action": "wait.sleep",
+            "status": "ok",
+            "started_at": "2026-10-30T06:30:03.055Z",
+            "duration_ms": 30002,
+            "detail": "等待 30000ms"
+          },
+          {
+            "id": "S16",
+            "action": "app.foreground",
+            "status": "ok",
+            "started_at": "2026-10-30T06:30:33.057Z",
+            "duration_ms": 7632,
+            "detail": "已从后台回到前台"
+          },
+          {
+            "id": "S17",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T06:30:40.689Z",
+            "duration_ms": 1886,
+            "detail": "截图 04-after-foreground"
+          },
+          {
+            "id": "S18",
+            "action": "wait.sleep",
+            "status": "ok",
+            "started_at": "2026-10-30T06:30:42.575Z",
+            "duration_ms": 10001,
+            "detail": "等待 10000ms"
+          },
+          {
+            "id": "S19",
+            "action": "wait.settled",
+            "status": "ok",
+            "started_at": "2026-10-30T06:30:52.576Z",
+            "duration_ms": 3418,
+            "detail": null
+          },
+          {
+            "id": "S20",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T06:30:55.994Z",
+            "duration_ms": 1949,
+            "detail": "截图 05-after-resync"
+          },
+          {
+            "id": "S21",
+            "action": "tap.artifact",
+            "status": "failed",
+            "started_at": "2026-10-30T06:30:57.943Z",
+            "duration_ms": 3312,
+            "detail": "未找到产物「novel-real-retry-142454.txt」"
+          },
+          {
+            "id": "S-failure",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T06:31:01.255Z",
+            "duration_ms": 0,
+            "detail": null
+          }
+        ],
+        "screenshots": 8,
+        "profiling_files": 24,
+        "run_id": "real-retry-142454",
+        "commit": "9b2e7bb",
+        "generated_at": "2026-10-30T08:08:34.849Z"
+      }
+    },
+    "DM-WF-MATH-01": {
+      "id": "DM-WF-MATH-01",
+      "title": "LaTeX公式：行内、块级和矩阵排版，滚动后结果保留",
+      "mode": "single-turn",
+      "points": [
+        {
+          "date": "2026-10-30",
+          "status": "COMPLETED",
+          "query_ms": 9163,
+          "query_count": 1,
+          "duration_ms": 93193,
+          "run_id": "real-nightly-123730",
+          "commit": "d225633",
+          "finished_at": "2026-10-30T05:07:19.370Z"
+        }
+      ],
+      "latest": {
+        "id": "DM-WF-MATH-01",
+        "title": "LaTeX公式：行内、块级和矩阵排版，滚动后结果保留",
+        "mode": "single-turn",
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-10-30T05:05:46.177Z",
+        "finished_at": "2026-10-30T05:07:19.370Z",
+        "duration_ms": 93193,
+        "query_count": 1,
+        "query_ms": 9163,
+        "first_text_ms": 8633,
+        "display_ms": 40412,
+        "queries": [
+          {
+            "started_at": "2026-10-30T05:06:22.956Z",
+            "duration_ms": 9163,
+            "first_text_ms": 8633,
+            "display_ms": 40412,
+            "outcome": "completed",
+            "text_chars": 822,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1793336782956,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1793336782956,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1793336782989,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1793336783010,
+                "detail": "encode=0 send=1 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1793336786355,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1793336791589,
+                "detail": "chars=822"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1793336792119,
+                "detail": "chars=822 events=2"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1793336795935,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1793336823368,
+                "detail": null
+              }
+            ]
+          }
+        ],
+        "device": {
+          "model": "JUY-AL50",
+          "screen": {
+            "width": 1280,
+            "height": 2832,
+            "measured": false
+          }
+        },
+        "step_count": 11,
+        "steps": [
+          {
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-10-30T05:05:54.348Z",
+            "duration_ms": 14083,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-10-30T05:06:08.431Z",
+            "duration_ms": 1758,
+            "detail": "Orbit 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S00",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:06:10.189Z",
+            "duration_ms": 16911,
+            "detail": "截图 00-before"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T05:06:27.100Z",
+            "duration_ms": 1178,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S02",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T05:06:28.278Z",
+            "duration_ms": 7793,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S03",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T05:06:36.071Z",
+            "duration_ms": 21401,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S04",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:06:57.472Z",
+            "duration_ms": 9177,
+            "detail": "截图 01-rendered"
+          },
+          {
+            "id": "S05",
+            "action": "scroll.up",
+            "status": "ok",
+            "started_at": "2026-10-30T05:07:06.649Z",
+            "duration_ms": 1808,
+            "detail": "上滑 2 次"
+          },
+          {
+            "id": "S06",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:07:08.457Z",
+            "duration_ms": 8997,
+            "detail": "截图 02-inline-and-matrix"
+          },
+          {
+            "id": "S07",
+            "action": "scroll.down",
+            "status": "ok",
+            "started_at": "2026-10-30T05:07:17.454Z",
+            "duration_ms": 1916,
+            "detail": "下滑 2 次"
+          },
+          {
+            "id": "S08",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:07:19.370Z",
+            "duration_ms": 0,
+            "detail": "截图 03-returned"
+          }
+        ],
+        "screenshots": 4,
+        "profiling_files": 23,
+        "run_id": "real-nightly-123730",
+        "commit": "d225633",
+        "generated_at": "2026-10-30T08:08:34.734Z"
+      }
+    },
+    "DM-WF-MEMORY-01": {
+      "id": "DM-WF-MEMORY-01",
+      "title": "跨会话长期记忆：说过一次的事实，后续任务与新一轮对话都能用上",
+      "mode": "multi-turn",
+      "points": [
+        {
+          "date": "2026-10-30",
+          "status": "COMPLETED",
+          "query_ms": 24323,
+          "query_count": 1,
+          "duration_ms": 356094,
+          "run_id": "real-nightly-123730",
+          "commit": "d225633",
+          "finished_at": "2026-10-30T05:13:21.647Z"
+        }
+      ],
+      "latest": {
+        "id": "DM-WF-MEMORY-01",
+        "title": "跨会话长期记忆：说过一次的事实，后续任务与新一轮对话都能用上",
+        "mode": "multi-turn",
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-10-30T05:07:25.553Z",
+        "finished_at": "2026-10-30T05:13:21.647Z",
+        "duration_ms": 356094,
+        "query_count": 1,
+        "query_ms": 24323,
+        "first_text_ms": 24323,
+        "display_ms": 44418,
+        "queries": [
+          {
+            "started_at": "2026-10-30T05:10:49.144Z",
+            "duration_ms": 24323,
+            "first_text_ms": 24323,
+            "display_ms": 44418,
+            "outcome": "completed",
+            "text_chars": 30,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1793337049144,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1793337049144,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1793337049178,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1793337049203,
+                "detail": "encode=0 send=2 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1793337052888,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1793337073467,
+                "detail": "chars=30"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1793337073467,
+                "detail": "chars=30 events=1"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1793337075392,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1793337093562,
+                "detail": null
+              }
+            ]
+          }
+        ],
+        "device": {
+          "model": "JUY-AL50",
+          "screen": {
+            "width": 1280,
+            "height": 2832,
+            "measured": false
+          }
+        },
+        "step_count": 26,
+        "steps": [
+          {
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-10-30T05:07:33.214Z",
+            "duration_ms": 14797,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-10-30T05:07:48.011Z",
+            "duration_ms": 164125,
+            "detail": "Orbit 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S-reset",
+            "action": "app.resetState",
+            "status": "ok",
+            "started_at": "2026-10-30T05:10:32.136Z",
+            "duration_ms": 1775,
+            "detail": "已重置到初始状态（10-30 13:07:58.895 64326 64326 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=6 databases=1 tables=0 files=3 notifications=cancelled room=room-00a7888daa464c2f8f8c9a6f8ece9e0f）"
+          },
+          {
+            "id": "S00",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:10:33.911Z",
+            "duration_ms": 19980,
+            "detail": "截图 00-before"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T05:10:53.891Z",
+            "duration_ms": 1376,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S02",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T05:10:55.267Z",
+            "duration_ms": 4266,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S02H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T05:10:59.533Z",
+            "duration_ms": 1909,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S03",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:11:01.442Z",
+            "duration_ms": 5001,
+            "detail": "截图 01-memory-ack"
+          },
+          {
+            "id": "S03W",
+            "action": "wait.sleep",
+            "status": "ok",
+            "started_at": "2026-10-30T05:11:06.443Z",
+            "duration_ms": 38118,
+            "detail": "等待 5000ms"
+          },
+          {
+            "id": "S04",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T05:11:44.561Z",
+            "duration_ms": 1248,
+            "detail": "已发出（第 2 次生效）"
+          },
+          {
+            "id": "S05",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T05:11:45.809Z",
+            "duration_ms": 11929,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S05H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T05:11:57.738Z",
+            "duration_ms": 1452,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S06",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:11:59.190Z",
+            "duration_ms": 5001,
+            "detail": "截图 02-preference-updated"
+          },
+          {
+            "id": "S06W",
+            "action": "wait.sleep",
+            "status": "ok",
+            "started_at": "2026-10-30T05:12:04.191Z",
+            "duration_ms": 8756,
+            "detail": "等待 5000ms"
+          },
+          {
+            "id": "S07",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-10-30T05:12:12.947Z",
+            "duration_ms": 1891,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S08",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:12:14.838Z",
+            "duration_ms": 23301,
+            "detail": "截图 03-new-session"
+          },
+          {
+            "id": "S09",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T05:12:38.139Z",
+            "duration_ms": 6595,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S09A",
+            "action": "approval.allow",
+            "status": "skipped",
+            "started_at": "2026-10-30T05:12:44.734Z",
+            "duration_ms": 1314,
+            "detail": "没有出现工具审批卡"
+          },
+          {
+            "id": "S10",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T05:12:46.048Z",
+            "duration_ms": 3592,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S10H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T05:12:49.640Z",
+            "duration_ms": 1713,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S11",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:12:51.353Z",
+            "duration_ms": 16938,
+            "detail": "截图 04-recommendation"
+          },
+          {
+            "id": "S12",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T05:13:08.291Z",
+            "duration_ms": 6590,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S12A",
+            "action": "approval.allow",
+            "status": "skipped",
+            "started_at": "2026-10-30T05:13:14.881Z",
+            "duration_ms": 1182,
+            "detail": "没有出现工具审批卡"
+          },
+          {
+            "id": "S13",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T05:13:16.063Z",
+            "duration_ms": 3861,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S13H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T05:13:19.924Z",
+            "duration_ms": 1723,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S14",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:13:21.647Z",
+            "duration_ms": 0,
+            "detail": "截图 05-trip-plan"
+          }
+        ],
+        "screenshots": 6,
+        "profiling_files": 24,
+        "run_id": "real-nightly-123730",
+        "commit": "d225633",
+        "generated_at": "2026-10-30T08:08:34.734Z"
+      }
+    },
+    "DM-WF-QUOTE-01": {
+      "id": "DM-WF-QUOTE-01",
+      "title": "引用发送：同一用户气泡内显示竖线与单行摘要",
+      "mode": "multi-turn",
+      "points": [
+        {
+          "date": "2026-10-30",
+          "status": "COMPLETED",
+          "query_ms": 8626,
+          "query_count": 1,
+          "duration_ms": 94740,
+          "run_id": "real-nightly-123730",
+          "commit": "d225633",
+          "finished_at": "2026-10-30T05:17:46.482Z"
+        }
+      ],
+      "latest": {
+        "id": "DM-WF-QUOTE-01",
+        "title": "引用发送：同一用户气泡内显示竖线与单行摘要",
+        "mode": "multi-turn",
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-10-30T05:16:11.742Z",
+        "finished_at": "2026-10-30T05:17:46.482Z",
+        "duration_ms": 94740,
+        "query_count": 1,
+        "query_ms": 8626,
+        "first_text_ms": 8028,
+        "display_ms": 33337,
+        "queries": [
+          {
+            "started_at": "2026-10-30T05:16:49.217Z",
+            "duration_ms": 8626,
+            "first_text_ms": 8028,
+            "display_ms": 33337,
+            "outcome": "completed",
+            "text_chars": 79,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1793337409217,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1793337409217,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1793337409258,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1793337409279,
+                "detail": "encode=0 send=2 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1793337412402,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1793337417245,
+                "detail": "chars=79"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1793337417843,
+                "detail": "chars=79 events=2"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1793337421863,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1793337442554,
+                "detail": null
+              }
+            ]
+          }
+        ],
+        "device": {
+          "model": "JUY-AL50",
+          "screen": {
+            "width": 1280,
+            "height": 2832,
+            "measured": false
+          }
+        },
+        "step_count": 15,
+        "steps": [
+          {
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-10-30T05:16:19.462Z",
+            "duration_ms": 14428,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-10-30T05:16:33.890Z",
+            "duration_ms": 1896,
+            "detail": "Orbit 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S00",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:16:35.786Z",
+            "duration_ms": 17412,
+            "detail": "截图 00-before"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T05:16:53.198Z",
+            "duration_ms": 1271,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S02",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T05:16:54.469Z",
+            "duration_ms": 3639,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S03",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T05:16:58.108Z",
+            "duration_ms": 2192,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S04",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:17:00.300Z",
+            "duration_ms": 3996,
+            "detail": "截图 01-source"
+          },
+          {
+            "id": "S05",
+            "action": "chat.quoteLatest",
+            "status": "ok",
+            "started_at": "2026-10-30T05:17:04.296Z",
+            "duration_ms": 3093,
+            "detail": "点击最新可见回复的引用图标，未发送消息"
+          },
+          {
+            "id": "S06",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:17:07.389Z",
+            "duration_ms": 26868,
+            "detail": "截图 02-selected"
+          },
+          {
+            "id": "S07",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T05:17:34.257Z",
+            "duration_ms": 3830,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S08",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T05:17:38.087Z",
+            "duration_ms": 1484,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S09",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:17:39.571Z",
+            "duration_ms": 1295,
+            "detail": "截图 03-sent"
+          },
+          {
+            "id": "S10",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T05:17:40.866Z",
+            "duration_ms": 3747,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S11",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T05:17:44.613Z",
+            "duration_ms": 1869,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S12",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:17:46.482Z",
+            "duration_ms": 0,
+            "detail": "截图 04-complete"
+          }
+        ],
+        "screenshots": 5,
+        "profiling_files": 24,
+        "run_id": "real-nightly-123730",
+        "commit": "d225633",
+        "generated_at": "2026-10-30T08:08:34.734Z"
+      }
+    },
+    "DM-WF-RESET-01": {
+      "id": "DM-WF-RESET-01",
+      "title": "测试归零：一键清空历史后回到干净初始态",
+      "mode": "multi-turn",
+      "points": [
+        {
+          "date": "2026-10-30",
+          "status": "COMPLETED",
+          "query_ms": 17515,
+          "query_count": 1,
+          "duration_ms": 415021,
+          "run_id": "real-nightly-123730",
+          "commit": "d225633",
+          "finished_at": "2026-10-30T05:24:47.921Z"
+        }
+      ],
+      "latest": {
+        "id": "DM-WF-RESET-01",
+        "title": "测试归零：一键清空历史后回到干净初始态",
+        "mode": "multi-turn",
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-10-30T05:17:52.900Z",
+        "finished_at": "2026-10-30T05:24:47.921Z",
+        "duration_ms": 415021,
+        "query_count": 1,
+        "query_ms": 17515,
+        "first_text_ms": 17515,
+        "display_ms": 39472,
+        "queries": [
+          {
+            "started_at": "2026-10-30T05:21:13.960Z",
+            "duration_ms": 17515,
+            "first_text_ms": 17515,
+            "display_ms": 39472,
+            "outcome": "completed",
+            "text_chars": 36,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1793337673960,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1793337673960,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1793337673995,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1793337674019,
+                "detail": "encode=0 send=1 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1793337678612,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1793337691475,
+                "detail": "chars=36"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1793337691475,
+                "detail": "chars=36 events=1"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1793337694391,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1793337713432,
+                "detail": null
+              }
+            ]
+          }
+        ],
+        "device": {
+          "model": "JUY-AL50",
+          "screen": {
+            "width": 1280,
+            "height": 2832,
+            "measured": false
+          }
+        },
+        "step_count": 10,
+        "steps": [
+          {
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-10-30T05:18:00.949Z",
+            "duration_ms": 14184,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-10-30T05:18:15.133Z",
+            "duration_ms": 163911,
+            "detail": "Orbit 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S-reset",
+            "action": "app.resetState",
+            "status": "ok",
+            "started_at": "2026-10-30T05:20:59.044Z",
+            "duration_ms": 1660,
+            "detail": "已重置到初始状态（10-30 13:18:24.998 5098 5098 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=6 databases=1 tables=0 files=3 notifications=cancelled room=room-f8889ad909b34d9e8f3a47aaa6f313be）"
+          },
+          {
+            "id": "S00",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:21:00.704Z",
+            "duration_ms": 17300,
+            "detail": "截图 00-initial"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T05:21:18.004Z",
+            "duration_ms": 38854,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S02",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T05:21:56.858Z",
+            "duration_ms": 3930,
+            "detail": "完成行 0 → 0（new-text）"
+          },
+          {
+            "id": "S02H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T05:22:00.788Z",
+            "duration_ms": 1769,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S03",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:22:02.557Z",
+            "duration_ms": 163853,
+            "detail": "截图 01-dirty"
+          },
+          {
+            "id": "S04",
+            "action": "app.resetState",
+            "status": "ok",
+            "started_at": "2026-10-30T05:24:46.410Z",
+            "duration_ms": 1511,
+            "detail": "已重置到初始状态（10-30 13:22:11.688 5460 5460 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=6 databases=1 tables=0 files=3 notifications=cancelled room=room-a80a0b34f54c49bab99cec867dc09dba）"
+          },
+          {
+            "id": "S05",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:24:47.921Z",
+            "duration_ms": 0,
+            "detail": "截图 02-clean-again"
+          }
+        ],
+        "screenshots": 3,
+        "profiling_files": 24,
+        "run_id": "real-nightly-123730",
+        "commit": "d225633",
+        "generated_at": "2026-10-30T08:08:34.734Z"
+      }
+    },
+    "DM-WF-STRUCTURED-01": {
+      "id": "DM-WF-STRUCTURED-01",
+      "title": "结构化结果：表格/预算/多天行程正确渲染，坏 Markdown 降级为可读文本",
+      "mode": "single-turn",
+      "points": [
+        {
+          "date": "2026-10-30",
+          "status": "COMPLETED",
+          "query_ms": null,
+          "query_count": 0,
+          "duration_ms": 238487,
+          "run_id": "real-nightly-123730",
+          "commit": "d225633",
+          "finished_at": "2026-10-30T05:28:52.659Z"
+        }
+      ],
+      "latest": {
+        "id": "DM-WF-STRUCTURED-01",
+        "title": "结构化结果：表格/预算/多天行程正确渲染，坏 Markdown 降级为可读文本",
+        "mode": "single-turn",
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-10-30T05:24:54.172Z",
+        "finished_at": "2026-10-30T05:28:52.659Z",
+        "duration_ms": 238487,
+        "query_count": 0,
+        "query_ms": null,
+        "first_text_ms": null,
+        "display_ms": null,
+        "queries": [],
+        "device": {
+          "model": "JUY-AL50",
+          "screen": {
+            "width": 1280,
+            "height": 2832,
+            "measured": false
+          }
+        },
+        "step_count": 13,
+        "steps": [
+          {
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-10-30T05:25:02.348Z",
+            "duration_ms": 14225,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-10-30T05:25:16.573Z",
+            "duration_ms": 163731,
+            "detail": "Orbit 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S-reset",
+            "action": "app.resetState",
+            "status": "ok",
+            "started_at": "2026-10-30T05:28:00.304Z",
+            "duration_ms": 1564,
+            "detail": "已重置到初始状态（10-30 13:25:27.376 8416 8416 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=5 databases=1 tables=0 files=3 notifications=cancelled room=room-aa96523388a845e6bad76b225aaead20）"
+          },
+          {
+            "id": "S00",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:28:01.868Z",
+            "duration_ms": 16599,
+            "detail": "截图 00-before"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T05:28:18.467Z",
+            "duration_ms": 6383,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S02",
+            "action": "approval.allow",
+            "status": "skipped",
+            "started_at": "2026-10-30T05:28:24.850Z",
+            "duration_ms": 1145,
+            "detail": "没有出现工具审批卡"
+          },
+          {
+            "id": "S03",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T05:28:25.995Z",
+            "duration_ms": 11092,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S03H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T05:28:37.087Z",
+            "duration_ms": 1507,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S04",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:28:38.594Z",
+            "duration_ms": 8622,
+            "detail": "截图 01-plan-top"
+          },
+          {
+            "id": "S05",
+            "action": "scroll.down",
+            "status": "ok",
+            "started_at": "2026-10-30T05:28:47.216Z",
+            "duration_ms": 3005,
+            "detail": "下滑 2 次"
+          },
+          {
+            "id": "S06",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:28:50.221Z",
+            "duration_ms": 933,
+            "detail": "截图 02-plan-bottom"
+          },
+          {
+            "id": "S07",
+            "action": "expand.execution",
+            "status": "ok",
+            "started_at": "2026-10-30T05:28:51.154Z",
+            "duration_ms": 1505,
+            "detail": "展开 0 处执行细节"
+          },
+          {
+            "id": "S08",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T05:28:52.659Z",
+            "duration_ms": 0,
+            "detail": "截图 03-details"
+          }
+        ],
+        "screenshots": 4,
+        "profiling_files": 23,
+        "run_id": "real-nightly-123730",
+        "commit": "d225633",
+        "generated_at": "2026-10-30T08:08:34.734Z"
+      }
+    },
+    "DM-WF-TOPIC-01": {
+      "id": "DM-WF-TOPIC-01",
+      "title": "话题自动管理：换任务自动开新话题，追问回到原话题",
+      "mode": "multi-turn",
+      "points": [
+        {
+          "date": "2026-10-30",
+          "status": "COMPLETED",
+          "query_ms": 19196,
+          "query_count": 4,
+          "duration_ms": 363344,
+          "run_id": "real-retry-142454",
+          "commit": "9b2e7bb",
+          "finished_at": "2026-10-30T06:37:11.947Z"
+        }
+      ],
+      "latest": {
+        "id": "DM-WF-TOPIC-01",
+        "title": "话题自动管理：换任务自动开新话题，追问回到原话题",
+        "mode": "multi-turn",
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-10-30T06:31:08.603Z",
+        "finished_at": "2026-10-30T06:37:11.947Z",
+        "duration_ms": 363344,
+        "query_count": 4,
+        "query_ms": 19196,
+        "first_text_ms": 18442,
+        "display_ms": 22380,
+        "queries": [
+          {
+            "started_at": "2026-10-30T06:34:27.238Z",
+            "duration_ms": 15049,
+            "first_text_ms": 14995,
+            "display_ms": 18383,
+            "outcome": "completed",
+            "text_chars": 77,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1793342067238,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1793342067238,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1793342067265,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1793342067287,
+                "detail": "encode=0 send=2 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1793342071714,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1793342082233,
+                "detail": "chars=77"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1793342082287,
+                "detail": "chars=77 events=2"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1793342085621,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1793342085621,
+                "detail": "no-reveal"
+              }
+            ]
+          },
+          {
+            "started_at": "2026-10-30T06:35:07.403Z",
+            "duration_ms": 30849,
+            "first_text_ms": 29718,
+            "display_ms": 32699,
+            "outcome": "completed",
+            "text_chars": 623,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1793342107403,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1793342107403,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1793342107432,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1793342107454,
+                "detail": "encode=0 send=2 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1793342111662,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1793342137121,
+                "detail": "chars=623"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1793342138252,
+                "detail": "chars=623 events=2"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1793342139876,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1793342140102,
+                "detail": null
+              }
+            ]
+          },
+          {
+            "started_at": "2026-10-30T06:36:01.581Z",
+            "duration_ms": 17728,
+            "first_text_ms": 17726,
+            "display_ms": 22185,
+            "outcome": "completed",
+            "text_chars": 86,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1793342161581,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1793342161581,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1793342161606,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1793342161630,
+                "detail": "encode=0 send=1 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1793342165921,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1793342179307,
+                "detail": "chars=86"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1793342179309,
+                "detail": "chars=86 events=2"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1793342183766,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1793342183766,
+                "detail": "no-reveal"
+              }
+            ]
+          },
+          {
+            "started_at": "2026-10-30T06:36:47.188Z",
+            "duration_ms": 13158,
+            "first_text_ms": 11329,
+            "display_ms": 16254,
+            "outcome": "completed",
+            "text_chars": 503,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1793342207188,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1793342207188,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1793342207216,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1793342207239,
+                "detail": "encode=0 send=1 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1793342211206,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1793342218517,
+                "detail": "chars=312"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1793342220346,
+                "detail": "chars=503 events=51"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1793342223442,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1793342223442,
+                "detail": "no-reveal"
+              }
+            ]
+          }
+        ],
+        "device": {
+          "model": "JUY-AL50",
+          "screen": {
+            "width": 1080,
+            "height": 2406,
+            "measured": true
+          }
+        },
+        "step_count": 24,
+        "steps": [
+          {
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-10-30T06:31:08.604Z",
+            "duration_ms": 8156,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-10-30T06:31:16.760Z",
+            "duration_ms": 14227,
+            "detail": "Orbit 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S-reset",
+            "action": "app.resetState",
+            "status": "ok",
+            "started_at": "2026-10-30T06:31:30.987Z",
+            "duration_ms": 161897,
+            "detail": "已重置到初始状态（10-30 14:31:40.213 37810 37810 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=6 databases=1 tables=0 files=3 notifications=cancelled room=room-4910450595c9432c841178f31608f6d9）"
+          },
+          {
+            "id": "S00",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T06:34:12.884Z",
+            "duration_ms": 1688,
+            "detail": "截图 00-before"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T06:34:14.572Z",
+            "duration_ms": 16801,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S01A",
+            "action": "approval.allow",
+            "status": "skipped",
+            "started_at": "2026-10-30T06:34:31.373Z",
+            "duration_ms": 6608,
+            "detail": "没有出现工具审批卡"
+          },
+          {
+            "id": "S02",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T06:34:37.981Z",
+            "duration_ms": 10921,
+            "detail": "完成行 0 → 0（new-text）"
+          },
+          {
+            "id": "S02H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T06:34:48.902Z",
+            "duration_ms": 3733,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S03",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T06:34:52.635Z",
+            "duration_ms": 1697,
+            "detail": "截图 01-first-task"
+          },
+          {
+            "id": "S04",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T06:34:54.332Z",
+            "duration_ms": 17140,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S04A",
+            "action": "approval.allow",
+            "status": "skipped",
+            "started_at": "2026-10-30T06:35:11.472Z",
+            "duration_ms": 6659,
+            "detail": "没有出现工具审批卡"
+          },
+          {
+            "id": "S05",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T06:35:18.131Z",
+            "duration_ms": 24112,
+            "detail": "完成行 0 → 0（new-text）"
+          },
+          {
+            "id": "S05H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T06:35:42.243Z",
+            "duration_ms": 3934,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S06",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T06:35:46.177Z",
+            "duration_ms": 1713,
+            "detail": "截图 02-new-topic"
+          },
+          {
+            "id": "S07",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T06:35:47.890Z",
+            "duration_ms": 17867,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S07A",
+            "action": "approval.allow",
+            "status": "skipped",
+            "started_at": "2026-10-30T06:36:05.757Z",
+            "duration_ms": 6872,
+            "detail": "没有出现工具审批卡"
+          },
+          {
+            "id": "S08",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T06:36:12.629Z",
+            "duration_ms": 14622,
+            "detail": "完成行 0 → 0（new-text）"
+          },
+          {
+            "id": "S08H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T06:36:27.251Z",
+            "duration_ms": 4035,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S09",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T06:36:31.286Z",
+            "duration_ms": 1841,
+            "detail": "截图 03-back-to-basketball"
+          },
+          {
+            "id": "S10",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T06:36:33.127Z",
+            "duration_ms": 18599,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S10A",
+            "action": "approval.allow",
+            "status": "skipped",
+            "started_at": "2026-10-30T06:36:51.726Z",
+            "duration_ms": 6987,
+            "detail": "没有出现工具审批卡"
+          },
+          {
+            "id": "S11",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-10-30T06:36:58.713Z",
+            "duration_ms": 7726,
+            "detail": "完成行 0 → 0（new-text）"
+          },
+          {
+            "id": "S11H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-10-30T06:37:06.439Z",
+            "duration_ms": 3859,
+            "detail": "已发送 BACK，但输入框仍在键盘上方"
+          },
+          {
+            "id": "S12",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T06:37:10.298Z",
+            "duration_ms": 1649,
+            "detail": "截图 04-back-to-nanjing"
+          }
+        ],
+        "screenshots": 5,
+        "profiling_files": 24,
+        "run_id": "real-retry-142454",
+        "commit": "9b2e7bb",
+        "generated_at": "2026-10-30T08:08:34.849Z"
+      }
+    },
+    "DM-WF-TRAVEL-01": {
+      "id": "DM-WF-TRAVEL-01",
+      "title": "多轮旅程规划：帮我规划新疆旅程 → 需求卡 → 逐题选择 → 生成方案",
+      "mode": "multi-turn",
+      "points": [
+        {
+          "date": "2026-10-30",
+          "status": "BLOCKED",
+          "query_ms": 9984,
+          "query_count": 1,
+          "duration_ms": 599320,
+          "run_id": "real-retry-142454",
+          "commit": "9b2e7bb",
+          "finished_at": "2026-10-30T06:47:18.493Z"
+        }
+      ],
+      "latest": {
+        "id": "DM-WF-TRAVEL-01",
+        "title": "多轮旅程规划：帮我规划新疆旅程 → 需求卡 → 逐题选择 → 生成方案",
+        "mode": "multi-turn",
+        "status": "BLOCKED",
+        "failure": "S02 wait.optionCard 失败：optionCard 超时（300000ms）：null",
+        "started_at": "2026-10-30T06:37:19.173Z",
+        "finished_at": "2026-10-30T06:47:18.493Z",
+        "duration_ms": 599320,
+        "query_count": 1,
+        "query_ms": 9984,
+        "first_text_ms": 9984,
+        "display_ms": 13774,
+        "queries": [
+          {
+            "started_at": "2026-10-30T06:40:38.833Z",
+            "duration_ms": 9984,
+            "first_text_ms": 9984,
+            "display_ms": 13774,
+            "outcome": "cancelled",
+            "text_chars": 48,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1793342438833,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1793342438833,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1793342438859,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1793342438881,
+                "detail": "encode=0 send=1 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1793342443267,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1793342448817,
+                "detail": "chars=48"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1793342448817,
+                "detail": "chars=48 events=1"
+              },
+              {
+                "name": "waiting",
+                "at_ms": 1793342452607,
+                "detail": "hitl"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1793342452607,
+                "detail": null
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1793342803050,
+                "detail": "cancelled"
+              }
+            ]
+          }
+        ],
+        "device": {
+          "model": "JUY-AL50",
+          "screen": {
+            "width": 1080,
+            "height": 2406,
+            "measured": true
+          }
+        },
+        "step_count": 8,
+        "steps": [
+          {
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-10-30T06:37:19.173Z",
+            "duration_ms": 8255,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-10-30T06:37:27.428Z",
+            "duration_ms": 14517,
+            "detail": "Orbit 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S-reset",
+            "action": "app.resetState",
+            "status": "ok",
+            "started_at": "2026-10-30T06:37:41.945Z",
+            "duration_ms": 162282,
+            "detail": "已重置到初始状态（10-30 14:37:53.410 41098 41098 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=6 databases=1 tables=0 files=3 notifications=cancelled room=room-9173ac2485394d2598a703610d44e63c）"
+          },
+          {
+            "id": "S00",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T06:40:24.227Z",
+            "duration_ms": 1607,
+            "detail": "截图 00-before"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-10-30T06:40:25.834Z",
+            "duration_ms": 17096,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S01A",
+            "action": "approval.allow",
+            "status": "skipped",
+            "started_at": "2026-10-30T06:40:42.930Z",
+            "duration_ms": 91320,
+            "detail": "没有出现工具审批卡"
+          },
+          {
+            "id": "S02",
+            "action": "wait.optionCard",
+            "status": "failed",
+            "started_at": "2026-10-30T06:42:14.250Z",
+            "duration_ms": 304243,
+            "detail": "optionCard 超时（300000ms）：null"
+          },
+          {
+            "id": "S-failure",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-10-30T06:47:18.493Z",
+            "duration_ms": 0,
+            "detail": null
+          }
+        ],
+        "screenshots": 2,
+        "profiling_files": 24,
+        "run_id": "real-retry-142454",
+        "commit": "9b2e7bb",
+        "generated_at": "2026-10-30T08:08:34.849Z"
+      }
+    }
+  }
+}
