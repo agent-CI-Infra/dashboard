@@ -1169,7 +1169,7 @@
     }));
   }
 
-  // Nightly performance: one query-latency point per case per Beijing calendar day.
+  // Nightly performance: one duration point per case per Beijing calendar day.
   // The file is optional, so boards that do not publish it simply omit this section.
   const PERF_STATUS = {
     COMPLETED: ['通过', 'good'],
@@ -1266,8 +1266,77 @@
     const latestQuery = queries[queries.length - 1];
     return `<div class="perf-query-list">${queries.map((q, i) => {
       const [label, tone] = perfOutcome(q.outcome);
-      return `<div class="perf-query"><div class="perf-query-head"><code>Q${i + 1}</code><span class="muted">${esc(shortDateTime(q.started_at))}</span>${badge(label, tone)}<span class="perf-query-ms">${perfMs(q.duration_ms)}</span></div><div class="perf-query-track"><span class="perf-query-fill ${tone}" style="width:${Math.max(2, ((q.duration_ms || 0) / max) * 100).toFixed(1)}%"></span></div><div class="perf-query-sub">首条消息 ${perfMs(q.first_text_ms)} · 展示完成 ${perfMs(q.display_ms)} · ${n(q.text_chars)} 字</div></div>`;
+      return `<div class="perf-query"><div class="perf-query-head"><code>Q${i + 1}</code><span class="muted">${esc(shortDateTime(q.started_at))}</span>${badge(label, tone)}<span class="perf-query-ms">${perfMs(q.duration_ms)}</span></div><div class="perf-query-track"><span class="perf-query-fill ${tone}" style="width:${Math.max(2, ((q.duration_ms || 0) / max) * 100).toFixed(1)}%"></span></div><div class="perf-query-sub">首条消息 ${perfMs(q.first_text_ms)} · 展示完成 ${perfMs(q.display_ms)} · ${n(q.text_chars)} 字 · 上下行 ${perfBytes(q.request_bytes)} / ${perfBytes(q.response_bytes)}</div></div>`;
     }).join('')}</div><div class="perf-stage-title">最近一次查询阶段</div>${perfQueryStages(latestQuery)}`;
+  }
+
+  const perfInt = (value) => {
+    if (value == null || !Number.isFinite(Number(value))) return '—';
+    return new Intl.NumberFormat('zh-CN').format(Number(value));
+  };
+  const perfBytes = (value) => {
+    if (value == null || !Number.isFinite(Number(value)) || Number(value) < 0) return '—';
+    const bytes = Number(value);
+    if (bytes < 1024) return `${Math.round(bytes)} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+  const PERF_PHASE_NAME = {
+    'route.apps': '路由应用',
+    route: '路由',
+    'task.saved': '保存任务',
+    'run.start': '启动',
+    classify: '分类',
+    'brief.memory': '记忆检索',
+    execute: '执行',
+    'post.reviews': '结果审阅',
+    'post.next_steps': '后续步骤',
+    'post.citations': '引用整理',
+    posted: '完成',
+  };
+
+  function perfCloudPhases(phases) {
+    const rows = (Array.isArray(phases) ? phases : [])
+      .filter((phase) => phase && phase.name)
+      .sort((a, b) => (Number(a.start_ms) || 0) - (Number(b.start_ms) || 0));
+    if (!rows.length) return empty('这条 trace 没有 Orbit 阶段事件');
+    const max = Math.max(...rows.map((phase) => (Number(phase.start_ms) || 0) + (Number(phase.duration_ms) || 0)), 1);
+    return `<div class="perf-waterfall">${rows.map((phase) => {
+      const start = Number(phase.start_ms) || 0;
+      const duration = Number(phase.duration_ms) || 0;
+      const label = PERF_PHASE_NAME[phase.name] || phase.name;
+      return `<div class="perf-step" title="${esc(phase.name)}${phase.note ? ` · ${esc(phase.note)}` : ''}"><span class="perf-step-id">${esc(label)}</span><span class="perf-step-action">+${perfMs(start)}</span><span class="perf-step-track"><span class="perf-step-fill ok" style="width:${Math.max(2, (duration / max) * 100).toFixed(1)}%"></span></span><span class="perf-step-ms">${perfMs(duration)}</span></div>`;
+    }).join('')}</div>`;
+  }
+
+  function perfCloud(latest) {
+    const cloud = latest?.cloud;
+    if (!cloud?.available || (!cloud.calls?.length && !cloud.phases?.length)) {
+      return empty('这次运行没有 Orbit 云端 trace；model / TTFT / TPOT 要在 profiling 落盘后才有');
+    }
+    const matched = Number(cloud.matched_queries) || 0;
+    const traceCount = Number(cloud.trace_count) || 0;
+    const calls = Array.isArray(cloud.calls) ? cloud.calls.slice().reverse().slice(0, 12) : [];
+    const totals = cloud.totals || {};
+    const note = matched > 0
+      ? `已按 task id 关联 ${matched} 个 query；以下是本 case 可见的 ${traceCount} 条云端 trace`
+      : `当前 query 的云端 trace 尚未落盘 / 未按 task id 匹配；以下为本 case 目录中可见的 ${traceCount} 条 trace，仅作模型侧参考`;
+    const captured = cloud.captured_at ? `采集 ${shortDateTime(cloud.captured_at)}` : '采集时间未知';
+    return `<div class="perf-cloud-note ${matched ? 'matched' : 'unmatched'}">${esc(note)}<span class="muted"> · ${esc(captured)}</span></div>
+      <div class="perf-cloud-stats">
+        <div><span>模型调用</span><strong>${n(totals.calls ?? cloud.call_count)}</strong><em>${n(traceCount)} 条 trace</em></div>
+        <div><span>平均 TTFT</span><strong>${perfMs(totals.ttft_avg_ms)}</strong><em>首 token</em></div>
+        <div><span>平均 TPOT</span><strong>${totals.tpot_avg_ms == null ? '—' : `${Number(totals.tpot_avg_ms).toFixed(2)}ms`}</strong><em>每 token</em></div>
+        <div><span>上下文 tokens</span><strong>${perfInt(totals.input_tokens)}</strong><em>单次最大 ${perfInt(totals.input_tokens_max)}</em></div>
+        <div><span>输出 tokens</span><strong>${perfInt(totals.output_tokens)}</strong><em>模型均耗时 ${perfMs(totals.model_ms_avg)}</em></div>
+      </div>
+      ${calls.length ? `<div class="perf-model-scroll-hint">表格可左右滑动查看 TTFT / TPOT / 上下文</div><div class="perf-model-wrap"><table class="perf-model-table"><thead><tr><th>模型</th><th class="num">耗时</th><th class="num">TTFT</th><th class="num">TPOT</th><th class="num">上下文</th><th class="num">输出</th><th>流式</th></tr></thead><tbody>${calls.map((call) => {
+        const title = [call.provider, call.stream_ms != null ? `stream ${perfMs(call.stream_ms)}` : null, call.finish_reason, call.status, call.tokens_per_s != null ? `${call.tokens_per_s} tok/s` : null].filter(Boolean).join(' · ');
+        return `<tr title="${esc(title)}"><td class="model" title="${esc(call.model)}">${esc(call.model)}</td><td class="num">${perfMs(call.duration_ms)}</td><td class="num">${perfMs(call.ttft_ms)}</td><td class="num">${call.tpot_ms == null ? '—' : `${Number(call.tpot_ms).toFixed(2)}ms`}</td><td class="num">${perfInt(call.input_tokens)}</td><td class="num">${perfInt(call.output_tokens)}</td><td>${call.stream ? badge('流式', 'good') : badge('非流式', '')}</td></tr>`;
+      }).join('')}</tbody></table></div>${cloud.call_count > calls.length ? `<p class="perf-note">共 ${n(cloud.call_count)} 条调用，显示最近 ${n(calls.length)} 条。</p>` : ''}` : ''}
+      <div class="perf-stage-title">Orbit 阶段（最新一次云端 trace）</div>
+      ${perfCloudPhases(cloud.phases)}
+      <p class="perf-note">上下文 = model call 的 input tokens；缓存读取 ${perfInt(cloud.usage?.cache_read_tokens)} tokens，reasoning ${perfInt(cloud.usage?.reasoning_tokens)} tokens。trace 由 Orbit 异步写入，未匹配时不代表当前 query。</p>`;
   }
 
   function perfHistoryTable(points) {
@@ -1325,6 +1394,7 @@
             <div><span>记录天数</span><strong>${n(activeDays)}</strong></div>
           </div>
           <div class="card perf-card"><h3>最近一次 Profiling · 查询耗时 <span class="sub">${n(queryCount)} 次查询 · 以最后一条消息到达计 · E2E ${perfMs(latest.duration_ms)}</span></h3>${perfQueries(latest)}</div>
+          <div class="card perf-card"><h3>Orbit 云端 trace <span class="sub">model 耗时 · TTFT · TPOT · 上下文 tokens · 阶段</span></h3>${perfCloud(latest)}</div>
           <div class="card perf-card"><h3>每日平均查询耗时 <span class="sub">一天一个点 · 从 query 到消息接收 · Asia/Shanghai</span></h3>${perfChart(points)}<p class="perf-note">当前 ${n(activeDays)} 个执行日；每点为当轮 query 平均耗时，仅 profiling，不含 E2E 步骤等待；缺失日期不补 0。</p></div>
           <details class="card perf-card perf-history"><summary>执行历史 <span class="sub">${n(points.length)} 天</span></summary>${perfHistoryTable(points)}</details>
         </div>
