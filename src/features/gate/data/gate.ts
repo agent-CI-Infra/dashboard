@@ -257,27 +257,6 @@ export const GATE_REPOS: GateRepo[] = [
       ]),
     ],
   },
-  {
-    id: 'digitalmate',
-    name: 'DigitalMate',
-    owner: 'openJiuwen-ai',
-    defaultBranch: 'main',
-    branchData: [
-      branch('main', 'passed', 82.4, [
-        stat('ready', 96.5, 1220, 305),
-        stat('merge', 91.2, 1490, 171),
-        stat('daily', 88.4, 9800, 33),
-        stat('release', 100, 17600, 5),
-      ]),
-      branch('develop', 'passed', 80.9, [
-        stat('ready', 94.8, 1240, 168),
-        stat('daily', 86.2, 10150, 18),
-      ]),
-      branch('feat/data-pipeline', 'failed', 72.3, [
-        stat('ready', 82.7, 1390, 33),
-      ]),
-    ],
-  },
 ]
 
 export function countReposByStatus(repos: { gateStatus: GateRunStatus }[]) {

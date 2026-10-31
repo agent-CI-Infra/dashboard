@@ -142,6 +142,22 @@
       }
     },
     {
+      "id": "digitalmate",
+      "name": "DigitalMate",
+      "owner": "openJiuwen-ai",
+      "defaultBranch": "main",
+      "type": "status-board-lanes",
+      "url": "https://agent-ci-infra.github.io/dashboard/boards/openJiuwen-ai/digitalmate/data/snapshot.json",
+      "dashboardUrl": "https://agent-ci-infra.github.io/dashboard/boards/openJiuwen-ai/digitalmate/",
+      "boardBaseUrl": "https://agent-ci-infra.github.io/dashboard/boards/openJiuwen-ai/digitalmate/",
+      "coverageTab": "coverage",
+      "laneMap": {
+        "pr": "ready",
+        "daily": "daily"
+      },
+      "comment": "Private source; only the public snapshot mirrored into the imported board is read. Do not add a token or private API access here. DigitalMate only publishes pr-ready and daily gate lanes; main/release are not gate categories."
+    },
+    {
       "id": "acme/web",
       "name": "web",
       "owner": "acme",

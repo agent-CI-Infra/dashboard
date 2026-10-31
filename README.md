@@ -224,6 +224,14 @@ python3 server.py
 }
 ```
 
+DigitalMate 已按这种方式接入：`config/gate-sources.json` 的 `digitalmate`
+只读取其导入看板公开的 `data/snapshot.json`，不访问私仓，也不需要私仓 token。
+看板只公开 `pr` 和 `daily` 两个门禁 lane，因此配置里的 `laneMap` 只把它们映射到
+`PR-Ready` 和 `Daily`，不会把 `main`/`release` 的普通 CI lane 误当成
+`PR-Merge`/`Release` 门禁。采集器会同时读取 snapshot 里的
+`sections.ci.data.gates`（合规等级、接入阶段、用例计数和最新结论）与
+`sections.ci.data.lanes` 的每日桶；看板没有公开覆盖率时，覆盖率列保持为空。
+
 然后：
 
 ```bash

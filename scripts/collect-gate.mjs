@@ -41,6 +41,12 @@ import {
   summaryIndexEntry,
   validateSummary,
 } from './lib/ci-gates.mjs'
+import {
+  boardGateMeta,
+  laneMapOf,
+  lanesToBranch,
+  snapshotCoverage,
+} from './lib/status-board.mjs'
 
 const CONFIG_FILE = path.join(process.cwd(), 'config', 'gate-sources.json')
 const OUT_DIR = path.join(process.cwd(), 'public', 'data', 'gate')
@@ -242,8 +248,9 @@ async function collectCaseCounts(source, runs) {
     if (!prev || run.created_at > prev.created_at) latest.set(lane, run)
   }
   const cases = {}
+  const laneMap = laneMapOf(source)
   for (const [lane, run] of latest) {
-    const column = LANE_TO_COLUMN[lane] ?? lane
+    const column = laneMap[lane] ?? lane
     const counts = await fetchCaseCounts(source, run)
     if (counts) cases[column] = counts
   }
@@ -255,7 +262,7 @@ async function collectCaseCounts(source, runs) {
 }
 
 /** Attach per-lane case counts and the branch coverage to one branch line. */
-function attachCasesAndCoverage(branch, source, cases, coverage) {
+function attachCasesAndCoverage(branch, source, cases, coverage, gateMeta) {
   const isCoverageLine =
     branch.name === (source.coverageLine ?? source.defaultBranch)
   return {
@@ -266,76 +273,10 @@ function attachCasesAndCoverage(branch, source, cases, coverage) {
     coverageLink: isCoverageLine && coverage ? coverageLink(source) : undefined,
     stats: branch.stats.map((stat) => {
       const counts = cases?.[stat.category]
-      return counts ? { ...stat, cases: counts } : stat
+      const latest = gateMeta?.latestByCategory?.get(stat.category)
+      const next = counts ? { ...stat, cases: counts } : stat
+      return latest ? { ...next, latest } : next
     }),
-  }
-}
-
-/** ---------- SD lane model (numbers taken from the board's own data) ---------- */
-
-/**
- * SD lane key → the dashboard's gate column id. Columns without a matching
- * lane (e.g. the merge queue, which the board does not present as a lane)
- * simply have no stat and render empty.
- */
-const LANE_TO_COLUMN = {
-  // SD's 主干 lane (main push / manual) is the post-merge gate.
-  main: 'merge',
-  pr: 'ready',
-  daily: 'daily',
-  release: 'release',
-}
-const LANE_IDS = Object.keys(LANE_TO_COLUMN)
-
-/** SD lane → a day-indexed bucket list, in the dashboard's daily shape. */
-function lanesToBranch(laneData, source) {
-  const days = laneData?.days ?? []
-  const stats = []
-  for (const lane of laneData?.lanes ?? []) {
-    if (!LANE_IDS.includes(lane.key)) continue
-    const byDay = new Map()
-    lane.days?.forEach((cells, index) => {
-      const date = days[index]
-      if (!date || !Array.isArray(cells) || cells.length === 0) return
-      const bucket = {
-        date,
-        pass: 0,
-        fail: 0,
-        ignored: 0,
-        retries: 0,
-        durations: [],
-      }
-      for (const run of cells) {
-        const outcome = run?.outcome ?? run?.conclusion
-        if (outcome === 'success') bucket.pass += 1
-        else if (outcome === 'failure') bucket.fail += 1
-        else bucket.ignored += 1
-        if ((run?.attempt ?? 1) > 1) bucket.retries += 1
-        if (typeof run?.duration_s === 'number' && run.duration_s > 0) {
-          bucket.durations.push(run.duration_s)
-        }
-      }
-      byDay.set(date, bucket)
-    })
-    if (byDay.size === 0) continue
-    stats.push({
-      category: LANE_TO_COLUMN[lane.key],
-      daily: [...byDay.values()].sort((a, b) => (a.date < b.date ? -1 : 1)),
-      link: `${source.boardBaseUrl}#ci`,
-    })
-  }
-  if (stats.length === 0) return null
-  // Lane order follows SD's own lane order.
-  const order = new Map(LANE_IDS.map((key, index) => [key, index]))
-  stats.sort((a, b) => order.get(a.category) - order.get(b.category))
-  const latest = laneData?.lanes?.find((l) => l.key === 'main') ??
-    laneData?.lanes?.find((l) => l.summary?.total)
-  const rate = latest?.summary?.success_rate
-  return {
-    name: laneData?.branch ?? source.defaultBranch,
-    gateStatus: rate == null ? 'passed' : rate >= 50 ? 'passed' : 'failed',
-    coverage: null,
-    stats,
   }
 }
 
@@ -350,6 +291,7 @@ function extractLaneBranches(snapshot) {
   }
   return branches
 }
+
 /** ---------- case counts (per test layer, same source as the SD board) ---------- */
 
 function matchesPattern(file, pattern) {
@@ -765,32 +707,51 @@ for (const source of config.sources ?? []) {
 
     if (source.type === 'status-board-lanes') {
       // Numbers come from the board's own lane data, so the dashboard shows
-      // exactly what the SD board shows.
+      // exactly what the source board shows.
       const snapshot = await loadSnapshot(source.url)
       const laneBranches = extractLaneBranches(snapshot)
-      let coverage = null
-      try {
-        coverage = await fetchCoverage(source)
-      } catch (error) {
-        console.warn(
-          `[gate] ${source.owner}/${source.name} coverage unavailable: ${error?.message ?? error}`
-        )
+      // The board may already publish coverage; use it before spending API
+      // calls on artifacts (private imported boards have no public token).
+      let coverage = snapshotCoverage(snapshot)
+      if (!coverage) {
+        try {
+          coverage = await fetchCoverage(source)
+        } catch (error) {
+          console.warn(
+            `[gate] ${source.owner}/${source.name} coverage unavailable: ${error?.message ?? error}`
+          )
+        }
       }
       let cases = {}
-      try {
-        const runs = await fetchRunsForCaseCounts(source, now)
-        cases = await collectCaseCounts(source, runs)
-      } catch (error) {
-        // Case counts are supplementary; a GitHub API hiccup must not block
-        // the lane data the board publishes.
-        console.warn(
-          `[gate] ${source.owner}/${source.name} case counts unavailable: ${error?.message ?? error}`
-        )
+      if ((source.caseLayers ?? []).length > 0) {
+        try {
+          const runs = await fetchRunsForCaseCounts(source, now)
+          cases = await collectCaseCounts(source, runs)
+        } catch (error) {
+          // Case counts are supplementary; a GitHub API hiccup must not block
+          // the lane data the board publishes.
+          console.warn(
+            `[gate] ${source.owner}/${source.name} case counts unavailable: ${error?.message ?? error}`
+          )
+        }
       }
+      const defaultGateMeta = boardGateMeta(
+        snapshot,
+        source.defaultBranch,
+        source.defaultBranch
+      )
       const branchData = laneBranches
         .map((lanes) => lanesToBranch(lanes, source))
         .filter(Boolean)
-        .map((branch) => attachCasesAndCoverage(branch, source, cases, coverage))
+        .map((branch) =>
+          attachCasesAndCoverage(
+            branch,
+            source,
+            cases,
+            coverage,
+            boardGateMeta(snapshot, branch.name, source.defaultBranch)
+          )
+        )
       writeJson(outPath, {
         id: source.id,
         name: source.name,
@@ -800,6 +761,12 @@ for (const source of config.sources ?? []) {
         generatedAt: now.toISOString(),
         sourceUrl: source.url,
         windowDays,
+        ...(source.boardUrl ? { boardUrl: source.boardUrl } : {}),
+        ...(defaultGateMeta?.level ? { level: defaultGateMeta.level } : {}),
+        ...(defaultGateMeta?.stage ? { stage: defaultGateMeta.stage } : {}),
+        ...(defaultGateMeta?.caseSummary
+          ? { caseSummary: defaultGateMeta.caseSummary }
+          : {}),
         branchData,
       })
       indexEntries.push({
@@ -809,6 +776,9 @@ for (const source of config.sources ?? []) {
         file,
         sourceUrl: source.url,
         windowDays,
+        ...(defaultGateMeta?.level ? { level: defaultGateMeta.level } : {}),
+        ...(defaultGateMeta?.stage ? { stage: defaultGateMeta.stage } : {}),
+        ...(source.boardUrl ? { boardUrl: source.boardUrl } : {}),
       })
       console.log(
         `[gate] ${source.owner}/${source.name}: ${branchData
