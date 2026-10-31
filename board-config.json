@@ -1,0 +1,31 @@
+{
+  "review_sla_days": 3,
+  "stale_days": 30,
+  "workflows": {
+    "gate": [
+      "^CI$",
+      "CI Gates",
+      "gate",
+      "门禁"
+    ],
+    "daily": [
+      "nightly",
+      "daily",
+      "每日"
+    ],
+    "release": [
+      "release",
+      "version",
+      "版本"
+    ]
+  },
+  "branch_lines": [],
+  "visibility": "private",
+  "deployments": {
+    "haowenz001/onboard-probe-private-2": {
+      "environment": "production",
+      "label": "onboard-probe-private-2",
+      "repository": "agent-CI-Infra/dashboard"
+    }
+  }
+}
