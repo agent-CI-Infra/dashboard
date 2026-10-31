@@ -65,6 +65,18 @@ class SyncTests(unittest.TestCase):
         (ROOT/'.tmp').mkdir(exist_ok=True)
         self.temp=tempfile.TemporaryDirectory(dir=ROOT/'.tmp');self.addCleanup(self.temp.cleanup)
         self.root=Path(self.temp.name)
+    def test_private_permission_comes_from_the_environment(self):
+        # The collector runs with GSB_ALLOW_PRIVATE=1 for private sources; the
+        # Sync guard must see it instead of the dataclass default.
+        self.root = tempfile.mkdtemp()
+        self.gh = Source()
+        with patch.dict('os.environ', {'GSB_ALLOW_PRIVATE': '1'}):
+            allowed = Sync(self.gh, Path(self.root), REPO, now=NOW, requests=4)
+        self.assertTrue(allowed.cfg.allow_private)
+        with patch.dict('os.environ', {'GSB_ALLOW_PRIVATE': '0'}):
+            denied = Sync(self.gh, Path(self.root), REPO, now=NOW, requests=4)
+        self.assertFalse(denied.cfg.allow_private)
+
     def persist(self, sync):
         for name,content in sync.files().items():
             path=self.root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(content)

@@ -97,7 +97,7 @@ class Sync:
         if self.state["schema"] != 1 or self.state["repository"].lower() != repo.lower():
             raise ValueError("sync state belongs to a different repository or schema")
         self.base = f"/repos/{repo}"
-        self.cfg = Config(repo=repo)
+        self.cfg = Config.from_env(repo=repo)
         self.tagged = TaggedStore(read_json(self.history.root / ".sync/tagged.json", None))
         if not self.state.get("migrated"):
             old = read_json(self.history.root / "site/data/snapshot.json", {})
