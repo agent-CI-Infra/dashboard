@@ -52,8 +52,8 @@
         ]
       },
       "branchLines": {
-        "main": "\u4e3b\u5e72",
-        "releases/v0.3.0.beta": "\u53d1\u5e03\u7ebf"
+        "main": "主干",
+        "releases/v0.3.0.beta": "发布线"
       },
       "boardBaseUrl": "https://sciencediscovery.github.io/github-status-board/",
       "coverageTab": "coverage",
@@ -177,6 +177,24 @@
       "url": "https://haowenz001.github.io/test-board/data/snapshot.json",
       "dashboardUrl": "https://haowenz001.github.io/test-board/",
       "boardUrl": "https://haowenz001.github.io/test-board/",
+      "channelMap": [
+        {
+          "channel": "gate",
+          "workflow": [
+            "CI"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "haowenz001/onboard-probe-private",
+      "name": "onboard-probe-private",
+      "owner": "haowenz001",
+      "defaultBranch": "main",
+      "type": "status-board-lanes",
+      "url": "https://agent-ci-infra.github.io/dashboard/boards/haowenz001/onboard-probe-private/data/snapshot.json",
+      "dashboardUrl": "https://agent-ci-infra.github.io/dashboard/boards/haowenz001/onboard-probe-private/",
+      "boardUrl": "https://agent-ci-infra.github.io/dashboard/boards/haowenz001/onboard-probe-private/",
       "channelMap": [
         {
           "channel": "gate",
