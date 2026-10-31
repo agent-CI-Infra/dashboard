@@ -13,10 +13,7 @@ import { LanguageSwitch } from '@/components/language-switch'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ThemeSwitch } from '@/components/theme-switch'
-import {
-  ChartLayoutGrid,
-  type ChartLayout,
-} from './components/chart-layout'
+import { ChartLayoutGrid, type ChartLayout } from './components/chart-layout'
 import { MonitorHeader } from './components/monitor-header'
 import { MonitorTable } from './components/monitor-table'
 import { RepoFilter } from './components/repo-filter'
