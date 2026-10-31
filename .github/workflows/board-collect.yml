@@ -3,6 +3,10 @@ name: Collect board data
 # Refresh every `board/<owner>/<repo>` data branch. A board branch contains
 # only board-config.json, site/data/ and .sync/; the collector code stays on
 # main and is copied into the branch checkout for each run.
+#
+# Public sources are read with the workflow token. Private sources are read
+# with the single read-only PRIVATE_SOURCE_TOKEN repository secret; publishing
+# to the board branch always uses the workflow token.
 
 on:
   schedule:
@@ -87,13 +91,98 @@ jobs:
           ref: ${{ matrix.branch }}
           path: board
 
+      # Kept as its own step so a failed run can be recognised (by name) as a
+      # missing dashboard secret rather than a bad source or token.
+      - name: Check PRIVATE_SOURCE_TOKEN
+        env:
+          PRIVATE_TOKEN: ${{ secrets.PRIVATE_SOURCE_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          try:
+              config = json.loads(Path("board/board-config.json").read_text(encoding="utf-8"))
+          except (OSError, ValueError):
+              config = {}
+          if str(config.get("visibility", "")).lower() == "private" and not os.environ.get("PRIVATE_TOKEN", "").strip():
+              print(
+                  "::error title=PRIVATE_SOURCE_TOKEN missing::"
+                  "This private board needs the dashboard repository secret PRIVATE_SOURCE_TOKEN "
+                  "(a read-only token for the private source). Add it once under Settings -> "
+                  "Secrets and variables -> Actions, then re-run this workflow.",
+                  file=sys.stderr,
+              )
+              sys.exit(1)
+          PY
+
       - name: Validate source repository
+        id: source
         env:
           GH_TOKEN: ${{ github.token }}
+          PRIVATE_TOKEN: ${{ secrets.PRIVATE_SOURCE_TOKEN }}
           SOURCE: ${{ matrix.board }}
         run: |
-          meta=$(gh api "repos/$SOURCE")
-          printf '%s' "$meta" | python3 -c 'import json,sys; meta=json.load(sys.stdin); sys.exit(1) if meta.get("private") or meta.get("visibility","public") != "public" else print(meta["full_name"])'
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os, subprocess, sys
+          from pathlib import Path
+
+          source = os.environ["SOURCE"]
+          private_token = (os.environ.get("PRIVATE_TOKEN") or "").strip()
+          public_token = (os.environ.get("GH_TOKEN") or "").strip()
+
+          try:
+              config = json.loads(Path("board/board-config.json").read_text(encoding="utf-8"))
+          except (OSError, ValueError):
+              config = {}
+          visibility = str(config.get("visibility") or "").strip().lower()
+
+          def fail(message):
+              print(f"::error::{message}", file=sys.stderr)
+              raise SystemExit(1)
+
+          def read(token):
+              env = dict(os.environ, GH_TOKEN=token, GITHUB_TOKEN=token)
+              proc = subprocess.run(
+                  ["gh", "api", f"repos/{source}"],
+                  env=env, capture_output=True, text=True,
+              )
+              if proc.returncode != 0:
+                  return None
+              try:
+                  return json.loads(proc.stdout)
+              except ValueError:
+                  return None
+
+          if visibility == "private":
+              if not private_token:
+                  fail(f"{source} is recorded as private and needs the dashboard repository secret PRIVATE_SOURCE_TOKEN")
+              meta = read(private_token)
+              if not meta:
+                  fail(f"PRIVATE_SOURCE_TOKEN cannot read private source {source}; check that the token is valid and has access")
+          elif visibility == "public":
+              meta = read(public_token)
+              if not meta:
+                  fail(f"board-config.json records {source} as public, but the workflow token cannot read it; recreate the board")
+              if meta.get("private") or meta.get("visibility", "public") != "public":
+                  fail(f"board-config.json records {source} as public, but it is not public; recreate the board")
+          else:
+              # Older boards have no visibility. Probe public first, then the
+              # private token, so validation still accepts exactly the two
+              # allowed cases.
+              meta = read(public_token)
+              if meta and not meta.get("private") and meta.get("visibility", "public") == "public":
+                  visibility = "public"
+              else:
+                  if not private_token:
+                      fail(f"{source} is not public and the dashboard repository secret PRIVATE_SOURCE_TOKEN is not set")
+                  meta = read(private_token)
+                  if not meta:
+                      fail(f"{source} is neither a public repository nor a private repository readable with PRIVATE_SOURCE_TOKEN")
+                  visibility = "private"
+
+          print(f"visibility={visibility}")
+          print(f"full_name={meta.get('full_name') or source}")
+          PY
 
       - name: Prepare collector
         run: |
@@ -102,7 +191,12 @@ jobs:
 
       - name: Collect and publish
         env:
+          # Source reads: the private token for private boards, otherwise the
+          # workflow token. Publishing always uses GSB_PUBLISH_TOKEN below.
+          SOURCE_TOKEN: ${{ steps.source.outputs.visibility == 'private' && secrets.PRIVATE_SOURCE_TOKEN || '' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GSB_PUBLISH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GSB_ALLOW_PRIVATE: ${{ steps.source.outputs.visibility == 'private' && '1' || '0' }}
           SOURCE: ${{ matrix.board }}
           BRANCH: ${{ matrix.branch }}
         run: |
@@ -115,4 +209,5 @@ jobs:
             --publish-repo "${{ github.repository }}" \
             --branch "$BRANCH" \
             --incremental \
-            --publish-data-only
+            --publish-data-only \
+            --source-token-env SOURCE_TOKEN

@@ -9,9 +9,11 @@
  *     site/data/...       snapshot, history, E2E index
  *     .sync/...           incremental state
  *
- * A board whose source repository cannot be collected publicly may instead be
- * imported as a static snapshot. Imported branches are listed in
- * config/imported-boards.json and do not need the board/<owner>/<repo> name.
+ * Boards may collect public or private sources (the latter read with the
+ * dashboard's PRIVATE_SOURCE_TOKEN); either way only site/data/ is published.
+ * A board with an existing independent snapshot can instead be imported from
+ * config/imported-boards.json; imported branches do not need the
+ * board/<owner>/<repo> name.
  *
  * GitHub Pages can only deploy one site per repository, so branches are not
  * independent sites. This script extracts the data from every board branch,

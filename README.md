@@ -2,7 +2,7 @@
 
 > **这是多个代码仓的公共 Dashboard，也是单仓看板的托管入口。**
 >
-> 它聚合展示多个社区的规模、活跃度、健康度和质量门禁；单个仓库的深度视图由本仓的数据分支托管，统一发布在 `/boards/<owner>/<repo>/`。公开源仓走 `board/*` 自动采集；私仓或已有独立 board 走“公开快照 + 镜像分支”。
+> 它聚合展示多个社区的规模、活跃度、健康度和质量门禁；单个仓库的深度视图由本仓的数据分支托管，统一发布在 `/boards/<owner>/<repo>/`。公开和私有源仓都走 `board/*` 自动采集；私有源仓由本仓一次性配置的只读 secret `PRIVATE_SOURCE_TOKEN` 读取。已有独立 board 的仓走“公开快照 + 镜像分支”。
 
 **入口：**
 
@@ -25,11 +25,11 @@
 
 ### 1.1 三个层次
 
-| 层     | 仓库                                                                          | 负责                                                                         | 不负责                      |
-| ------ | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | --------------------------- |
-| CI 层  | [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow) | CI workflow（含门禁）模板、`gate.mjs`、报告/用例 schema、starter、`AGENT.md` | Dashboard UI、站点发布      |
-| 单仓层 | **本仓** [`single-repo/`](single-repo/) + `board/*` / 导入分支                | 单仓采集器、分支托管、静态导入、`/boards/` 页面、私仓本地模式                | 跨仓聚合、门禁协议定义      |
-| 汇总层 | **本仓** `agent-CI-Infra/dashboard`                                           | 多仓聚合、`/gate`、Deploy 汇总、公开 Pages、接入入口                         | 执行用户 CI、保存私仓 token |
+| 层     | 仓库                                                                          | 负责                                                                         | 不负责                          |
+| ------ | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------- |
+| CI 层  | [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow) | CI workflow（含门禁）模板、`gate.mjs`、报告/用例 schema、starter、`AGENT.md` | Dashboard UI、站点发布          |
+| 单仓层 | **本仓** [`single-repo/`](single-repo/) + `board/*` / 导入分支                | 单仓采集器、分支托管、静态导入、`/boards/` 页面、私有源只读采集              | 跨仓聚合、门禁协议定义          |
+| 汇总层 | **本仓** `agent-CI-Infra/dashboard`                                           | 多仓聚合、`/gate`、Deploy 汇总、公开 Pages、接入入口、`PRIVATE_SOURCE_TOKEN` | 执行用户 CI、保存逐仓私仓 token |
 
 ```text
 用户源仓
@@ -64,15 +64,15 @@ board 仓采集 ─► 公开 snapshot ─► dashboard 导入分支（如 digit
 - 本仓已经有 15 个社区的指标采集和公开 Dashboard。
 - 本仓已经支持 `board-summary` 和 `status-board-lanes` 两种门禁来源；`CI-workflow` 直连 artifact 适配器尚未实现。
 - CI workflow（含门禁）模板已经迁到 [`agent-CI-Infra/CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow)，本仓不再保留 `templates/ci-gates`。
-- 单仓看板不再要求复制模板或新建看板仓：公开源仓由本仓 `board/<owner>/<repo>` 分支托管，`Deploy` 汇总发布到 `/boards/<owner>/<repo>/`。
-- 私有源仓默认只在本地运行 `single-repo/` 采集器，不进入公开 Dashboard；只有在源仓所有者明确同意公开 snapshot 时，才可通过 [`config/imported-boards.json`](config/imported-boards.json) 登记为静态导入看板。`board-collect` 不直接采集它；`mirror-digitalmate.yml` 每小时从公开快照镜像更新。
+- 单仓看板不再要求复制模板或新建看板仓：公开和私有源仓都由本仓 `board/<owner>/<repo>` 分支托管，`Deploy` 汇总发布到 `/boards/<owner>/<repo>/`。
+- 私有源仓与公开源仓共用同一套分支；采集时由本仓一次性配置的只读 secret `PRIVATE_SOURCE_TOKEN` 读取，发布分支仍用本仓自己的令牌。已有独立 board、希望继续用公开快照的仓，也可通过 [`config/imported-boards.json`](config/imported-boards.json) 登记为静态导入看板；`mirror-digitalmate.yml` 每小时从公开快照镜像更新。
 - **命名兼容**：仓名已改为 `CI-workflow`；协议标识 `ci-gates/*`、artifact `ci-gates-reports`、配置 `.github/ci-gates.json` 暂保持不变，避免已接入仓失效。
 
 ---
 
 ## 二、如何接入
 
-接入分三条路径。公开采集要求源仓是 **public**；private 源仓默认只做本地看板，只有所有者明确同意公开 snapshot 时才走静态导入。
+接入分三条路径。单仓看板对公开和私有源仓都适用；私有源仓只要求本仓一次性配置只读 secret `PRIVATE_SOURCE_TOKEN`，不需要逐仓 secret。已有独立 board 的仓可以继续走静态导入。
 
 ### 2.1 只接入社区指标（不接门禁）
 
@@ -123,12 +123,14 @@ cp -R /tmp/ci-workflow/template/test/. ./test/
 
 #### 第二步：创建单仓看板（自动化托管）
 
-**不需要复制 `single-repo/`，也不需要新建 `owner/repo-board` 仓。** 维护者在本仓操作。按源仓可见性分两种模式：
+**不需要复制 `single-repo/`，也不需要新建 `owner/repo-board` 仓。** 维护者在本仓操作。按是否有独立 board 分两种模式：
 
-**A. 公开源仓：全自动**
+**A. 公开 / 私有源仓：全自动**
+
+私有源仓在运行前，由本仓维护者一次性添加 repository secret `PRIVATE_SOURCE_TOKEN`（Settings → Secrets and variables → Actions）：只需能只读访问源仓，不要给写权限，所有私有源仓共用。`board-config.json` 会记录 `visibility`，采集器据此选择 workflow 令牌或该 secret。
 
 1. **Actions → Create board → Run workflow**：
-   - `source_repository`：要展示的公开源仓，例如 `owner/service`；
+   - `source_repository`：要展示的源仓，例如 `owner/service`；
    - `config_json`（可选）：
 
      ```json
@@ -148,11 +150,11 @@ cp -R /tmp/ci-workflow/template/test/. ./test/
    https://agent-ci-infra.github.io/dashboard/boards/owner/service/
    ```
 
-数据分支只放 `board-config.json`、`site/data/` 和 `.sync/`，采集器代码始终来自 `main`。GitHub Pages 一个仓只能发布一个站点，所以分支不是独立站点；`Deploy` 会把所有分支汇总到同一个 Pages artifact。
+数据分支只放 `board-config.json`、`site/data/` 和 `.sync/`，采集器代码始终来自 `main`。私有源仓的看板分支也只发布 `site/data/` 快照，不包含源码或凭据。GitHub Pages 一个仓只能发布一个站点，所以分支不是独立站点；`Deploy` 会把所有分支汇总到同一个 Pages artifact。
 
-**B. 私仓 / 已有独立 board：静态导入 + 自动镜像**
+**B. 已有独立 board：静态导入 + 自动镜像**
 
-适用：源仓是 private，但已经有一个独立 board 仓在采集并发布公开 snapshot（DigitalMate 就是这个模式）。**不要让本仓直接采集私仓，也不要把私仓 token 放进本仓。**
+适用：源仓已经有一个独立 board 仓在采集并发布公开 snapshot（DigitalMate 就是这个模式），希望继续沿用。也可以直接用上面的 A 模式让本仓采集私仓。
 
 1. 确认 board 仓是 public，且它的 `site/data/snapshot.json` 可以匿名访问。
 2. 在 [`config/imported-boards.json`](config/imported-boards.json) 登记一条：
@@ -180,23 +182,23 @@ cp -R /tmp/ci-workflow/template/test/. ./test/
    https://agent-ci-infra.github.io/dashboard/boards/<owner>/<repo>/
    ```
 
-私仓默认仍然只在本地运行：
+私有源仓仍可只在本地运行（不发布到 Pages）：
 
 ```bash
 GSB_ALLOW_PRIVATE=1 python3 publish.py --repo owner/private-repo
 python3 server.py
 ```
 
-只有所有者明确同意公开 snapshot 时，才走上面的 B 流程；本仓不保存私仓 token。
+走 A 模式时，本仓只保存一次性配置的只读 secret `PRIVATE_SOURCE_TOKEN`，不保存逐仓 token；看板分支只发布 `site/data/` 数据。
 
 **工作流分工：**
 
-| 工作流                   | 触发                                | 职责                                                  |
-| ------------------------ | ----------------------------------- | ----------------------------------------------------- |
-| `Create board`           | 手动                                | 校验公开源仓，创建 `board/<owner>/<repo>` 数据分支    |
-| `Collect board data`     | 定时 + 手动                         | 采集公开源仓，写回 `board/*`，再触发 Deploy           |
-| `mirror-digitalmate`     | 每小时 + 手动                       | 从 board 仓公开 snapshot 更新导入分支，再触发 Deploy  |
-| `Deploy to GitHub Pages` | push main、定时、workflow_run、手动 | Vite 构建 + 汇总所有数据分支，发布一个 Pages artifact |
+| 工作流                   | 触发                                | 职责                                                                                        |
+| ------------------------ | ----------------------------------- | ------------------------------------------------------------------------------------------- |
+| `Create board`           | 手动                                | 校验公开/私有源仓，创建 `board/<owner>/<repo>` 数据分支                                     |
+| `Collect board data`     | 定时 + 手动                         | 公开源用 workflow 令牌、私有源用 `PRIVATE_SOURCE_TOKEN` 采集，写回 `board/*`，再触发 Deploy |
+| `mirror-digitalmate`     | 每小时 + 手动                       | 从 board 仓公开 snapshot 更新导入分支，再触发 Deploy                                        |
+| `Deploy to GitHub Pages` | push main、定时、workflow_run、手动 | Vite 构建 + 汇总所有数据分支，发布一个 Pages artifact                                       |
 
 #### 第三步：让公共 Dashboard 收录门禁数据
 
@@ -351,10 +353,10 @@ npm run collect
 
 ## 七、安全边界
 
-- 公共 Dashboard 只展示公开数据；私仓不要配置公开 snapshot/summary。
-- 私仓 Dashboard 使用本机/私有部署，不发布到公开 GitHub Pages。
+- 公共 Dashboard 只展示看板数据：私有源仓的 `board/<owner>/<repo>` 分支只允许 `site/data/` 快照与静态资源，不含源码、日志、token 或 `.sync/`；`Deploy` 在上传 artifact 前会检查这一点。
+- 私有源仓的读取统一使用本仓一次性配置的只读 secret `PRIVATE_SOURCE_TOKEN`，不按源仓保存 token。
 - 不把 token、PAT、私钥写入仓库或配置。
-- 接入配置只接受受 schema 约束的公开 summary，不接受任意 gate JSON 或任意 URL。
+- 接入配置只接受受 schema 约束的 summary，不接受任意 gate JSON 或任意 URL。
 
 ---
 

@@ -74,6 +74,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/assemble-boards.mjs
 
+      - name: Verify boards publish only data
+        # Private boards use the same public Pages site, so a board branch may
+        # publish only site/data/ plus the static board assets. board-config.json,
+        # .sync/ and any source file must never reach the artifact.
+        run: |
+          set -euo pipefail
+          [ -d dist/boards ] || exit 0
+          if find dist/boards -type f \( -name 'board-config.json' -o -path '*/.sync/*' -o -name '*.py' -o -name '*.env' -o -name '*.pem' \) -print -quit | grep -q .; then
+            echo "::error::board output contains files that are not public board data"
+            exit 1
+          fi
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 

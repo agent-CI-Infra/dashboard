@@ -32,12 +32,17 @@ def deployment_for(repo, settings, target=None):
     return deployment
 
 
-def ensure_public_repository(gh, repository, *, role="repository"):
+def ensure_repository(gh, repository, *, role="repository"):
+    """Validate the owner/repository spelling and that the token can read it."""
     if not REPO_RE.fullmatch(repository):
         raise ValueError(f"invalid {role}: {repository!r}")
-    meta = gh.get(f"/repos/{repository}")
+    return gh.get(f"/repos/{repository}")
+
+
+def ensure_public_repository(gh, repository, *, role="repository"):
+    meta = ensure_repository(gh, repository, role=role)
     if meta.get("private") or meta.get("visibility", "public") != "public":
-        raise ValueError(f"{role} must be public; private boards are local-only")
+        raise ValueError(f"{role} must be public; the publishing target is a public Pages repository")
 
 
 def export_site(output, snapshot):
@@ -154,17 +159,25 @@ def main():
     parser.add_argument("--publish-data-only", action="store_true",
                         help="publish only board data; static assets come from main at deploy time")
     parser.add_argument("--request-budget", type=int, default=180)
+    parser.add_argument("--source-token-env", default="SOURCE_TOKEN",
+                        help="environment variable holding the source read token; empty falls back to discover_token()")
     args = parser.parse_args()
-    token, _ = discover_token()
-    publish_token = os.environ.get("GSB_PUBLISH_TOKEN", "").strip() or token
+    source_env = os.environ.get(args.source_token_env, "").strip()
+    token = source_env or discover_token()[0]
+    # Publishing always uses its own token, never the private source read token.
+    publish_token = os.environ.get("GSB_PUBLISH_TOKEN", "").strip() or (None if source_env else token)
     gh = GitHub(token, timeout=30)
+    publisher = gh if publish_token and publish_token == token else (GitHub(publish_token, timeout=30) if publish_token else None)
     phase = "collect"
     try:
         settings = json.loads(Path(args.settings).read_text())
         deployment = deployment_for(args.repo, settings, args.publish_repo)
         if args.publish_repo:
-            ensure_public_repository(gh, args.repo, role="source repository")
-            ensure_public_repository(gh, args.publish_repo, role="publishing target")
+            # A private source is allowed; only the Pages target has to be public.
+            ensure_repository(gh, args.repo, role="source repository")
+            if publisher is None:
+                raise ValueError("publishing requires a token")
+            ensure_public_repository(publisher, args.publish_repo, role="publishing target")
         sync = records = None
         if args.incremental:
             from gsb.sync import Sync
@@ -191,7 +204,6 @@ def main():
             phase = "publish"
             if not publish_token:
                 raise ValueError("publishing requires a token")
-            publisher = GitHub(publish_token, timeout=30)
             if sync:
                 from gsb.history import encode
                 files = sync.files()
