@@ -42,9 +42,7 @@ function DraggableChart({ item }: { item: ChartItem }) {
             }
           : undefined
       }
-      className={cn(
-        isDragging ? 'relative z-10 opacity-90' : 'opacity-100'
-      )}
+      className={cn(isDragging ? 'relative z-10 opacity-90' : 'opacity-100')}
     >
       <ChartCard
         title={item.title}

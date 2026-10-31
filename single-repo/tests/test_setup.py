@@ -22,6 +22,13 @@ class SetupConfigTests(unittest.TestCase):
             }
         })
         self.assertEqual(config["branch_lines"], [])
+        self.assertEqual(config["visibility"], "public")
+
+    def test_visibility_is_recorded_for_the_collector(self):
+        private = setup.build_config("owner/source", "owner/board", {}, "private")
+        self.assertEqual(private["visibility"], "private")
+        with self.assertRaises(SystemExit):
+            setup.build_config("owner/source", "owner/board", {}, "internal")
 
     def test_custom_json_is_validated_and_kept(self):
         raw = {

@@ -1,8 +1,8 @@
 # 单仓 / 私仓 Dashboard 采集器
 
 > 本目录是 `agent-CI-Infra/dashboard` 内的**单仓采集器 + 静态站点**。
-> 公开源仓由公仓的分支统一托管，**不需要复制本目录，也不需要新建看板仓**；
-> 私有源仓只在本机运行，不发布到公开 Pages。
+> 公开和私有源仓都由公仓的分支统一托管，**不需要复制本目录，也不需要新建看板仓**；
+> 私有源仓只多一个 dashboard 仓库级只读 secret `PRIVATE_SOURCE_TOKEN`。
 
 ## 链接
 
@@ -14,7 +14,7 @@
 
 ## 公仓托管（推荐）
 
-公开源仓的单仓看板直接放在本仓，一个源仓对应一个数据分支：
+公开和私有源仓的单仓看板直接放在本仓，一个源仓对应一个数据分支：
 
 ```text
 agent-CI-Infra/dashboard
@@ -27,8 +27,9 @@ agent-CI-Infra/dashboard
 
 维护者只需要：
 
-1. 在源仓接入 [`CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow)。
-2. 在本仓 **Actions → Create board** 填源仓 `owner/repository`，可选填配置 JSON：
+1. 私有源仓：在本仓 Settings → Secrets and variables → Actions 添加一次只读 repository secret `PRIVATE_SOURCE_TOKEN`，所有私有源仓共用；公开源仓跳过。
+2. 在源仓接入 [`CI-workflow`](https://github.com/agent-CI-Infra/CI-workflow)。
+3. 在本仓 **Actions → Create board** 填源仓 `owner/repository`，可选填配置 JSON：
 
    ```json
    {
@@ -40,7 +41,7 @@ agent-CI-Infra/dashboard
    }
    ```
 
-3. 等待 `Collect board data` 完成，再等待 `Deploy to GitHub Pages`，打开：
+4. 等待 `Collect board data` 完成，再等待 `Deploy to GitHub Pages`，打开：
 
    ```text
    https://agent-ci-infra.github.io/dashboard/boards/owner/repo/
@@ -48,17 +49,17 @@ agent-CI-Infra/dashboard
 
 工作流分工：
 
-- `board-create.yml` 创建 `board/<owner>/<repo>` 分支，并触发首次采集；
-- `board-collect.yml` 每天把采集结果写回对应分支（`--publish-data-only`，不写静态资源），分支之间互不影响；
-- `deploy.yml` 在构建公共 Dashboard 后，把所有分支的 `site/data/` 汇总到 `/boards/<owner>/<repo>/`。
+- `board-create.yml` 创建 `board/<owner>/<repo>` 分支，把 `visibility` 写进 `board-config.json`，并触发首次采集；
+- `board-collect.yml` 每天把采集结果写回对应分支（`--publish-data-only`，不写静态资源）；公开源用 workflow 令牌，私有源用 `PRIVATE_SOURCE_TOKEN`，发布始终用本仓令牌；
+- `deploy.yml` 在构建公共 Dashboard 后，把所有分支的 `site/data/` 汇总到 `/boards/<owner>/<repo>/`，并检查私有看板只发布数据。
 
-GitHub Pages 一个仓只能发布一个站点，所以**分支本身不是站点**；分支只存数据，由 `main` 上的 Deploy 统一发布。不要手动修改数据分支，也不要把私仓数据写进去。
+GitHub Pages 一个仓只能发布一个站点，所以**分支本身不是站点**；分支只存数据，由 `main` 上的 Deploy 统一发布。不要手动修改数据分支，也不要把源码或凭据写进去。
 
 已知限制：当前汇总部署不附带 E2E HTML 报告产物，页面会回退到源仓 artifact 链接；后续可把各 board 的 `e2e-html` 产物一起汇总。
 
-## 本地 / 私仓
+## 本地运行
 
-私有源仓不进入公开 Dashboard，也不创建 `board/*` 分支。克隆本仓后直接在 `single-repo/` 运行：
+私有源仓也可以不发布到 Pages，只在本机运行。克隆本仓后直接在 `single-repo/` 运行：
 
 ```bash
 cd single-repo
@@ -66,7 +67,7 @@ GSB_ALLOW_PRIVATE=1 GITHUB_TOKEN=... python3 publish.py --repo owner/private-rep
 python3 server.py
 ```
 
-浏览器打开 <http://127.0.0.1:8790/>。`publish.py` 默认输出到 `dist/`；`--publish-repo` 只允许公开源仓发布到公开目标，私仓会被拒绝。
+浏览器打开 <http://127.0.0.1:8790/>。`publish.py` 默认输出到 `dist/`。远程发布时源仓读取令牌和发布令牌分开：`--source-token-env SOURCE_TOKEN` 指定读取私有源的环境变量，`GSB_PUBLISH_TOKEN` 必须单独提供发布令牌；发布目标仍然必须是公开 Pages 仓。
 
 公开源仓也可以本地预览：
 

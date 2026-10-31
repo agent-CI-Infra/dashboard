@@ -11,12 +11,15 @@ from publish import export_site, publish, publish_batch, deployment_for, ROOT
 class DeploymentTests(unittest.TestCase):
     def test_cli_separates_source_and_destination_credentials(self):
         import publish as publisher
-        from types import SimpleNamespace
         class PublicSource:
             token = 'read-token'
             def get(self, path):
                 return {'private': False, 'visibility': 'public'}
-        source, destination = PublicSource(), SimpleNamespace(token='write-token')
+        class PublicDestination:
+            token = 'write-token'
+            def get(self, path):
+                return {'private': False, 'visibility': 'public'}
+        source, destination = PublicSource(), PublicDestination()
         with patch('sys.argv',['publish.py','--repo','example/source','--publish-repo','example/board']), \
              patch.dict('os.environ',{'GSB_PUBLISH_TOKEN':'write-token'}), \
              patch.object(publisher,'discover_token',return_value=('read-token','env')), \
@@ -29,15 +32,47 @@ class DeploymentTests(unittest.TestCase):
         self.assertIs(commit.call_args.args[0],destination)
         self.assertEqual(commit.call_args.kwargs['source_token'],'read-token')
 
-    def test_private_source_is_rejected_before_publishing(self):
+    def test_private_source_is_read_with_its_own_token_before_publishing(self):
         import publish as publisher
         class PrivateSource:
-            token = 'read-token'
+            token = 'private-read-token'
+            def get(self, path):
+                return {'private': True, 'visibility': 'private'} if path.endswith('/source') else {'private': False, 'visibility': 'public'}
+        class PublicDestination:
+            token = 'write-token'
+            def get(self, path):
+                return {'private': False, 'visibility': 'public'}
+        source, destination = PrivateSource(), PublicDestination()
+        with patch('sys.argv',['publish.py','--repo','example/source','--publish-repo','example/board',
+                               '--source-token-env','SOURCE_TOKEN']), \
+             patch.dict('os.environ',{'SOURCE_TOKEN':'private-read-token','GSB_PUBLISH_TOKEN':'write-token'}), \
+             patch.object(publisher,'discover_token',side_effect=AssertionError('source token must be explicit')), \
+             patch.object(publisher,'GitHub',side_effect=[source,destination]), \
+             patch.object(publisher,'build_project',return_value={'generated_at':'now'}) as build, \
+             patch.object(publisher,'export_site'), \
+             patch.object(publisher,'publish',return_value='a'*40) as commit, patch('builtins.print'):
+            self.assertEqual(publisher.main(),0)
+        self.assertIs(build.call_args.args[0],source)
+        self.assertIs(commit.call_args.args[0],destination)
+        self.assertEqual(commit.call_args.kwargs['source_token'],'private-read-token')
+
+    def test_private_source_cannot_publish_without_a_separate_publish_token(self):
+        import publish as publisher
+        from types import SimpleNamespace
+        class PrivateSource:
+            token = 'private-read-token'
             def get(self, path):
                 return {'private': True, 'visibility': 'private'}
-        with patch('sys.argv',['publish.py','--repo','example/source','--publish-repo','example/board']), \
-             patch.object(publisher,'discover_token',return_value=('read-token','env')), \
-             patch.object(publisher,'GitHub',return_value=PrivateSource()), \
+        class PublicDestination:
+            token = ''
+            def get(self, path):
+                return {'private': False, 'visibility': 'public'}
+        with patch('sys.argv',['publish.py','--repo','example/source','--publish-repo','example/board',
+                               '--source-token-env','SOURCE_TOKEN']), \
+             patch.dict('os.environ',{'SOURCE_TOKEN':'private-read-token'},clear=True), \
+             patch.object(publisher,'GitHub',side_effect=[PrivateSource(),PublicDestination()]), \
+             patch.object(publisher,'build_project',return_value={'generated_at':'now'}), \
+             patch.object(publisher,'export_site'), \
              patch.object(publisher,'publish') as commit, patch('builtins.print'):
             self.assertEqual(publisher.main(),1)
         commit.assert_not_called()
