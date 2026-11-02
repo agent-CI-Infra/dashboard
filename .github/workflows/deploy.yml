@@ -44,7 +44,9 @@ jobs:
         # GitHub data. The collector degrades gracefully: on failure it keeps
         # the previously published values instead of overwriting them.
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Read-only token for the private monitored repos (reuses the existing
+          # PRIVATE_SOURCE_TOKEN secret; unset => public repos only).
+          MONITOR_TOKEN: ${{ secrets.PRIVATE_SOURCE_TOKEN }}
           # Monitored repos default to the keys of config/internal-contributors.json.
           # Set a repository variable only to override that list.
           MONITOR_REPOS: ${{ vars.MONITOR_REPOS }}
