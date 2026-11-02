@@ -19,6 +19,13 @@ const INTERNAL_CONTRIBUTORS_FILE = path.join(
   'internal-contributors.json'
 )
 
+/** Manual release metadata (homepage + promo videos), keyed by `owner/name`. */
+const RELEASE_OVERRIDES_FILE = path.join(
+  process.cwd(),
+  'config',
+  'release-overrides.json'
+)
+
 function splitList(value) {
   if (!value) return []
   return value
@@ -60,6 +67,41 @@ function loadInternalContributors() {
  */
 export function internalContributorsFor(config, fullName) {
   return config.internalContributors[fullName] ?? []
+}
+
+/**
+ * Manual release metadata read from `config/release-overrides.json`:
+ * `{ "owner/name": { "homepage": "https://...", "videos": { "v1.0.0": "https://..." } } }`.
+ * The homepage overrides the GitHub repository value; videos are keyed by tag.
+ *
+ * @returns {Record<string, { homepage?: string, videos?: Record<string, string> }>}
+ */
+export function loadReleaseOverrides() {
+  if (!existsSync(RELEASE_OVERRIDES_FILE)) return {}
+  try {
+    const parsed = JSON.parse(readFileSync(RELEASE_OVERRIDES_FILE, 'utf8'))
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
+    /** @type {Record<string, { homepage?: string, videos?: Record<string, string> }>} */
+    const out = {}
+    for (const [repo, entry] of Object.entries(parsed)) {
+      if (!entry || typeof entry !== 'object' || Array.isArray(entry)) continue
+      /** @type {{ homepage?: string, videos?: Record<string, string> }} */
+      const override = {}
+      if (typeof entry.homepage === 'string' && entry.homepage) {
+        override.homepage = entry.homepage
+      }
+      if (entry.videos && typeof entry.videos === 'object' && !Array.isArray(entry.videos)) {
+        override.videos = {}
+        for (const [tag, url] of Object.entries(entry.videos)) {
+          if (typeof url === 'string' && url) override.videos[tag] = url
+        }
+      }
+      out[repo] = override
+    }
+    return out
+  } catch {
+    return {}
+  }
 }
 
 /** @returns {{ owner: string, name: string, fullName: string }} */
@@ -126,5 +168,6 @@ export function loadConfig(outDir) {
     outDir: outDir,
     maxListPages: Number(process.env.MONITOR_MAX_LIST_PAGES ?? 20),
     schemaVersion: 1,
+    releaseOverrides: loadReleaseOverrides(),
   }
 }

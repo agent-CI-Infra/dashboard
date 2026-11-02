@@ -27,8 +27,8 @@ export function TimeRangeFilter({
   return (
     <div
       className={cn(
-        'inline-flex flex-wrap items-center rounded-lg border',
-        lg ? 'gap-1.5 p-1.5' : 'gap-1 p-1',
+        'inline-flex items-center rounded-lg border',
+        lg ? 'h-9 gap-1.5 p-1' : 'gap-1 p-1',
         className
       )}
     >
@@ -38,7 +38,7 @@ export function TimeRangeFilter({
           type='button'
           size='sm'
           variant={range === key ? 'secondary' : 'ghost'}
-          className={lg ? 'h-9 px-5 text-sm' : 'h-7 px-2.5 text-xs'}
+          className={lg ? 'h-full px-5 text-sm' : 'h-7 px-2.5 text-xs'}
           onClick={() => onChange({ ...value, range: key })}
         >
           {TIME_RANGE_LABELS[key]}

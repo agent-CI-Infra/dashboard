@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   LineChart,
   ShieldCheck,
+  Tags,
   Users,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
@@ -51,6 +52,11 @@ export const sidebarData: SidebarData = {
               title: '社区成长',
               url: '/growth',
               icon: LineChart,
+            },
+            {
+              title: '版本管理',
+              url: '/versions',
+              icon: Tags,
             },
             {
               title: '生态影响力',

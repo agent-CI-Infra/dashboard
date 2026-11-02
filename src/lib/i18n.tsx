@@ -24,6 +24,7 @@ const DICT = {
   'nav.community.issues': { zh: 'Issues', en: 'Issues' },
   'nav.community.contributors': { zh: '贡献者', en: 'Contributors' },
   'nav.community.growth': { zh: '社区成长', en: 'Growth' },
+  'nav.community.versions': { zh: '版本管理', en: 'Versions' },
   'nav.community.ecosystem': { zh: '生态影响力', en: 'Ecosystem' },
   'nav.about': { zh: '关于本站', en: 'About' },
   'nav.qualityGates': { zh: '质量门禁', en: 'Quality Gates' },

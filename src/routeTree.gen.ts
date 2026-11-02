@@ -31,6 +31,7 @@ import { Route as AuthenticatedGrowthRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedIssuesRouteImport } from './routes/_authenticated/issues'
 import { Route as AuthenticatedPullsRouteImport } from './routes/_authenticated/pulls'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
+import { Route as AuthenticatedVersionsRouteImport } from './routes/_authenticated/versions'
 import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
 import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_authenticated/route'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
@@ -156,6 +157,11 @@ const AuthenticatedSettingsRouteRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedVersionsRoute = AuthenticatedVersionsRouteImport.update({
+  id: '/versions',
+  path: '/versions',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ClerkauthRouteRoute = ClerkauthRouteRouteImport.update({
   id: '/(auth)',
   getParentRoute: () => ClerkRouteRoute,
@@ -241,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/growth': typeof AuthenticatedGrowthRoute
   '/issues': typeof AuthenticatedIssuesRoute
   '/pulls': typeof AuthenticatedPullsRoute
+  '/versions': typeof AuthenticatedVersionsRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
@@ -272,6 +279,7 @@ export interface FileRoutesByTo {
   '/growth': typeof AuthenticatedGrowthRoute
   '/issues': typeof AuthenticatedIssuesRoute
   '/pulls': typeof AuthenticatedPullsRoute
+  '/versions': typeof AuthenticatedVersionsRoute
   '/': typeof AuthenticatedIndexRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -309,6 +317,7 @@ export interface FileRoutesById {
   '/_authenticated/growth': typeof AuthenticatedGrowthRoute
   '/_authenticated/issues': typeof AuthenticatedIssuesRoute
   '/_authenticated/pulls': typeof AuthenticatedPullsRoute
+  '/_authenticated/versions': typeof AuthenticatedVersionsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -345,6 +354,7 @@ export interface FileRouteTypes {
     | '/growth'
     | '/issues'
     | '/pulls'
+    | '/versions'
     | '/errors/$error'
     | '/settings/appearance'
     | '/clerk/sign-in'
@@ -376,6 +386,7 @@ export interface FileRouteTypes {
     | '/growth'
     | '/issues'
     | '/pulls'
+    | '/versions'
     | '/'
     | '/errors/$error'
     | '/settings/appearance'
@@ -412,6 +423,7 @@ export interface FileRouteTypes {
     | '/_authenticated/growth'
     | '/_authenticated/issues'
     | '/_authenticated/pulls'
+    | '/_authenticated/versions'
     | '/_authenticated/'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/appearance'
@@ -596,6 +608,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/versions': {
+      id: '/_authenticated/versions'
+      path: '/versions'
+      fullPath: '/versions'
+      preLoaderRoute: typeof AuthenticatedVersionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/clerk/(auth)': {
       id: '/clerk/(auth)'
       path: ''
@@ -709,6 +728,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGrowthRoute: typeof AuthenticatedGrowthRoute
   AuthenticatedIssuesRoute: typeof AuthenticatedIssuesRoute
   AuthenticatedPullsRoute: typeof AuthenticatedPullsRoute
+  AuthenticatedVersionsRoute: typeof AuthenticatedVersionsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
@@ -727,6 +747,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGrowthRoute: AuthenticatedGrowthRoute,
   AuthenticatedIssuesRoute: AuthenticatedIssuesRoute,
   AuthenticatedPullsRoute: AuthenticatedPullsRoute,
+  AuthenticatedVersionsRoute: AuthenticatedVersionsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,

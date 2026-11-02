@@ -8,7 +8,7 @@
  *   public/data/<owner>/<name>/meta.json          per-repo status & provenance
  *   public/data/<owner>/<name>/latest.json        per-repo cumulative snapshot
  *   public/data/<owner>/<name>/history.json       per-repo daily snapshots
- *   public/data/<owner>/<name>/{pulls,issues,contributors}.json
+ *   public/data/<owner>/<name>/{pulls,issues,contributors,releases}.json
  *
  * Design rules (see the task spec):
  * - Secrets come only from the environment and are never written to output.
@@ -96,6 +96,7 @@ async function collectRepo(repo, cfg, client, now, log) {
   const prevHistory = readJson(path.join(repoDir, 'history.json'), []) ?? []
   const prevPulls = readJson(path.join(repoDir, 'pulls.json'), { items: [] })
   const prevIssues = readJson(path.join(repoDir, 'issues.json'), { items: [] })
+  const prevReleases = readJson(path.join(repoDir, 'releases.json'), { items: [] })
 
   /** @type {{ at: string, scope: string, message: string }[]} */
   const errors = []
@@ -160,6 +161,19 @@ async function collectRepo(repo, cfg, client, now, log) {
     if (truncated) notes.push('Issue list truncated by MONITOR_MAX_LIST_PAGES.')
   } catch (error) {
     fail('issues', error)
+  }
+
+  // --- releases (versions) ---------------------------------------------------
+  let releasesRaw = null
+  try {
+    const { items, truncated } = await client.paginate(
+      `/repos/${full}/releases`,
+      { maxPages: cfg.maxListPages }
+    )
+    releasesRaw = items
+    if (truncated) notes.push('Release list truncated by MONITOR_MAX_LIST_PAGES.')
+  } catch (error) {
+    fail('releases', error)
   }
 
   // --- build records --------------------------------------------------------
@@ -288,6 +302,16 @@ async function collectRepo(repo, cfg, client, now, log) {
     notes,
   }
 
+  // Build the version list once the repository metadata (homepage / branch) is
+  // known. Curated promotional videos are attached by matching release tag.
+  const releaseRecords = buildReleaseRecords(
+    releasesRaw,
+    full,
+    meta.repo.homepage,
+    meta.repo.defaultBranch,
+    cfg.releaseOverrides?.[full] ?? {}
+  )
+
   // --- persist --------------------------------------------------------------
   writeJson(path.join(repoDir, 'meta.json'), meta)
   writeJson(path.join(repoDir, 'latest.json'), latest)
@@ -304,8 +328,12 @@ async function collectRepo(repo, cfg, client, now, log) {
     generatedAt: contributorsSection ? generatedAt : (readJson(path.join(repoDir, 'contributors.json'))?.generatedAt ?? null),
     items: contributorsSection ? buildContributorRecords(pullRecords ?? [], issueRecords ?? [], contributorRaw, internal, cfg) : (readJson(path.join(repoDir, 'contributors.json'))?.items ?? []),
   })
+  writeJson(path.join(repoDir, 'releases.json'), {
+    generatedAt: releaseRecords ? generatedAt : (prevReleases?.generatedAt ?? null),
+    items: releaseRecords ? releaseRecords : (prevReleases?.items ?? []),
+  })
 
-  log(`Status: ${status} | PRs: ${pullsSection?.total ?? '-'} | Issues: ${issuesSection?.total ?? '-'}`)
+  log(`Status: ${status} | PRs: ${pullsSection?.total ?? '-'} | Issues: ${issuesSection?.total ?? '-'} | Releases: ${releaseRecords?.length ?? '-'}`)
 
   // Summary used to build the multi-repo `index.json`.
   return {
@@ -536,6 +564,33 @@ function emptyIssues(config) {
     composition: { internal: 0, external: 0, unknown: 0 },
     longOpen: { thresholdDays: config.longOpenIssueDays, count: 0, items: [] },
   }
+}
+
+/**
+ * Map raw GitHub Releases into the frontend `ReleaseRecord` contract. Draft
+ * releases are skipped; README / release-note links are derived per tag. The
+ * homepage falls back to the manually curated override, then the GitHub value;
+ * promotional videos come from the override's `{ tag: url }` map.
+ */
+function buildReleaseRecords(releasesRaw, full, githubHomepage, defaultBranch, override) {
+  if (!releasesRaw) return null
+  const homepage = override?.homepage || githubHomepage || null
+  const videos = override?.videos ?? {}
+  return releasesRaw
+    .filter((r) => !r.draft && r.tag_name)
+    .map((r) => ({
+      tag: r.tag_name,
+      name: r.name ?? null,
+      publishedAt: r.published_at ?? null,
+      prerelease: Boolean(r.prerelease),
+      readmeUrl: `https://github.com/${full}/blob/${r.tag_name}/README.md`,
+      releaseNoteUrl:
+        r.html_url ?? `https://github.com/${full}/releases/tag/${r.tag_name}`,
+      videoUrl: videos[r.tag_name] ?? null,
+      homepage,
+      branch: defaultBranch,
+    }))
+    .sort((a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? ''))
 }
 
 main().catch((error) => {

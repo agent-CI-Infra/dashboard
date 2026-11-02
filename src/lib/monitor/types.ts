@@ -232,3 +232,29 @@ export type ReposIndex = {
   generatedAt: string | null
   repos: RepoSummary[]
 }
+
+/** One published release (version) of a repository. */
+export type ReleaseRecord = {
+  /** Git tag backing this release (e.g. `v1.0.0`). */
+  tag: string
+  /** Human-readable release title. */
+  name: string | null
+  publishedAt: string | null
+  prerelease: boolean
+  /** Link to the README as of this release's tag. */
+  readmeUrl: string
+  /** Link to the release note / changelog entry. */
+  releaseNoteUrl: string
+  /** Manually curated promotional video URL, if any. */
+  videoUrl: string | null
+  /** Project homepage, taken from the repository metadata. */
+  homepage: string | null
+  /** Default branch of the repository. */
+  branch: string
+}
+
+/** `releases.json` */
+export type ReleaseDataset = {
+  generatedAt: string | null
+  items: ReleaseRecord[]
+}

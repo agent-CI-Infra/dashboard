@@ -17,6 +17,7 @@ const NAV_LABEL: Record<string, I18nKey> = {
   '/issues': 'nav.community.issues',
   '/contributors': 'nav.community.contributors',
   '/growth': 'nav.community.growth',
+  '/versions': 'nav.community.versions',
   '/ecosystem': 'nav.community.ecosystem',
   '/about': 'nav.about',
   '/gate': 'nav.qualityGates',

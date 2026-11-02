@@ -11,6 +11,8 @@ import type {
   MonitorConfig,
   MonitorMeta,
   PullRecord,
+  ReleaseDataset,
+  ReleaseRecord,
   ReposIndex,
   RepoSummary,
 } from './types'
@@ -115,6 +117,13 @@ export const contributorsQuery = (repo: string) =>
     `${repo}:contributors`
   )
 
+export const releasesQuery = (repo: string) =>
+  datasetOptions<ReleaseDataset, ReleaseRecord[]>(
+    `${repo}/releases.json`,
+    `${repo}:releases`,
+    (data) => data.items
+  )
+
 export const usePulls = (repo: string) =>
   useQuery({ ...pullsQuery(repo), enabled: Boolean(repo) })
 
@@ -123,6 +132,9 @@ export const useIssues = (repo: string) =>
 
 export const useContributors = (repo: string) =>
   useQuery({ ...contributorsQuery(repo), enabled: Boolean(repo) })
+
+export const useReleases = (repo: string) =>
+  useQuery({ ...releasesQuery(repo), enabled: Boolean(repo) })
 
 /** Classification rules are shared across all monitored repositories. */
 export const useMonitorConfig = () =>

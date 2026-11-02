@@ -25,7 +25,7 @@ import { useMonitorBase } from './use-monitor'
 const route = getRouteApi('/_authenticated/pulls')
 
 export function PullsAnalysis() {
-  const [layout, setLayout] = useState<ChartLayout>('vertical')
+  const [layout, setLayout] = useState<ChartLayout>('horizontal')
   const search = route.useSearch()
   const navigate = route.useNavigate()
   const repoList = useSelectedRepo(search)
@@ -285,19 +285,21 @@ export function PullsAnalysis() {
             },
             {
               label: 'PR 滞留时长 P90',
-              value: formatDurationHours(stats.p90),
+              value:
+                stats.p90 === null ? '—' : `≤${formatDurationHours(stats.p90)}`,
             },
             {
               label: 'PR 滞留时长 P50',
-              value: formatDurationHours(stats.p50),
+              value:
+                stats.p50 === null ? '—' : `≤${formatDurationHours(stats.p50)}`,
             },
           ].map((item) => (
-            <Card key={item.label}>
-              <CardContent className='flex flex-col gap-0.5 p-2'>
+            <Card key={item.label} className='py-1.5'>
+              <CardContent className='flex items-center justify-between gap-2 px-4'>
                 <span className='text-xs text-muted-foreground'>
                   {item.label}
                 </span>
-                <span className='text-lg font-semibold tabular-nums'>
+                <span className='text-base font-semibold tabular-nums'>
                   {item.value}
                 </span>
               </CardContent>
