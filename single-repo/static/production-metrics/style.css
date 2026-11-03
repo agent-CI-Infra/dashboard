@@ -1407,3 +1407,23 @@ h1 {
   margin-bottom: -6px;
 }
 .current-model:empty { display: none; }
+
+/* The time range applies to both the comparison and model details. */
+.comparison-head {
+  align-items: center;
+  flex-wrap: wrap;
+}
+.comparison-controls {
+  display: flex;
+  flex: 1 1 550px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+.comparison-updated {
+  margin-left: auto;
+}
+@media (max-width: 700px) {
+  .comparison-controls { flex-basis: 100%; }
+  .comparison-updated { margin-left: 0; }
+}

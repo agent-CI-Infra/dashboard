@@ -51,27 +51,26 @@
       </section>
 
       <section id="view-models" class="view" role="tabpanel" aria-labelledby="tab-models" hidden>
-        <div id="model-controls" class="toolbar">
-          <div class="range-picker" role="group" aria-label="时间范围">
-            <button class="range-btn" type="button" data-range="7" aria-pressed="false">近 7 天</button>
-            <button class="range-btn" type="button" data-range="30" aria-pressed="false">近 30 天</button>
-            <button class="range-btn active" type="button" data-range="0" aria-pressed="true">全部</button>
-          </div>
-          <span id="updated" class="muted">加载中…</span>
-          <span id="model-range" class="muted toolbar-scope">—</span>
-        </div>
-
         <div id="model-insights"></div>
 
         <section class="card">
-          <div class="card-head">
+          <div class="card-head comparison-head">
             <h2>模型对比</h2>
-            <span id="compare-version" class="muted">—</span>
+            <div id="model-controls" class="comparison-controls">
+              <div class="range-picker" role="group" aria-label="时间范围（影响模型对比及下方明细）">
+                <button class="range-btn" type="button" data-range="7" aria-pressed="false">近 7 天</button>
+                <button class="range-btn" type="button" data-range="30" aria-pressed="false">近 30 天</button>
+                <button class="range-btn active" type="button" data-range="0" aria-pressed="true">全部</button>
+              </div>
+              <span id="model-range" class="muted">—</span>
+              <span id="updated" class="muted comparison-updated">加载中…</span>
+            </div>
           </div>
           <div id="model-compare"><p class="empty">加载中…</p></div>
           <p class="chart-note">
             所选时间范围内全部模型的汇总指标，按调用数排序；「最新 TTFT 较前日」达到 20% 升幅即标记为回退。
             点击模型名称或对应行可切换下方明细。
+            <span id="compare-version" class="muted">—</span>
           </p>
         </section>
 
