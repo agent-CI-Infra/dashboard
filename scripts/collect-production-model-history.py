@@ -133,7 +133,16 @@ def main():
                 start_dt = parse_dt(row.get('startTime'))
                 first_dt = parse_dt(row.get('completionStartTime'))
                 end_dt = parse_dt(row.get('endTime'))
-                if (row.get('status') or '').lower() == 'success' and row.get('stream') is True and start_dt and first_dt:
+                metadata = row.get('metadata') if isinstance(row.get('metadata'), dict) else {}
+                spend_metadata = metadata.get('spend_logs_metadata')
+                if not isinstance(spend_metadata, dict):
+                    spend_metadata = {}
+                # Unknown stream status is allowed as an explicitly labelled estimate.
+                # A known non-streaming call cannot measure first-token latency.
+                if ((row.get('status') or '').lower() == 'success'
+                        and row.get('stream') is not False and spend_metadata.get('stream') is not False
+                        and start_dt and first_dt and end_dt
+                        and start_dt <= first_dt < end_dt):
                     ttft = (first_dt - start_dt).total_seconds() * 1000
                     if ttft >= 0:
                         ttft_values.append(ttft)

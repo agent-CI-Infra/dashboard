@@ -461,7 +461,7 @@ function benchmarkMetrics(latest) {
   const callDetails = calls.length
     ? `<details><summary>单次调用${b.calls_truncated ? '（仅前 200 条）' : ''}</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>模型</th><th>状态</th><th>耗时</th><th>TTFT</th><th>TPOT</th><th>输入</th><th>输出</th><th>总 Token</th></tr></thead><tbody>${callRows}</tbody></table></div></details>`
     : '';
-  return `<p class="chart-note">当前用例已关联 ${fmtCount(b.matched_calls)} 次调用；未关联 ${fmtCount(b.unmatched_calls)} 次。P95 至少需要 20 个成功样本；TTFT/TPOT 仅统计已确认的流式成功调用；模型名称为 trace 上报值。</p><div class="table-wrap"><table class="history-table"><thead><tr><th>上报模型</th><th>调用数</th><th>平均 TTFT（样本）</th><th>平均 TPOT（样本）</th><th>耗时 P95（样本）</th><th>输入 Token</th><th>输出 Token</th><th>总 Token</th></tr></thead><tbody>${modelRows}</tbody></table></div>${callDetails}`;
+  return `<p class="chart-note">当前用例已关联 ${fmtCount(b.matched_calls)} 次调用；未关联 ${fmtCount(b.unmatched_calls)} 次。P95 至少需要 20 个成功样本；TTFT/TPOT 仅统计已确认的流式成功调用；模型名称为 trace 上报值。</p><div class="table-wrap"><table class="history-table"><thead><tr><th>上报模型</th><th>调用数</th><th>平均 TTFT（估算）（样本）</th><th>平均 TPOT（估算）（样本）</th><th>耗时 P95（样本）</th><th>输入 Token</th><th>输出 Token</th><th>总 Token</th></tr></thead><tbody>${modelRows}</tbody></table></div>${callDetails}`;
 }
 function productionMetrics(doc) {
   if (!doc || doc.schema !== 'model-request-metrics@1' || doc.scope !== 'classified-production' || !Array.isArray(doc.models)) return '<p class="empty">未配置现网指标数据源，或采集数据不可用。</p>';
@@ -1035,8 +1035,8 @@ function latencyTrendChart(points, visibility = {}) {
   const usable = [...leftUsable, ...tpotUsable];
 
   const legend = [
-    { key: 'ttft', label: '平均 TTFT', value: latestTtft, style: 'ttft' },
-    { key: 'tpot', label: '平均 TPOT', value: latestTpot, style: 'tpot', format: fmtTpot },
+    { key: 'ttft', label: '平均 TTFT（估算）', value: latestTtft, style: 'ttft' },
+    { key: 'tpot', label: '平均 TPOT（估算）', value: latestTpot, style: 'tpot', format: fmtTpot },
     { key: 'p95_upper', label: 'P95 上界', value: latestUpper, style: 'p95' },
     { key: 'p95_lower', label: 'P95 下界', value: latestLower, style: 'p95 lower' },
   ]
@@ -1147,8 +1147,8 @@ function latencyTrendChart(points, visibility = {}) {
   const zones = rows
     .map((row, index) => {
       const lines = [String(row?.date || '')];
-      if (isVisible('ttft') && ttft[index] !== null) lines.push(`${fmtDuration(ttft[index])} · 平均 TTFT`);
-      if (isVisible('tpot') && tpot[index] !== null) lines.push(`${fmtTpot(tpot[index])} · 平均 TPOT`);
+      if (isVisible('ttft') && ttft[index] !== null) lines.push(`${fmtDuration(ttft[index])} · 平均 TTFT（估算）`);
+      if (isVisible('tpot') && tpot[index] !== null) lines.push(`${fmtTpot(tpot[index])} · 平均 TPOT（估算）`);
       if (isVisible('p95_upper') && upper[index] !== null) lines.push(`${fmtDuration(upper[index])} · P95 上界`);
       if (isVisible('p95_lower') && lower[index] !== null) lines.push(`${fmtDuration(lower[index])} · P95 下界`);
       if (lines.length === 1) return '';
@@ -1159,7 +1159,7 @@ function latencyTrendChart(points, visibility = {}) {
     })
     .join('');
 
-  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="平均 TTFT、TPOT 与耗时 P95 区间趋势">
+  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="平均 TTFT（估算）、TPOT 与耗时 P95 区间趋势">
     ${grid}
     <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
     ${bands ? `<path class="p95-band" d="${bands}" />` : ''}
@@ -1323,12 +1323,12 @@ function modelSummary(days, model, { unit = 'query', failure = null } = {}) {
       <div class="stat-hint">${hint('现网调用', deltaChip(latest.calls, previous?.calls))}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">平均 TTFT</div>
+      <div class="stat-label">平均 TTFT（估算）</div>
       <div class="stat-value">${fmtDuration(latest.ttft_ms)}</div>
       <div class="stat-hint">${hint(`${fmtCount(latest.ttft_samples)} 个样本`, deltaChip(latest.ttft_ms, previous?.ttft_ms, { lowerIsBetter: true }))}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">平均 TPOT</div>
+      <div class="stat-label">平均 TPOT（估算）</div>
       <div class="stat-value">${fmtTpot(latest.tpot_ms)}</div>
       <div class="stat-hint">${hint(`${fmtCount(latest.tpot_samples)} 个样本`, deltaChip(latest.tpot_ms, previous?.tpot_ms, { lowerIsBetter: true }))}</div>
     </div>
@@ -1379,7 +1379,7 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
     </tr>`)
     .join('');
   return `<div class="table-wrap"><table class="history-table">
-    <thead><tr><th>${esc(label)}</th><th>调用数</th><th>请求数</th><th>平均 TTFT（样本）</th><th>平均 TPOT（样本）</th><th>耗时 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th></tr></thead>
+    <thead><tr><th>${esc(label)}</th><th>调用数</th><th>请求数</th><th>平均 TTFT（估算）（样本）</th><th>平均 TPOT（估算）（样本）</th><th>耗时 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th></tr></thead>
     <tbody>${body}</tbody>
   </table></div>`;
 }
