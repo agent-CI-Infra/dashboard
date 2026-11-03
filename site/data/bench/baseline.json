@@ -1,0 +1,129 @@
+{
+  "schema": "digitalmate/bench-baseline@1",
+  "repository": "openJiuwen-ai/DigitalMate",
+  "label": "baseline",
+  "captured_at": "2026-11-03T06:03:33Z",
+  "profile": "all",
+  "run": {
+    "id": 41579349187,
+    "attempt": 1,
+    "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/41579349187"
+  },
+  "commit": "9bc91a3afec3b01128b5704d82e387957bf4bf74",
+  "backend": "wss://1.94.211.46/orbit-profiling/ws?binding_id=default",
+  "benchmarks": {
+    "gaia": {
+      "name": "GAIA",
+      "result": "PASS",
+      "kind": "eval",
+      "tasks": 6,
+      "trials": 18,
+      "pass@1": 0.2777777777777778,
+      "pass@k": 0.3333333333333333,
+      "pass^k": 0.16666666666666666,
+      "flaky_tasks": 1,
+      "latency_ms": {
+        "p50": 162504.5,
+        "p95": 206094.15
+      },
+      "official": false,
+      "note": "Headless text/component proxy; not an official benchmark leaderboard score."
+    },
+    "past-bench": {
+      "name": "PAST-Bench",
+      "result": "PASS",
+      "kind": "eval",
+      "tasks": 6,
+      "trials": 6,
+      "pass@1": 1,
+      "pass@k": 1,
+      "pass^k": 1,
+      "flaky_tasks": 0,
+      "latency_ms": {
+        "p50": 24053.5,
+        "p95": 31475.25
+      },
+      "official": false,
+      "note": "Headless text/component proxy; not an official benchmark leaderboard score."
+    },
+    "pi-bench": {
+      "name": "Pi-Bench",
+      "result": "PASS",
+      "kind": "eval",
+      "tasks": 13,
+      "trials": 13,
+      "pass@1": 0.7692307692307693,
+      "pass@k": 0.7692307692307693,
+      "pass^k": 0.7692307692307693,
+      "flaky_tasks": 0,
+      "latency_ms": {
+        "p50": 103031,
+        "p95": 199246.4
+      },
+      "official": false,
+      "note": "Headless text/component proxy; not an official benchmark leaderboard score."
+    },
+    "vita-bench": {
+      "name": "VitaBench 2.0",
+      "result": "PASS",
+      "kind": "eval",
+      "tasks": 9,
+      "trials": 9,
+      "pass@1": 0.7777777777777778,
+      "pass@k": 0.7777777777777778,
+      "pass^k": 0.7777777777777778,
+      "flaky_tasks": 0,
+      "latency_ms": {
+        "p50": 60693,
+        "p95": 68191
+      },
+      "official": false,
+      "note": "Headless text/component proxy; not an official benchmark leaderboard score."
+    },
+    "vibelife-office": {
+      "name": "VibeLifeBench office_fitout_15d",
+      "result": "FAIL",
+      "kind": "vibelife",
+      "stage": 0,
+      "score": 0.0,
+      "earned_weight": 0,
+      "total_weight": 6.0,
+      "elapsed_ms": 203852,
+      "outcome": "failed",
+      "timed_out": true,
+      "artifact_files": [],
+      "error": "WorkSwarm turn timed out",
+      "official": false,
+      "officialFullTaskScore": false,
+      "note": "Official stage 0 workspace rubric, not the full 21-stage task score."
+    },
+    "vibelife-apartment": {
+      "name": "VibeLifeBench apartment_renovation_20d",
+      "result": "INFO",
+      "kind": "apartment",
+      "stage": 0,
+      "elapsed_ms": 130544,
+      "outcome": "completed",
+      "checks": [
+        {
+          "check": "apt_s0_artifact",
+          "weight": 3.5,
+          "status": "fail"
+        },
+        {
+          "check": "apt_s0_tool_evidence",
+          "weight": 0.5,
+          "status": "skipped",
+          "reason": "requires mock services (calendar/notion/email)"
+        }
+      ],
+      "official": false,
+      "note": "Informational stage check; not a score."
+    }
+  },
+  "notes": [
+    "Headless component-level results; not a full-product score.",
+    "GAIA is component-level; PAST/Pi/Vita are text proxies; VibeLife is stage 0 only.",
+    "Do not compare these numbers with official leaderboards."
+  ]
+}

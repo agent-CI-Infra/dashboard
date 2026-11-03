@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DigitalMate Bench Baseline</title>
+<style>
+:root{color-scheme:light dark;--bg:#f6f7f9;--card:#fff;--ink:#1c2430;--dim:#61708a;--line:#dde3ec}
+@media(prefers-color-scheme:dark){:root{--bg:#111827;--card:#1c2534;--ink:#e5e9f0;--dim:#98a6bc;--line:#2d3a4f}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif}
+main{max-width:1180px;margin:0 auto;padding:36px 20px 60px}a{color:#2563eb}h1{font-size:28px;margin:0 0 6px}
+p.meta{color:var(--dim);margin:0 0 22px}table{width:100%;border-collapse:collapse;background:var(--card);font-size:13px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}th{background:color-mix(in srgb,var(--card) 88%,var(--ink));font-weight:600}
+.note{color:var(--dim);font-size:13px;margin-top:16px}code{font-size:12px}</style></head><body><main>
+<a href="../../">← DigitalMate board</a>
+<h1>DigitalMate Bench Baseline</h1>
+<p class="meta">captured 2026-11-03T06:03:33Z · run <a href="https://github.com/openJiuwen-ai/DigitalMate/actions/runs/41579349187">#41579349187</a> · commit <code>9bc91a3afec3b01128b5704d82e387957bf4bf74</code></p>
+<table><thead><tr><th>benchmark</th><th>result</th><th>tasks</th><th>trials</th><th>pass@1</th><th>pass@k</th><th>pass^k</th><th>score / detail</th><th>p50 / p95</th></tr></thead><tbody><tr><td>GAIA</td><td>PASS</td><td>6</td><td>18</td><td>27.8%</td><td>33.3%</td><td>16.7%</td><td>1 flaky</td><td>162.5s / 206.1s</td></tr>
+<tr><td>PAST-Bench</td><td>PASS</td><td>6</td><td>6</td><td>100.0%</td><td>100.0%</td><td>100.0%</td><td>0 flaky</td><td>24.1s / 31.5s</td></tr>
+<tr><td>Pi-Bench</td><td>PASS</td><td>13</td><td>13</td><td>76.9%</td><td>76.9%</td><td>76.9%</td><td>0 flaky</td><td>103.0s / 199.2s</td></tr>
+<tr><td>VitaBench 2.0</td><td>PASS</td><td>9</td><td>9</td><td>77.8%</td><td>77.8%</td><td>77.8%</td><td>0 flaky</td><td>60.7s / 68.2s</td></tr>
+<tr><td>VibeLifeBench office_fitout_15d</td><td>FAIL</td><td>1 stage</td><td>1</td><td>—</td><td>—</td><td>—</td><td>0.000 (0/6.0 weight)</td><td>203.9s</td></tr>
+<tr><td>VibeLifeBench apartment_renovation_20d</td><td>INFO</td><td>1 stage</td><td>1</td><td>—</td><td>—</td><td>—</td><td>apt_s0_artifact=fail; apt_s0_tool_evidence=skipped</td><td>130.5s</td></tr></tbody></table>
+<p class="note">Headless component-level results. GAIA is component-level; PAST/Pi/Vita are text proxies; VibeLife is stage 0 only. Do not compare with official leaderboards. <a href="baseline.json">baseline.json</a> · <a href="baseline.md">baseline.md</a></p>
+</main></body></html>
