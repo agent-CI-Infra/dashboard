@@ -100,6 +100,7 @@ export function mergeHistory(history, performance) {
         status: item.status,
         query_ms: item.query_ms ?? null,
         query_count: item.query_count ?? 0,
+        benchmark_models: item.cloud?.benchmark?.models ?? null,
         duration_ms: item.duration_ms ?? null,
         run_id: performance.run_id,
         commit: performance.commit ?? null,

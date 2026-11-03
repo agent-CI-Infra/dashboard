@@ -52,7 +52,7 @@
   const loadViews = () => { try { return { issues: 'table', prs: 'table', ...JSON.parse(localStorage.getItem(VIEW_KEY) || '{}') }; } catch (e) { return { issues: 'table', prs: 'table' }; } };
   const loadLine = () => { try { return localStorage.getItem(LINE_KEY); } catch (e) { return null; } };
   const loadCovSort = () => { try { return localStorage.getItem(COV_SORT_KEY) === 'lines' ? 'lines' : 'name'; } catch (e) { return 'name'; } };
-  const STATE = { snap: null, status: null, tab: 'overview', views: loadViews(), line: loadLine(), covOpen: new Set(), covSort: loadCovSort(), sort: {}, filters: { issueQ: '', issueLabel: '', issueAssignee: '', runBranch: '' }, ageFilter: { issues: null, prs: null }, coverageWeekOffset: 0, e2e: null, e2eSteps: {}, e2eFilter: { status: '', q: '' }, e2eLoading: new Set(), e2eErrors: new Set(), e2eCollapsed: new Set(), performance: null, perfCase: null, pollTimer: null };
+  const STATE = { snap: null, status: null, tab: 'overview', views: loadViews(), line: loadLine(), covOpen: new Set(), covSort: loadCovSort(), sort: {}, filters: { issueQ: '', issueLabel: '', issueAssignee: '', runBranch: '' }, ageFilter: { issues: null, prs: null }, coverageWeekOffset: 0, e2e: null, e2eSteps: {}, e2eFilter: { status: '', q: '' }, e2eLoading: new Set(), e2eErrors: new Set(), e2eCollapsed: new Set(), performance: null, modelMetrics: null, perfCase: null, pollTimer: null };
   const returnParams = new URLSearchParams(location.search);
   const returnFocus = { line: returnParams.get('returnLine'), caseName: returnParams.get('returnCase'), pending: !!returnParams.get('returnCase'),
     e2eKey: returnParams.get('returnE2E'), e2ePending: !!returnParams.get('returnE2E') };
@@ -408,6 +408,14 @@
       return { ...lane, days, summary: { total: runs.length, success, failure, cancelled: by('cancelled'), running: by('running'), other: by('other'), success_rate: success + failure ? Math.round((success * 1000) / (success + failure)) / 10 : null, median_duration_s: median } };
     }) });
 
+  function productionModelSection(doc) {
+    if (!doc || doc.schema !== 'model-request-metrics@1' || doc.scope !== 'classified-production' || !Array.isArray(doc.models)) return '';
+    const rows = doc.models.map((m) => `<tr><td>${esc(m.model || '未知')}</td><td class="num">${perfInt(m.calls)}</td><td class="num">${perfMs(m.ttft_avg_ms)} (${perfInt(m.ttft_sample_count)})</td><td class="num">${m.tpot_avg_ms == null ? '—' : `${Number(m.tpot_avg_ms).toFixed(2)} ms/token`} (${perfInt(m.tpot_sample_count)})</td><td class="num">${perfMs(m.gateway_duration_p95_ms)} (${perfInt(m.duration_sample_count)})</td><td class="num">${perfInt(m.prompt_tokens)}</td><td class="num">${perfInt(m.completion_tokens)}</td><td class="num">${perfInt(m.total_tokens)}</td></tr>`).join('');
+    const calls = Array.isArray(doc.calls) ? doc.calls : [];
+    const details = calls.slice(0, 200).map((c) => `<tr><td>${esc(c.model || '未知')}</td><td>${esc(c.status || '未知')}</td><td class="num">${perfMs(c.duration_ms)}</td><td class="num">${perfMs(c.ttft_ms)}</td><td class="num">${c.tpot_ms == null ? '—' : `${Number(c.tpot_ms).toFixed(2)} ms/token`}</td><td class="num">${perfInt(c.prompt_tokens)}</td><td class="num">${perfInt(c.completion_tokens)}</td><td class="num">${perfInt(c.total_tokens)}</td></tr>`).join('');
+    return `<div class="card perf-card"><h3>现网模型请求 <span class="sub">网关侧统计 · 不包含 benchmark</span></h3><p class="perf-note">${esc(doc.environment || '未知环境')} · ${esc(doc.start || '—')} 至 ${esc(doc.end || '—')} UTC · 更新 ${esc(doc.generated_at || '—')} · 未分类排除 ${perfInt(doc.excluded_unknown)} 条。P95 为网关侧总耗时，至少 20 次成功调用；不能视为上游纯模型耗时。</p>${rows ? `<div class="table-wrap"><table class="perf-model-table"><thead><tr><th>物理模型</th><th>调用</th><th>TTFT 均值（样本）</th><th>TPOT 均值（样本）</th><th>网关耗时 P95（样本）</th><th>输入 Token</th><th>输出 Token</th><th>总 Token</th></tr></thead><tbody>${rows}</tbody></table></div>` : empty('无已分类现网调用；请检查采集状态和流量标记')}<details><summary>单次调用（最多 200 条）</summary><div class="table-wrap"><table class="perf-model-table"><thead><tr><th>模型</th><th>状态</th><th>网关耗时</th><th>TTFT</th><th>TPOT</th><th>输入</th><th>输出</th><th>总 Token</th></tr></thead><tbody>${details}</tbody></table></div></details></div>`;
+  }
+
   function renderOverview(snap) {
     const S = snap.sections;
     const iss = S.issues?.data, prs = S.prs?.data, ci = S.ci?.data, tests = S.tests?.data, ops = S.ops?.data;
@@ -485,6 +493,7 @@
       ${card('最近动态', merged.length || opened.length ? `<ul class="checks">${[...merged, ...opened].join('')}</ul>` : empty('最近没有合并或新建'), { sub: '最近合并的 PR 与新建的 Issue' })}
     </div>`;
     const status = Object.entries(S).filter(([, s]) => s.status !== 'ok').map(([k, s]) => badge(`${k} ${s.status}`, s.status === 'partial' ? 'warn' : 'bad'));
+    html += productionModelSection(STATE.modelMetrics);
     html += `<p class="muted small" style="margin-top:12px">数据来源 ${link(snap.repo_url, esc(snap.repo))} · 视图每 60 秒读取已发布快照${status.length ? ` · 部分区块不完整：${status.join(' ')}` : ''}</p>`;
     return html;
   }
@@ -1309,6 +1318,17 @@
     }).join('')}</div>`;
   }
 
+  // Benchmark data is populated only by query-linked traces, never the
+  // legacy case-directory totals which can contain unrelated earlier calls.
+  function perfBenchmark(latest) {
+    const b = latest?.cloud?.benchmark;
+    if (!b || !Array.isArray(b.models) || !b.models.length) return empty('没有可确认关联的基准模型调用；旧数据或未匹配 trace 不纳入统计');
+    const models = b.models.map((m) => `<tr><td>${esc(m.model || '未知')}</td><td class="num">${perfInt(m.call_count)}</td><td class="num">${perfMs(m.ttft_avg_ms)}</td><td class="num">${m.tpot_avg_ms == null ? '—' : `${Number(m.tpot_avg_ms).toFixed(2)} ms/token`}</td><td class="num">${perfMs(m.duration_p95_ms)} (${perfInt(m.duration_sample_count)} 样本)</td><td class="num">${perfInt(m.input_tokens)}</td><td class="num">${perfInt(m.output_tokens)}</td><td class="num">${perfInt(m.total_tokens)}</td></tr>`).join('');
+    const calls = Array.isArray(b.calls) ? b.calls : [];
+    const rows = calls.map((c) => `<tr><td>${esc(c.model || '未知')}</td><td>${esc(c.status || '未知')}</td><td class="num">${perfMs(c.duration_ms)}</td><td class="num">${c.stream === true ? perfMs(c.ttft_ms) : '—'}</td><td class="num">${c.stream === true && c.output_tokens > 1 && c.tpot_ms != null ? `${Number(c.tpot_ms).toFixed(2)} ms/token` : '—'}</td><td class="num">${perfInt(c.input_tokens)}</td><td class="num">${perfInt(c.output_tokens)}</td><td class="num">${perfInt(c.total_tokens)}</td></tr>`).join('');
+    return `<p class="perf-note">基准用例 · 已关联 ${perfInt(b.matched_calls)} 次调用 · 未关联 ${perfInt(b.unmatched_calls)} 次；P95 至少 20 次成功样本，按上报模型分别统计。TTFT/TPOT 仅包含已确认流式成功调用。</p><div class="table-wrap"><table class="perf-model-table"><thead><tr><th>上报模型</th><th>调用数</th><th>平均 TTFT</th><th>平均 TPOT</th><th>耗时 P95</th><th>输入 Token</th><th>输出 Token</th><th>总 Token</th></tr></thead><tbody>${models}</tbody></table></div><details><summary>已关联的单次调用${b.calls_truncated ? '（仅前 200 条）' : ''}</summary><div class="table-wrap"><table class="perf-model-table"><thead><tr><th>模型</th><th>状态</th><th>耗时</th><th>TTFT</th><th>TPOT</th><th>输入</th><th>输出</th><th>总 Token</th></tr></thead><tbody>${rows}</tbody></table></div></details>`;
+  }
+
   function perfCloud(latest) {
     const cloud = latest?.cloud;
     if (!cloud?.available || (!cloud.calls?.length && !cloud.phases?.length)) {
@@ -1341,9 +1361,9 @@
 
   function perfHistoryTable(points) {
     if (!points.length) return empty('还没有历史点');
-    return `<div class="table-wrap perf-table-wrap"><table class="perf-table"><thead><tr><th>日期</th><th>状态</th><th class="num">平均查询</th><th class="num">查询数</th><th>运行</th><th>commit</th></tr></thead><tbody>${points.slice().reverse().map((p) => {
+    return `<div class="table-wrap perf-table-wrap"><table class="perf-table"><thead><tr><th>日期</th><th>状态</th><th class="num">平均查询</th><th class="num">查询数</th><th>运行</th><th>commit</th><th>基准模型（P95 / 总 Token）</th></tr></thead><tbody>${points.slice().reverse().map((p) => {
       const [label, tone] = perfStatus(p.status);
-      return `<tr><td class="nowrap">${esc(p.date)}</td><td>${badge(label, tone)}</td><td class="num nowrap">${perfMs(p.query_ms)}</td><td class="num">${n(p.query_count ?? 0)}</td><td><code>${esc(p.run_id || '—')}</code></td><td class="mono">${esc((p.commit || '').slice(0, 7) || '—')}</td></tr>`;
+      return `<tr><td class="nowrap">${esc(p.date)}</td><td>${badge(label, tone)}</td><td class="num nowrap">${perfMs(p.query_ms)}</td><td class="num">${n(p.query_count ?? 0)}</td><td><code>${esc(p.run_id || '—')}</code></td><td class="mono">${esc((p.commit || '').slice(0, 7) || '—')}</td><td>${Array.isArray(p.benchmark_models) && p.benchmark_models.length ? p.benchmark_models.map((m) => `${esc(m.model || '未知')}: ${perfMs(m.duration_p95_ms)} / ${perfInt(m.total_tokens)}`).join('<br>') : '—'}</td></tr>`;
     }).join('')}</tbody></table></div>`;
   }
 
@@ -1394,6 +1414,7 @@
             <div><span>记录天数</span><strong>${n(activeDays)}</strong></div>
           </div>
           <div class="card perf-card"><h3>最近一次 Profiling · 查询耗时 <span class="sub">${n(queryCount)} 次查询 · 以最后一条消息到达计 · E2E ${perfMs(latest.duration_ms)}</span></h3>${perfQueries(latest)}</div>
+          <div class="card perf-card"><h3>基准用例模型性能 <span class="sub">仅统计当前用例已关联调用</span></h3>${perfBenchmark(latest)}</div>
           <div class="card perf-card"><h3>Orbit 云端 trace <span class="sub">model 耗时 · TTFT · TPOT · 上下文 tokens · 阶段</span></h3>${perfCloud(latest)}</div>
           <div class="card perf-card"><h3>每日平均查询耗时 <span class="sub">一天一个点 · 从 query 到消息接收 · Asia/Shanghai</span></h3>${perfChart(points)}<p class="perf-note">当前 ${n(activeDays)} 个执行日；每点为当轮 query 平均耗时，仅 profiling，不含 E2E 步骤等待；缺失日期不补 0。</p></div>
           <details class="card perf-card perf-history"><summary>执行历史 <span class="sub">${n(points.length)} 天</span></summary>${perfHistoryTable(points)}</details>
@@ -1698,6 +1719,8 @@
       STATE.e2e = await fetchJson('./data/e2e/index.json?ts='+Date.now()).catch(() => null);
       // Optional nightly performance history; a missing file hides the section on other boards.
       STATE.performance = await fetchJson('./data/e2e-performance/history.json?ts='+Date.now()).catch(() => null);
+      // Only a separately provisioned local/private, sanitized snapshot is read.
+      STATE.modelMetrics = await fetchJson('./data/model-request-metrics.json?ts='+Date.now()).catch(() => null);
       STATE.e2eErrors.clear();
     } catch (err) {
       STATE.clientError = err.name === 'AbortError'
