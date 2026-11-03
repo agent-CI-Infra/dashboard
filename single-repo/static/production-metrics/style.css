@@ -1378,3 +1378,52 @@ h1 {
 .history-table td .metric-change .delta {
   margin-left: 0;
 }
+
+.compare-model-button {
+  appearance: none;
+  border: 0;
+  padding: 2px 0;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.compare-model-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+.selected-model-badge {
+  color: var(--accent);
+  font: 600 11px/1.5 system-ui, sans-serif;
+  white-space: nowrap;
+}
+.current-model {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  margin-bottom: -6px;
+}
+.current-model:empty { display: none; }
+
+/* The time range applies to both the comparison and model details. */
+.comparison-head {
+  align-items: center;
+  flex-wrap: wrap;
+}
+.comparison-controls {
+  display: flex;
+  flex: 1 1 550px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+.comparison-updated {
+  margin-left: auto;
+}
+@media (max-width: 700px) {
+  .comparison-controls { flex-basis: 100%; }
+  .comparison-updated { margin-left: 0; }
+}
