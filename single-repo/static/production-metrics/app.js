@@ -882,18 +882,11 @@ function volumeTrendChart(days, failures, visibility = {}) {
       axis: 'right',
     },
   ];
-  const latest = (values) => {
-    for (let index = values.length - 1; index >= 0; index -= 1) {
-      if (values[index] !== null) return values[index];
-    }
-    return null;
-  };
   const legend = series
     .map((item) => {
       const active = isVisible(item.key);
-      const value = latest(item.values);
       return `<button class="legend-toggle volume-toggle${active ? '' : ' off'}" type="button" data-volume-layer="${item.key}" aria-pressed="${active}">
-        <i class="legend-line ${item.layer}"></i><span>${esc(item.label)}</span><b>${value === null ? '—' : esc(item.format(value))}</b>
+        <i class="legend-line ${item.layer}"></i><span>${esc(item.label)}</span>
       </button>`;
     })
     .join('');
@@ -1035,32 +1028,21 @@ function latencyTrendChart(points, visibility = {}) {
     if (!Number.isFinite(row?.p95_ms)) return null;
     return Number.isFinite(row?.p95_lower_ms) ? row.p95_lower_ms : row.p95_ms;
   });
-  const latest = (values) => {
-    for (let index = values.length - 1; index >= 0; index -= 1) {
-      if (values[index] !== null) return values[index];
-    }
-    return null;
-  };
-  const latestTtft = latest(ttft);
-  const latestTpot = latest(tpot);
-  const latestLower = latest(lower);
-  const latestUpper = latest(upper);
   const leftUsable = [...ttft, ...upper].filter((value) => value !== null);
   const tpotUsable = tpot.filter((value) => value !== null);
   const hasTpot = tpotUsable.length > 0;
   const usable = [...leftUsable, ...tpotUsable];
 
   const legend = [
-    { key: 'ttft', label: '平均 TTFT（估算）', value: latestTtft, style: 'ttft' },
-    { key: 'tpot', label: '平均 TPOT（估算）', value: latestTpot, style: 'tpot', format: fmtTpot },
-    { key: 'p95_upper', label: 'P95 上界', value: latestUpper, style: 'p95' },
-    { key: 'p95_lower', label: 'P95 下界', value: latestLower, style: 'p95 lower' },
+    { key: 'ttft', label: '平均 TTFT（估算）', style: 'ttft' },
+    { key: 'tpot', label: '平均 TPOT（估算）', style: 'tpot' },
+    { key: 'p95_upper', label: 'P95 上界', style: 'p95' },
+    { key: 'p95_lower', label: 'P95 下界', style: 'p95 lower' },
   ]
     .map((item) => {
       const active = isVisible(item.key);
-      const text = item.value === null ? '—' : (item.format ? item.format(item.value) : fmtDuration(item.value));
       return `<button class="legend-toggle latency-toggle${active ? '' : ' off'}" type="button" data-latency-layer="${item.key}" aria-pressed="${active}">
-        <i class="legend-line ${item.style}"></i><span>${item.label}</span><b>${esc(text)}</b>
+        <i class="legend-line ${item.style}"></i><span>${item.label}</span>
       </button>`;
     })
     .join('');
