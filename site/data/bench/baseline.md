@@ -11,7 +11,8 @@
 | PAST-Bench | PASS | 6 | 6 | 100.0% | 100.0% | 100.0% | 0 flaky | 24.1s / 31.5s |
 | Pi-Bench | PASS | 13 | 13 | 76.9% | 76.9% | 76.9% | 0 flaky | 103.0s / 199.2s |
 | VitaBench 2.0 | PASS | 9 | 9 | 77.8% | 77.8% | 77.8% | 0 flaky | 60.7s / 68.2s |
-| VibeLifeBench office_fitout_15d | FAIL | 1 stage | 1 | — | — | — | 0.000 (0/6.0 weight) | 203.9s |
-| VibeLifeBench apartment_renovation_20d | INFO | 1 stage | 1 | — | — | — | apt_s0_artifact=fail; apt_s0_tool_evidence=skipped | 130.5s |
+| VibeLifeBench office_fitout_15d | FAIL | 1 stage | 1 | — | — | — | 0.583 (3.5/6.0 weight) | 113.2s |
+| VibeLifeBench apartment_renovation_20d | INFO | 1 stage | 1 | — | — | — | apt_s0_artifact=fail; apt_s0_tool_evidence=skipped | 73.6s |
 
-> Headless component-level results; text proxies are not official benchmark scores.
+> VibeLife rows are synced from standalone run 41591625795. The original all-run office check was a 203.9s timeout (0.000).
+> Headless component-level results; text proxies are not official leaderboard scores.

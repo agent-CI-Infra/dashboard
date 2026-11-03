@@ -85,24 +85,58 @@
       "result": "FAIL",
       "kind": "vibelife",
       "stage": 0,
-      "score": 0.0,
-      "earned_weight": 0,
+      "score": 0.5833333333333334,
+      "earned_weight": 3.5,
       "total_weight": 6.0,
-      "elapsed_ms": 203852,
-      "outcome": "failed",
-      "timed_out": true,
-      "artifact_files": [],
-      "error": "WorkSwarm turn timed out",
+      "elapsed_ms": 113240,
+      "outcome": "completed",
+      "timed_out": false,
+      "artifact_files": [
+        "budget_tracker.md",
+        "fit_out_plan.md",
+        "risk_register.md",
+        "schedule.md",
+        "vendor_comparison.md"
+      ],
       "official": false,
       "officialFullTaskScore": false,
-      "note": "Official stage 0 workspace rubric, not the full 21-stage task score."
+      "note": "Official stage 0 workspace rubric, not the full 21-stage task score.",
+      "source_run": 41591625795,
+      "source_note": "Standalone rerun completed; the all-run VibeLife was a 203.9s timeout with score 0.000.",
+      "checks": [
+        {
+          "check": "chk_artifact_core_files_exist",
+          "weight": 1,
+          "pass": true
+        },
+        {
+          "check": "chk_artifact_budget_has_committed_pending_reserve",
+          "weight": 1.5,
+          "pass": false
+        },
+        {
+          "check": "chk_artifact_schedule_sequenced",
+          "weight": 1.5,
+          "pass": true
+        },
+        {
+          "check": "chk_artifact_contractor_comparison_rows",
+          "weight": 1,
+          "pass": false
+        },
+        {
+          "check": "chk_artifact_risk_register_has_known_traps",
+          "weight": 1,
+          "pass": true
+        }
+      ]
     },
     "vibelife-apartment": {
       "name": "VibeLifeBench apartment_renovation_20d",
       "result": "INFO",
       "kind": "apartment",
       "stage": 0,
-      "elapsed_ms": 130544,
+      "elapsed_ms": 73620,
       "outcome": "completed",
       "checks": [
         {
@@ -118,12 +152,15 @@
         }
       ],
       "official": false,
-      "note": "Informational stage check; not a score."
+      "note": "Informational stage check; not a score.",
+      "source_run": 41591625795,
+      "source_note": "Standalone rerun; tool evidence still skipped (mock services not mounted)."
     }
   },
   "notes": [
     "Headless component-level results; not a full-product score.",
     "GAIA is component-level; PAST/Pi/Vita are text proxies; VibeLife is stage 0 only.",
-    "Do not compare these numbers with official leaderboards."
+    "Do not compare these numbers with official leaderboards.",
+    "VibeLife rows are synced from standalone run 41591625795; the original all-run VibeLife office hit a 203.9s timeout (0.000)."
   ]
 }
