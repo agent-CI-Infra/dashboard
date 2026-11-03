@@ -865,6 +865,23 @@ h1 {
   display: none;
 }
 
+/* Keep the model view's sections evenly separated, including optional alerts. */
+#view-models:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#view-models > .toolbar,
+#view-models > .model-summary,
+#model-insights .insight-banner {
+  margin-bottom: 0;
+}
+
+#model-insights:empty {
+  display: none;
+}
+
 .model-summary {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
