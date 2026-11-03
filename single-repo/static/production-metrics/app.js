@@ -30,7 +30,7 @@ const state = {
     calls: true,
     failure: true,
   },
-  tokenUnit: 'query',
+  tokenUnit: 'request',
 };
 
 const $ = (id) => document.getElementById(id);
@@ -1192,7 +1192,7 @@ function latencyTrendChart(points, visibility = {}) {
 function tokenTrendChart(points, visibility = {}, unit = 'query') {
   const rows = Array.isArray(points) ? points : [];
   const suffix = unit === 'request' ? 'per_request' : 'per_query';
-  const unitLabel = unit === 'request' ? '次' : '提问';
+  const unitLabel = unit === 'request' ? '请求' : '提问';
   const definitions = [
     { key: 'input_per_request', field: 'input', label: `输入 / ${unitLabel}`, layer: 'input' },
     { key: 'output_per_request', field: 'output', label: `输出 / ${unitLabel}`, layer: 'output' },
@@ -1210,20 +1210,13 @@ function tokenTrendChart(points, visibility = {}, unit = 'query') {
   const legend = series
     .map((item) => {
       const active = isVisible(item.key);
-      const latest = [...item.values].reverse().find((value) => value !== null);
       return `<button class="legend-toggle${active ? '' : ' off'}" type="button" data-trend-layer="${item.key}" aria-pressed="${active}">
-        <i class="legend-swatch ${item.layer}"></i><span>${esc(item.label)}</span><b>${latest === undefined ? '—' : fmtToken(latest)}</b>
+        <i class="legend-swatch ${item.layer}"></i><span>${esc(item.label)}</span>
       </button>`;
     })
     .join('');
   const head = `<div class="trend-head"><h3>Token / ${unitLabel}</h3>
     <div class="trend-tools">
-      <label class="unit-picker"><span class="muted">口径</span>
-        <select data-token-unit>
-          <option value="query"${unit === 'query' ? ' selected' : ''}>每次提问</option>
-          <option value="request"${unit === 'request' ? ' selected' : ''}>每次请求</option>
-        </select>
-      </label>
       <div class="trend-legend">${legend}</div>
     </div></div>`;
   if (!allValues.length) return `<div class="trend-card wide">${head}<p class="empty">暂无数据</p></div>`;
@@ -1326,7 +1319,7 @@ function modelSummary(days, model, { unit = 'query', failure = null } = {}) {
   const previous = previousRow(days);
   const hint = (base, delta) => `${base}${delta ? ` · ${delta}` : ''}`;
   const suffix = unit === 'request' ? 'per_request' : 'per_query';
-  const unitLabel = unit === 'request' ? '次' : '提问';
+  const unitLabel = unit === 'request' ? '请求' : '提问';
   return `
     <div class="stat-card">
       <div class="stat-label">最新数据</div>
@@ -1383,7 +1376,7 @@ const REGRESSION_THRESHOLD = 20;
 function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'query', showVersion = false } = {}) {
   if (!Array.isArray(rows) || !rows.length) return '<p class="empty">暂无统计数据。</p>';
   const suffix = unit === 'request' ? 'per_request' : 'per_query';
-  const unitLabel = unit === 'request' ? '次' : '提问';
+  const unitLabel = unit === 'request' ? '请求' : '提问';
   const versionHead = showVersion ? '<th>版本</th>' : '';
   const body = [...rows]
     .map((row, index) => {
@@ -1974,15 +1967,6 @@ $('model-trends').addEventListener('click', (event) => {
   state.tokenVisibility[key] = button.getAttribute('aria-pressed') !== 'true';
   renderTrends();
   const next = document.querySelector(`#model-trends [data-trend-layer="${key}"]`);
-  if (next) next.focus();
-});
-
-$('model-trends').addEventListener('change', (event) => {
-  const select = event.target.closest?.('[data-token-unit]');
-  if (!select) return;
-  state.tokenUnit = select.value === 'request' ? 'request' : 'query';
-  renderModels();
-  const next = document.querySelector('#model-trends [data-token-unit]');
   if (next) next.focus();
 });
 
