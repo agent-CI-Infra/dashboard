@@ -1599,7 +1599,7 @@
   // ------------------------------------------------------------ shell
   const activeTab = () => {
     const requested = location.hash.slice(1);
-    const known = [...document.querySelectorAll('#tabs [data-tab]')].some(tab => tab.dataset.tab === requested);
+    const known = [...document.querySelectorAll('#tabs [data-tab]')].some(tab => (!tab.hidden || (!STATE.snap && requested === 'production-metrics')) && tab.dataset.tab === requested);
     if (known) return requested;
     if (requested) history.replaceState(history.state, '', location.pathname + location.search + '#overview');
     return 'overview';
@@ -1607,6 +1607,11 @@
 
   function renderShell() {
     const snap=STATE.snap, btn=$('#refresh-btn'), banner=$('#global-banner');
+    const productionTab = document.querySelector('[data-tab="production-metrics"]');
+    productionTab.hidden = !snap || String(snap.repo || '').toLowerCase() !== 'openjiuwen-ai/digitalmate';
+    if (snap && productionTab.hidden && STATE.tab === 'production-metrics') { STATE.tab = 'overview'; history.replaceState(history.state, '', location.pathname + location.search + '#overview'); }
+    const frame = document.querySelector('#tab-production-metrics iframe');
+    if (!productionTab.hidden && STATE.tab === 'production-metrics' && frame.getAttribute('src') === 'about:blank') frame.src = './production-metrics/index.html#models';
     btn.disabled=!!STATE.status?.refreshing;
     btn.textContent=btn.disabled?'读取中…':'刷新视图';
     if(snap){
