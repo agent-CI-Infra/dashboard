@@ -1398,9 +1398,9 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
         <td>${esc(row?.[dateKey] ?? '—')}</td>${versionCell}
         <td class="num">${fmtCount(row?.calls)}</td>
         <td class="num">${fmtCount(row?.queries)}</td>
-        <td class="num">${fmtDuration(row?.ttft_ms)}（${fmtCount(row?.ttft_samples)}）${ttftChip}</td>
-        <td class="num">${fmtTpot(row?.tpot_ms)}（${fmtCount(row?.tpot_samples)}）${tpotChip}</td>
-        <td class="num">${esc(p95RangeText(row))}（${fmtCount(row?.duration_samples)}）${p95Chip}</td>
+        <td class="num"><span class="metric-cell"><span>${fmtDuration(row?.ttft_ms)}</span><span class="metric-samples">（${fmtCount(row?.ttft_samples)}）</span><span class="metric-change">${ttftChip}</span></span></td>
+        <td class="num"><span class="metric-cell"><span>${fmtTpot(row?.tpot_ms)}</span><span class="metric-samples">（${fmtCount(row?.tpot_samples)}）</span><span class="metric-change">${tpotChip}</span></span></td>
+        <td class="num"><span class="metric-cell"><span>${esc(p95RangeText(row))}</span><span class="metric-samples">（${fmtCount(row?.duration_samples)}）</span><span class="metric-change">${p95Chip}</span></span></td>
         <td class="num">${fmtToken(row?.[`input_${suffix}`])}</td>
         <td class="num">${fmtToken(row?.[`output_${suffix}`])}</td>
         <td class="num">${fmtToken(row?.[`total_${suffix}`])}</td>

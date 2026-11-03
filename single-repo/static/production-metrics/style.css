@@ -1357,3 +1357,19 @@ h1 {
     margin-left: 0;
   }
 }
+
+/* Reserve consistent columns for values, sample counts and changes. */
+.metric-cell {
+  display: grid;
+  grid-template-columns: max-content 1fr 56px;
+  align-items: baseline;
+  column-gap: 4px;
+}
+
+.metric-samples {
+  justify-self: end;
+}
+
+.history-table td .metric-change .delta {
+  margin-left: 0;
+}
