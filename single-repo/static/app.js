@@ -1834,6 +1834,13 @@
   $('#refresh-btn').addEventListener('click', refresh);
   // Browsers throttle timers in background tabs; re-sync as soon as the tab is visible again.
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { clearTimeout(STATE.pollTimer); load(); } });
+  window.addEventListener('message', (event) => {
+    const frame = document.querySelector('#tab-production-metrics iframe');
+    if (event.origin !== location.origin || event.source !== frame?.contentWindow || event.data?.type !== 'production-metrics-height') return;
+    const height = Number(event.data.height);
+    if (Number.isFinite(height) && height >= 100 && height <= 20000) frame.style.height = `${Math.ceil(height)}px`;
+  });
+
   window.addEventListener('hashchange', () => { STATE.tab = activeTab(); renderShell(); mountBoard(); document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.id === `tab-${STATE.tab}`)); pinLanes(); drawTrends(); loadE2EHistory(); });
   // Tooltip layer: any element with data-tip.
   const tipEl = $('#tooltip');

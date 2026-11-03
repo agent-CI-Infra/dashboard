@@ -1284,6 +1284,38 @@ h1 {
   display: none;
 }
 
+/* Models view: regression banner, comparison card and version cells. */
+.insight-banner {
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--failed);
+  border-radius: 12px;
+  background: var(--failed-bg);
+  color: var(--failed);
+  font-size: 12px;
+}
+
+.compare-table tbody tr {
+  cursor: pointer;
+}
+
+.compare-table tbody tr:hover td {
+  background: var(--panel-soft);
+}
+
+.compare-table tbody tr.is-selected td {
+  background: var(--accent-soft);
+}
+
+.mono-cell {
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.history-table td .delta {
+  margin-left: 4px;
+}
+
 @media (max-width: 860px) {
   .trend-grid {
     grid-template-columns: minmax(0, 1fr);

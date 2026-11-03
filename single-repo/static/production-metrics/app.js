@@ -11,6 +11,7 @@ const state = {
   history: null,
   selected: null,
   model: null,
+  hashModel: null,
   view: 'cases',
   rangeDays: 0,
   granularity: 'daily',
@@ -29,7 +30,7 @@ const state = {
     calls: true,
     failure: true,
   },
-  tokenUnit: 'request',
+  tokenUnit: 'query',
 };
 
 const $ = (id) => document.getElementById(id);
@@ -186,12 +187,13 @@ function renderHeader() {
   $('updated').textContent = updated;
 
   const withDevice = sortedCases().find((entry) => entry.latest?.device);
-  const device = withDevice?.latest?.device;
+  const device = history.device || withDevice?.latest?.device;
   if (device) {
     const screen = device.screen;
     const resolution =
       screen && screen.width && screen.height ? ` · ${screen.width}×${screen.height}` : '';
-    $('device').textContent = `真机 ${device.model || device.target || ''}${resolution}`.trim();
+    const name = `${device.model || device.target || ''}${resolution}`.trim();
+    $('device').textContent = device.kind === 'gateway' ? name : `真机 ${name}`.trim();
   } else {
     $('device').textContent = '设备信息未记录';
   }
@@ -496,7 +498,8 @@ function deltaChip(current, previous, { lowerIsBetter = false, colorDirection = 
   if (percent < 0.05) return `<span class="delta neutral">持平</span>`;
   const tone = lowerIsBetter || colorDirection ? (up ? 'bad' : 'good') : 'neutral';
   const text = percent < 10 ? `${percent.toFixed(1)}%` : `${Math.round(percent)}%`;
-  return `<span class="delta ${tone}" title="${esc(label)}${up ? '上升' : '下降'} ${text}">${arrow} ${text}</span> <span class="delta-label">${esc(label)}</span>`;
+  const labelHtml = label ? ` <span class="delta-label">${esc(label)}</span>` : '';
+  return `<span class="delta ${tone}" title="${esc(label)}${up ? '上升' : '下降'} ${text}">${arrow} ${text}</span>${labelHtml}`;
 }
 
 function previousRow(rows) {
@@ -658,7 +661,7 @@ function perfStrip(history) {
       <div class="stat-hint">${esc(changeHint)}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">请求失败率</div>
+      <div class="stat-label">提问失败率</div>
       <div class="stat-value ${failure?.failed ? 'failed' : 'ok'}">${failure ? fmtPercent(failure.failure_rate) : '—'}</div>
       <div class="stat-hint">${failure ? `失败 ${fmtCount(failure.failed)} / 请求 ${fmtCount(failure.queries)}${failure.blocked ? ` · 阻塞 ${fmtCount(failure.blocked)}` : ''}` : '暂无请求数据'}</div>
     </div>
@@ -762,16 +765,29 @@ function modelSeries(history, model) {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
       const matched = (point?.benchmark_models || []).filter((row) => benchmarkModelName(row) === name);
       if (!matched.length) continue;
-      if (!byDate.has(date)) byDate.set(date, newMetricAccumulator());
-      const acc = byDate.get(date);
-      for (const row of matched) mergeMetricRow(acc, benchmarkRowToMetric(row));
+      if (!byDate.has(date)) byDate.set(date, { acc: newMetricAccumulator(), version: null });
+      const slot = byDate.get(date);
+      for (const row of matched) mergeMetricRow(slot.acc, benchmarkRowToMetric(row));
       // Count the day's questions once per model, not once per model row.
-      acc.queries += questionCount(point);
+      slot.acc.queries += questionCount(point);
+      // Keep the freshest contributing point's provenance so the daily table
+      // can attribute a day to the run / commit that produced it.
+      const candidate = {
+        finished_at: String(point?.finished_at || ''),
+        run_id: String(point?.run_id || ''),
+        commit: String(point?.commit || ''),
+      };
+      if (!slot.version || candidate.finished_at >= slot.version.finished_at) slot.version = candidate;
     }
   }
   return [...byDate.entries()]
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([date, acc]) => ({ date, ...finalizeMetricAccumulator(acc) }));
+    .map(([date, slot]) => ({
+      date,
+      run_id: slot.version?.run_id || '',
+      commit: slot.version?.commit || '',
+      ...finalizeMetricAccumulator(slot.acc),
+    }));
 }
 
 function weekStart(date) {
@@ -856,7 +872,7 @@ function volumeTrendChart(days, failures, visibility = {}) {
     },
     {
       key: 'failure',
-      label: '请求失败率',
+      label: '提问失败率',
       layer: 'failure',
       values: rows.map((row) => {
         const rate = failureByDate.get(row?.date)?.failure_rate;
@@ -881,7 +897,7 @@ function volumeTrendChart(days, failures, visibility = {}) {
       </button>`;
     })
     .join('');
-  const head = `<div class="trend-head"><h3>调用数与请求失败率</h3><div class="trend-legend">${legend}</div></div>`;
+  const head = `<div class="trend-head"><h3>调用数与提问失败率</h3><div class="trend-legend">${legend}</div></div>`;
   if (!rows.length || series.every((item) => item.values.every((value) => value === null))) {
     return `<div class="trend-card wide">${head}<p class="empty">暂无数据</p></div>`;
   }
@@ -987,7 +1003,7 @@ function volumeTrendChart(days, failures, visibility = {}) {
         .join('')
     : '';
 
-  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="调用数与请求失败率趋势">
+  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="调用数与提问失败率趋势">
     ${grid}
     <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
     ${layers}
@@ -995,7 +1011,7 @@ function volumeTrendChart(days, failures, visibility = {}) {
     ${xLabels}
     <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
     ${zones}
-  </svg><p class="chart-note">调用数使用左侧计数轴，请求失败率使用右侧百分比轴（全部请求，与所选模型无关）。</p></div>`;
+  </svg><p class="chart-note">调用数使用左侧计数轴，提问失败率使用右侧百分比轴（全部提问，与所选模型无关）。</p></div>`;
 }
 
 function p95RangeText(row) {
@@ -1176,7 +1192,7 @@ function latencyTrendChart(points, visibility = {}) {
 function tokenTrendChart(points, visibility = {}, unit = 'query') {
   const rows = Array.isArray(points) ? points : [];
   const suffix = unit === 'request' ? 'per_request' : 'per_query';
-  const unitLabel = unit === 'request' ? '次' : '请求';
+  const unitLabel = unit === 'request' ? '次' : '提问';
   const definitions = [
     { key: 'input_per_request', field: 'input', label: `输入 / ${unitLabel}`, layer: 'input' },
     { key: 'output_per_request', field: 'output', label: `输出 / ${unitLabel}`, layer: 'output' },
@@ -1204,7 +1220,7 @@ function tokenTrendChart(points, visibility = {}, unit = 'query') {
     <div class="trend-tools">
       <label class="unit-picker"><span class="muted">口径</span>
         <select data-token-unit>
-          <option value="query"${unit === 'query' ? ' selected' : ''}>每次请求</option>
+          <option value="query"${unit === 'query' ? ' selected' : ''}>每次提问</option>
           <option value="request"${unit === 'request' ? ' selected' : ''}>每次请求</option>
         </select>
       </label>
@@ -1310,7 +1326,7 @@ function modelSummary(days, model, { unit = 'query', failure = null } = {}) {
   const previous = previousRow(days);
   const hint = (base, delta) => `${base}${delta ? ` · ${delta}` : ''}`;
   const suffix = unit === 'request' ? 'per_request' : 'per_query';
-  const unitLabel = unit === 'request' ? '次' : '请求';
+  const unitLabel = unit === 'request' ? '次' : '提问';
   return `
     <div class="stat-card">
       <div class="stat-label">最新数据</div>
@@ -1353,35 +1369,178 @@ function modelSummary(days, model, { unit = 'query', failure = null } = {}) {
       <div class="stat-hint">${hint(`当日合计 ${fmtToken(latest.total_tokens)}`, deltaChip(latest[`total_${suffix}`], previous?.[`total_${suffix}`], { colorDirection: true }))}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">请求失败率</div>
+      <div class="stat-label">提问失败率</div>
       <div class="stat-value ${failure ? (failure.failed ? 'failed' : 'ok') : ''}">${failure ? fmtPercent(failure.failure_rate) : '—'}</div>
       <div class="stat-hint">${failure ? `全部用例 · 失败 ${fmtCount(failure.failed)} / 请求 ${fmtCount(failure.queries)}${failure.blocked ? ` · 阻塞 ${fmtCount(failure.blocked)}` : ''}` : '暂无请求数据'}</div>
     </div>
   `;
 }
 
-function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'query' } = {}) {
+// Day-over-day increases at or above this percentage are treated as
+// regressions worth flagging to whoever is triaging the dashboard.
+const REGRESSION_THRESHOLD = 20;
+
+function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'query', showVersion = false } = {}) {
   if (!Array.isArray(rows) || !rows.length) return '<p class="empty">暂无统计数据。</p>';
   const suffix = unit === 'request' ? 'per_request' : 'per_query';
-  const unitLabel = unit === 'request' ? '次' : '请求';
+  const unitLabel = unit === 'request' ? '次' : '提问';
+  const versionHead = showVersion ? '<th>版本</th>' : '';
   const body = [...rows]
+    .map((row, index) => {
+      const previous = index > 0 ? rows[index - 1] : null;
+      const ttftChip = deltaChip(row?.ttft_ms, previous?.ttft_ms, { lowerIsBetter: true, label: '' });
+      const tpotChip = deltaChip(row?.tpot_ms, previous?.tpot_ms, { lowerIsBetter: true, label: '' });
+      const p95Chip = deltaChip(row?.p95_ms, previous?.p95_ms, { lowerIsBetter: true, label: '' });
+      const versionCell = showVersion
+        ? `<td class="run-id" title="${esc([row?.run_id, row?.commit].filter(Boolean).join(' · '))}">${esc(shortVersion(row) || '—')}</td>`
+        : '';
+      return `<tr>
+        <td>${esc(row?.[dateKey] ?? '—')}</td>${versionCell}
+        <td class="num">${fmtCount(row?.calls)}</td>
+        <td class="num">${fmtCount(row?.queries)}</td>
+        <td class="num">${fmtDuration(row?.ttft_ms)}（${fmtCount(row?.ttft_samples)}）${ttftChip}</td>
+        <td class="num">${fmtTpot(row?.tpot_ms)}（${fmtCount(row?.tpot_samples)}）${tpotChip}</td>
+        <td class="num">${esc(p95RangeText(row))}（${fmtCount(row?.duration_samples)}）${p95Chip}</td>
+        <td class="num">${fmtToken(row?.[`input_${suffix}`])}</td>
+        <td class="num">${fmtToken(row?.[`output_${suffix}`])}</td>
+        <td class="num">${fmtToken(row?.[`total_${suffix}`])}</td>
+      </tr>`;
+    })
     .reverse()
-    .map((row) => `<tr>
-      <td>${esc(row?.[dateKey] ?? '—')}</td>
-      <td class="num">${fmtCount(row?.calls)}</td>
-      <td class="num">${fmtCount(row?.queries)}</td>
-      <td class="num">${fmtDuration(row?.ttft_ms)}（${fmtCount(row?.ttft_samples)}）</td>
-      <td class="num">${fmtTpot(row?.tpot_ms)}（${fmtCount(row?.tpot_samples)}）</td>
-      <td class="num">${esc(p95RangeText(row))}（${fmtCount(row?.duration_samples)}）</td>
-      <td class="num">${fmtToken(row?.[`input_${suffix}`])}</td>
-      <td class="num">${fmtToken(row?.[`output_${suffix}`])}</td>
-      <td class="num">${fmtToken(row?.[`total_${suffix}`])}</td>
-    </tr>`)
     .join('');
   return `<div class="table-wrap"><table class="history-table">
-    <thead><tr><th>${esc(label)}</th><th>调用数</th><th>请求数</th><th>平均 TTFT（估算）（样本）</th><th>平均 TPOT（估算）（样本）</th><th>耗时 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th></tr></thead>
+    <thead><tr><th>${esc(label)}</th>${versionHead}<th>调用数</th><th>请求数</th><th>平均 TTFT（估算）（样本）</th><th>平均 TPOT（估算）（样本）</th><th>耗时 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th></tr></thead>
     <tbody>${body}</tbody>
   </table></div>`;
+}
+
+// The shortest stable identifier for the run that produced a row: prefer the
+// git commit, fall back to the run id, and keep nightly uuids compact.
+function shortVersion(row) {
+  const commit = typeof row?.commit === 'string' ? row.commit.trim() : '';
+  if (commit) return commit.slice(0, 10);
+  const run = typeof row?.run_id === 'string' ? row.run_id.trim() : '';
+  if (!run) return '';
+  return run.length <= 18 ? run : `${run.slice(0, 8)}…`;
+}
+
+// Regressions worth surfacing: day-over-day increases at or above the
+// threshold for the latency-oriented metrics.
+function regressionFindings(latest, previous) {
+  const findings = [];
+  if (!latest || !previous) return findings;
+  const checks = [
+    ['平均 TTFT（估算）', latest.ttft_ms, previous.ttft_ms],
+    ['平均 TPOT（估算）', latest.tpot_ms, previous.tpot_ms],
+    ['P95 上界', latest.p95_ms, previous.p95_ms],
+  ];
+  for (const [label, current, prior] of checks) {
+    if (!Number.isFinite(current) || !Number.isFinite(prior) || prior <= 0) continue;
+    const change = ((current - prior) / prior) * 100;
+    if (change >= REGRESSION_THRESHOLD) findings.push({ label, change });
+  }
+  return findings;
+}
+
+// A slim banner above the model cards when the latest day regresses; an empty
+// string keeps the page clean on quiet days.
+function regressionBanner(days, failures = []) {
+  if (!Array.isArray(days) || days.length < 2) return '';
+  const latest = days[days.length - 1];
+  const previous = days[days.length - 2];
+  const notes = regressionFindings(latest, previous).map(
+    (finding) => `${finding.label} ▲${Math.round(finding.change)}%`,
+  );
+  const failureByDate = new Map((Array.isArray(failures) ? failures : []).map((row) => [row?.date, row]));
+  const latestFailure = failureByDate.get(latest.date);
+  if (latestFailure && Number.isFinite(latestFailure.failure_rate) && latestFailure.failure_rate > 0) {
+    const previousRate = Number.isFinite(failureByDate.get(previous.date)?.failure_rate)
+      ? failureByDate.get(previous.date).failure_rate
+      : 0;
+    // A jump from zero (or a doubling) is the signal; small absolute rates stay quiet.
+    if (latestFailure.failure_rate >= Math.max(previousRate * 2, previousRate + 5)) {
+      notes.push(
+        `提问失败率升至 ${fmtPercent(latestFailure.failure_rate)}（失败 ${fmtCount(latestFailure.failed)} / 请求 ${fmtCount(latestFailure.queries)}）`,
+      );
+    }
+  }
+  if (!notes.length) return '';
+  return `<div class="insight-banner" role="status">⚠ ${esc(latest.date)} 较前一日：${esc(notes.join(' · '))}（回退阈值 ≥${REGRESSION_THRESHOLD}%）</div>`;
+}
+
+// Range-wide totals per model so the comparison card can sit above the
+// per-model drill-down; rows reuse the same weighted merging as weekly stats.
+// Unlike the per-model range control, the window is anchored at the newest
+// data date across ALL models, so every row covers the same calendar days.
+function modelComparison(history, rangeDays = 0) {
+  const perModel = new Map();
+  let end = '';
+  for (const name of benchmarkModelNames(history)) {
+    const days = modelSeries(history, name);
+    if (days.length) end = end > days[days.length - 1].date ? end : days[days.length - 1].date;
+    perModel.set(name, days);
+  }
+  const span = Number(rangeDays);
+  const start = Number.isFinite(span) && span > 0 && end ? addDays(end, -(Math.floor(span) - 1)) : '';
+  const rows = [];
+  for (const [name, days] of perModel) {
+    const scoped = start ? days.filter((day) => day.date >= start && day.date <= end) : days;
+    if (!scoped.length) continue;
+    const acc = newMetricAccumulator();
+    for (const day of scoped) mergeMetricRow(acc, day);
+    rows.push({
+      name,
+      totals: finalizeMetricAccumulator(acc),
+      latest: scoped[scoped.length - 1],
+      previous: scoped.length > 1 ? scoped[scoped.length - 2] : null,
+    });
+  }
+  return rows;
+}
+
+function modelCompareCard(rows, { selected = null } = {}) {
+  if (!Array.isArray(rows) || !rows.length) return '<p class="empty">暂无模型数据。</p>';
+  const body = rows
+    .map((row) => {
+      const regressing = regressionFindings(row.latest, row.previous).length > 0;
+      const chip = deltaChip(row.latest?.ttft_ms, row.previous?.ttft_ms, { lowerIsBetter: true, label: '' });
+      return `<tr data-compare-model="${esc(row.name)}"${row.name === selected ? ' class="is-selected"' : ''}>
+        <td class="mono-cell">${esc(row.name)}${regressing ? ' <span class="badge failed">回退</span>' : ''}</td>
+        <td class="num">${fmtCount(row.totals.calls)}</td>
+        <td class="num">${fmtDuration(row.totals.ttft_ms)}</td>
+        <td class="num">${fmtTpot(row.totals.tpot_ms)}</td>
+        <td class="num">${esc(p95RangeText(row.totals))}</td>
+        <td class="num">${fmtToken(row.totals.output_per_query)}</td>
+        <td class="num">${fmtDuration(row.latest?.ttft_ms)}${chip ? ` ${chip}` : ''}</td>
+      </tr>`;
+    })
+    .join('');
+  return `<div class="table-wrap"><table class="history-table compare-table">
+    <thead><tr><th>模型</th><th>调用数</th><th>平均 TTFT（估算）</th><th>平均 TPOT（估算）</th><th>耗时 P95 区间</th><th>输出 / 请求</th><th>最新 TTFT 较前日</th></tr></thead>
+    <tbody>${body}</tbody>
+  </table></div>`;
+}
+
+// The freshest point across all cases identifies the current data drop.
+function latestDataPoint(history) {
+  let latest = null;
+  for (const entry of Object.values(history?.cases || {})) {
+    for (const point of entry?.points || []) {
+      if (!latest || String(point?.finished_at || '') >= String(latest.finished_at || '')) latest = point;
+    }
+  }
+  return latest;
+}
+
+function versionLine(history) {
+  const point = latestDataPoint(history);
+  if (!point) return '暂无采集信息';
+  const parts = [];
+  if (point.run_id) parts.push(`run ${point.run_id}`);
+  const commit = typeof point.commit === 'string' ? point.commit.trim() : '';
+  if (commit) parts.push(`commit ${commit.slice(0, 10)}`);
+  if (point.finished_at) parts.push(`完成于 ${fmtDateTime(point.finished_at)}`);
+  return parts.join(' · ') || '暂无采集信息';
 }
 
 function historyTable(points) {
@@ -1518,7 +1677,13 @@ function renderModels() {
   const history = state.history;
   if (!history) return;
   const names = benchmarkModelNames(history);
-  if (!names.includes(state.model)) state.model = names[0] || null;
+  // A model named in the URL hash wins once, then falls back to the busiest.
+  if (state.hashModel) {
+    if (names.includes(state.hashModel)) state.model = state.hashModel;
+    state.hashModel = null;
+  } else if (!names.includes(state.model)) {
+    state.model = names[0] || null;
+  }
 
   const select = $('model-select');
   if (select) {
@@ -1533,17 +1698,28 @@ function renderModels() {
     select.disabled = !names.length;
   }
 
+  const granularitySelect = $('granularity-select');
+  if (granularitySelect && granularitySelect.value !== state.granularity) {
+    granularitySelect.value = state.granularity;
+  }
+
   const summary = $('model-summary');
   const trends = $('model-trends');
   const stats = $('model-stats');
   const range = $('daily-range');
   const scope = $('model-range');
+  const insights = $('model-insights');
+  const compare = $('model-compare');
+  const compareVersion = $('compare-version');
   if (!names.length) {
     const empty =
       '<p class="empty">历史中没有可确认关联的基准模型调用。nightly 产生 <code>points[].benchmark_models</code> 后，这里会按天展示 TTFT、TPOT、耗时 P95 与 Token 曲线。</p>';
     if (summary) summary.innerHTML = '';
     if (trends) trends.innerHTML = empty;
     if (stats) stats.innerHTML = '<p class="empty">暂无统计数据。</p>';
+    if (insights) insights.innerHTML = '';
+    if (compare) compare.innerHTML = '<p class="empty">暂无模型数据。</p>';
+    if (compareVersion) compareVersion.textContent = '暂无可选模型';
     if (range) range.textContent = 'Asia/Shanghai';
     if (scope) scope.textContent = '暂无可选模型';
     syncRangeButtons(true);
@@ -1557,6 +1733,11 @@ function renderModels() {
   const span = days.length
     ? `${days[0].date} 至 ${days[days.length - 1].date} · ${days.length} 天`
     : '暂无数据';
+  if (insights) insights.innerHTML = regressionBanner(days, failures);
+  if (compare) {
+    compare.innerHTML = modelCompareCard(modelComparison(history, state.rangeDays), { selected: state.model });
+  }
+  if (compareVersion) compareVersion.textContent = versionLine(history);
   if (summary) summary.innerHTML = modelSummary(days, state.model, { unit: state.tokenUnit, failure: latestFailure });
   if (trends) {
     trends.innerHTML = modelTrends(days, state.tokenVisibility, state.latencyVisibility, {
@@ -1569,13 +1750,45 @@ function renderModels() {
     stats.innerHTML =
       state.granularity === 'weekly'
         ? modelMetricTable(weeks, { label: '周（周一至周日）', dateKey: 'week_label', unit: state.tokenUnit })
-        : modelMetricTable(days, { label: '日期', unit: state.tokenUnit });
+        : modelMetricTable(days, { label: '日期', unit: state.tokenUnit, showVersion: true });
   }
   if (range) {
     range.textContent = state.granularity === 'weekly' ? `周一至周日 · ${span}` : span;
   }
   if (scope) scope.textContent = span;
   syncRangeButtons(false);
+  // Keep the URL shareable: model, range and granularity round-trip through
+  // the hash so a version manager can paste a link straight into an issue.
+  if (state.view === 'models') {
+    try {
+      window.history.replaceState(null, '', modelsHash());
+    } catch {
+      // file:// and sandboxed frames may refuse history updates; tabs still work.
+    }
+  }
+}
+
+// The models view round-trips model / range / granularity through the hash
+// (#models?model=…&range=…&granularity=…) so a link pasted into an issue or
+// release note reopens the exact same view.
+function modelsHash() {
+  const params = new URLSearchParams();
+  if (state.model) params.set('model', state.model);
+  params.set('range', String(state.rangeDays));
+  params.set('granularity', state.granularity);
+  return `#models?${params.toString()}`;
+}
+
+function applyModelsHash() {
+  const queryIndex = location.hash.indexOf('?');
+  if (queryIndex < 0) return;
+  const params = new URLSearchParams(location.hash.slice(queryIndex + 1));
+  const model = params.get('model');
+  if (model) state.hashModel = model;
+  const range = Number(params.get('range'));
+  if (Number.isFinite(range) && range > 0) state.rangeDays = Math.min(Math.floor(range), 365);
+  const granularity = params.get('granularity');
+  if (granularity === 'daily' || granularity === 'weekly') state.granularity = granularity;
 }
 
 function showView(view, { updateHash = true } = {}) {
@@ -1593,8 +1806,9 @@ function showView(view, { updateHash = true } = {}) {
     tab.setAttribute('aria-selected', String(active));
     tab.tabIndex = active ? 0 : -1;
   });
+  if (models) applyModelsHash();
   if (updateHash) {
-    const hash = models ? '#models' : '#cases';
+    const hash = models ? modelsHash() : '#cases';
     if (location.hash !== hash) {
       try {
         history.replaceState(null, '', hash);
@@ -1607,7 +1821,7 @@ function showView(view, { updateHash = true } = {}) {
 }
 
 function viewFromHash() {
-  return location.hash === '#models' ? 'models' : 'cases';
+  return location.hash.startsWith('#models') ? 'models' : 'cases';
 }
 
 function render() {
@@ -1629,6 +1843,30 @@ function showError(message) {
   $('model-summary').innerHTML = '';
   $('model-trends').innerHTML = '<p class="empty">无法加载数据。</p>';
   $('model-stats').innerHTML = '';
+  const insights = $('model-insights');
+  if (insights) insights.innerHTML = '';
+  const compare = $('model-compare');
+  if (compare) compare.innerHTML = '';
+}
+
+// The dashboard ships in two layouts: standalone (a data/ directory next to
+// this file) and embedded in the CI dashboard, where board data is assembled
+// one level up under data/e2e-performance/. Try the standalone layout first
+// and fall back to the assembled board layout.
+const DATA_BASES = ['data/', '../data/e2e-performance/']
+
+async function fetchDataJson(name, options) {
+  let lastError = null
+  for (const base of DATA_BASES) {
+    try {
+      const response = await fetch(base + name, options)
+      if (response.ok) return response
+      lastError = new Error(`HTTP ${response.status}`)
+    } catch (error) {
+      lastError = error
+    }
+  }
+  throw lastError || new Error(`无法加载 ${name}`)
 }
 
 // The production snapshot is optional and may live behind a slow private data
@@ -1640,8 +1878,8 @@ async function loadProductionMetrics() {
     ? AbortSignal.timeout(10000)
     : undefined;
   try {
-    const response = await fetch('data/model-request-metrics.json', { cache: 'no-store', signal });
-    target.innerHTML = productionMetrics(response.ok ? await response.json() : null);
+    const response = await fetchDataJson('model-request-metrics.json', { cache: 'no-store', signal });
+    target.innerHTML = productionMetrics(await response.json());
   } catch {
     target.innerHTML = productionMetrics(null);
   }
@@ -1686,6 +1924,15 @@ $('tabs').addEventListener('click', (event) => {
 
 $('model-select').addEventListener('change', (event) => {
   state.model = event.target.value || null;
+  renderModels();
+});
+
+// The comparison card doubles as a switcher: clicking a row drills into that
+// model's summary, trends and table below.
+$('model-compare').addEventListener('click', (event) => {
+  const row = event.target.closest('[data-compare-model]');
+  if (!row) return;
+  state.model = row.dataset.compareModel;
   renderModels();
 });
 
@@ -1832,3 +2079,10 @@ window.addEventListener('resize', () => {
 
 showView(viewFromHash(), { updateHash: false });
 load();
+
+// Keep the embedded view as tall as its content.
+if (window.parent !== window) {
+  const reportHeight = () => window.parent.postMessage({ type: 'production-metrics-height', height: document.documentElement.scrollHeight }, location.origin);
+  new ResizeObserver(reportHeight).observe(document.body);
+  window.addEventListener('load', reportHeight);
+}

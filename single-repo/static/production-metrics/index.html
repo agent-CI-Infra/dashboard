@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <style>.topbar, #tabs, .footer { display: none; } .page { padding-top: 0; } [data-token-unit] { display: none; }</style>
+    <style>.topbar, #tabs, .footer { display: none; } .page { padding-top: 0; }</style>
     <header class="topbar">
       <div class="topbar-main">
         <p class="eyebrow">DigitalMate · Nightly E2E</p>
@@ -65,6 +65,20 @@
           <span id="model-range" class="muted toolbar-scope">—</span>
         </div>
 
+        <div id="model-insights"></div>
+
+        <section class="card">
+          <div class="card-head">
+            <h2>模型对比</h2>
+            <span id="compare-version" class="muted">—</span>
+          </div>
+          <div id="model-compare"><p class="empty">加载中…</p></div>
+          <p class="chart-note">
+            所选时间范围内全部模型的汇总指标，按调用数排序；「最新 TTFT 较前日」达到 20% 升幅即标记为回退。
+            点击任意行可切换下方选中模型的明细。
+          </p>
+        </section>
+
         <section id="model-summary" class="summary model-summary" aria-label="模型指标汇总">
           <p class="empty">加载中…</p>
         </section>
@@ -77,7 +91,7 @@
           <div id="model-trends" class="trend-grid"><p class="empty">加载中…</p></div>
           <p class="chart-note">
             仅统计现网模型请求。TTFT/TPOT 为网关时间戳估算：未能确认是否流式的成功请求也计入，可能偏离真实首 token 指标；耗时 P95 至少需要 20 个成功样本。
-            三张图均可点击图例单独显示或隐藏曲线；Token 按每次请求统计；缺失值留空，不补 0。
+            三张图均可点击图例单独显示或隐藏曲线；本数据仅有请求数，提问数暂按请求数近似；Token 曲线可切换口径；缺失值留空，不补 0。
           </p>
         </section>
 
