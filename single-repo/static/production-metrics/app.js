@@ -184,7 +184,7 @@ function renderHeader() {
   const updated = history.updated_at
     ? `更新于 ${fmtDateTime(history.updated_at)}`
     : '暂无更新时间';
-  $('updated').textContent = updated;
+  $('updated').textContent = updated + (history.current_day_partial ? ' · 采集当日未结束' : '') + (history.excluded_missing_model ? ` · 未识别模型排除 ${fmtCount(history.excluded_missing_model)} 条` : '');
 
   const withDevice = sortedCases().find((entry) => entry.latest?.device);
   const device = history.device || withDevice?.latest?.device;
@@ -503,7 +503,9 @@ function deltaChip(current, previous, { lowerIsBetter = false, colorDirection = 
 }
 
 function previousRow(rows) {
-  return Array.isArray(rows) && rows.length > 1 ? rows[rows.length - 2] : null;
+  if (!Array.isArray(rows) || rows.length < 2) return null;
+  const previous = rows[rows.length - 2];
+  return addDays(previous.date, 1) === rows[rows.length - 1].date ? previous : null;
 }
 
 function benchmarkModelName(row) {
@@ -619,7 +621,8 @@ function failureSeries(history, dates, model) {
       const day = byDate.get(point.date);
       const queries = point.query_count;
       const failed = point.failed_queries;
-      if (models.size !== 1 || !Number.isFinite(queries) || queries <= 0 || !Number.isFinite(failed) || failed < 0 || failed > queries) {
+      const unknown = point.unknown_status_count;
+      if (unknown !== 0 || models.size !== 1 || !Number.isFinite(queries) || queries <= 0 || !Number.isFinite(failed) || failed < 0 || failed > queries) {
         day.complete = false;
         continue;
       }
@@ -690,7 +693,7 @@ function perfStrip(history) {
       <div class="stat-hint">${esc(changeHint)}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">提问失败率</div>
+      <div class="stat-label">请求失败率</div>
       <div class="stat-value ${failure?.failed ? 'failed' : 'ok'}">${failure ? fmtPercent(failure.failure_rate) : '—'}</div>
       <div class="stat-hint">${failure ? `失败 ${fmtCount(failure.failed)} / 请求 ${fmtCount(failure.queries)}${failure.blocked ? ` · 阻塞 ${fmtCount(failure.blocked)}` : ''}` : '暂无请求数据'}</div>
     </div>
@@ -707,6 +710,7 @@ function newMetricAccumulator() {
     tpot_samples: 0,
     p95_min: null,
     p95_max: null,
+    p95_complete: true,
     duration_samples: 0,
     input_sum: 0,
     input_complete: true,
@@ -738,6 +742,7 @@ function mergeMetricRow(acc, row) {
   }
   if (Number.isFinite(row?.duration_samples) && row.duration_samples > 0) {
     acc.duration_samples += row.duration_samples;
+    if (!Number.isFinite(row.p95_ms)) acc.p95_complete = false;
   }
   for (const key of ['input', 'output', 'total']) {
     const value = row?.[`${key}_tokens`];
@@ -754,8 +759,8 @@ function finalizeMetricAccumulator(acc) {
     ttft_samples: acc.ttft_samples,
     tpot_ms: acc.tpot_samples > 0 ? acc.tpot_sum / acc.tpot_samples : null,
     tpot_samples: acc.tpot_samples,
-    p95_lower_ms: acc.p95_min,
-    p95_ms: acc.p95_max,
+    p95_lower_ms: acc.p95_complete ? acc.p95_min : null,
+    p95_ms: acc.p95_complete ? acc.p95_max : null,
     duration_samples: acc.duration_samples,
   };
   for (const key of ['input', 'output', 'total']) {
@@ -855,13 +860,22 @@ function weekSeries(days) {
 
 // The range control scopes every card below it: keep only rows inside the
 // trailing calendar window ending at the latest data date.
-function inRange(days, rangeDays) {
+function inRange(days, rangeDays, endDate = null) {
   const rows = Array.isArray(days) ? days : [];
   const span = Number(rangeDays);
   if (!Number.isFinite(span) || span <= 0 || !rows.length) return rows;
-  const end = rows[rows.length - 1].date;
+  const end = endDate || rows[rows.length - 1].date;
   const start = addDays(end, -(span - 1));
   return rows.filter((row) => row.date >= start && row.date <= end);
+}
+
+function latestModelDate(history) {
+  let latest = '';
+  for (const name of benchmarkModelNames(history)) {
+    const date = modelSeries(history, name).at(-1)?.date || '';
+    if (date > latest) latest = date;
+  }
+  return latest;
 }
 
 // SVG charts scale their whole viewBox, labels included. On a phone a fixed
@@ -901,7 +915,7 @@ function volumeTrendChart(days, failures, visibility = {}) {
     },
     {
       key: 'failure',
-      label: '提问失败率',
+      label: '请求失败率',
       layer: 'failure',
       values: rows.map((row) => {
         const rate = failureByDate.get(row?.date)?.failure_rate;
@@ -919,7 +933,7 @@ function volumeTrendChart(days, failures, visibility = {}) {
       </button>`;
     })
     .join('');
-  const head = `<div class="trend-head"><h3>调用数与提问失败率</h3><div class="trend-legend">${legend}</div></div>`;
+  const head = `<div class="trend-head"><h3>调用数与请求失败率</h3><div class="trend-legend">${legend}</div></div>`;
   if (!rows.length || series.every((item) => item.values.every((value) => value === null))) {
     return `<div class="trend-card wide">${head}<p class="empty">暂无数据</p></div>`;
   }
@@ -933,7 +947,7 @@ function volumeTrendChart(days, failures, visibility = {}) {
   const innerWidth = width - pad.left - pad.right;
   const innerHeight = height - pad.top - pad.bottom;
   const leftMax = niceMax(hasLeft ? Math.max(...leftValues) : 1);
-  const rightMax = niceMax(hasRight ? Math.max(...rightValues, 10) : 10);
+  const rightMax = Math.min(100, niceMax(hasRight ? Math.max(...rightValues, 10) : 10));
   const x = (index) =>
     rows.length === 1 ? pad.left + innerWidth / 2 : pad.left + (index * innerWidth) / (rows.length - 1);
   const yLeft = (value) => pad.top + innerHeight - (Math.max(0, value) / leftMax) * innerHeight;
@@ -1025,7 +1039,7 @@ function volumeTrendChart(days, failures, visibility = {}) {
         .join('')
     : '';
 
-  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="调用数与提问失败率趋势">
+  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="调用数与请求失败率趋势">
     ${grid}
     <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
     ${layers}
@@ -1033,7 +1047,7 @@ function volumeTrendChart(days, failures, visibility = {}) {
     ${xLabels}
     <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
     ${zones}
-  </svg><p class="chart-note">调用数使用左侧计数轴，提问失败率使用右侧百分比轴（所选模型的请求）。</p></div>`;
+  </svg><p class="chart-note">调用数使用左侧计数轴，请求失败率使用右侧百分比轴（所选模型的请求）。</p></div>`;
 }
 
 function p95RangeText(row) {
@@ -1373,7 +1387,7 @@ function modelSummary(days, model, { unit = 'query', failure = null } = {}) {
       <div class="stat-hint">${hint(`当日合计 ${fmtToken(latest.total_tokens)}`, deltaChip(latest[`total_${suffix}`], previous?.[`total_${suffix}`], { colorDirection: true }))}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">提问失败率</div>
+      <div class="stat-label">请求失败率</div>
       <div class="stat-value ${failure ? (failure.failed ? 'failed' : 'ok') : ''}">${failure ? fmtPercent(failure.failure_rate) : '—'}</div>
       <div class="stat-hint">${failure ? `所选模型 · 失败 ${fmtCount(failure.failed)} / 请求 ${fmtCount(failure.queries)}${failure.blocked ? ` · 阻塞 ${fmtCount(failure.blocked)}` : ''}` : '暂无请求数据'}</div>
     </div>
@@ -1391,7 +1405,8 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
   const versionHead = showVersion ? '<th>版本</th>' : '';
   const body = [...rows]
     .map((row, index) => {
-      const previous = index > 0 ? rows[index - 1] : null;
+      const prior = index > 0 ? rows[index - 1] : null;
+      const previous = prior && (!row.date || addDays(prior.date, 1) === row.date) ? prior : null;
       const ttftChip = deltaChip(row?.ttft_ms, previous?.ttft_ms, { lowerIsBetter: true, label: '' });
       const tpotChip = deltaChip(row?.tpot_ms, previous?.tpot_ms, { lowerIsBetter: true, label: '' });
       const p95Chip = deltaChip(row?.p95_ms, previous?.p95_ms, { lowerIsBetter: true, label: '' });
@@ -1414,7 +1429,7 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
     .reverse()
     .join('');
   return `<div class="table-wrap"><table class="history-table">
-    <thead><tr><th>${esc(label)}</th>${versionHead}<th>调用数</th><th>请求数</th><th title="所选模型，以请求数近似提问数">提问失败率</th><th class="metric-column">平均 TTFT（样本）</th><th class="metric-column">平均 TPOT（样本）</th><th class="metric-column">耗时 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th></tr></thead>
+    <thead><tr><th>${esc(label)}</th>${versionHead}<th>调用数</th><th>请求数</th><th title="所选模型的失败请求占全部请求的比例；未知状态时不显示">请求失败率</th><th class="metric-column">平均 TTFT（样本）</th><th class="metric-column">平均 TPOT（样本）</th><th class="metric-column">耗时 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th></tr></thead>
     <tbody>${body}</tbody>
   </table></div>`;
 }
@@ -1452,7 +1467,8 @@ function regressionFindings(latest, previous) {
 function regressionBanner(days, failures = []) {
   if (!Array.isArray(days) || days.length < 2) return '';
   const latest = days[days.length - 1];
-  const previous = days[days.length - 2];
+  const previous = previousRow(days);
+  if (!previous) return '';
   const notes = regressionFindings(latest, previous).map(
     (finding) => `${finding.label} ▲${Math.round(finding.change)}%`,
   );
@@ -1465,7 +1481,7 @@ function regressionBanner(days, failures = []) {
     // A jump from zero (or a doubling) is the signal; small absolute rates stay quiet.
     if (latestFailure.failure_rate >= Math.max(previousRate * 2, previousRate + 5)) {
       notes.push(
-        `提问失败率升至 ${fmtPercent(latestFailure.failure_rate)}（失败 ${fmtCount(latestFailure.failed)} / 请求 ${fmtCount(latestFailure.queries)}）`,
+        `请求失败率升至 ${fmtPercent(latestFailure.failure_rate)}（失败 ${fmtCount(latestFailure.failed)} / 请求 ${fmtCount(latestFailure.queries)}）`,
       );
     }
   }
@@ -1497,7 +1513,7 @@ function modelComparison(history, rangeDays = 0) {
       name,
       totals: finalizeMetricAccumulator(acc),
       latest: scoped[scoped.length - 1],
-      previous: scoped.length > 1 ? scoped[scoped.length - 2] : null,
+      previous: previousRow(scoped),
     });
   }
   return rows;
@@ -1658,7 +1674,7 @@ function syncRangeButtons(disabled = false) {
 
 function currentModelDays() {
   if (!state.history || !state.model) return [];
-  return inRange(modelSeries(state.history, state.model), state.rangeDays);
+  return inRange(modelSeries(state.history, state.model), state.rangeDays, latestModelDate(state.history));
 }
 
 function renderTrends() {

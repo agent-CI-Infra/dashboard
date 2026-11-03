@@ -28,7 +28,7 @@ jobs:
             exit 1
           fi
           mkdir -p /tmp/production-model-metrics
-          python3 scripts/collect-production-model-history.py /tmp/production-model-metrics 10
+          python3 scripts/collect-production-model-history.py /tmp/production-model-metrics 35
       - name: Publish aggregate to the DigitalMate data branch
         id: update
         run: |
