@@ -1,0 +1,54 @@
+name: Collect DigitalMate production model metrics
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 21 * * *'
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: collect-production-model-metrics
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Collect aggregated gateway metrics
+        env:
+          PRODUCTION_GATEWAY_KEY: ${{ secrets.PRODUCTION_GATEWAY_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$PRODUCTION_GATEWAY_KEY" ]; then
+            echo '::error::PRODUCTION_GATEWAY_KEY is not configured.'
+            exit 1
+          fi
+          mkdir -p /tmp/production-model-metrics
+          python3 scripts/collect-production-model-history.py /tmp/production-model-metrics 35
+      - name: Publish aggregate to the DigitalMate data branch
+        id: update
+        run: |
+          set -euo pipefail
+          git fetch origin digitalmate:refs/remotes/origin/digitalmate
+          git checkout -B digitalmate origin/digitalmate
+          cp /tmp/production-model-metrics/production-model-history.json site/data/production-model-history.json
+          if git diff --quiet -- site/data/production-model-history.json && git ls-files --error-unmatch site/data/production-model-history.json >/dev/null 2>&1; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site/data/production-model-history.json
+          git commit -m 'chore(digitalmate): update production model metrics'
+          git pull --rebase origin digitalmate
+          git push origin HEAD:digitalmate
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+      - name: Deploy dashboard
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main

@@ -6,10 +6,6 @@ import {
 } from '@/lib/monitor/data'
 import { formatDate } from '@/lib/monitor/format'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { LanguageSwitch } from '@/components/language-switch'
-import { Header } from '@/components/layout/header'
-import { Main } from '@/components/layout/main'
-import { ThemeSwitch } from '@/components/theme-switch'
 import {
   Table,
   TableBody,
@@ -18,6 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { LanguageSwitch } from '@/components/language-switch'
+import { Header } from '@/components/layout/header'
+import { Main } from '@/components/layout/main'
+import { ThemeSwitch } from '@/components/theme-switch'
 import { MonitorHeader } from './components/monitor-header'
 import { RepoFilter } from './components/repo-filter'
 import { EmptyState, ErrorState, LoadingState } from './components/states'
@@ -186,7 +186,10 @@ export function VersionsAnalysis() {
                           <LinkCell href={r.readmeUrl} label='README' />
                         </TableCell>
                         <TableCell>
-                          <LinkCell href={r.releaseNoteUrl} label='Release Note' />
+                          <LinkCell
+                            href={r.releaseNoteUrl}
+                            label='Release Note'
+                          />
                         </TableCell>
                         <TableCell>
                           <LinkCell href={r.videoUrl} label='点击进入' />

@@ -1599,7 +1599,7 @@
   // ------------------------------------------------------------ shell
   const activeTab = () => {
     const requested = location.hash.slice(1);
-    const known = [...document.querySelectorAll('#tabs [data-tab]')].some(tab => tab.dataset.tab === requested);
+    const known = [...document.querySelectorAll('#tabs [data-tab]')].some(tab => (!tab.hidden || (!STATE.snap && requested === 'production-metrics')) && tab.dataset.tab === requested);
     if (known) return requested;
     if (requested) history.replaceState(history.state, '', location.pathname + location.search + '#overview');
     return 'overview';
@@ -1607,6 +1607,11 @@
 
   function renderShell() {
     const snap=STATE.snap, btn=$('#refresh-btn'), banner=$('#global-banner');
+    const productionTab = document.querySelector('[data-tab="production-metrics"]');
+    productionTab.hidden = !snap || String(snap.repo || '').toLowerCase() !== 'openjiuwen-ai/digitalmate';
+    if (snap && productionTab.hidden && STATE.tab === 'production-metrics') { STATE.tab = 'overview'; history.replaceState(history.state, '', location.pathname + location.search + '#overview'); }
+    const frame = document.querySelector('#tab-production-metrics iframe');
+    if (!productionTab.hidden && STATE.tab === 'production-metrics' && frame.getAttribute('src') === 'about:blank') frame.src = './production-metrics/index.html#models';
     btn.disabled=!!STATE.status?.refreshing;
     btn.textContent=btn.disabled?'读取中…':'刷新视图';
     if(snap){
@@ -1829,6 +1834,13 @@
   $('#refresh-btn').addEventListener('click', refresh);
   // Browsers throttle timers in background tabs; re-sync as soon as the tab is visible again.
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { clearTimeout(STATE.pollTimer); load(); } });
+  window.addEventListener('message', (event) => {
+    const frame = document.querySelector('#tab-production-metrics iframe');
+    if (event.origin !== location.origin || event.source !== frame?.contentWindow || event.data?.type !== 'production-metrics-height') return;
+    const height = Number(event.data.height);
+    if (Number.isFinite(height) && height >= 100 && height <= 20000) frame.style.height = `${Math.ceil(height)}px`;
+  });
+
   window.addEventListener('hashchange', () => { STATE.tab = activeTab(); renderShell(); mountBoard(); document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.id === `tab-${STATE.tab}`)); pinLanes(); drawTrends(); loadE2EHistory(); });
   // Tooltip layer: any element with data-tip.
   const tipEl = $('#tooltip');
