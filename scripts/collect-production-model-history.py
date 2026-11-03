@@ -24,6 +24,7 @@ import time
 import urllib.parse
 import urllib.request
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -99,21 +100,33 @@ def fetch_rows(key, start, end):
     return rows
 
 
-def fetch_window(key, start, end):
-    # Split large windows into overlapping one-day pages; deduplicate boundary rows.
+def fetch_window(key, start, end, workers=3):
+    # Split large windows into overlapping one-day pages; bound gateway load and
+    # keep page validation within each day before deduplicating boundary rows.
     rows = []
     seen = {}
     cursor = start
+    windows = []
     while cursor < end:
         stop = min(cursor + timedelta(days=1), end)
-        for row in fetch_rows(key, cursor, stop):
-            request_id = row['request_id']
-            if request_id in seen and seen[request_id] != row:
-                raise ValueError('Gateway record changed across window boundaries')
-            if request_id not in seen:
-                rows.append(row)
-                seen[request_id] = row
+        windows.append((cursor, stop))
         cursor = stop
+
+    def collect_day(window):
+        day_start, day_end = window
+        result = fetch_rows(key, day_start, day_end)
+        print(f'Collected window {day_start:%Y-%m-%d %H:%M} UTC: {len(result)} records', flush=True)
+        return result
+
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        for batch in executor.map(collect_day, windows):
+            for row in batch:
+                request_id = row['request_id']
+                if request_id in seen and seen[request_id] != row:
+                    raise ValueError('Gateway record changed across window boundaries')
+                if request_id not in seen:
+                    rows.append(row)
+                    seen[request_id] = row
     return rows
 
 
