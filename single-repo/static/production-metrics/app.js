@@ -1497,11 +1497,11 @@ function modelComparison(history, rangeDays = 0) {
   const rows = [];
   for (const [name, days] of perModel) {
     const scoped = start ? days.filter((day) => day.date >= start && day.date <= end) : days;
-    if (!scoped.length) continue;
     const acc = newMetricAccumulator();
     for (const day of scoped) mergeMetricRow(acc, day);
     rows.push({
       name,
+      hasData: scoped.length > 0,
       totals: finalizeMetricAccumulator(acc),
       latest: scoped[scoped.length - 1],
       previous: previousRow(scoped),
@@ -1517,8 +1517,8 @@ function modelCompareCard(rows, { selected = null } = {}) {
       const regressing = regressionFindings(row.latest, row.previous).length > 0;
       const chip = deltaChip(row.latest?.ttft_ms, row.previous?.ttft_ms, { lowerIsBetter: true, label: '' });
       return `<tr data-compare-model="${esc(row.name)}"${row.name === selected ? ' class="is-selected"' : ''}>
-        <td class="mono-cell">${esc(row.name)}${regressing ? ' <span class="badge failed">回退</span>' : ''}</td>
-        <td class="num">${fmtCount(row.totals.calls)}</td>
+        <td class="mono-cell"><button type="button" class="compare-model-button" data-select-model="${esc(row.name)}" aria-pressed="${row.name === selected}">${esc(row.name)}</button>${row.name === selected ? ' <span class="selected-model-badge">当前查看</span>' : ''}${regressing ? ' <span class="badge failed">回退</span>' : ''}</td>
+        <td class="num">${row.hasData ? fmtCount(row.totals.calls) : '无数据'}</td>
         <td class="num">${fmtDuration(row.totals.ttft_ms)}</td>
         <td class="num">${fmtTpot(row.totals.tpot_ms)}</td>
         <td class="num">${esc(p95RangeText(row.totals))}</td>
@@ -1697,24 +1697,12 @@ function renderModels() {
     state.model = names[0] || null;
   }
 
-  const select = $('model-select');
-  if (select) {
-    select.innerHTML = names.length
-      ? names
-          .map(
-            (name) =>
-              `<option value="${esc(name)}"${name === state.model ? ' selected' : ''}>${esc(name)}</option>`,
-          )
-          .join('')
-      : '<option value="">暂无模型数据</option>';
-    select.disabled = !names.length;
-  }
-
   const granularitySelect = $('granularity-select');
   if (granularitySelect && granularitySelect.value !== state.granularity) {
     granularitySelect.value = state.granularity;
   }
 
+  const currentModel = $('current-model');
   const summary = $('model-summary');
   const trends = $('model-trends');
   const stats = $('model-stats');
@@ -1724,6 +1712,7 @@ function renderModels() {
   const compare = $('model-compare');
   const compareVersion = $('compare-version');
   if (!names.length) {
+    if (currentModel) currentModel.textContent = '';
     const empty =
       '<p class="empty">历史中没有可确认关联的基准模型调用。nightly 产生 <code>points[].benchmark_models</code> 后，这里会按天展示 TTFT、TPOT、耗时 P95 与 Token 曲线。</p>';
     if (summary) summary.innerHTML = '';
@@ -1738,6 +1727,7 @@ function renderModels() {
     return;
   }
 
+  if (currentModel) currentModel.textContent = `当前模型：${state.model}`;
   const days = currentModelDays();
   const weeks = weekSeries(days);
   const failures = failureSeries(history, days, state.model);
@@ -1936,18 +1926,18 @@ $('tabs').addEventListener('click', (event) => {
   showView(button.dataset.view);
 });
 
-$('model-select').addEventListener('change', (event) => {
-  state.model = event.target.value || null;
-  renderModels();
-});
-
 // The comparison card doubles as a switcher: clicking a row drills into that
 // model's summary, trends and table below.
 $('model-compare').addEventListener('click', (event) => {
   const row = event.target.closest('[data-compare-model]');
   if (!row) return;
+  const restoreFocus = event.target.closest('[data-select-model]') !== null;
   state.model = row.dataset.compareModel;
   renderModels();
+  if (restoreFocus) {
+    const button = [...document.querySelectorAll('[data-select-model]')].find((item) => item.dataset.selectModel === state.model);
+    button?.focus();
+  }
 });
 
 $('granularity-select').addEventListener('change', (event) => {
