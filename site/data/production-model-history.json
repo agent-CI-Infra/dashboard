@@ -1,0 +1,1116 @@
+{
+ "schema": "digitalmate/e2e-performance-history@1",
+ "generated_at": "2026-11-03T10:32:24Z",
+ "updated_at": "2026-11-03T10:32:24Z",
+ "window_start": "2026-09-29T16:00:00+00:00",
+ "window_end": "2026-11-03T10:20:23+00:00",
+ "current_day_partial": true,
+ "source_scope": "gateway-all-requests",
+ "excluded_missing_model": 75,
+ "device": {
+  "model": "现网网关 prod / adx-jiuwen",
+  "kind": "gateway"
+ },
+ "cases": {
+  "PROD-deepseek-v4.1-flash-1017-openai-deepseek-v4.1-flash-1017-d7faf14fc9e3": {
+   "title": "现网模型 deepseek-v4.1-flash-1017",
+   "points": [
+    {
+     "date": "2026-10-28",
+     "status": "COMPLETED",
+     "query_ms": 4850,
+     "query_count": 507,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-28T15:31:05Z",
+     "failed_queries": 3,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/deepseek-v4.1-flash-1017",
+       "call_count": 507,
+       "ttft_avg_ms": 3369,
+       "ttft_sample_count": 373,
+       "tpot_avg_ms": 2.79,
+       "tpot_sample_count": 372,
+       "duration_p95_ms": 14484,
+       "duration_sample_count": 504,
+       "input_tokens": 12614414,
+       "output_tokens": 273030,
+       "total_tokens": 12887444
+      }
+     ]
+    },
+    {
+     "date": "2026-10-29",
+     "status": "COMPLETED",
+     "query_ms": 5466,
+     "query_count": 885,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-29T15:59:02Z",
+     "failed_queries": 40,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/deepseek-v4.1-flash-1017",
+       "call_count": 885,
+       "ttft_avg_ms": 3581,
+       "ttft_sample_count": 634,
+       "tpot_avg_ms": 2.71,
+       "tpot_sample_count": 633,
+       "duration_p95_ms": 18566,
+       "duration_sample_count": 845,
+       "input_tokens": 30707015,
+       "output_tokens": 606777,
+       "total_tokens": 31313792
+      }
+     ]
+    },
+    {
+     "date": "2026-10-30",
+     "status": "COMPLETED",
+     "query_ms": 6276,
+     "query_count": 502,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-30T15:27:51Z",
+     "failed_queries": 78,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/deepseek-v4.1-flash-1017",
+       "call_count": 502,
+       "ttft_avg_ms": 4619,
+       "ttft_sample_count": 324,
+       "tpot_avg_ms": 2.67,
+       "tpot_sample_count": 324,
+       "duration_p95_ms": 25467,
+       "duration_sample_count": 424,
+       "input_tokens": 20259238,
+       "output_tokens": 299847,
+       "total_tokens": 20559085
+      }
+     ]
+    },
+    {
+     "date": "2026-10-31",
+     "status": "COMPLETED",
+     "query_ms": 6885,
+     "query_count": 260,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-31T15:52:28Z",
+     "failed_queries": 17,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/deepseek-v4.1-flash-1017",
+       "call_count": 260,
+       "ttft_avg_ms": 5811,
+       "ttft_sample_count": 160,
+       "tpot_avg_ms": 3.09,
+       "tpot_sample_count": 160,
+       "duration_p95_ms": 39901,
+       "duration_sample_count": 243,
+       "input_tokens": 12491146,
+       "output_tokens": 156797,
+       "total_tokens": 12647943
+      }
+     ]
+    },
+    {
+     "date": "2026-11-01",
+     "status": "COMPLETED",
+     "query_ms": 4977,
+     "query_count": 1405,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-11-01T14:08:47Z",
+     "failed_queries": 5,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/deepseek-v4.1-flash-1017",
+       "call_count": 1405,
+       "ttft_avg_ms": 3005,
+       "ttft_sample_count": 1011,
+       "tpot_avg_ms": 2.43,
+       "tpot_sample_count": 1011,
+       "duration_p95_ms": 18013,
+       "duration_sample_count": 1400,
+       "input_tokens": 48162122,
+       "output_tokens": 1121999,
+       "total_tokens": 49284121
+      }
+     ]
+    },
+    {
+     "date": "2026-11-02",
+     "status": "COMPLETED",
+     "query_ms": 6368,
+     "query_count": 1174,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-11-02T15:55:04Z",
+     "failed_queries": 28,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/deepseek-v4.1-flash-1017",
+       "call_count": 1174,
+       "ttft_avg_ms": 3341,
+       "ttft_sample_count": 858,
+       "tpot_avg_ms": 3.08,
+       "tpot_sample_count": 858,
+       "duration_p95_ms": 22602,
+       "duration_sample_count": 1146,
+       "input_tokens": 42177069,
+       "output_tokens": 1046313,
+       "total_tokens": 43223382
+      }
+     ]
+    },
+    {
+     "date": "2026-11-03",
+     "status": "COMPLETED",
+     "query_ms": 6565,
+     "query_count": 358,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-11-03T10:10:53Z",
+     "failed_queries": 21,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/deepseek-v4.1-flash-1017",
+       "call_count": 358,
+       "ttft_avg_ms": 4489,
+       "ttft_sample_count": 248,
+       "tpot_avg_ms": 3.42,
+       "tpot_sample_count": 247,
+       "duration_p95_ms": 23467,
+       "duration_sample_count": 337,
+       "input_tokens": 10322024,
+       "output_tokens": 213079,
+       "total_tokens": 10535103
+      }
+     ]
+    }
+   ],
+   "latest": {
+    "date": "2026-11-03",
+    "status": "COMPLETED",
+    "query_ms": 6565,
+    "query_count": 358,
+    "run_id": "prod-adx-jiuwen",
+    "commit": "",
+    "finished_at": "2026-11-03T10:10:53Z",
+    "failed_queries": 21,
+    "unknown_status_count": 0,
+    "blocked_queries": 0,
+    "benchmark_models": [
+     {
+      "model": "openai/deepseek-v4.1-flash-1017",
+      "call_count": 358,
+      "ttft_avg_ms": 4489,
+      "ttft_sample_count": 248,
+      "tpot_avg_ms": 3.42,
+      "tpot_sample_count": 247,
+      "duration_p95_ms": 23467,
+      "duration_sample_count": 337,
+      "input_tokens": 10322024,
+      "output_tokens": 213079,
+      "total_tokens": 10535103
+     }
+    ]
+   }
+  },
+  "PROD-glm-5.2-glm-5.2-286b70252d4f": {
+   "title": "现网模型 glm-5.2",
+   "points": [
+    {
+     "date": "2026-10-20",
+     "status": "FAILED",
+     "query_ms": null,
+     "query_count": 1,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-20T08:13:49Z",
+     "failed_queries": 1,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "glm-5.2",
+       "call_count": 1,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "duration_p95_ms": null,
+       "duration_sample_count": 0,
+       "input_tokens": 0,
+       "output_tokens": 0,
+       "total_tokens": 0
+      }
+     ]
+    }
+   ],
+   "latest": {
+    "date": "2026-10-20",
+    "status": "FAILED",
+    "query_ms": null,
+    "query_count": 1,
+    "run_id": "prod-adx-jiuwen",
+    "commit": "",
+    "finished_at": "2026-10-20T08:13:49Z",
+    "failed_queries": 1,
+    "unknown_status_count": 0,
+    "blocked_queries": 0,
+    "benchmark_models": [
+     {
+      "model": "glm-5.2",
+      "call_count": 1,
+      "ttft_avg_ms": null,
+      "ttft_sample_count": 0,
+      "tpot_avg_ms": null,
+      "tpot_sample_count": 0,
+      "duration_p95_ms": null,
+      "duration_sample_count": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0
+     }
+    ]
+   }
+  },
+  "PROD-glm-5.2-openai-glm-5.2-8eb06d8c8024": {
+   "title": "现网模型 glm-5.2",
+   "points": [
+    {
+     "date": "2026-10-15",
+     "status": "COMPLETED",
+     "query_ms": 17793,
+     "query_count": 180,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-15T15:52:52Z",
+     "failed_queries": 42,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/glm-5.2",
+       "call_count": 180,
+       "ttft_avg_ms": 6346,
+       "ttft_sample_count": 138,
+       "tpot_avg_ms": 24.13,
+       "tpot_sample_count": 138,
+       "duration_p95_ms": 86496,
+       "duration_sample_count": 138,
+       "input_tokens": 9417229,
+       "output_tokens": 68351,
+       "total_tokens": 9485580
+      }
+     ]
+    },
+    {
+     "date": "2026-10-16",
+     "status": "COMPLETED",
+     "query_ms": 17231,
+     "query_count": 1126,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-16T13:15:19Z",
+     "failed_queries": 205,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/glm-5.2",
+       "call_count": 1126,
+       "ttft_avg_ms": 5791,
+       "ttft_sample_count": 918,
+       "tpot_avg_ms": 22.64,
+       "tpot_sample_count": 910,
+       "duration_p95_ms": 49291,
+       "duration_sample_count": 921,
+       "input_tokens": 34880115,
+       "output_tokens": 486641,
+       "total_tokens": 35366756
+      }
+     ]
+    },
+    {
+     "date": "2026-10-17",
+     "status": "COMPLETED",
+     "query_ms": 12485,
+     "query_count": 64,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-17T05:51:42Z",
+     "failed_queries": 24,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/glm-5.2",
+       "call_count": 64,
+       "ttft_avg_ms": 5220,
+       "ttft_sample_count": 40,
+       "tpot_avg_ms": 22.48,
+       "tpot_sample_count": 40,
+       "duration_p95_ms": 22709,
+       "duration_sample_count": 40,
+       "input_tokens": 970287,
+       "output_tokens": 13161,
+       "total_tokens": 983448
+      }
+     ]
+    },
+    {
+     "date": "2026-10-19",
+     "status": "COMPLETED",
+     "query_ms": 15514,
+     "query_count": 256,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-19T15:26:06Z",
+     "failed_queries": 86,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/glm-5.2",
+       "call_count": 256,
+       "ttft_avg_ms": 5470,
+       "ttft_sample_count": 170,
+       "tpot_avg_ms": 22.82,
+       "tpot_sample_count": 169,
+       "duration_p95_ms": 43915,
+       "duration_sample_count": 170,
+       "input_tokens": 5475222,
+       "output_tokens": 75829,
+       "total_tokens": 5551051
+      }
+     ]
+    },
+    {
+     "date": "2026-10-20",
+     "status": "COMPLETED",
+     "query_ms": 17474,
+     "query_count": 493,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-20T13:49:06Z",
+     "failed_queries": 79,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/glm-5.2",
+       "call_count": 493,
+       "ttft_avg_ms": 5420,
+       "ttft_sample_count": 413,
+       "tpot_avg_ms": 22.81,
+       "tpot_sample_count": 410,
+       "duration_p95_ms": 57025,
+       "duration_sample_count": 414,
+       "input_tokens": 16628941,
+       "output_tokens": 220467,
+       "total_tokens": 16849408
+      }
+     ]
+    },
+    {
+     "date": "2026-10-21",
+     "status": "COMPLETED",
+     "query_ms": 14209,
+     "query_count": 175,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-21T13:34:12Z",
+     "failed_queries": 42,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/glm-5.2",
+       "call_count": 175,
+       "ttft_avg_ms": 5864,
+       "ttft_sample_count": 133,
+       "tpot_avg_ms": 23.58,
+       "tpot_sample_count": 132,
+       "duration_p95_ms": 35931,
+       "duration_sample_count": 133,
+       "input_tokens": 4549280,
+       "output_tokens": 47494,
+       "total_tokens": 4596774
+      }
+     ]
+    },
+    {
+     "date": "2026-10-22",
+     "status": "COMPLETED",
+     "query_ms": 17640,
+     "query_count": 262,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-22T13:16:44Z",
+     "failed_queries": 38,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/glm-5.2",
+       "call_count": 262,
+       "ttft_avg_ms": 5861,
+       "ttft_sample_count": 224,
+       "tpot_avg_ms": 22.42,
+       "tpot_sample_count": 223,
+       "duration_p95_ms": 44517,
+       "duration_sample_count": 224,
+       "input_tokens": 8043955,
+       "output_tokens": 118586,
+       "total_tokens": 8162541
+      }
+     ]
+    },
+    {
+     "date": "2026-10-23",
+     "status": "COMPLETED",
+     "query_ms": 22357,
+     "query_count": 428,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-23T15:59:57Z",
+     "failed_queries": 137,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/glm-5.2",
+       "call_count": 428,
+       "ttft_avg_ms": 6314,
+       "ttft_sample_count": 261,
+       "tpot_avg_ms": 20.56,
+       "tpot_sample_count": 257,
+       "duration_p95_ms": 67046,
+       "duration_sample_count": 291,
+       "input_tokens": 5976786,
+       "output_tokens": 216720,
+       "total_tokens": 6193506
+      }
+     ]
+    },
+    {
+     "date": "2026-10-24",
+     "status": "COMPLETED",
+     "query_ms": 27957,
+     "query_count": 351,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-24T15:48:19Z",
+     "failed_queries": 76,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/glm-5.2",
+       "call_count": 351,
+       "ttft_avg_ms": 7341,
+       "ttft_sample_count": 218,
+       "tpot_avg_ms": 15.55,
+       "tpot_sample_count": 217,
+       "duration_p95_ms": 80898,
+       "duration_sample_count": 275,
+       "input_tokens": 5299388,
+       "output_tokens": 296248,
+       "total_tokens": 5595636
+      }
+     ]
+    },
+    {
+     "date": "2026-10-25",
+     "status": "COMPLETED",
+     "query_ms": 25017,
+     "query_count": 405,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-25T15:50:56Z",
+     "failed_queries": 114,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/glm-5.2",
+       "call_count": 405,
+       "ttft_avg_ms": 8695,
+       "ttft_sample_count": 209,
+       "tpot_avg_ms": 12.75,
+       "tpot_sample_count": 207,
+       "duration_p95_ms": 92100,
+       "duration_sample_count": 291,
+       "input_tokens": 4535869,
+       "output_tokens": 271913,
+       "total_tokens": 4807782
+      }
+     ]
+    },
+    {
+     "date": "2026-10-26",
+     "status": "COMPLETED",
+     "query_ms": 26028,
+     "query_count": 1295,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-26T14:54:41Z",
+     "failed_queries": 365,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/glm-5.2",
+       "call_count": 1295,
+       "ttft_avg_ms": 10655,
+       "ttft_sample_count": 662,
+       "tpot_avg_ms": 14.2,
+       "tpot_sample_count": 661,
+       "duration_p95_ms": 85957,
+       "duration_sample_count": 930,
+       "input_tokens": 12671383,
+       "output_tokens": 848420,
+       "total_tokens": 13519803
+      }
+     ]
+    },
+    {
+     "date": "2026-10-27",
+     "status": "COMPLETED",
+     "query_ms": 32715,
+     "query_count": 389,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-27T15:28:32Z",
+     "failed_queries": 114,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/glm-5.2",
+       "call_count": 389,
+       "ttft_avg_ms": 11300,
+       "ttft_sample_count": 193,
+       "tpot_avg_ms": 13.72,
+       "tpot_sample_count": 192,
+       "duration_p95_ms": 123409,
+       "duration_sample_count": 275,
+       "input_tokens": 3257442,
+       "output_tokens": 326873,
+       "total_tokens": 3584315
+      }
+     ]
+    },
+    {
+     "date": "2026-10-28",
+     "status": "COMPLETED",
+     "query_ms": 24528,
+     "query_count": 246,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-28T08:15:05Z",
+     "failed_queries": 69,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/glm-5.2",
+       "call_count": 246,
+       "ttft_avg_ms": 10571,
+       "ttft_sample_count": 126,
+       "tpot_avg_ms": 12.43,
+       "tpot_sample_count": 126,
+       "duration_p95_ms": 79684,
+       "duration_sample_count": 177,
+       "input_tokens": 2500990,
+       "output_tokens": 159958,
+       "total_tokens": 2660948
+      }
+     ]
+    },
+    {
+     "date": "2026-10-29",
+     "status": "COMPLETED",
+     "query_ms": 8987,
+     "query_count": 19,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-29T08:16:39Z",
+     "failed_queries": 8,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/glm-5.2",
+       "call_count": 19,
+       "ttft_avg_ms": 5435,
+       "ttft_sample_count": 11,
+       "tpot_avg_ms": 25.11,
+       "tpot_sample_count": 11,
+       "duration_p95_ms": null,
+       "duration_sample_count": 11,
+       "input_tokens": 241834,
+       "output_tokens": 1578,
+       "total_tokens": 243412
+      }
+     ]
+    },
+    {
+     "date": "2026-10-31",
+     "status": "FAILED",
+     "query_ms": 5102,
+     "query_count": 33,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-31T02:28:39Z",
+     "failed_queries": 32,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/glm-5.2",
+       "call_count": 33,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "duration_p95_ms": null,
+       "duration_sample_count": 1,
+       "input_tokens": 464,
+       "output_tokens": 85,
+       "total_tokens": 549
+      }
+     ]
+    }
+   ],
+   "latest": {
+    "date": "2026-10-31",
+    "status": "FAILED",
+    "query_ms": 5102,
+    "query_count": 33,
+    "run_id": "prod-adx-jiuwen",
+    "commit": "",
+    "finished_at": "2026-10-31T02:28:39Z",
+    "failed_queries": 32,
+    "unknown_status_count": 0,
+    "blocked_queries": 0,
+    "benchmark_models": [
+     {
+      "model": "openai/glm-5.2",
+      "call_count": 33,
+      "ttft_avg_ms": null,
+      "ttft_sample_count": 0,
+      "tpot_avg_ms": null,
+      "tpot_sample_count": 0,
+      "duration_p95_ms": null,
+      "duration_sample_count": 1,
+      "input_tokens": 464,
+      "output_tokens": 85,
+      "total_tokens": 549
+     }
+    ]
+   }
+  },
+  "PROD-openpangu-2.0-pro-openai-openpangu-2.0-pro-951356c27a65": {
+   "title": "现网模型 openpangu-2.0-pro",
+   "points": [
+    {
+     "date": "2026-10-15",
+     "status": "FAILED",
+     "query_ms": null,
+     "query_count": 20,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-15T15:21:41Z",
+     "failed_queries": 20,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/openpangu-2.0-pro",
+       "call_count": 20,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "duration_p95_ms": null,
+       "duration_sample_count": 0,
+       "input_tokens": 280,
+       "output_tokens": 0,
+       "total_tokens": 280
+      }
+     ]
+    },
+    {
+     "date": "2026-10-16",
+     "status": "FAILED",
+     "query_ms": null,
+     "query_count": 22,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-16T13:04:35Z",
+     "failed_queries": 22,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/openpangu-2.0-pro",
+       "call_count": 22,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "duration_p95_ms": null,
+       "duration_sample_count": 0,
+       "input_tokens": 308,
+       "output_tokens": 0,
+       "total_tokens": 308
+      }
+     ]
+    },
+    {
+     "date": "2026-10-17",
+     "status": "FAILED",
+     "query_ms": null,
+     "query_count": 8,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-17T05:36:30Z",
+     "failed_queries": 8,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/openpangu-2.0-pro",
+       "call_count": 8,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "duration_p95_ms": null,
+       "duration_sample_count": 0,
+       "input_tokens": 112,
+       "output_tokens": 0,
+       "total_tokens": 112
+      }
+     ]
+    },
+    {
+     "date": "2026-10-19",
+     "status": "FAILED",
+     "query_ms": null,
+     "query_count": 34,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-19T15:26:07Z",
+     "failed_queries": 34,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/openpangu-2.0-pro",
+       "call_count": 34,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "duration_p95_ms": null,
+       "duration_sample_count": 0,
+       "input_tokens": 476,
+       "output_tokens": 0,
+       "total_tokens": 476
+      }
+     ]
+    },
+    {
+     "date": "2026-10-20",
+     "status": "FAILED",
+     "query_ms": null,
+     "query_count": 24,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-20T13:49:06Z",
+     "failed_queries": 24,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/openpangu-2.0-pro",
+       "call_count": 24,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "duration_p95_ms": null,
+       "duration_sample_count": 0,
+       "input_tokens": 336,
+       "output_tokens": 0,
+       "total_tokens": 336
+      }
+     ]
+    },
+    {
+     "date": "2026-10-21",
+     "status": "FAILED",
+     "query_ms": null,
+     "query_count": 18,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-21T13:34:13Z",
+     "failed_queries": 18,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/openpangu-2.0-pro",
+       "call_count": 18,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "duration_p95_ms": null,
+       "duration_sample_count": 0,
+       "input_tokens": 252,
+       "output_tokens": 0,
+       "total_tokens": 252
+      }
+     ]
+    },
+    {
+     "date": "2026-10-22",
+     "status": "FAILED",
+     "query_ms": null,
+     "query_count": 6,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-22T13:08:54Z",
+     "failed_queries": 6,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/openpangu-2.0-pro",
+       "call_count": 6,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "duration_p95_ms": null,
+       "duration_sample_count": 0,
+       "input_tokens": 84,
+       "output_tokens": 0,
+       "total_tokens": 84
+      }
+     ]
+    },
+    {
+     "date": "2026-10-23",
+     "status": "FAILED",
+     "query_ms": null,
+     "query_count": 18,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-23T14:16:38Z",
+     "failed_queries": 18,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/openpangu-2.0-pro",
+       "call_count": 18,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "duration_p95_ms": null,
+       "duration_sample_count": 0,
+       "input_tokens": 252,
+       "output_tokens": 0,
+       "total_tokens": 252
+      }
+     ]
+    },
+    {
+     "date": "2026-10-24",
+     "status": "FAILED",
+     "query_ms": null,
+     "query_count": 10,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-24T15:04:51Z",
+     "failed_queries": 10,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/openpangu-2.0-pro",
+       "call_count": 10,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "duration_p95_ms": null,
+       "duration_sample_count": 0,
+       "input_tokens": 140,
+       "output_tokens": 0,
+       "total_tokens": 140
+      }
+     ]
+    },
+    {
+     "date": "2026-10-25",
+     "status": "FAILED",
+     "query_ms": null,
+     "query_count": 8,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-25T14:17:56Z",
+     "failed_queries": 8,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/openpangu-2.0-pro",
+       "call_count": 8,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "duration_p95_ms": null,
+       "duration_sample_count": 0,
+       "input_tokens": 112,
+       "output_tokens": 0,
+       "total_tokens": 112
+      }
+     ]
+    },
+    {
+     "date": "2026-10-26",
+     "status": "FAILED",
+     "query_ms": null,
+     "query_count": 6,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-26T02:33:56Z",
+     "failed_queries": 6,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/openpangu-2.0-pro",
+       "call_count": 6,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "duration_p95_ms": null,
+       "duration_sample_count": 0,
+       "input_tokens": 84,
+       "output_tokens": 0,
+       "total_tokens": 84
+      }
+     ]
+    },
+    {
+     "date": "2026-10-29",
+     "status": "FAILED",
+     "query_ms": null,
+     "query_count": 2,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-29T06:21:21Z",
+     "failed_queries": 2,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/openpangu-2.0-pro",
+       "call_count": 2,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "duration_p95_ms": null,
+       "duration_sample_count": 0,
+       "input_tokens": 28,
+       "output_tokens": 0,
+       "total_tokens": 28
+      }
+     ]
+    },
+    {
+     "date": "2026-10-31",
+     "status": "FAILED",
+     "query_ms": 4070,
+     "query_count": 33,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-10-31T02:28:34Z",
+     "failed_queries": 32,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/openpangu-2.0-pro",
+       "call_count": 33,
+       "ttft_avg_ms": 4070,
+       "ttft_sample_count": 1,
+       "tpot_avg_ms": 0.01,
+       "tpot_sample_count": 1,
+       "duration_p95_ms": null,
+       "duration_sample_count": 1,
+       "input_tokens": 465,
+       "output_tokens": 121,
+       "total_tokens": 586
+      }
+     ]
+    }
+   ],
+   "latest": {
+    "date": "2026-10-31",
+    "status": "FAILED",
+    "query_ms": 4070,
+    "query_count": 33,
+    "run_id": "prod-adx-jiuwen",
+    "commit": "",
+    "finished_at": "2026-10-31T02:28:34Z",
+    "failed_queries": 32,
+    "unknown_status_count": 0,
+    "blocked_queries": 0,
+    "benchmark_models": [
+     {
+      "model": "openai/openpangu-2.0-pro",
+      "call_count": 33,
+      "ttft_avg_ms": 4070,
+      "ttft_sample_count": 1,
+      "tpot_avg_ms": 0.01,
+      "tpot_sample_count": 1,
+      "duration_p95_ms": null,
+      "duration_sample_count": 1,
+      "input_tokens": 465,
+      "output_tokens": 121,
+      "total_tokens": 586
+     }
+    ]
+   }
+  }
+ }
+}
