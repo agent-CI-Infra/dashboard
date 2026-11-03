@@ -1358,6 +1358,11 @@ h1 {
   }
 }
 
+/* Size metric columns to their contents; other columns absorb spare table width. */
+.history-table .metric-column {
+  width: 1%;
+}
+
 /* Keep sample counts close to their values while aligning change indicators. */
 .metric-cell {
   display: flex;

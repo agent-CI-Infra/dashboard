@@ -1403,9 +1403,9 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
         <td class="num">${fmtCount(row?.calls)}</td>
         <td class="num">${fmtCount(row?.queries)}</td>
         <td class="num">${fmtPercent(row?.failure_rate)}</td>
-        <td class="num"><span class="metric-cell"><span>${fmtDuration(row?.ttft_ms)}</span><span class="metric-samples">（${fmtCount(row?.ttft_samples)}）</span><span class="metric-change">${ttftChip}</span></span></td>
-        <td class="num"><span class="metric-cell"><span>${fmtTpot(row?.tpot_ms)}</span><span class="metric-samples">（${fmtCount(row?.tpot_samples)}）</span><span class="metric-change">${tpotChip}</span></span></td>
-        <td class="num"><span class="metric-cell"><span>${esc(p95RangeText(row))}</span><span class="metric-samples">（${fmtCount(row?.duration_samples)}）</span><span class="metric-change">${p95Chip}</span></span></td>
+        <td class="num metric-column"><span class="metric-cell"><span>${fmtDuration(row?.ttft_ms)}</span><span class="metric-samples">（${fmtCount(row?.ttft_samples)}）</span><span class="metric-change">${ttftChip}</span></span></td>
+        <td class="num metric-column"><span class="metric-cell"><span>${fmtTpot(row?.tpot_ms)}</span><span class="metric-samples">（${fmtCount(row?.tpot_samples)}）</span><span class="metric-change">${tpotChip}</span></span></td>
+        <td class="num metric-column"><span class="metric-cell"><span>${esc(p95RangeText(row))}</span><span class="metric-samples">（${fmtCount(row?.duration_samples)}）</span><span class="metric-change">${p95Chip}</span></span></td>
         <td class="num">${fmtToken(row?.[`input_${suffix}`])}</td>
         <td class="num">${fmtToken(row?.[`output_${suffix}`])}</td>
         <td class="num">${fmtToken(row?.[`total_${suffix}`])}</td>
@@ -1414,7 +1414,7 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
     .reverse()
     .join('');
   return `<div class="table-wrap"><table class="history-table">
-    <thead><tr><th>${esc(label)}</th>${versionHead}<th>调用数</th><th>请求数</th><th title="所选模型，以请求数近似提问数">提问失败率</th><th>平均 TTFT（样本）</th><th>平均 TPOT（样本）</th><th>耗时 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th></tr></thead>
+    <thead><tr><th>${esc(label)}</th>${versionHead}<th>调用数</th><th>请求数</th><th title="所选模型，以请求数近似提问数">提问失败率</th><th class="metric-column">平均 TTFT（样本）</th><th class="metric-column">平均 TPOT（样本）</th><th class="metric-column">耗时 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th></tr></thead>
     <tbody>${body}</tbody>
   </table></div>`;
 }
