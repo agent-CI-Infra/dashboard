@@ -320,7 +320,7 @@ npm run collect
 ```json
 {
   "openJiuwen-ai/sciencediscovery": ["hsliuustc0106", "wyhohyw"],
-  "ThinkFlowLab/system1-agents": []
+  "ThinkFlowLab/OpenDirector": []
 }
 ```
 
