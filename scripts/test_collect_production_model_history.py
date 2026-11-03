@@ -61,8 +61,20 @@ class CollectionTests(unittest.TestCase):
     def test_deduplicates_overlapping_daily_boundaries(self):
         now = collector.datetime.now(collector.timezone.utc)
         with patch.object(collector, 'fetch_rows', side_effect=[[{'request_id':'a'}, {'request_id':'shared'}], [{'request_id':'shared'}, {'request_id':'b'}]]):
-            rows = collector.fetch_window('dummy', now, now + collector.timedelta(days=2))
+            rows = collector.fetch_window('dummy', now, now + collector.timedelta(days=2), workers=1)
             self.assertEqual([r['request_id'] for r in rows], ['a','shared','b'])
+
+    def test_failed_day_does_not_return_partial_data(self):
+        now = collector.datetime.now(collector.timezone.utc)
+        with patch.object(collector, 'fetch_rows', side_effect=[[{'request_id':'a'}], ValueError('incomplete')]):
+            with self.assertRaises(ValueError):
+                collector.fetch_window('dummy', now, now + collector.timedelta(days=2), workers=1)
+
+    def test_rejects_changed_boundary_record(self):
+        now = collector.datetime.now(collector.timezone.utc)
+        with patch.object(collector, 'fetch_rows', side_effect=[[{'request_id':'a','status':'success'}], [{'request_id':'a','status':'failure'}]]):
+            with self.assertRaises(ValueError):
+                collector.fetch_window('dummy', now, now + collector.timedelta(days=2), workers=1)
 
     def test_rejects_changed_pagination(self):
         pages = [{'total_pages': 2, 'total': 2, 'data': [{'request_id':'a'}]}, {'total_pages': 3, 'total': 2, 'data': [{'request_id':'b'}]}]
