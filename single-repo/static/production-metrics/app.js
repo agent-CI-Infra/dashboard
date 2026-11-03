@@ -463,7 +463,7 @@ function benchmarkMetrics(latest) {
   const callDetails = calls.length
     ? `<details><summary>单次调用${b.calls_truncated ? '（仅前 200 条）' : ''}</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>模型</th><th>状态</th><th>耗时</th><th>TTFT</th><th>TPOT</th><th>输入</th><th>输出</th><th>总 Token</th></tr></thead><tbody>${callRows}</tbody></table></div></details>`
     : '';
-  return `<p class="chart-note">当前用例已关联 ${fmtCount(b.matched_calls)} 次调用；未关联 ${fmtCount(b.unmatched_calls)} 次。P95 至少需要 20 个成功样本；TTFT/TPOT 仅统计已确认的流式成功调用；模型名称为 trace 上报值。</p><div class="table-wrap"><table class="history-table"><thead><tr><th>上报模型</th><th>调用数</th><th>平均 TTFT（估算）（样本）</th><th>平均 TPOT（估算）（样本）</th><th>耗时 P95（样本）</th><th>输入 Token</th><th>输出 Token</th><th>总 Token</th></tr></thead><tbody>${modelRows}</tbody></table></div>${callDetails}`;
+  return `<p class="chart-note">当前用例已关联 ${fmtCount(b.matched_calls)} 次调用；未关联 ${fmtCount(b.unmatched_calls)} 次。P95 至少需要 20 个成功样本；TTFT/TPOT 仅统计已确认的流式成功调用；模型名称为 trace 上报值。</p><div class="table-wrap"><table class="history-table"><thead><tr><th>上报模型</th><th>调用数</th><th>平均 TTFT（样本）</th><th>平均 TPOT（样本）</th><th>耗时 P95（样本）</th><th>输入 Token</th><th>输出 Token</th><th>总 Token</th></tr></thead><tbody>${modelRows}</tbody></table></div>${callDetails}`;
 }
 function productionMetrics(doc) {
   if (!doc || doc.schema !== 'model-request-metrics@1' || doc.scope !== 'classified-production' || !Array.isArray(doc.models)) return '<p class="empty">未配置现网指标数据源，或采集数据不可用。</p>';
@@ -623,6 +623,20 @@ function failureSeries(history, dates) {
 
 function fmtPercent(value) {
   return Number.isFinite(value) ? `${value.toFixed(1)}%` : '—';
+}
+
+// Aggregate counts first so weekly rates are weighted by request volume.
+function weeklyFailureRates(failures) {
+  const weeks = new Map();
+  for (const row of failures || []) {
+    const start = weekStart(row.date);
+    if (!start) continue;
+    if (!weeks.has(start)) weeks.set(start, { queries: 0, failed: 0 });
+    const total = weeks.get(start);
+    total.queries += row.queries;
+    total.failed += row.failed;
+  }
+  return new Map([...weeks].map(([start, row]) => [start, row.queries > 0 ? row.failed / row.queries * 100 : null]));
 }
 
 function perfStrip(history) {
@@ -1034,8 +1048,8 @@ function latencyTrendChart(points, visibility = {}) {
   const usable = [...leftUsable, ...tpotUsable];
 
   const legend = [
-    { key: 'ttft', label: '平均 TTFT（估算）', style: 'ttft' },
-    { key: 'tpot', label: '平均 TPOT（估算）', style: 'tpot' },
+    { key: 'ttft', label: '平均 TTFT', style: 'ttft' },
+    { key: 'tpot', label: '平均 TPOT', style: 'tpot' },
     { key: 'p95_upper', label: 'P95 上界', style: 'p95' },
     { key: 'p95_lower', label: 'P95 下界', style: 'p95 lower' },
   ]
@@ -1145,8 +1159,8 @@ function latencyTrendChart(points, visibility = {}) {
   const zones = rows
     .map((row, index) => {
       const lines = [String(row?.date || '')];
-      if (isVisible('ttft') && ttft[index] !== null) lines.push(`${fmtDuration(ttft[index])} · 平均 TTFT（估算）`);
-      if (isVisible('tpot') && tpot[index] !== null) lines.push(`${fmtTpot(tpot[index])} · 平均 TPOT（估算）`);
+      if (isVisible('ttft') && ttft[index] !== null) lines.push(`${fmtDuration(ttft[index])} · 平均 TTFT`);
+      if (isVisible('tpot') && tpot[index] !== null) lines.push(`${fmtTpot(tpot[index])} · 平均 TPOT`);
       if (isVisible('p95_upper') && upper[index] !== null) lines.push(`${fmtDuration(upper[index])} · P95 上界`);
       if (isVisible('p95_lower') && lower[index] !== null) lines.push(`${fmtDuration(lower[index])} · P95 下界`);
       if (lines.length === 1) return '';
@@ -1157,7 +1171,7 @@ function latencyTrendChart(points, visibility = {}) {
     })
     .join('');
 
-  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="平均 TTFT（估算）、TPOT 与耗时 P95 区间趋势">
+  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="平均 TTFT、TPOT 与耗时 P95 区间趋势">
     ${grid}
     <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
     ${bands ? `<path class="p95-band" d="${bands}" />` : ''}
@@ -1314,12 +1328,12 @@ function modelSummary(days, model, { unit = 'query', failure = null } = {}) {
       <div class="stat-hint">${hint('现网调用', deltaChip(latest.calls, previous?.calls))}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">平均 TTFT（估算）</div>
+      <div class="stat-label">平均 TTFT</div>
       <div class="stat-value">${fmtDuration(latest.ttft_ms)}</div>
       <div class="stat-hint">${hint(`${fmtCount(latest.ttft_samples)} 个样本`, deltaChip(latest.ttft_ms, previous?.ttft_ms, { lowerIsBetter: true }))}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">平均 TPOT（估算）</div>
+      <div class="stat-label">平均 TPOT</div>
       <div class="stat-value">${fmtTpot(latest.tpot_ms)}</div>
       <div class="stat-hint">${hint(`${fmtCount(latest.tpot_samples)} 个样本`, deltaChip(latest.tpot_ms, previous?.tpot_ms, { lowerIsBetter: true }))}</div>
     </div>
@@ -1373,6 +1387,7 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
         <td>${esc(row?.[dateKey] ?? '—')}</td>${versionCell}
         <td class="num">${fmtCount(row?.calls)}</td>
         <td class="num">${fmtCount(row?.queries)}</td>
+        <td class="num">${fmtPercent(row?.failure_rate)}</td>
         <td class="num"><span class="metric-cell"><span>${fmtDuration(row?.ttft_ms)}</span><span class="metric-samples">（${fmtCount(row?.ttft_samples)}）</span><span class="metric-change">${ttftChip}</span></span></td>
         <td class="num"><span class="metric-cell"><span>${fmtTpot(row?.tpot_ms)}</span><span class="metric-samples">（${fmtCount(row?.tpot_samples)}）</span><span class="metric-change">${tpotChip}</span></span></td>
         <td class="num"><span class="metric-cell"><span>${esc(p95RangeText(row))}</span><span class="metric-samples">（${fmtCount(row?.duration_samples)}）</span><span class="metric-change">${p95Chip}</span></span></td>
@@ -1384,7 +1399,7 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
     .reverse()
     .join('');
   return `<div class="table-wrap"><table class="history-table">
-    <thead><tr><th>${esc(label)}</th>${versionHead}<th>调用数</th><th>请求数</th><th>平均 TTFT（估算）（样本）</th><th>平均 TPOT（估算）（样本）</th><th>耗时 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th></tr></thead>
+    <thead><tr><th>${esc(label)}</th>${versionHead}<th>调用数</th><th>请求数</th><th title="全部模型，以请求数近似提问数">提问失败率（全部模型）</th><th>平均 TTFT（样本）</th><th>平均 TPOT（样本）</th><th>耗时 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th></tr></thead>
     <tbody>${body}</tbody>
   </table></div>`;
 }
@@ -1405,8 +1420,8 @@ function regressionFindings(latest, previous) {
   const findings = [];
   if (!latest || !previous) return findings;
   const checks = [
-    ['平均 TTFT（估算）', latest.ttft_ms, previous.ttft_ms],
-    ['平均 TPOT（估算）', latest.tpot_ms, previous.tpot_ms],
+    ['平均 TTFT', latest.ttft_ms, previous.ttft_ms],
+    ['平均 TPOT', latest.tpot_ms, previous.tpot_ms],
     ['P95 上界', latest.p95_ms, previous.p95_ms],
   ];
   for (const [label, current, prior] of checks) {
@@ -1491,7 +1506,7 @@ function modelCompareCard(rows, { selected = null } = {}) {
     })
     .join('');
   return `<div class="table-wrap"><table class="history-table compare-table">
-    <thead><tr><th>模型</th><th>调用数</th><th>平均 TTFT（估算）</th><th>平均 TPOT（估算）</th><th>耗时 P95 区间</th><th>输出 / 请求</th><th>最新 TTFT 较前日</th></tr></thead>
+    <thead><tr><th>模型</th><th>调用数</th><th>平均 TTFT</th><th>平均 TPOT</th><th>耗时 P95 区间</th><th>输出 / 请求</th><th>最新 TTFT 较前日</th></tr></thead>
     <tbody>${body}</tbody>
   </table></div>`;
 }
@@ -1704,6 +1719,8 @@ function renderModels() {
   const days = currentModelDays();
   const weeks = weekSeries(days);
   const failures = failureSeries(history, days);
+  const dailyRates = new Map(failures.map((row) => [row.date, row.failure_rate]));
+  const weeklyRates = weeklyFailureRates(failures);
   const latestFailure = [...failures].reverse().find((row) => row.queries > 0) || null;
   const span = days.length
     ? `${days[0].date} 至 ${days[days.length - 1].date} · ${days.length} 天`
@@ -1724,8 +1741,8 @@ function renderModels() {
   if (stats) {
     stats.innerHTML =
       state.granularity === 'weekly'
-        ? modelMetricTable(weeks, { label: '周（周一至周日）', dateKey: 'week_label', unit: state.tokenUnit })
-        : modelMetricTable(days, { label: '日期', unit: state.tokenUnit, showVersion: true });
+        ? modelMetricTable(weeks.map((row) => ({ ...row, failure_rate: weeklyRates.get(row.week_start) ?? null })), { label: '周（周一至周日）', dateKey: 'week_label', unit: state.tokenUnit })
+        : modelMetricTable(days.map((row) => ({ ...row, failure_rate: dailyRates.get(row.date) ?? null })), { label: '日期', unit: state.tokenUnit, showVersion: true });
   }
   if (range) {
     range.textContent = state.granularity === 'weekly' ? `周一至周日 · ${span}` : span;
