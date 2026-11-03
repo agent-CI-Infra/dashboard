@@ -1402,9 +1402,21 @@
     </div>`;
   }
 
+  // Full standalone DigitalMate performance dashboard (prod / adx-jiuwen
+  // gateway data), maintained in openJiuwen-ai/DigitalMate under
+  // dashboard/e2e-performance and served from this board's static template.
+  // Its data files are assembled per board from <branch>:site/data/e2e-performance/.
+  function perfDashboardEmbed() {
+    return `<div class="card perf-embed-card">
+      <div class="perf-embed-head"><h3>DigitalMate 现网性能看板</h3><span class="sub">prod / adx-jiuwen 网关数据 · 每日自动更新 · <a href="./e2e-performance/index.html" target="_blank" rel="noopener">独立打开 ↗</a></span></div>
+      <iframe class="perf-embed" src="./e2e-performance/index.html" title="DigitalMate 现网性能看板" loading="lazy"></iframe>
+    </div>`;
+  }
+
   function renderTests(sec, line) {
     const d = sec?.data;
     let html = sectionState(sec, 'E2E');
+    html += perfDashboardEmbed();
     if (!d) return html;
     const tree = d.tree;
     const ut = d.executed.find((e) => e.artifact.startsWith('ut'));

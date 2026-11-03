@@ -1,0 +1,98 @@
+name: Collect DigitalMate production performance
+
+# Collects DigitalMate production gateway metrics (prod / adx-jiuwen) with the
+# collectors maintained in openJiuwen-ai/DigitalMate (tools/dashboard-collectors),
+# writes site/data/e2e-performance/*.json on the static `digitalmate` branch,
+# and redeploys. Requires the JIUWEN_PROD_GATEWAY_KEY secret; without it the
+# job is a no-op, so forks and the public dashboard keep working. Only
+# aggregate counters leave the gateway — no messages, users, or keys.
+on:
+  schedule:
+    # 00:45 UTC = 08:45 Asia/Shanghai.
+    - cron: '45 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: collect-digitalmate-prod
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Check gateway key
+        id: key
+        env:
+          KEY: ${{ secrets.JIUWEN_PROD_GATEWAY_KEY }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo 'skip=true' >> "$GITHUB_OUTPUT"
+            echo '::warning::JIUWEN_PROD_GATEWAY_KEY is not configured; skipping DigitalMate production collection.'
+          else
+            echo 'skip=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download collectors
+        if: steps.key.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          base='https://raw.githubusercontent.com/openJiuwen-ai/DigitalMate/main/tools/dashboard-collectors'
+          for script in collect_prod_history.py collect_model_request_metrics.py; do
+            curl --fail --silent --show-error --location \
+              --retry 3 --retry-delay 2 --max-time 60 \
+              "$base/$script" -o "/tmp/$script"
+          done
+
+      - name: Collect production metrics
+        if: steps.key.outputs.skip != 'true'
+        env:
+          KEY: ${{ secrets.JIUWEN_PROD_GATEWAY_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/digitalmate-prod-data
+          # 10-day daily history plus a 24h fixed-window snapshot.
+          python3 /tmp/collect_prod_history.py /tmp/digitalmate-prod-data "$KEY" 10
+          python3 /tmp/collect_model_request_metrics.py /tmp/digitalmate-prod-data "$KEY" 24
+
+      - name: Update digitalmate branch
+        if: steps.key.outputs.skip != 'true'
+        id: update
+        run: |
+          set -euo pipefail
+          git fetch origin digitalmate:refs/remotes/origin/digitalmate
+          git checkout -B digitalmate origin/digitalmate
+          mkdir -p site/data/e2e-performance
+          cp /tmp/digitalmate-prod-data/history.json site/data/e2e-performance/history.json
+          cp /tmp/digitalmate-prod-data/model-request-metrics.json site/data/e2e-performance/model-request-metrics.json
+          if git diff --quiet -- site/data/e2e-performance \
+             && git ls-files --error-unmatch site/data/e2e-performance/history.json >/dev/null 2>&1; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            echo 'production performance data unchanged'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site/data/e2e-performance
+          git commit -m 'chore(digitalmate): collect production performance data'
+          # mirror-digitalmate.yml and collect-digitalmate-performance.yml also
+          # write this branch; rebase if one of them won the race.
+          git pull --rebase origin digitalmate
+          git push origin HEAD:digitalmate
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+
+      - name: Deploy dashboard
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main
