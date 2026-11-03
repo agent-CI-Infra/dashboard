@@ -606,19 +606,33 @@ function baselineStats(history, ratio = 1.5) {
   };
 }
 
-// Failure-rate rows aligned with the model series dates, so the curve follows
-// the selected range even though failures are counted at question level.
-function failureSeries(history, dates) {
+// Attribute failures only when the source point describes exactly one model.
+function failureSeries(history, dates, model) {
   const wanted = new Set((dates || []).map((day) => day?.date).filter(Boolean));
-  return dailyQuestionStats(history)
-    .filter((day) => wanted.has(day.date))
-    .map((day) => ({
-      date: day.date,
-      failure_rate: day.failure_rate,
-      queries: day.queries,
-      failed: day.failed,
-      blocked: day.blocked,
-    }));
+  const byDate = new Map();
+  for (const entry of Object.values(history?.cases || {})) {
+    for (const point of entry?.points || []) {
+      if (!wanted.has(point?.date)) continue;
+      const models = new Set((point.benchmark_models || []).map(benchmarkModelName));
+      if (!models.has(model)) continue;
+      if (!byDate.has(point.date)) byDate.set(point.date, { queries: 0, failed: 0, complete: true });
+      const day = byDate.get(point.date);
+      const queries = point.query_count;
+      const failed = point.failed_queries;
+      if (models.size !== 1 || !Number.isFinite(queries) || queries <= 0 || !Number.isFinite(failed) || failed < 0 || failed > queries) {
+        day.complete = false;
+        continue;
+      }
+      day.queries += queries;
+      day.failed += failed;
+    }
+  }
+  return [...wanted].sort().map((date) => {
+    const day = byDate.get(date);
+    return day?.complete && day.queries > 0
+      ? { date, queries: day.queries, failed: day.failed, failure_rate: day.failed / day.queries * 100 }
+      : { date, queries: 0, failed: 0, failure_rate: null };
+  });
 }
 
 function fmtPercent(value) {
@@ -631,12 +645,13 @@ function weeklyFailureRates(failures) {
   for (const row of failures || []) {
     const start = weekStart(row.date);
     if (!start) continue;
-    if (!weeks.has(start)) weeks.set(start, { queries: 0, failed: 0 });
+    if (!weeks.has(start)) weeks.set(start, { queries: 0, failed: 0, complete: true });
     const total = weeks.get(start);
+    if (!Number.isFinite(row.failure_rate)) total.complete = false;
     total.queries += row.queries;
     total.failed += row.failed;
   }
-  return new Map([...weeks].map(([start, row]) => [start, row.queries > 0 ? row.failed / row.queries * 100 : null]));
+  return new Map([...weeks].map(([start, row]) => [start, row.complete && row.queries > 0 ? row.failed / row.queries * 100 : null]));
 }
 
 function perfStrip(history) {
@@ -866,7 +881,7 @@ function chartSize(baseWidth, baseHeight, { columns = 1, hostId = 'model-trends'
 
 // Call volume and question failures are one "how much ran, how much broke"
 // view: calls use the left count axis while the failure rate (all benchmark
-// cases, independent of the selected model) uses the right percentage axis.
+// requests for the selected model) uses the right percentage axis.
 function volumeTrendChart(days, failures, visibility = {}) {
   const rows = Array.isArray(days) ? days : [];
   const failureByDate = new Map(
@@ -1018,7 +1033,7 @@ function volumeTrendChart(days, failures, visibility = {}) {
     ${xLabels}
     <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
     ${zones}
-  </svg><p class="chart-note">调用数使用左侧计数轴，提问失败率使用右侧百分比轴（全部提问，与所选模型无关）。</p></div>`;
+  </svg><p class="chart-note">调用数使用左侧计数轴，提问失败率使用右侧百分比轴（所选模型的请求）。</p></div>`;
 }
 
 function p95RangeText(row) {
@@ -1360,7 +1375,7 @@ function modelSummary(days, model, { unit = 'query', failure = null } = {}) {
     <div class="stat-card">
       <div class="stat-label">提问失败率</div>
       <div class="stat-value ${failure ? (failure.failed ? 'failed' : 'ok') : ''}">${failure ? fmtPercent(failure.failure_rate) : '—'}</div>
-      <div class="stat-hint">${failure ? `全部用例 · 失败 ${fmtCount(failure.failed)} / 请求 ${fmtCount(failure.queries)}${failure.blocked ? ` · 阻塞 ${fmtCount(failure.blocked)}` : ''}` : '暂无请求数据'}</div>
+      <div class="stat-hint">${failure ? `所选模型 · 失败 ${fmtCount(failure.failed)} / 请求 ${fmtCount(failure.queries)}${failure.blocked ? ` · 阻塞 ${fmtCount(failure.blocked)}` : ''}` : '暂无请求数据'}</div>
     </div>
   `;
 }
@@ -1399,7 +1414,7 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
     .reverse()
     .join('');
   return `<div class="table-wrap"><table class="history-table">
-    <thead><tr><th>${esc(label)}</th>${versionHead}<th>调用数</th><th>请求数</th><th title="全部模型，以请求数近似提问数">提问失败率（全部模型）</th><th>平均 TTFT（样本）</th><th>平均 TPOT（样本）</th><th>耗时 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th></tr></thead>
+    <thead><tr><th>${esc(label)}</th>${versionHead}<th>调用数</th><th>请求数</th><th title="所选模型，以请求数近似提问数">提问失败率</th><th>平均 TTFT（样本）</th><th>平均 TPOT（样本）</th><th>耗时 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th></tr></thead>
     <tbody>${body}</tbody>
   </table></div>`;
 }
@@ -1657,7 +1672,7 @@ function renderTrends() {
   const days = currentModelDays();
   target.innerHTML = modelTrends(days, state.tokenVisibility, state.latencyVisibility, {
     tokenUnit: state.tokenUnit,
-    failures: failureSeries(state.history, days),
+    failures: failureSeries(state.history, days, state.model),
     volumeVisibility: state.volumeVisibility,
   });
 }
@@ -1718,10 +1733,10 @@ function renderModels() {
 
   const days = currentModelDays();
   const weeks = weekSeries(days);
-  const failures = failureSeries(history, days);
+  const failures = failureSeries(history, days, state.model);
   const dailyRates = new Map(failures.map((row) => [row.date, row.failure_rate]));
   const weeklyRates = weeklyFailureRates(failures);
-  const latestFailure = [...failures].reverse().find((row) => row.queries > 0) || null;
+  const latestFailure = failures.find((row) => row.date === days.at(-1)?.date && Number.isFinite(row.failure_rate)) || null;
   const span = days.length
     ? `${days[0].date} 至 ${days[days.length - 1].date} · ${days.length} 天`
     : '暂无数据';
