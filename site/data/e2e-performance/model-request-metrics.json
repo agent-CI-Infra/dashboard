@@ -1,0 +1,2028 @@
+{
+ "schema": "model-request-metrics@1",
+ "scope": "classified-production",
+ "environment": "prod / adx-jiuwen (onlineswarm.openjiuwen.com:31474)",
+ "start": "2026-11-02T07:56:54Z",
+ "end": "2026-11-03T07:56:54Z",
+ "generated_at": "2026-11-03T07:57:00Z",
+ "excluded_unknown": 3,
+ "excluded_duplicates": 0,
+ "calls_truncated": true,
+ "models": [
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "calls": 987,
+   "ttft_avg_ms": 4131,
+   "ttft_sample_count": 987,
+   "tpot_avg_ms": 2.38,
+   "tpot_sample_count": 977,
+   "gateway_duration_p95_ms": 23656,
+   "duration_sample_count": 987,
+   "prompt_tokens": 34523856,
+   "completion_tokens": 869639,
+   "total_tokens": 35393495
+  }
+ ],
+ "calls": [
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 70962,
+   "ttft_ms": 8356,
+   "tpot_ms": 5.16,
+   "prompt_tokens": 61723,
+   "completion_tokens": 12130,
+   "total_tokens": 73853
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 51542,
+   "ttft_ms": 2025,
+   "tpot_ms": 9.01,
+   "prompt_tokens": 132213,
+   "completion_tokens": 5495,
+   "total_tokens": 137708
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 50591,
+   "ttft_ms": 50591,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 135479,
+   "completion_tokens": 2569,
+   "total_tokens": 138048
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 49621,
+   "ttft_ms": 42684,
+   "tpot_ms": 6.69,
+   "prompt_tokens": 49216,
+   "completion_tokens": 1037,
+   "total_tokens": 50253
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 49474,
+   "ttft_ms": 1545,
+   "tpot_ms": 4.79,
+   "prompt_tokens": 34169,
+   "completion_tokens": 9999,
+   "total_tokens": 44168
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 44310,
+   "ttft_ms": 2540,
+   "tpot_ms": 3.84,
+   "prompt_tokens": 58286,
+   "completion_tokens": 10873,
+   "total_tokens": 69159
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 43878,
+   "ttft_ms": 43878,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 109481,
+   "completion_tokens": 5730,
+   "total_tokens": 115211
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 42924,
+   "ttft_ms": 42924,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 90684,
+   "completion_tokens": 7304,
+   "total_tokens": 97988
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 42569,
+   "ttft_ms": 1885,
+   "tpot_ms": 15.6,
+   "prompt_tokens": 72819,
+   "completion_tokens": 2608,
+   "total_tokens": 75427
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 41079,
+   "ttft_ms": 1102,
+   "tpot_ms": 3.79,
+   "prompt_tokens": 35412,
+   "completion_tokens": 10541,
+   "total_tokens": 45953
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 40152,
+   "ttft_ms": 2457,
+   "tpot_ms": 5.69,
+   "prompt_tokens": 105574,
+   "completion_tokens": 6621,
+   "total_tokens": 112195
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 39913,
+   "ttft_ms": 37674,
+   "tpot_ms": 3.98,
+   "prompt_tokens": 37270,
+   "completion_tokens": 563,
+   "total_tokens": 37833
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 39518,
+   "ttft_ms": 1671,
+   "tpot_ms": 3.76,
+   "prompt_tokens": 37773,
+   "completion_tokens": 10056,
+   "total_tokens": 47829
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 37972,
+   "ttft_ms": 37972,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 106223,
+   "completion_tokens": 7313,
+   "total_tokens": 113536
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 37593,
+   "ttft_ms": 1610,
+   "tpot_ms": 6.11,
+   "prompt_tokens": 74248,
+   "completion_tokens": 5890,
+   "total_tokens": 80138
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 36401,
+   "ttft_ms": 36402,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 603,
+   "completion_tokens": 58,
+   "total_tokens": 661
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 36126,
+   "ttft_ms": 1783,
+   "tpot_ms": 4.59,
+   "prompt_tokens": 64179,
+   "completion_tokens": 7488,
+   "total_tokens": 71667
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 35126,
+   "ttft_ms": 2740,
+   "tpot_ms": 5.92,
+   "prompt_tokens": 48868,
+   "completion_tokens": 5475,
+   "total_tokens": 54343
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 34980,
+   "ttft_ms": 34980,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 1394,
+   "completion_tokens": 1178,
+   "total_tokens": 2572
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 33276,
+   "ttft_ms": 33276,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 139188,
+   "completion_tokens": 5269,
+   "total_tokens": 144457
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 32986,
+   "ttft_ms": 3890,
+   "tpot_ms": 6.83,
+   "prompt_tokens": 80604,
+   "completion_tokens": 4262,
+   "total_tokens": 84866
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 32496,
+   "ttft_ms": 1886,
+   "tpot_ms": 4.86,
+   "prompt_tokens": 78361,
+   "completion_tokens": 6297,
+   "total_tokens": 84658
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 31933,
+   "ttft_ms": 31932,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 158821,
+   "completion_tokens": 4752,
+   "total_tokens": 163573
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 31834,
+   "ttft_ms": 31834,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 161045,
+   "completion_tokens": 5744,
+   "total_tokens": 166789
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 31752,
+   "ttft_ms": 31751,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 118630,
+   "completion_tokens": 7432,
+   "total_tokens": 126062
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 30308,
+   "ttft_ms": 1837,
+   "tpot_ms": 6.39,
+   "prompt_tokens": 85312,
+   "completion_tokens": 4457,
+   "total_tokens": 89769
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 30129,
+   "ttft_ms": 30129,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 147435,
+   "completion_tokens": 5991,
+   "total_tokens": 153426
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 30043,
+   "ttft_ms": 2701,
+   "tpot_ms": 5.62,
+   "prompt_tokens": 113823,
+   "completion_tokens": 4868,
+   "total_tokens": 118691
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 29716,
+   "ttft_ms": 29716,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 50987,
+   "completion_tokens": 5128,
+   "total_tokens": 56115
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 29706,
+   "ttft_ms": 29705,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 1427,
+   "completion_tokens": 1334,
+   "total_tokens": 2761
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 29381,
+   "ttft_ms": 29380,
+   "tpot_ms": 0.04,
+   "prompt_tokens": 553,
+   "completion_tokens": 24,
+   "total_tokens": 577
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 29276,
+   "ttft_ms": 3360,
+   "tpot_ms": 12.88,
+   "prompt_tokens": 37894,
+   "completion_tokens": 2012,
+   "total_tokens": 39906
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 28951,
+   "ttft_ms": 28951,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 2334,
+   "completion_tokens": 3787,
+   "total_tokens": 6121
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 28825,
+   "ttft_ms": 1626,
+   "tpot_ms": 2.59,
+   "prompt_tokens": 64657,
+   "completion_tokens": 10505,
+   "total_tokens": 75162
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 28059,
+   "ttft_ms": 28059,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 127155,
+   "completion_tokens": 2583,
+   "total_tokens": 129738
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 27871,
+   "ttft_ms": 1303,
+   "tpot_ms": 5.53,
+   "prompt_tokens": 54466,
+   "completion_tokens": 4801,
+   "total_tokens": 59267
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 27743,
+   "ttft_ms": 2300,
+   "tpot_ms": 5.43,
+   "prompt_tokens": 85181,
+   "completion_tokens": 4688,
+   "total_tokens": 89869
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 27671,
+   "ttft_ms": 27671,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 254835,
+   "completion_tokens": 3828,
+   "total_tokens": 258663
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 26907,
+   "ttft_ms": 26908,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 89544,
+   "completion_tokens": 3980,
+   "total_tokens": 93524
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 26464,
+   "ttft_ms": 26464,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 103753,
+   "completion_tokens": 5267,
+   "total_tokens": 109020
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 26410,
+   "ttft_ms": 26410,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 135159,
+   "completion_tokens": 3142,
+   "total_tokens": 138301
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 25169,
+   "ttft_ms": 1759,
+   "tpot_ms": 2.5,
+   "prompt_tokens": 72294,
+   "completion_tokens": 9356,
+   "total_tokens": 81650
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 24940,
+   "ttft_ms": 24940,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 77905,
+   "completion_tokens": 728,
+   "total_tokens": 78633
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 24757,
+   "ttft_ms": 24757,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 89163,
+   "completion_tokens": 3053,
+   "total_tokens": 92216
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 24440,
+   "ttft_ms": 1506,
+   "tpot_ms": 4.52,
+   "prompt_tokens": 62769,
+   "completion_tokens": 5075,
+   "total_tokens": 67844
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 24435,
+   "ttft_ms": 3136,
+   "tpot_ms": 4.9,
+   "prompt_tokens": 84392,
+   "completion_tokens": 4351,
+   "total_tokens": 88743
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 24130,
+   "ttft_ms": 24130,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 65349,
+   "completion_tokens": 3573,
+   "total_tokens": 68922
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 23943,
+   "ttft_ms": 1486,
+   "tpot_ms": 6.66,
+   "prompt_tokens": 59496,
+   "completion_tokens": 3370,
+   "total_tokens": 62866
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 23811,
+   "ttft_ms": 23811,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 124567,
+   "completion_tokens": 4162,
+   "total_tokens": 128729
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 23656,
+   "ttft_ms": 23656,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 60852,
+   "completion_tokens": 4460,
+   "total_tokens": 65312
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 23639,
+   "ttft_ms": 1595,
+   "tpot_ms": 4.99,
+   "prompt_tokens": 55501,
+   "completion_tokens": 4422,
+   "total_tokens": 59923
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 23617,
+   "ttft_ms": 23617,
+   "tpot_ms": 0.01,
+   "prompt_tokens": 755,
+   "completion_tokens": 167,
+   "total_tokens": 922
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 23467,
+   "ttft_ms": 23467,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 200,
+   "completion_tokens": 2,
+   "total_tokens": 202
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 23454,
+   "ttft_ms": 2114,
+   "tpot_ms": 6.23,
+   "prompt_tokens": 74553,
+   "completion_tokens": 3426,
+   "total_tokens": 77979
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 23386,
+   "ttft_ms": 23386,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 1525,
+   "completion_tokens": 2110,
+   "total_tokens": 3635
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 22945,
+   "ttft_ms": 22945,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 91048,
+   "completion_tokens": 4749,
+   "total_tokens": 95797
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 22602,
+   "ttft_ms": 22602,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 98745,
+   "completion_tokens": 2968,
+   "total_tokens": 101713
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 22321,
+   "ttft_ms": 22320,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 108989,
+   "completion_tokens": 4140,
+   "total_tokens": 113129
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 22293,
+   "ttft_ms": 22293,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 121217,
+   "completion_tokens": 4608,
+   "total_tokens": 125825
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 22121,
+   "ttft_ms": 3632,
+   "tpot_ms": 6.09,
+   "prompt_tokens": 93639,
+   "completion_tokens": 3034,
+   "total_tokens": 96673
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 21728,
+   "ttft_ms": 21729,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 87102,
+   "completion_tokens": 4072,
+   "total_tokens": 91174
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 21710,
+   "ttft_ms": 13935,
+   "tpot_ms": 5.69,
+   "prompt_tokens": 52276,
+   "completion_tokens": 1367,
+   "total_tokens": 53643
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 21309,
+   "ttft_ms": 21309,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 181419,
+   "completion_tokens": 4113,
+   "total_tokens": 185532
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 21167,
+   "ttft_ms": 21167,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 98908,
+   "completion_tokens": 3717,
+   "total_tokens": 102625
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 21155,
+   "ttft_ms": 21154,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 1975,
+   "completion_tokens": 3719,
+   "total_tokens": 5694
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 21144,
+   "ttft_ms": 21144,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 116423,
+   "completion_tokens": 4488,
+   "total_tokens": 120911
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 21021,
+   "ttft_ms": 9649,
+   "tpot_ms": 6.49,
+   "prompt_tokens": 59401,
+   "completion_tokens": 1752,
+   "total_tokens": 61153
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 21018,
+   "ttft_ms": 21019,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 63092,
+   "completion_tokens": 4747,
+   "total_tokens": 67839
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 20859,
+   "ttft_ms": 2033,
+   "tpot_ms": 3.23,
+   "prompt_tokens": 52924,
+   "completion_tokens": 5830,
+   "total_tokens": 58754
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 20779,
+   "ttft_ms": 20779,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 2071,
+   "completion_tokens": 2236,
+   "total_tokens": 4307
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 20305,
+   "ttft_ms": 2602,
+   "tpot_ms": 5.31,
+   "prompt_tokens": 47443,
+   "completion_tokens": 3333,
+   "total_tokens": 50776
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 20154,
+   "ttft_ms": 1531,
+   "tpot_ms": 3.75,
+   "prompt_tokens": 51970,
+   "completion_tokens": 4970,
+   "total_tokens": 56940
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 20101,
+   "ttft_ms": 1470,
+   "tpot_ms": 6.36,
+   "prompt_tokens": 68628,
+   "completion_tokens": 2929,
+   "total_tokens": 71557
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 20048,
+   "ttft_ms": 2780,
+   "tpot_ms": 4.22,
+   "prompt_tokens": 84172,
+   "completion_tokens": 4088,
+   "total_tokens": 88260
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 19794,
+   "ttft_ms": 2927,
+   "tpot_ms": 7.96,
+   "prompt_tokens": 138247,
+   "completion_tokens": 2120,
+   "total_tokens": 140367
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 19690,
+   "ttft_ms": 19690,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 1585,
+   "completion_tokens": 104,
+   "total_tokens": 1689
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 19616,
+   "ttft_ms": 1466,
+   "tpot_ms": 5.24,
+   "prompt_tokens": 64252,
+   "completion_tokens": 3461,
+   "total_tokens": 67713
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 19202,
+   "ttft_ms": 19202,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 163518,
+   "completion_tokens": 2527,
+   "total_tokens": 166045
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 19097,
+   "ttft_ms": 19098,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 83436,
+   "completion_tokens": 3579,
+   "total_tokens": 87015
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 18770,
+   "ttft_ms": 7835,
+   "tpot_ms": 5.83,
+   "prompt_tokens": 43704,
+   "completion_tokens": 1876,
+   "total_tokens": 45580
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 18467,
+   "ttft_ms": 18467,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 553,
+   "completion_tokens": 66,
+   "total_tokens": 619
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 18433,
+   "ttft_ms": 1446,
+   "tpot_ms": 6.51,
+   "prompt_tokens": 71875,
+   "completion_tokens": 2609,
+   "total_tokens": 74484
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 18428,
+   "ttft_ms": 18429,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 108921,
+   "completion_tokens": 3106,
+   "total_tokens": 112027
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 18295,
+   "ttft_ms": 18295,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 82052,
+   "completion_tokens": 2488,
+   "total_tokens": 84540
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 18047,
+   "ttft_ms": 9636,
+   "tpot_ms": 4.67,
+   "prompt_tokens": 76104,
+   "completion_tokens": 1800,
+   "total_tokens": 77904
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17968,
+   "ttft_ms": 1498,
+   "tpot_ms": 5.29,
+   "prompt_tokens": 61422,
+   "completion_tokens": 3116,
+   "total_tokens": 64538
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17922,
+   "ttft_ms": 17922,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 96027,
+   "completion_tokens": 2755,
+   "total_tokens": 98782
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17884,
+   "ttft_ms": 17884,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 61399,
+   "completion_tokens": 3631,
+   "total_tokens": 65030
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17883,
+   "ttft_ms": 17883,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 85376,
+   "completion_tokens": 3135,
+   "total_tokens": 88511
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17763,
+   "ttft_ms": 17764,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 98219,
+   "completion_tokens": 3255,
+   "total_tokens": 101474
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17755,
+   "ttft_ms": 17756,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 52325,
+   "completion_tokens": 3073,
+   "total_tokens": 55398
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17703,
+   "ttft_ms": 3201,
+   "tpot_ms": 5.58,
+   "prompt_tokens": 77736,
+   "completion_tokens": 2599,
+   "total_tokens": 80335
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17652,
+   "ttft_ms": 15264,
+   "tpot_ms": 5.07,
+   "prompt_tokens": 43416,
+   "completion_tokens": 471,
+   "total_tokens": 43887
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17605,
+   "ttft_ms": 17605,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 111606,
+   "completion_tokens": 2723,
+   "total_tokens": 114329
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17504,
+   "ttft_ms": 17504,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 67868,
+   "completion_tokens": 3387,
+   "total_tokens": 71255
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17480,
+   "ttft_ms": 17480,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 73444,
+   "completion_tokens": 2364,
+   "total_tokens": 75808
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17266,
+   "ttft_ms": 17266,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 61244,
+   "completion_tokens": 3346,
+   "total_tokens": 64590
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17195,
+   "ttft_ms": 1520,
+   "tpot_ms": 5.99,
+   "prompt_tokens": 50205,
+   "completion_tokens": 2618,
+   "total_tokens": 52823
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17127,
+   "ttft_ms": 3502,
+   "tpot_ms": 6.6,
+   "prompt_tokens": 79694,
+   "completion_tokens": 2066,
+   "total_tokens": 81760
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17109,
+   "ttft_ms": 15357,
+   "tpot_ms": 3.42,
+   "prompt_tokens": 36069,
+   "completion_tokens": 512,
+   "total_tokens": 36581
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 17060,
+   "ttft_ms": 17060,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 90401,
+   "completion_tokens": 3811,
+   "total_tokens": 94212
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 16967,
+   "ttft_ms": 16967,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 1862,
+   "completion_tokens": 1604,
+   "total_tokens": 3466
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 16957,
+   "ttft_ms": 16958,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 40494,
+   "completion_tokens": 1344,
+   "total_tokens": 41838
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 16807,
+   "ttft_ms": 1605,
+   "tpot_ms": 8.32,
+   "prompt_tokens": 40579,
+   "completion_tokens": 1827,
+   "total_tokens": 42406
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 16554,
+   "ttft_ms": 16554,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 763,
+   "completion_tokens": 108,
+   "total_tokens": 871
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 16546,
+   "ttft_ms": 16546,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 101541,
+   "completion_tokens": 2992,
+   "total_tokens": 104533
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 16085,
+   "ttft_ms": 16085,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 117307,
+   "completion_tokens": 3409,
+   "total_tokens": 120716
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 16083,
+   "ttft_ms": 2677,
+   "tpot_ms": 4.88,
+   "prompt_tokens": 73221,
+   "completion_tokens": 2747,
+   "total_tokens": 75968
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 15778,
+   "ttft_ms": 2335,
+   "tpot_ms": 3.43,
+   "prompt_tokens": 87848,
+   "completion_tokens": 3920,
+   "total_tokens": 91768
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 15729,
+   "ttft_ms": 2441,
+   "tpot_ms": 8.91,
+   "prompt_tokens": 48354,
+   "completion_tokens": 1491,
+   "total_tokens": 49845
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 15607,
+   "ttft_ms": 3038,
+   "tpot_ms": 5.32,
+   "prompt_tokens": 65948,
+   "completion_tokens": 2361,
+   "total_tokens": 68309
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 15571,
+   "ttft_ms": 1699,
+   "tpot_ms": 7.05,
+   "prompt_tokens": 56242,
+   "completion_tokens": 1969,
+   "total_tokens": 58211
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 15562,
+   "ttft_ms": 15562,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 2563,
+   "completion_tokens": 3173,
+   "total_tokens": 5736
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 15165,
+   "ttft_ms": 15166,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 78593,
+   "completion_tokens": 3195,
+   "total_tokens": 81788
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 15162,
+   "ttft_ms": 15162,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 88469,
+   "completion_tokens": 2096,
+   "total_tokens": 90565
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14975,
+   "ttft_ms": 14975,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 1488,
+   "completion_tokens": 1932,
+   "total_tokens": 3420
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14946,
+   "ttft_ms": 14945,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 113705,
+   "completion_tokens": 1920,
+   "total_tokens": 115625
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14914,
+   "ttft_ms": 2138,
+   "tpot_ms": 5.56,
+   "prompt_tokens": 50736,
+   "completion_tokens": 2296,
+   "total_tokens": 53032
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14913,
+   "ttft_ms": 2085,
+   "tpot_ms": 5.67,
+   "prompt_tokens": 50764,
+   "completion_tokens": 2264,
+   "total_tokens": 53028
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14888,
+   "ttft_ms": 14888,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 115307,
+   "completion_tokens": 2556,
+   "total_tokens": 117863
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14877,
+   "ttft_ms": 14877,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 99888,
+   "completion_tokens": 2153,
+   "total_tokens": 102041
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14752,
+   "ttft_ms": 14752,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 62598,
+   "completion_tokens": 3232,
+   "total_tokens": 65830
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14701,
+   "ttft_ms": 14701,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 75587,
+   "completion_tokens": 2019,
+   "total_tokens": 77606
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14627,
+   "ttft_ms": 14627,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 2101,
+   "completion_tokens": 2650,
+   "total_tokens": 4751
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14509,
+   "ttft_ms": 2230,
+   "tpot_ms": 5.91,
+   "prompt_tokens": 52106,
+   "completion_tokens": 2076,
+   "total_tokens": 54182
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14475,
+   "ttft_ms": 14475,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 137976,
+   "completion_tokens": 2512,
+   "total_tokens": 140488
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14383,
+   "ttft_ms": 14383,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 148032,
+   "completion_tokens": 2753,
+   "total_tokens": 150785
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14357,
+   "ttft_ms": 14358,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 72010,
+   "completion_tokens": 2734,
+   "total_tokens": 74744
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14346,
+   "ttft_ms": 2147,
+   "tpot_ms": 6.55,
+   "prompt_tokens": 89639,
+   "completion_tokens": 1862,
+   "total_tokens": 91501
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14327,
+   "ttft_ms": 8905,
+   "tpot_ms": 5.99,
+   "prompt_tokens": 61411,
+   "completion_tokens": 905,
+   "total_tokens": 62316
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 14149,
+   "ttft_ms": 1753,
+   "tpot_ms": 6.74,
+   "prompt_tokens": 82508,
+   "completion_tokens": 1838,
+   "total_tokens": 84346
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13961,
+   "ttft_ms": 13962,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 84757,
+   "completion_tokens": 2456,
+   "total_tokens": 87213
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13720,
+   "ttft_ms": 3482,
+   "tpot_ms": 10.48,
+   "prompt_tokens": 89737,
+   "completion_tokens": 977,
+   "total_tokens": 90714
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13656,
+   "ttft_ms": 13657,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 1349,
+   "completion_tokens": 1222,
+   "total_tokens": 2571
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13610,
+   "ttft_ms": 1393,
+   "tpot_ms": 4.46,
+   "prompt_tokens": 50122,
+   "completion_tokens": 2742,
+   "total_tokens": 52864
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13522,
+   "ttft_ms": 1953,
+   "tpot_ms": 4.81,
+   "prompt_tokens": 51170,
+   "completion_tokens": 2406,
+   "total_tokens": 53576
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13439,
+   "ttft_ms": 1508,
+   "tpot_ms": 4.75,
+   "prompt_tokens": 46508,
+   "completion_tokens": 2514,
+   "total_tokens": 49022
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13437,
+   "ttft_ms": 13436,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 84386,
+   "completion_tokens": 2649,
+   "total_tokens": 87035
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13413,
+   "ttft_ms": 2060,
+   "tpot_ms": 5.91,
+   "prompt_tokens": 57738,
+   "completion_tokens": 1921,
+   "total_tokens": 59659
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13364,
+   "ttft_ms": 7168,
+   "tpot_ms": 8.35,
+   "prompt_tokens": 46557,
+   "completion_tokens": 742,
+   "total_tokens": 47299
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13237,
+   "ttft_ms": 13237,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 2078,
+   "completion_tokens": 2171,
+   "total_tokens": 4249
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13232,
+   "ttft_ms": 1916,
+   "tpot_ms": 4.91,
+   "prompt_tokens": 81834,
+   "completion_tokens": 2306,
+   "total_tokens": 84140
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13227,
+   "ttft_ms": 13227,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 75834,
+   "completion_tokens": 2654,
+   "total_tokens": 78488
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13170,
+   "ttft_ms": 13171,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 152273,
+   "completion_tokens": 1995,
+   "total_tokens": 154268
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13135,
+   "ttft_ms": 13134,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 78254,
+   "completion_tokens": 1740,
+   "total_tokens": 79994
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13089,
+   "ttft_ms": 2750,
+   "tpot_ms": 6.2,
+   "prompt_tokens": 105514,
+   "completion_tokens": 1667,
+   "total_tokens": 107181
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 13016,
+   "ttft_ms": 1661,
+   "tpot_ms": 6.01,
+   "prompt_tokens": 33709,
+   "completion_tokens": 1890,
+   "total_tokens": 35599
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 12864,
+   "ttft_ms": 12863,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 93419,
+   "completion_tokens": 2053,
+   "total_tokens": 95472
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 12821,
+   "ttft_ms": 2511,
+   "tpot_ms": 2.79,
+   "prompt_tokens": 46442,
+   "completion_tokens": 3696,
+   "total_tokens": 50138
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 12747,
+   "ttft_ms": 1733,
+   "tpot_ms": 5.6,
+   "prompt_tokens": 67761,
+   "completion_tokens": 1967,
+   "total_tokens": 69728
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 12683,
+   "ttft_ms": 1658,
+   "tpot_ms": 5.5,
+   "prompt_tokens": 54201,
+   "completion_tokens": 2005,
+   "total_tokens": 56206
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 12617,
+   "ttft_ms": 2505,
+   "tpot_ms": 5.43,
+   "prompt_tokens": 128228,
+   "completion_tokens": 1863,
+   "total_tokens": 130091
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 12566,
+   "ttft_ms": 12566,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 81398,
+   "completion_tokens": 2921,
+   "total_tokens": 84319
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 12464,
+   "ttft_ms": 1916,
+   "tpot_ms": 5.41,
+   "prompt_tokens": 33504,
+   "completion_tokens": 1948,
+   "total_tokens": 35452
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 12404,
+   "ttft_ms": 12404,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 1954,
+   "completion_tokens": 2315,
+   "total_tokens": 4269
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 12381,
+   "ttft_ms": 12381,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 864,
+   "completion_tokens": 2211,
+   "total_tokens": 3075
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 12031,
+   "ttft_ms": 1916,
+   "tpot_ms": 4.02,
+   "prompt_tokens": 49246,
+   "completion_tokens": 2514,
+   "total_tokens": 51760
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11980,
+   "ttft_ms": 11979,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 117958,
+   "completion_tokens": 1691,
+   "total_tokens": 119649
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11951,
+   "ttft_ms": 11951,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 82909,
+   "completion_tokens": 2603,
+   "total_tokens": 85512
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11950,
+   "ttft_ms": 1505,
+   "tpot_ms": 3.73,
+   "prompt_tokens": 45085,
+   "completion_tokens": 2804,
+   "total_tokens": 47889
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11907,
+   "ttft_ms": 11907,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 104711,
+   "completion_tokens": 1381,
+   "total_tokens": 106092
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11893,
+   "ttft_ms": 11892,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 77831,
+   "completion_tokens": 1625,
+   "total_tokens": 79456
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11722,
+   "ttft_ms": 4458,
+   "tpot_ms": 6.01,
+   "prompt_tokens": 49546,
+   "completion_tokens": 1208,
+   "total_tokens": 50754
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11702,
+   "ttft_ms": 11702,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 592,
+   "completion_tokens": 306,
+   "total_tokens": 898
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11685,
+   "ttft_ms": 1743,
+   "tpot_ms": 4.89,
+   "prompt_tokens": 47768,
+   "completion_tokens": 2033,
+   "total_tokens": 49801
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11682,
+   "ttft_ms": 1918,
+   "tpot_ms": 13.79,
+   "prompt_tokens": 80875,
+   "completion_tokens": 708,
+   "total_tokens": 81583
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11581,
+   "ttft_ms": 11581,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 82533,
+   "completion_tokens": 1862,
+   "total_tokens": 84395
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11530,
+   "ttft_ms": 2449,
+   "tpot_ms": 5.65,
+   "prompt_tokens": 47773,
+   "completion_tokens": 1606,
+   "total_tokens": 49379
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11431,
+   "ttft_ms": 11431,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 125434,
+   "completion_tokens": 1409,
+   "total_tokens": 126843
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11412,
+   "ttft_ms": 11411,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 84430,
+   "completion_tokens": 1779,
+   "total_tokens": 86209
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11335,
+   "ttft_ms": 2845,
+   "tpot_ms": 5.12,
+   "prompt_tokens": 68304,
+   "completion_tokens": 1658,
+   "total_tokens": 69962
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11297,
+   "ttft_ms": 6626,
+   "tpot_ms": 8.97,
+   "prompt_tokens": 32251,
+   "completion_tokens": 521,
+   "total_tokens": 32772
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11287,
+   "ttft_ms": 11287,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 97627,
+   "completion_tokens": 2111,
+   "total_tokens": 99738
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11266,
+   "ttft_ms": 1420,
+   "tpot_ms": 3.72,
+   "prompt_tokens": 75697,
+   "completion_tokens": 2648,
+   "total_tokens": 78345
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 11197,
+   "ttft_ms": 9398,
+   "tpot_ms": 6.64,
+   "prompt_tokens": 69607,
+   "completion_tokens": 271,
+   "total_tokens": 69878
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10984,
+   "ttft_ms": 10984,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 1349,
+   "completion_tokens": 1862,
+   "total_tokens": 3211
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10948,
+   "ttft_ms": 4082,
+   "tpot_ms": 5.81,
+   "prompt_tokens": 57694,
+   "completion_tokens": 1182,
+   "total_tokens": 58876
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10928,
+   "ttft_ms": 10928,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 67844,
+   "completion_tokens": 1849,
+   "total_tokens": 69693
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10923,
+   "ttft_ms": 1879,
+   "tpot_ms": 5.08,
+   "prompt_tokens": 52498,
+   "completion_tokens": 1782,
+   "total_tokens": 54280
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10913,
+   "ttft_ms": 10913,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 620,
+   "completion_tokens": 308,
+   "total_tokens": 928
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10872,
+   "ttft_ms": 10871,
+   "tpot_ms": 0.04,
+   "prompt_tokens": 559,
+   "completion_tokens": 24,
+   "total_tokens": 583
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10848,
+   "ttft_ms": 2034,
+   "tpot_ms": 6.35,
+   "prompt_tokens": 68489,
+   "completion_tokens": 1388,
+   "total_tokens": 69877
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10770,
+   "ttft_ms": 10770,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 79939,
+   "completion_tokens": 1341,
+   "total_tokens": 81280
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10718,
+   "ttft_ms": 1226,
+   "tpot_ms": 7.46,
+   "prompt_tokens": 44458,
+   "completion_tokens": 1272,
+   "total_tokens": 45730
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10676,
+   "ttft_ms": 1798,
+   "tpot_ms": 6.65,
+   "prompt_tokens": 49372,
+   "completion_tokens": 1336,
+   "total_tokens": 50708
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10592,
+   "ttft_ms": 10592,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 65261,
+   "completion_tokens": 2016,
+   "total_tokens": 67277
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10584,
+   "ttft_ms": 2477,
+   "tpot_ms": 7.74,
+   "prompt_tokens": 122430,
+   "completion_tokens": 1048,
+   "total_tokens": 123478
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10561,
+   "ttft_ms": 10562,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 1886,
+   "completion_tokens": 1923,
+   "total_tokens": 3809
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10556,
+   "ttft_ms": 1382,
+   "tpot_ms": 3.89,
+   "prompt_tokens": 48947,
+   "completion_tokens": 2360,
+   "total_tokens": 51307
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10507,
+   "ttft_ms": 10507,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 67431,
+   "completion_tokens": 2383,
+   "total_tokens": 69814
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10466,
+   "ttft_ms": 10466,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 4583,
+   "completion_tokens": 68,
+   "total_tokens": 4651
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10407,
+   "ttft_ms": 10407,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 84683,
+   "completion_tokens": 1590,
+   "total_tokens": 86273
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10401,
+   "ttft_ms": 10401,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 119330,
+   "completion_tokens": 1486,
+   "total_tokens": 120816
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10325,
+   "ttft_ms": 10325,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 1059,
+   "completion_tokens": 1991,
+   "total_tokens": 3050
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10162,
+   "ttft_ms": 2098,
+   "tpot_ms": 4.95,
+   "prompt_tokens": 60437,
+   "completion_tokens": 1629,
+   "total_tokens": 62066
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10076,
+   "ttft_ms": 10076,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 82193,
+   "completion_tokens": 2369,
+   "total_tokens": 84562
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10076,
+   "ttft_ms": 1677,
+   "tpot_ms": 6.03,
+   "prompt_tokens": 44264,
+   "completion_tokens": 1394,
+   "total_tokens": 45658
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10033,
+   "ttft_ms": 2862,
+   "tpot_ms": 5.65,
+   "prompt_tokens": 82495,
+   "completion_tokens": 1270,
+   "total_tokens": 83765
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 10012,
+   "ttft_ms": 10012,
+   "tpot_ms": 0.0,
+   "prompt_tokens": 2102,
+   "completion_tokens": 2381,
+   "total_tokens": 4483
+  },
+  {
+   "model": "openai/deepseek-v4.1-flash-1017",
+   "status": "success",
+   "duration_ms": 9998,
+   "ttft_ms": 4705,
+   "tpot_ms": 8.17,
+   "prompt_tokens": 40655,
+   "completion_tokens": 648,
+   "total_tokens": 41303
+  }
+ ]
+}
