@@ -1358,16 +1358,16 @@ h1 {
   }
 }
 
-/* Reserve consistent columns for values, sample counts and changes. */
+/* Keep sample counts close to their values while aligning change indicators. */
 .metric-cell {
-  display: grid;
-  grid-template-columns: max-content 1fr 56px;
+  display: flex;
   align-items: baseline;
-  column-gap: 4px;
+  gap: 4px;
 }
 
-.metric-samples {
-  justify-self: end;
+.metric-change {
+  flex: 0 0 56px;
+  margin-left: auto;
 }
 
 .history-table td .metric-change .delta {
