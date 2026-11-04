@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/e2e-performance-history@1",
- "generated_at": "2026-11-04T01:33:06Z",
- "updated_at": "2026-11-04T01:33:06Z",
+ "generated_at": "2026-11-04T10:53:57Z",
+ "updated_at": "2026-11-04T10:53:57Z",
  "window_start": "2026-09-30T16:00:00+00:00",
- "window_end": "2026-11-04T01:33:00+00:00",
+ "window_end": "2026-11-04T10:53:51+00:00",
  "current_day_partial": true,
  "source_scope": "gateway-all-requests",
  "excluded_missing_model": 3,
@@ -207,27 +207,27 @@
     {
      "date": "2026-11-04",
      "status": "COMPLETED",
-     "query_ms": 5620,
-     "query_count": 258,
+     "query_ms": 6523,
+     "query_count": 673,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-04T00:16:42Z",
-     "failed_queries": 0,
+     "finished_at": "2026-11-04T10:31:45Z",
+     "failed_queries": 1,
      "unknown_status_count": 0,
      "blocked_queries": 0,
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 258,
-       "ttft_avg_ms": 2890,
-       "ttft_sample_count": 186,
-       "tpot_avg_ms": 2.41,
-       "tpot_sample_count": 186,
-       "duration_p95_ms": 16985,
-       "duration_sample_count": 258,
-       "input_tokens": 9583665,
-       "output_tokens": 266359,
-       "total_tokens": 9850024
+       "call_count": 673,
+       "ttft_avg_ms": 4008,
+       "ttft_sample_count": 459,
+       "tpot_avg_ms": 2.91,
+       "tpot_sample_count": 459,
+       "duration_p95_ms": 23656,
+       "duration_sample_count": 672,
+       "input_tokens": 18925219,
+       "output_tokens": 578026,
+       "total_tokens": 19503245
       }
      ]
     }
@@ -235,27 +235,27 @@
    "latest": {
     "date": "2026-11-04",
     "status": "COMPLETED",
-    "query_ms": 5620,
-    "query_count": 258,
+    "query_ms": 6523,
+    "query_count": 673,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-04T00:16:42Z",
-    "failed_queries": 0,
+    "finished_at": "2026-11-04T10:31:45Z",
+    "failed_queries": 1,
     "unknown_status_count": 0,
     "blocked_queries": 0,
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 258,
-      "ttft_avg_ms": 2890,
-      "ttft_sample_count": 186,
-      "tpot_avg_ms": 2.41,
-      "tpot_sample_count": 186,
-      "duration_p95_ms": 16985,
-      "duration_sample_count": 258,
-      "input_tokens": 9583665,
-      "output_tokens": 266359,
-      "total_tokens": 9850024
+      "call_count": 673,
+      "ttft_avg_ms": 4008,
+      "ttft_sample_count": 459,
+      "tpot_avg_ms": 2.91,
+      "tpot_sample_count": 459,
+      "duration_p95_ms": 23656,
+      "duration_sample_count": 672,
+      "input_tokens": 18925219,
+      "output_tokens": 578026,
+      "total_tokens": 19503245
      }
     ]
    }
