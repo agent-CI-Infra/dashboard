@@ -2,7 +2,11 @@ name: Collect DigitalMate production model metrics
 on:
   workflow_dispatch:
   schedule:
-    - cron: '15 21 * * *'
+    # GitHub can delay scheduled runs by hours and drops some of them, so a
+    # single daily tick left the board up to a day behind. Collect every three
+    # hours; a delayed or dropped tick is replaced by the next one. Each run
+    # re-reads the full 35-day window, so this trades gateway load for freshness.
+    - cron: '15 */3 * * *'
 permissions:
   contents: write
   actions: write
