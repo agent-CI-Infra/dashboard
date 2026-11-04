@@ -464,7 +464,7 @@ function breakdownTooltip(point, total) {
     point.date,
     point.region || point.network ? `${point.region || '地域未标注'} · ${point.network || '网络未标注'}` : '',
     `${statusLabel(point.status)} · 查询 ${fmtDuration(point.query_ms)}`,
-    total > 0 ? `端到端展示 ${fmtDuration(total)}` : '',
+    total > 0 ? `阶段耗时合计 ${fmtDuration(total)}` : '',
     Number.isFinite(point.stage_sample_count) ? `阶段完整样本 ${point.stage_sample_count}` : '',
     ...stageLines,
     point.run_id ? `run ${point.run_id}` : '',
@@ -472,7 +472,7 @@ function breakdownTooltip(point, total) {
   ].filter(Boolean).join('\n');
 }
 
-// 每日耗时分解图：柱 = 当日六段堆叠（总高为点击→展示完成），线 = 每日平均
+// 每日耗时分解图：柱 = 当日六段堆叠（排队起至展示完成），线 = 每日平均
 // 查询耗时；相邻点 commit 变化处画标注线，把曲线突变关联到版本。
 function dailyBreakdownChart(points) {
   const usable = (points || []).filter(
