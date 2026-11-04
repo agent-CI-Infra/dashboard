@@ -1427,3 +1427,69 @@ h1 {
   .comparison-controls { flex-basis: 100%; }
   .comparison-updated { margin-left: 0; }
 }
+
+.lookup-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.lookup-form input {
+  flex: 1 1 280px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+.lookup-form button {
+  padding: 8px 20px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--series-1);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lookup-form button:hover {
+  filter: brightness(1.08);
+}
+
+.lookup-key {
+  margin-top: 10px;
+}
+
+.lookup-key summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.lookup-key input {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+.lookup-meta {
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 12.5px;
+  word-break: break-all;
+}
+
+.lookup-time {
+  margin-top: 10px;
+  font-size: 12.5px;
+}
