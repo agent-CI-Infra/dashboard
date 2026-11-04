@@ -1429,6 +1429,9 @@ h1 {
 }
 :root { --stage-client: #6e7781; --stage-ack: #8250df; --stage-ttft: #0969da; --stage-gen: #ef6530; --stage-render: #1a7f37; }
 .e2e-filters { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin:0 0 12px; color:var(--muted); font-size:12px; }
+.e2e-details { margin-top:12px; }
+.e2e-details > summary { color:var(--accent); cursor:pointer; font-size:12px; }
+.e2e-details[open] > summary { margin-bottom:10px; }
 .e2e-filters select { max-width:100%; padding:4px 7px; border:1px solid var(--line); border-radius:6px; color:var(--ink); background:var(--panel); }
 .breakdown-chart-wrap { overflow-x:auto; }
 .chart .stage-value-label { fill:#fff; stroke:#24292f; stroke-width:2px; stroke-linejoin:round; paint-order:stroke; font-size:10px; font-weight:600; pointer-events:none; }

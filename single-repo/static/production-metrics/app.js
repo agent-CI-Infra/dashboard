@@ -1882,6 +1882,21 @@ function renderTrends() {
 let e2eHistory = null;
 let e2eCase = '';
 let e2eNetwork = '';
+let e2eDetailsOpen = false;
+
+function e2eDetailsTable(points) {
+  if (!points.length) return '<p class="empty">暂无每日明细。</p>';
+  const headers = STAGE_AVG_ORDER.map((key) => `<th>${esc(STAGE_AVG_LABEL[key])}</th>`).join('');
+  const rows = [...points].sort((a, b) => b.date.localeCompare(a.date)).map((point) => {
+    const stages = STAGE_AVG_ORDER.map((key) => `<td class="num">${fmtDuration(point.stage_avg_ms?.[key])}</td>`).join('');
+    const environment = [point.region, point.network].filter(Boolean).join(' · ') || '未标注';
+    const ttft = Number.isFinite(point.cloud_ttft_ms)
+      ? `${fmtDuration(point.cloud_ttft_ms)}（${esc(point.cloud_ttft_model || '未知模型')}，${fmtCount(point.cloud_ttft_samples)} 个样本）` : '—';
+    return `<tr><td>${esc(point.date)}</td><td>${esc(environment)}</td><td class="num">${fmtDuration(point.query_ms)}</td>${stages}<td>${ttft}</td><td class="num">${Number.isFinite(point.stage_sample_count) ? fmtCount(point.stage_sample_count) : '—'}</td></tr>`;
+  }).join('');
+  return `<div class="table-wrap"><table class="history-table"><thead><tr><th>日期</th><th>地域 / 网络</th><th>平均查询耗时</th>${headers}<th>云侧 TTFT（关联调用最多的模型）</th><th>阶段完整样本</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
 function renderE2eBreakdown() {
   const target = $('e2e-breakdown');
   if (!target) return;
@@ -1902,7 +1917,11 @@ function renderE2eBreakdown() {
     const [region, network] = JSON.parse(key);
     return `<option value="${esc(key)}"${key === e2eNetwork ? ' selected' : ''}>${esc(region || '地域未标注')} · ${esc(network || '网络未标注')}</option>`;
   }).join('');
-  target.innerHTML = `${e2eHistory.demo === true ? '<p class="demo-notice">演示数据：地域、网络和耗时均为模拟值</p>' : ''}<div class="e2e-filters"><label>用例 <select data-e2e-case>${caseOptions}</select></label><label>地域 / 网络 <select data-e2e-network${groups.length ? '' : ' disabled'}><option value="">${groups.length ? '全部地域 / 网络' : '暂无地域 / 网络数据'}</option>${networkOptions}</select></label></div>${dailyBreakdownChart(selected)}<p class="chart-note">数据来自 Nightly E2E 端侧用例，与所选现网模型无关联；柱顶数字和蓝线为平均查询耗时，柱体仅统计六个阶段时间戳齐全的样本，样本范围可能不同。悬停查看完整明细；同一用例同日同地域网络保留最新运行。</p>`;
+  target.innerHTML = `${e2eHistory.demo === true ? '<p class="demo-notice">演示数据：地域、网络和耗时均为模拟值</p>' : ''}<div class="e2e-filters"><label>用例 <select data-e2e-case>${caseOptions}</select></label><label>地域 / 网络 <select data-e2e-network${groups.length ? '' : ' disabled'}><option value="">${groups.length ? '全部地域 / 网络' : '暂无地域 / 网络数据'}</option>${networkOptions}</select></label></div>${dailyBreakdownChart(selected)}<p class="chart-note">数据来自 Nightly E2E 端侧用例，与所选现网模型无关联；柱顶数字和蓝线为平均查询耗时，柱体仅统计六个阶段时间戳齐全的样本，样本范围可能不同。悬停查看完整明细；同一用例同日同地域网络保留最新运行。</p><details class="e2e-details"${e2eDetailsOpen ? ' open' : ''}><summary>查看每日明细</summary>${e2eDetailsTable(selected)}</details>`;
+  target.querySelector('.e2e-details')?.addEventListener('toggle', (event) => {
+    e2eDetailsOpen = event.currentTarget.open;
+    window.parent.postMessage({ type: 'production-metrics-height', height: document.documentElement.scrollHeight }, location.origin);
+  });
 }
 async function loadE2eBreakdown() {
   try {

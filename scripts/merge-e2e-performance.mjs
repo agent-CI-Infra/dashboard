@@ -105,6 +105,17 @@ function stageAverages(queries) {
   return { stage_avg_ms, stage_sample_count: samples };
 }
 
+function cloudTtft(item) {
+  const models = Array.isArray(item.cloud?.benchmark?.models) ? item.cloud.benchmark.models : [];
+  const valid = models.filter((model) => typeof model?.model === 'string'
+    && Number.isFinite(model.ttft_avg_ms) && model.ttft_avg_ms >= 0
+    && Number.isFinite(model.ttft_sample_count) && model.ttft_sample_count > 0);
+  valid.sort((a, b) => (Number(b.call_count) || 0) - (Number(a.call_count) || 0));
+  const model = valid[0];
+  return model ? { cloud_ttft_ms: model.ttft_avg_ms, cloud_ttft_model: model.model,
+    cloud_ttft_samples: model.ttft_sample_count } : {};
+}
+
 export function mergeHistory(history, performance) {
   if (!performance || !Array.isArray(performance.cases)) {
     throw new Error('performance object has no cases array');
@@ -146,6 +157,7 @@ export function mergeHistory(history, performance) {
         ...(typeof item.region === 'string' && /^[\p{L}\p{N} _-]{1,32}$/u.test(item.region) ? { region: item.region } : {}),
         ...(typeof item.network === 'string' && /^[\p{L}\p{N} _-]{1,32}$/u.test(item.network) ? { network: item.network } : {}),
         ...stageAverages(item.queries),
+        ...cloudTtft(item),
       };
       // Keep separate network environments on the same day for the breakdown,
       // while preserving the existing one-point-per-day E2E history contract.
@@ -165,7 +177,7 @@ export function mergeHistory(history, performance) {
       const existing = entry.points.find((candidate) => candidate.date === date);
       if (!existing) entry.points.push(point);
       else if (timestamp(item.finished_at) >= timestamp(existing.finished_at)) {
-        for (const key of ['region', 'network', 'stage_avg_ms', 'stage_sample_count']) delete existing[key];
+        for (const key of ['region', 'network', 'stage_avg_ms', 'stage_sample_count', 'cloud_ttft_ms', 'cloud_ttft_model', 'cloud_ttft_samples']) delete existing[key];
         Object.assign(existing, point);
       }
       entry.points.sort((a, b) => String(a.date).localeCompare(String(b.date)));
