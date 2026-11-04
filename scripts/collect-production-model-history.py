@@ -11,7 +11,13 @@ the digitalmate/e2e-performance-history@1 schema with one case per model:
                         benchmark_models[0] per-day TTFT/TPOT/P95/Token stats
                           (physical model name, P95 only with >=20 samples)
 
-Usage: set PRODUCTION_GATEWAY_KEY and run python collect-production-model-history.py <data_dir> [days]
+Usage: set PRODUCTION_GATEWAY_KEY and run
+python collect-production-model-history.py <data_dir> [fetch_days] [previous_history]
+
+With a previous_history file, only the last fetch_days (default 2) are read
+from the gateway and merged into it; older days are kept until they leave the
+HISTORY_DAYS retention window. Without it, the full HISTORY_DAYS window is
+rebuilt from the gateway.
 """
 import json
 import hashlib
@@ -32,6 +38,7 @@ BASE = 'https://onlineswarm.openjiuwen.com:31474'
 SCHEMA = 'digitalmate/e2e-performance-history@1'
 RUN_ID = 'prod-adx-jiuwen'
 P95_MIN_SAMPLES = 20
+HISTORY_DAYS = 35
 SH = timezone(timedelta(hours=8))
 
 
@@ -135,17 +142,66 @@ def complete_token_sum(rows, field):
     return sum(values) if all(type(value) is int and value >= 0 for value in values) else None
 
 
+def load_previous_history(path):
+    """Read the published snapshot that fresh days are merged into."""
+    if not path:
+        return None
+    try:
+        doc = json.loads(Path(path).read_text(encoding='utf-8'))
+    except FileNotFoundError:
+        return None
+    if not isinstance(doc, dict) or not isinstance(doc.get('cases'), dict):
+        raise ValueError('Previous history must contain a cases object')
+    return doc
+
+
+def merge_history(previous_cases, fresh_cases, cutoff_date):
+    """Merge freshly collected days into the published case history.
+
+    Fresh points replace the same dates from the previous snapshot, older days
+    are kept until they fall outside the retention window, and cases whose
+    points have all aged out are dropped.
+    """
+    merged = {}
+    for case_id, case in previous_cases.items():
+        if not isinstance(case, dict):
+            continue
+        points = [point for point in case.get('points') or []
+                  if isinstance(point, dict) and isinstance(point.get('date'), str)
+                  and point['date'] >= cutoff_date]
+        if points:
+            merged[case_id] = {'title': case.get('title') or case_id, 'points': points}
+    for case_id, case in fresh_cases.items():
+        slot = merged.setdefault(case_id, {'title': case['title'], 'points': []})
+        by_date = {point['date']: point for point in slot['points']}
+        for point in case['points']:
+            by_date[point['date']] = point
+        slot['title'] = case['title']
+        slot['points'] = [by_date[date] for date in sorted(by_date)]
+    return {
+        case_id: {'title': slot['title'], 'points': slot['points'], 'latest': dict(slot['points'][-1])}
+        for case_id, slot in sorted(merged.items())
+        if slot['points']
+    }
+
+
 def main():
     data_dir = Path(sys.argv[1])
     key = os.environ['PRODUCTION_GATEWAY_KEY']
-    days = int(sys.argv[2]) if len(sys.argv) > 2 else 35
+    days = int(sys.argv[2]) if len(sys.argv) > 2 else HISTORY_DAYS
     if not 1 <= days <= 365:
         raise ValueError('Days must be between 1 and 365')
+    previous = load_previous_history(sys.argv[3] if len(sys.argv) > 3 else '')
+    if previous is None and days < HISTORY_DAYS:
+        # Nothing to merge into: rebuild the full window rather than publish a
+        # history that only covers the freshly fetched days.
+        days = HISTORY_DAYS
 
     end = datetime.now(timezone.utc).replace(microsecond=0)
-    start = (end.astimezone(SH).replace(hour=0, minute=0, second=0, microsecond=0)
-             - timedelta(days=days - 1)).astimezone(timezone.utc)
-    rows = fetch_window(key, start, end)
+    today = end.astimezone(SH).replace(hour=0, minute=0, second=0, microsecond=0)
+    history_start = today - timedelta(days=HISTORY_DAYS - 1)
+    fetch_start = today - timedelta(days=days - 1)
+    rows = fetch_window(key, fetch_start.astimezone(timezone.utc), end)
 
     seen_ids = set()
     groups = defaultdict(list)
@@ -245,12 +301,15 @@ def main():
             'latest': latest,
         }
 
+    if previous is not None:
+        cases = merge_history(previous.get('cases', {}), cases, history_start.date().isoformat())
+
     generated = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     doc = {
         'schema': SCHEMA,
         'generated_at': generated,
         'updated_at': generated,
-        'window_start': start.isoformat(),
+        'window_start': history_start.astimezone(timezone.utc).isoformat(),
         'window_end': end.isoformat(),
         'current_day_partial': True,
         'source_scope': 'gateway-all-requests',
@@ -268,7 +327,8 @@ def main():
     finally:
         if temp is not None:
             temp.unlink(missing_ok=True)
-    print(f'window {start.strftime("%Y-%m-%d")} .. {end.strftime("%Y-%m-%d")} UTC | rows {len(rows)} -> {sum(len(c["points"]) for c in cases.values())} case-days')
+    mode = 'merge' if previous is not None else 'rebuild'
+    print(f'{mode}: fetched {fetch_start.strftime("%Y-%m-%d")} .. {end.strftime("%Y-%m-%d")} UTC | rows {len(rows)} -> {sum(len(c["points"]) for c in cases.values())} case-days')
     for case_id, case in cases.items():
         calls = sum(p['query_count'] for p in case['points'])
         print(f'  {case_id}: {len(case["points"])} days, {calls} calls')

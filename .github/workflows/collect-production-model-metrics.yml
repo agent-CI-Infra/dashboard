@@ -32,7 +32,15 @@ jobs:
             exit 1
           fi
           mkdir -p /tmp/production-model-metrics
-          python3 scripts/collect-production-model-history.py /tmp/production-model-metrics 35
+          # Merge into the published history: re-read only the last two days and
+          # keep older days from the digitalmate branch.
+          git fetch origin digitalmate:refs/remotes/origin/digitalmate
+          previous=''
+          if git cat-file -e origin/digitalmate:site/data/production-model-history.json 2>/dev/null; then
+            git show origin/digitalmate:site/data/production-model-history.json > /tmp/production-model-metrics/previous.json
+            previous=/tmp/production-model-metrics/previous.json
+          fi
+          python3 scripts/collect-production-model-history.py /tmp/production-model-metrics 2 "$previous"
       - name: Publish aggregate to the DigitalMate data branch
         id: update
         run: |

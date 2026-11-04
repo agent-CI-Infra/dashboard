@@ -82,4 +82,55 @@ class CollectionTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 collector.fetch_rows('dummy', collector.datetime.now(collector.timezone.utc), collector.datetime.now(collector.timezone.utc))
 
+    def test_merge_history_replaces_fresh_days_and_prunes_aged_points(self):
+        today = collector.datetime.now(collector.SH).date()
+        old = (today - collector.timedelta(days=5)).isoformat()
+        stale = (today - collector.timedelta(days=collector.HISTORY_DAYS + 5)).isoformat()
+        cutoff = (today - collector.timedelta(days=collector.HISTORY_DAYS - 1)).isoformat()
+        previous = {
+            'PROD-a': {'title': 'a', 'points': [{'date': stale, 'query_count': 1}, {'date': old, 'query_count': 2}]},
+            'PROD-b': {'title': 'b', 'points': [{'date': stale, 'query_count': 3}]},
+        }
+        fresh = {'PROD-a': {'title': 'a', 'points': [{'date': old, 'query_count': 9}, {'date': today.isoformat(), 'query_count': 4}]}}
+        merged = collector.merge_history(previous, fresh, cutoff)
+        self.assertEqual(sorted(merged), ['PROD-a'])
+        self.assertEqual([p['date'] for p in merged['PROD-a']['points']], [old, today.isoformat()])
+        self.assertEqual(merged['PROD-a']['points'][0]['query_count'], 9)
+        self.assertEqual(merged['PROD-a']['latest']['query_count'], 4)
+
+    def test_main_merges_previous_snapshot_and_keeps_older_days(self):
+        today = collector.datetime.now(collector.SH).date()
+        yesterday = (today - collector.timedelta(days=1)).isoformat()
+        today_text = today.isoformat()
+        rows = [{'model_group': 'test', 'model': 'provider/test', 'status': 'success',
+                 'startTime': f'{today_text}T00:00:00+08:00', 'completionStartTime': f'{today_text}T00:00:01+08:00',
+                 'endTime': f'{today_text}T00:00:02+08:00', 'request_duration_ms': 2000,
+                 'prompt_tokens': 10, 'completion_tokens': 4, 'request_id': 'fresh'}]
+        previous = {'cases': {'PROD-kept': {'title': 'kept', 'points': [{'date': yesterday, 'query_count': 1}]}}}
+        with tempfile.TemporaryDirectory() as d:
+            previous_path = Path(d) / 'previous.json'
+            previous_path.write_text(json.dumps(previous), encoding='utf-8')
+            with patch.object(collector, 'fetch_window', return_value=rows), \
+                    patch.dict(os.environ, {'PRODUCTION_GATEWAY_KEY': 'dummy'}), \
+                    patch.object(sys, 'argv', ['collector', d, '2', str(previous_path)]), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                collector.main()
+            doc = json.loads((Path(d) / 'production-model-history.json').read_text(encoding='utf-8'))
+            self.assertIn('PROD-kept', doc['cases'])
+            self.assertEqual([p['date'] for p in doc['cases']['PROD-kept']['points']], [yesterday])
+            fresh = next(case for case_id, case in doc['cases'].items() if case_id != 'PROD-kept')
+            self.assertEqual([p['date'] for p in fresh['points']], [today_text])
+
+    def test_missing_previous_snapshot_rebuilds_the_full_window(self):
+        today = collector.datetime.now(collector.SH).replace(hour=0, minute=0, second=0, microsecond=0)
+        expected_start = (today - collector.timedelta(days=collector.HISTORY_DAYS - 1)).astimezone(collector.timezone.utc)
+        with tempfile.TemporaryDirectory() as d, \
+                patch.object(collector, 'fetch_window', return_value=[]) as fetch, \
+                patch.dict(os.environ, {'PRODUCTION_GATEWAY_KEY': 'dummy'}), \
+                patch.object(sys, 'argv', ['collector', d, '2']), \
+                contextlib.redirect_stdout(io.StringIO()):
+            collector.main()
+        self.assertEqual(fetch.call_args.args[1], expected_start)
+
+
 if __name__ == '__main__': unittest.main()
