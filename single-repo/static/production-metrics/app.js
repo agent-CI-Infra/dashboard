@@ -1910,14 +1910,15 @@ function renderE2eBreakdown() {
   const group = (point) => JSON.stringify([point.region || null, point.network || null]);
   const points = [...(entry.breakdown_points?.length ? entry.breakdown_points : entry.points)].sort((a, b) => a.date.localeCompare(b.date));
   const groups = points.some((point) => point.region || point.network) ? [...new Set(points.map(group))] : [];
-  if (!groups.includes(e2eNetwork)) e2eNetwork = '';
-  const selected = e2eNetwork ? points.filter((point) => group(point) === e2eNetwork) : points;
+  if (groups.length && !groups.includes(e2eNetwork)) e2eNetwork = groups[0];
+  if (!groups.length) e2eNetwork = '';
+  const selected = groups.length ? points.filter((point) => group(point) === e2eNetwork) : points;
   const caseOptions = cases.map((item) => `<option value="${esc(item.id)}"${item.id === e2eCase ? ' selected' : ''}>${esc(item.id)} · ${esc(item.title || '')}</option>`).join('');
   const networkOptions = groups.map((key) => {
     const [region, network] = JSON.parse(key);
     return `<option value="${esc(key)}"${key === e2eNetwork ? ' selected' : ''}>${esc(region || '地域未标注')} · ${esc(network || '网络未标注')}</option>`;
   }).join('');
-  target.innerHTML = `${e2eHistory.demo === true ? '<p class="demo-notice">演示数据：地域、网络和耗时均为模拟值</p>' : ''}<div class="e2e-filters"><label>用例 <select data-e2e-case>${caseOptions}</select></label><label>地域 / 网络 <select data-e2e-network${groups.length ? '' : ' disabled'}><option value="">${groups.length ? '全部地域 / 网络' : '暂无地域 / 网络数据'}</option>${networkOptions}</select></label></div>${dailyBreakdownChart(selected)}<p class="chart-note">数据来自 Nightly E2E 端侧用例，与所选现网模型无关联；柱顶数字和蓝线为平均查询耗时，柱体仅统计六个阶段时间戳齐全的样本，样本范围可能不同。悬停查看完整明细；同一用例同日同地域网络保留最新运行。</p><details class="e2e-details"${e2eDetailsOpen ? ' open' : ''}><summary>查看每日明细</summary>${e2eDetailsTable(selected)}</details>`;
+  target.innerHTML = `${e2eHistory.demo === true ? '<p class="demo-notice">演示数据：地域、网络和耗时均为模拟值</p>' : ''}<div class="e2e-filters"><label>用例 <select data-e2e-case>${caseOptions}</select></label><label>地域 / 网络 <select data-e2e-network${groups.length ? '' : ' disabled'}>${groups.length ? networkOptions : '<option value="">暂无地域 / 网络数据</option>'}</select></label></div>${dailyBreakdownChart(selected)}<p class="chart-note">数据来自 Nightly E2E 端侧用例，与所选现网模型无关联；每条曲线只显示一个地域 / 网络组合。柱顶数字和蓝线为平均查询耗时，柱体仅统计六个阶段时间戳齐全的样本，样本范围可能不同。悬停查看完整明细；同一用例同日同地域网络保留最新运行。</p><details class="e2e-details"${e2eDetailsOpen ? ' open' : ''}><summary>查看每日明细</summary>${e2eDetailsTable(selected)}</details>`;
   target.querySelector('.e2e-details')?.addEventListener('toggle', (event) => {
     e2eDetailsOpen = event.currentTarget.open;
     window.parent.postMessage({ type: 'production-metrics-height', height: document.documentElement.scrollHeight }, location.origin);
