@@ -430,6 +430,200 @@ function dailyChart(points) {
   </div>`;
 }
 
+const STAGE_AVG_LABEL = {
+  queue_ms: '排队',
+  send_ms: '发送',
+  ack_ms: 'ACK',
+  first_text_ms: '首条消息',
+  generation_ms: '消息接收',
+  display_ms: '展示完成',
+};
+const STAGE_AVG_ORDER = ['queue_ms', 'send_ms', 'ack_ms', 'first_text_ms', 'generation_ms', 'display_ms'];
+// 阶段类别决定配色：端侧准备/发出、服务端确认（ACK）、首响、流式生成、渲染展示。
+const STAGE_AVG_CAT = {
+  queue_ms: 'client',
+  send_ms: 'client',
+  ack_ms: 'ack',
+  first_text_ms: 'ttft',
+  generation_ms: 'gen',
+  display_ms: 'render',
+};
+
+function stageTotal(avg) {
+  if (!avg || typeof avg !== 'object') return 0;
+  return STAGE_AVG_ORDER.reduce((sum, key) => sum + (Number.isFinite(avg[key]) ? avg[key] : 0), 0);
+}
+
+
+function breakdownTooltip(point, total) {
+  const stages = point.stage_avg_ms;
+  const stageLines = stages && typeof stages === 'object'
+    ? STAGE_AVG_ORDER.map((key) => `${STAGE_AVG_LABEL[key]} ${fmtDuration(stages[key])}`)
+    : ['阶段耗时 暂无数据'];
+  return [
+    point.date,
+    point.region || point.network ? `${point.region || '地域未标注'} · ${point.network || '网络未标注'}` : '',
+    `${statusLabel(point.status)} · 查询 ${fmtDuration(point.query_ms)}`,
+    total > 0 ? `阶段耗时合计 ${fmtDuration(total)}` : '',
+    Number.isFinite(point.stage_sample_count) ? `阶段完整样本 ${point.stage_sample_count}` : '',
+    ...stageLines,
+    point.run_id ? `run ${point.run_id}` : '',
+    point.commit ? `commit ${point.commit.slice(0, 7)}` : '',
+  ].filter(Boolean).join('\n');
+}
+
+// 每日耗时分解图：柱 = 当日六段堆叠（排队起至展示完成），线 = 每日平均
+// 查询耗时；相邻点 commit 变化处画标注线，把曲线突变关联到版本。
+function dailyBreakdownChart(points) {
+  const usable = (points || []).filter(
+    (point) => Number.isFinite(point.query_ms) || stageTotal(point.stage_avg_ms) > 0,
+  );
+  if (!usable.length) return '<p class="empty">暂无可绘制的按日数据。</p>';
+
+  const size = chartSize(760, 280, { hostId: 'e2e-breakdown' });
+  const width = Math.max(size.width, usable.length * 60 + 74);
+  const { height } = size;
+  const pad = { left: 56, right: 18, top: 30, bottom: 38 };
+  const innerWidth = width - pad.left - pad.right;
+  const innerHeight = height - pad.top - pad.bottom;
+  const totals = usable.map((point) => stageTotal(point.stage_avg_ms));
+  const max = niceMax(
+    Math.max(...usable.map((point) => (Number.isFinite(point.query_ms) ? point.query_ms : 0)), ...totals, 1),
+  );
+  const n = usable.length;
+  const zone = innerWidth / n;
+  const colW = Math.min(48, zone * 0.6);
+  const cx = (index) => pad.left + zone * (index + 0.5);
+  const y = (value) => pad.top + innerHeight - (value / max) * innerHeight;
+
+  const grid = Array.from({ length: 5 }, (_, index) => (max / 4) * index)
+    .map((value) => {
+      const yy = y(value);
+      return `<line class="grid-line" x1="${pad.left}" y1="${yy}" x2="${width - pad.right}" y2="${yy}" />
+        <text class="axis-text" x="${pad.left - 8}" y="${yy + 3}" text-anchor="end">${fmtAxis(value)}</text>`;
+    })
+    .join('');
+
+  const step = Math.max(1, Math.ceil(usable.length / 8));
+  const labelIndexes = new Set([0, usable.length - 1]);
+  for (let index = step; index < usable.length - 1; index += step) labelIndexes.add(index);
+  const xLabels = [...labelIndexes]
+    .sort((a, b) => a - b)
+    .map(
+      (index) =>
+        `<text class="axis-text" x="${cx(index).toFixed(1)}" y="${height - 14}" text-anchor="middle">${esc(usable[index].date.slice(5))}</text>`,
+    )
+    .join('');
+
+  // 柱：自下而上按 STAGE_AVG_ORDER 堆叠，缺失段跳过。
+  const stageLabels = [];
+  const columns = usable
+    .map((point, index) => {
+      const total = totals[index];
+      if (total <= 0) return '';
+      let top = pad.top + innerHeight;
+      return STAGE_AVG_ORDER.filter(
+        (key) => Number.isFinite(point.stage_avg_ms?.[key]) && point.stage_avg_ms[key] > 0,
+      )
+        .map((key) => {
+          const value = point.stage_avg_ms[key];
+          const h = (value / max) * innerHeight;
+          top -= h;
+          const label = fmtDuration(value);
+          if (h >= 16 && colW >= label.length * 6 + 4) {
+            stageLabels.push(`<text class="stage-value-label" x="${cx(index).toFixed(1)}" y="${(top + h / 2 + 3.5).toFixed(1)}" text-anchor="middle">${esc(label)}</text>`);
+          }
+          return `<rect x="${(cx(index) - colW / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${colW.toFixed(1)}" height="${Math.max(h, 0.5).toFixed(1)}" rx="1.5" style="fill:var(--stage-${STAGE_AVG_CAT[key]})"><title>${esc(STAGE_AVG_LABEL[key])} ${fmtDuration(value)}</title></rect>`;
+        })
+        .join('');
+    })
+    .join('');
+
+  const queryLabels = usable.map((point, index) => {
+    if (!Number.isFinite(point.query_ms)) return '';
+    const top = Math.max(point.query_ms, totals[index]);
+    return `<text class="query-value-label" x="${cx(index).toFixed(1)}" y="${(y(top) - 8).toFixed(1)}" text-anchor="middle">${esc(fmtDuration(point.query_ms))}</text>`;
+  }).join('');
+
+  // 线：只在 query_ms 连续有值的天之间连线，缺失断开。
+  const finiteRuns = [];
+  let run = [];
+  usable.forEach((point, index) => {
+    if (Number.isFinite(point.query_ms)) {
+      if (run.length && index !== run[run.length - 1] + 1) {
+        finiteRuns.push(run);
+        run = [];
+      }
+      run.push(index);
+    }
+  });
+  if (run.length) finiteRuns.push(run);
+  const lines = finiteRuns
+    .map(
+      (indexes) =>
+        `<path class="series" d="${indexes.map((index, k) => `${k === 0 ? 'M' : 'L'}${cx(index).toFixed(1)},${y(usable[index].query_ms).toFixed(1)}`).join(' ')}"/>`,
+    )
+    .join('');
+  const dots = usable
+    .map((point, index) => {
+      if (!Number.isFinite(point.query_ms)) return '';
+      const tip = breakdownTooltip(point, totals[index]);
+      return `<circle class="point ${statusClass(point.status)}" cx="${cx(index).toFixed(1)}" cy="${y(point.query_ms).toFixed(1)}" r="4"><title>${esc(tip)}</title></circle>`;
+    })
+    .join('');
+
+  // commit 标注线：相邻点 commit 变化处画竖虚线，标签上下交替防重叠。
+  let commitCount = 0;
+  const commitMarks = [];
+  for (let index = 1; index < n; index += 1) {
+    const prev = (usable[index - 1].commit || '').trim();
+    const cur = (usable[index].commit || '').trim();
+    if (!cur || cur === prev) continue;
+    const xLine = ((cx(index - 1) + cx(index)) / 2).toFixed(1);
+    commitMarks.push(`<line class="commit-line" x1="${xLine}" y1="${pad.top}" x2="${xLine}" y2="${pad.top + innerHeight}"/>`);
+    commitMarks.push(
+      `<text class="commit-label" x="${xLine}" y="${pad.top + 8 + (commitCount % 2) * 10}" text-anchor="middle">${esc(cur.slice(0, 7))}</text>`,
+    );
+    commitCount += 1;
+  }
+
+  const zones = usable
+    .map((point, index) => {
+      const left = Math.max(pad.left, cx(index) - zone / 2);
+      const right = Math.min(width - pad.right, cx(index) + zone / 2);
+      const tip = breakdownTooltip(point, totals[index]);
+      const tipY = Number.isFinite(point.query_ms) ? y(point.query_ms) : pad.top + innerHeight;
+      return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right - left).toFixed(1)}" height="${innerHeight}" data-tip="${esc(tip)}" data-x="${cx(index).toFixed(1)}" data-y="${tipY.toFixed(1)}" />`;
+    })
+    .join('');
+
+  const hasStages = totals.some((total) => total > 0);
+  const stageLegend = hasStages
+    ? STAGE_AVG_ORDER.map(
+        (key) =>
+          `<span class="legend-key"><i class="legend-dot" style="background:var(--stage-${STAGE_AVG_CAT[key]})"></i>${esc(STAGE_AVG_LABEL[key])}</span>`,
+      ).join('')
+    : '';
+  const legend = `<div class="chart-legend">${stageLegend}<span class="legend-key">— 平均查询耗时（柱顶数字）</span></div>`;
+
+  return `${legend}<div class="chart-wrap breakdown-chart-wrap">
+    <svg class="chart" style="min-width:${width}px" viewBox="0 0 ${width} ${height}" role="img" aria-label="端侧 E2E 每日耗时分解">
+      ${grid}
+      <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
+      ${commitMarks.join('')}
+      ${columns}
+      ${lines}
+      ${dots}
+      ${stageLabels.join('')}
+      ${queryLabels}
+      ${xLabels}
+      <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
+      <circle class="hover-dot" r="4" cx="0" cy="0" hidden />
+      ${zones}
+    </svg>
+  </div>`;
+}
+
 function fmtCount(value) {
   if (!Number.isFinite(value) || value < 0) return '—';
   // Intl.NumberFormat construction is expensive; reuse one instance per page.
@@ -1684,6 +1878,70 @@ function renderTrends() {
   });
 }
 
+
+let e2eHistory = null;
+let e2eCase = '';
+let e2eNetwork = '';
+let e2eDetailsOpen = false;
+
+function e2eDetailsTable(points) {
+  if (!points.length) return '<p class="empty">暂无每日明细。</p>';
+  const headers = STAGE_AVG_ORDER.map((key) => `<th>${esc(STAGE_AVG_LABEL[key])}</th>`).join('');
+  const rows = [...points].sort((a, b) => b.date.localeCompare(a.date)).map((point) => {
+    const stages = STAGE_AVG_ORDER.map((key) => `<td class="num">${fmtDuration(point.stage_avg_ms?.[key])}</td>`).join('');
+    const environment = [point.region, point.network].filter(Boolean).join(' · ') || '未标注';
+    const ttft = Number.isFinite(point.cloud_ttft_ms)
+      ? `${fmtDuration(point.cloud_ttft_ms)}（${esc(point.cloud_ttft_model || '未知模型')}，${fmtCount(point.cloud_ttft_samples)} 个样本）` : '—';
+    return `<tr><td>${esc(point.date)}</td><td>${esc(environment)}</td><td class="num">${fmtDuration(point.query_ms)}</td>${stages}<td>${ttft}</td><td class="num">${Number.isFinite(point.stage_sample_count) ? fmtCount(point.stage_sample_count) : '—'}</td></tr>`;
+  }).join('');
+  return `<div class="table-wrap"><table class="history-table"><thead><tr><th>日期</th><th>地域 / 网络</th><th>平均查询耗时</th>${headers}<th>云侧 TTFT（关联调用最多的模型）</th><th>阶段完整样本</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function renderE2eBreakdown() {
+  const target = $('e2e-breakdown');
+  if (!target) return;
+  const cases = Object.values(e2eHistory?.cases || {}).filter((entry) => Array.isArray(entry.points) && entry.points.length);
+  if (!cases.length) {
+    target.innerHTML = '<p class="empty">暂无端侧 E2E 历史数据；等待 Nightly 采集。</p>';
+    return;
+  }
+  if (!cases.some((entry) => entry.id === e2eCase)) e2eCase = cases[0].id;
+  const entry = cases.find((item) => item.id === e2eCase);
+  const group = (point) => JSON.stringify([point.region || null, point.network || null]);
+  const points = [...(entry.breakdown_points?.length ? entry.breakdown_points : entry.points)].sort((a, b) => a.date.localeCompare(b.date));
+  const groups = points.some((point) => point.region || point.network) ? [...new Set(points.map(group))] : [];
+  if (groups.length && !groups.includes(e2eNetwork)) e2eNetwork = groups[0];
+  if (!groups.length) e2eNetwork = '';
+  const selected = groups.length ? points.filter((point) => group(point) === e2eNetwork) : points;
+  const caseOptions = cases.map((item) => `<option value="${esc(item.id)}"${item.id === e2eCase ? ' selected' : ''}>${esc(item.id)} · ${esc(item.title || '')}</option>`).join('');
+  const networkOptions = groups.map((key) => {
+    const [region, network] = JSON.parse(key);
+    return `<option value="${esc(key)}"${key === e2eNetwork ? ' selected' : ''}>${esc(region || '地域未标注')} · ${esc(network || '网络未标注')}</option>`;
+  }).join('');
+  target.innerHTML = `${e2eHistory.demo === true ? '<p class="demo-notice">演示数据：地域、网络和耗时均为模拟值</p>' : ''}<div class="e2e-filters"><label>用例 <select data-e2e-case>${caseOptions}</select></label><label>地域 / 网络 <select data-e2e-network${groups.length ? '' : ' disabled'}>${groups.length ? networkOptions : '<option value="">暂无地域 / 网络数据</option>'}</select></label></div>${dailyBreakdownChart(selected)}<p class="chart-note">数据来自 Nightly E2E 端侧用例，与所选现网模型无关联；每条曲线只显示一个地域 / 网络组合。柱顶数字和蓝线为平均查询耗时，柱体仅统计六个阶段时间戳齐全的样本，样本范围可能不同。悬停查看完整明细；同一用例同日同地域网络保留最新运行。</p><details class="e2e-details"${e2eDetailsOpen ? ' open' : ''}><summary>查看每日明细</summary>${e2eDetailsTable(selected)}</details>`;
+  target.querySelector('.e2e-details')?.addEventListener('toggle', (event) => {
+    e2eDetailsOpen = event.currentTarget.open;
+    window.parent.postMessage({ type: 'production-metrics-height', height: document.documentElement.scrollHeight }, location.origin);
+  });
+}
+async function loadE2eBreakdown() {
+  try {
+    const response = await fetch('../data/e2e-performance/history.json', { cache: 'no-store' });
+    if (!response.ok) throw new Error('unavailable');
+    const history = await response.json();
+    if (!history || !history.cases || typeof history.cases !== 'object') throw new Error('invalid');
+    e2eHistory = history;
+  } catch { e2eHistory = null; }
+  renderE2eBreakdown();
+}
+$('e2e-breakdown')?.addEventListener('change', (event) => {
+  if (event.target.matches('[data-e2e-case]')) { e2eCase = event.target.value; e2eNetwork = ''; }
+  else if (event.target.matches('[data-e2e-network]')) e2eNetwork = event.target.value;
+  else return;
+  hideChartHover();
+  renderE2eBreakdown();
+});
+
 function renderModels() {
   hideChartHover();
   const history = state.history;
@@ -1890,6 +2148,7 @@ async function loadProductionMetrics() {
 }
 
 async function load() {
+  void loadE2eBreakdown();
   try {
     const response = await fetch('../data/production-model-history.json', { cache: 'no-store' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
