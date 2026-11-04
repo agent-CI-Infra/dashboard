@@ -1427,3 +1427,14 @@ h1 {
   .comparison-controls { flex-basis: 100%; }
   .comparison-updated { margin-left: 0; }
 }
+:root { --stage-client: #6e7781; --stage-ack: #8250df; --stage-ttft: #0969da; --stage-gen: #ef6530; --stage-render: #1a7f37; }
+.e2e-filters { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin:0 0 12px; color:var(--muted); font-size:12px; }
+.e2e-filters select { max-width:100%; padding:4px 7px; border:1px solid var(--line); border-radius:6px; color:var(--ink); background:var(--panel); }
+.breakdown-chart-wrap { overflow-x:auto; }
+.chart .stage-value-label { fill:#fff; stroke:#24292f; stroke-width:2px; stroke-linejoin:round; paint-order:stroke; font-size:10px; font-weight:600; pointer-events:none; }
+.chart .query-value-label { fill:var(--series-1); font-size:11px; font-weight:600; pointer-events:none; }
+.chart .commit-line { stroke:var(--line); stroke-dasharray:3 3; }
+.chart .commit-label { fill:var(--muted); font-size:9px; }
+.chart-legend { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:8px; font-size:11px; color:var(--muted); }
+.legend-key { display:inline-flex; gap:5px; align-items:center; }
+.legend-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
