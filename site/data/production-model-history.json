@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/e2e-performance-history@1",
- "generated_at": "2026-11-03T11:12:53Z",
- "updated_at": "2026-11-03T11:12:53Z",
- "window_start": "2026-09-29T16:00:00+00:00",
- "window_end": "2026-11-03T11:12:17+00:00",
+ "generated_at": "2026-11-04T01:21:12Z",
+ "updated_at": "2026-11-04T01:21:12Z",
+ "window_start": "2026-09-30T16:00:00+00:00",
+ "window_end": "2026-11-04T01:20:37+00:00",
  "current_day_partial": true,
  "source_scope": "gateway-all-requests",
  "excluded_missing_model": 75,
@@ -180,55 +180,82 @@
     {
      "date": "2026-11-03",
      "status": "COMPLETED",
-     "query_ms": 6514,
-     "query_count": 362,
+     "query_ms": 6848,
+     "query_count": 635,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-03T10:54:06Z",
+     "finished_at": "2026-11-03T15:42:13Z",
      "failed_queries": 21,
      "unknown_status_count": 0,
      "blocked_queries": 0,
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 362,
-       "ttft_avg_ms": 4472,
-       "ttft_sample_count": 250,
-       "tpot_avg_ms": 3.43,
-       "tpot_sample_count": 249,
-       "duration_p95_ms": 23454,
-       "duration_sample_count": 341,
-       "input_tokens": 10401371,
-       "output_tokens": 213515,
-       "total_tokens": 10614886
+       "call_count": 635,
+       "ttft_avg_ms": 4354,
+       "ttft_sample_count": 451,
+       "tpot_avg_ms": 3.01,
+       "tpot_sample_count": 450,
+       "duration_p95_ms": 23467,
+       "duration_sample_count": 614,
+       "input_tokens": 20870841,
+       "output_tokens": 557015,
+       "total_tokens": 21427856
+      }
+     ]
+    },
+    {
+     "date": "2026-11-04",
+     "status": "COMPLETED",
+     "query_ms": 5620,
+     "query_count": 258,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-11-04T00:16:42Z",
+     "failed_queries": 0,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "benchmark_models": [
+      {
+       "model": "openai/deepseek-v4.1-flash-1017",
+       "call_count": 258,
+       "ttft_avg_ms": 2890,
+       "ttft_sample_count": 186,
+       "tpot_avg_ms": 2.41,
+       "tpot_sample_count": 186,
+       "duration_p95_ms": 16985,
+       "duration_sample_count": 258,
+       "input_tokens": 9583665,
+       "output_tokens": 266359,
+       "total_tokens": 9850024
       }
      ]
     }
    ],
    "latest": {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "status": "COMPLETED",
-    "query_ms": 6514,
-    "query_count": 362,
+    "query_ms": 5620,
+    "query_count": 258,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-03T10:54:06Z",
-    "failed_queries": 21,
+    "finished_at": "2026-11-04T00:16:42Z",
+    "failed_queries": 0,
     "unknown_status_count": 0,
     "blocked_queries": 0,
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 362,
-      "ttft_avg_ms": 4472,
-      "ttft_sample_count": 250,
-      "tpot_avg_ms": 3.43,
-      "tpot_sample_count": 249,
-      "duration_p95_ms": 23454,
-      "duration_sample_count": 341,
-      "input_tokens": 10401371,
-      "output_tokens": 213515,
-      "total_tokens": 10614886
+      "call_count": 258,
+      "ttft_avg_ms": 2890,
+      "ttft_sample_count": 186,
+      "tpot_avg_ms": 2.41,
+      "tpot_sample_count": 186,
+      "duration_p95_ms": 16985,
+      "duration_sample_count": 258,
+      "input_tokens": 9583665,
+      "output_tokens": 266359,
+      "total_tokens": 9850024
      }
     ]
    }
