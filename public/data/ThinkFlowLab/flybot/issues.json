@@ -1,16 +1,1128 @@
 {
-  "generatedAt": "2026-11-03T20:53:03.707Z",
+  "generatedAt": "2026-11-04T21:13:39.667Z",
   "items": [
+    {
+      "number": 2461,
+      "title": "project_state lists a Project State file it cannot read as if it were absent",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T19:29:38Z",
+      "closedAt": "2026-11-04T20:09:51Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2461"
+    },
+    {
+      "number": 2459,
+      "title": "workflow: saving the graph drops the stop-retry deadline a paused run depends on",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T19:10:12Z",
+      "closedAt": "2026-11-04T19:36:18Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2459"
+    },
+    {
+      "number": 2457,
+      "title": "client: a read-only window's Bot Details overview drops the model, permission and folder values",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T18:35:34Z",
+      "closedAt": "2026-11-04T19:35:40Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2457"
+    },
+    {
+      "number": 2455,
+      "title": "fix(docs): say compose.yaml shares the host network, not a published port",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T18:15:41Z",
+      "closedAt": "2026-11-04T18:38:17Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2455"
+    },
+    {
+      "number": 2452,
+      "title": "workflow: a Stop that cannot release its Bot freezes the run and its lane slot forever",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T18:00:32Z",
+      "closedAt": "2026-11-04T18:49:46Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2452"
+    },
+    {
+      "number": 2450,
+      "title": "tree: a Bot retired by archive_bot does not reach the Archived section until the next poll",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T17:56:21Z",
+      "closedAt": "2026-11-04T19:16:05Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2450"
+    },
+    {
+      "number": 2447,
+      "title": "room-share: one brace in a chat line's text drops the whole envelope",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T17:55:21Z",
+      "closedAt": null,
+      "waitingHours": 3.305185277777778,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2447"
+    },
+    {
+      "number": 2446,
+      "title": "social: a read-only Sharing card drops the People with access read along with its writes",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T17:52:14Z",
+      "closedAt": "2026-11-04T18:52:49Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2446"
+    },
+    {
+      "number": 2443,
+      "title": "preview: words before and after a complete untrusted wrap are dropped from the row",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T17:50:17Z",
+      "closedAt": null,
+      "waitingHours": 3.3896297222222223,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2443"
+    },
+    {
+      "number": 2442,
+      "title": "timeline/export throws on a trace that holds one untimed record instead of exporting the spans it can build",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T17:49:19Z",
+      "closedAt": null,
+      "waitingHours": 3.405740833333333,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2442"
+    },
+    {
+      "number": 2438,
+      "title": "social: peer-supplied face-room names, roles, platform lines and join errors are capped on UTF-16 units, so a label can carry half a surrogate pair",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T17:44:11Z",
+      "closedAt": null,
+      "waitingHours": 3.491296388888889,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2438"
+    },
+    {
+      "number": 2435,
+      "title": "bug(issue-ref): a URL fragment after a path segment is read as owner/repo#12 and names an issue nobody meant",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T17:41:51Z",
+      "closedAt": null,
+      "waitingHours": 3.5301852777777776,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2435"
+    },
+    {
+      "number": 2434,
+      "title": "host: the diagnostics report names the team file but never its backups",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T17:40:36Z",
+      "closedAt": "2026-11-04T19:25:53Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2434"
+    },
+    {
+      "number": 2431,
+      "title": "workflow: a read-only run flowchart draws its wires with no name and no hit target",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T17:38:31Z",
+      "closedAt": "2026-11-04T18:47:12Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2431"
+    },
+    {
+      "number": 2430,
+      "title": "tree: a retired Bot still occupies its tree slot and strands its children",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T17:36:53Z",
+      "closedAt": "2026-11-04T18:30:57Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2430"
+    },
+    {
+      "number": 2429,
+      "title": "workflow: a node prompt or step-result body cut at its bound keeps half a surrogate pair",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T17:36:48Z",
+      "closedAt": null,
+      "waitingHours": 3.6143519444444445,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2429"
+    },
+    {
+      "number": 2428,
+      "title": "host: a team file linking to a file it cannot read is still reported as read through the link",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T17:33:39Z",
+      "closedAt": "2026-11-04T18:28:40Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2428"
+    },
+    {
+      "number": 2425,
+      "title": "bug(workflow): a valid definition is refused as edge/misaligned when one fact is spelled with a space on the node and without one on its edge",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T17:31:48Z",
+      "closedAt": null,
+      "waitingHours": 3.6976852777777776,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2425"
+    },
+    {
+      "number": 2423,
+      "title": "workflow: a run frozen by a failed Stop is named Pause in the strip and Running in the Runs tab",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T17:29:26Z",
+      "closedAt": "2026-11-04T18:20:16Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2423"
+    },
+    {
+      "number": 2422,
+      "title": "client: a hold's reason is drawn, not only in a hover title",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T17:28:26Z",
+      "closedAt": "2026-11-04T18:23:28Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2422"
+    },
+    {
+      "number": 2419,
+      "title": "timeline: an unanswered handoff row reports an exact total wait of 0 ms",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T16:53:09Z",
+      "closedAt": "2026-11-04T17:07:58Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2419"
+    },
+    {
+      "number": 2418,
+      "title": "social: a read-only window still draws the Sharing card's and the group Members' invite entries",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T16:52:13Z",
+      "closedAt": "2026-11-04T17:15:02Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2418"
+    },
+    {
+      "number": 2416,
+      "title": "host: a state file that links to a folder is described as read through the link, then reported unreadable (EISDIR)",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T16:26:29Z",
+      "closedAt": "2026-11-04T16:45:45Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2416"
+    },
+    {
+      "number": 2413,
+      "title": "可靠交接已合入候选的 Chief 收尾，恢复中断通知并对账过期等待",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T15:17:24Z",
+      "closedAt": null,
+      "waitingHours": 5.937685277777778,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2413"
+    },
+    {
+      "number": 2411,
+      "title": "client: a host refusal with an empty message is thrown as an empty error, so the row settles on Loading…",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T15:15:16Z",
+      "closedAt": "2026-11-04T16:37:18Z",
+      "waitingHours": null,
+      "comments": 4,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2411"
+    },
+    {
+      "number": 2409,
+      "title": "client: an approval card never says how long it has been waiting",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T15:04:21Z",
+      "closedAt": "2026-11-04T17:11:04Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2409"
+    },
+    {
+      "number": 2404,
+      "title": "host: a linked team file is described as \"nothing is read or written\" right after the report read it",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T14:25:54Z",
+      "closedAt": "2026-11-04T15:41:32Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2404"
+    },
+    {
+      "number": 2403,
+      "title": "Backfill merge intents for previously approved candidates when merge policy becomes enabled",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T14:16:35Z",
+      "closedAt": null,
+      "waitingHours": 6.951296388888889,
+      "comments": 9,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2403"
+    },
+    {
+      "number": 2402,
+      "title": "client: a memory row's read failure is drawn inside its button, so nothing announces it",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T13:49:39Z",
+      "closedAt": "2026-11-04T15:38:29Z",
+      "waitingHours": null,
+      "comments": 5,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2402"
+    },
+    {
+      "number": 2400,
+      "title": "client: a group's overview in a read-only window still draws its rename and Remove my Bot",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T13:37:49Z",
+      "closedAt": "2026-11-04T14:39:17Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2400"
+    },
+    {
+      "number": 2398,
+      "title": "Preserve SDK authentication failures and bind setup/readiness to the actual resource profile",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T13:08:11Z",
+      "closedAt": "2026-11-04T13:35:08Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2398"
+    },
+    {
+      "number": 2395,
+      "title": "A refused memory read leaves the Memory row on \"Loading…\" forever (details pane and settings card)",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T12:48:28Z",
+      "closedAt": "2026-11-04T13:36:23Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2395"
+    },
+    {
+      "number": 2394,
+      "title": "Diagnostics report never names the team file state.json (size, last write, or replaced by a link/directory)",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T12:46:45Z",
+      "closedAt": "2026-11-04T13:39:04Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2394"
+    },
+    {
+      "number": 2393,
+      "title": "修复 Chief 执行故障与快照反馈，保留 Agent 自主恢复和路由决策",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T12:21:37Z",
+      "closedAt": null,
+      "waitingHours": 8.8674075,
+      "comments": 2,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2393"
+    },
+    {
+      "number": 2391,
+      "title": "client: the drawer's overview view hides its refusal line, and a read-only window still draws its write entries",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T12:05:44Z",
+      "closedAt": "2026-11-04T12:36:01Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2391"
+    },
+    {
+      "number": 2388,
+      "title": "host: the diagnostics report names whether the journal is recording but never the file it records into",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T11:43:12Z",
+      "closedAt": "2026-11-04T12:08:17Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2388"
+    },
+    {
+      "number": 2387,
+      "title": "client: a read-only window's drawer group settings still draw the live form and say nothing",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T11:40:57Z",
+      "closedAt": "2026-11-04T12:11:15Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2387"
+    },
+    {
+      "number": 2385,
+      "title": "client: the drawer's own Settings view reports a refused write on the scroll box's first line, above the viewport, so the sentence that explains it is never seen",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T11:06:14Z",
+      "closedAt": "2026-11-04T11:37:32Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2385"
+    },
+    {
+      "number": 2383,
+      "title": "host: the diagnostics report never says whether its own log file could be written",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T10:34:45Z",
+      "closedAt": "2026-11-04T11:41:21Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2383"
+    },
+    {
+      "number": 2381,
+      "title": "client: a read-only window still draws Approve/Reject on the room overview card, and the refusal vanishes",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T10:07:08Z",
+      "closedAt": "2026-11-04T10:37:04Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2381"
+    },
+    {
+      "number": 2379,
+      "title": "host: a Clear with no log on disk prints \"not truncated: ENOENT\" while the window says Cleared",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T09:55:39Z",
+      "closedAt": "2026-11-04T10:22:26Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2379"
+    },
+    {
+      "number": 2378,
+      "title": "Enable SDK Reviewers to fetch trusted GitHub PR and build evidence within scoped resource permissions",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T09:38:48Z",
+      "closedAt": null,
+      "waitingHours": 11.58101861111111,
+      "comments": 2,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2378"
+    },
+    {
+      "number": 2377,
+      "title": "Preserve continuation baseline and draft lineage when restarting cancelled delivery attempts",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T09:30:58Z",
+      "closedAt": null,
+      "waitingHours": 11.711574166666667,
+      "comments": 2,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2377"
+    },
+    {
+      "number": 2375,
+      "title": "Reconcile proven execution exit with durable claim retirement before integration admission",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T09:20:40Z",
+      "closedAt": null,
+      "waitingHours": 11.883240833333334,
+      "comments": 3,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2375"
+    },
+    {
+      "number": 2373,
+      "title": "host: the state journal says \"recording\" before the writer has opened, so a refused journal looks healthy",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T08:54:06Z",
+      "closedAt": "2026-11-04T09:43:34Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2373"
+    },
+    {
+      "number": 2365,
+      "title": "Use role-bound GitHub App identities for SDK development, reviews and delivery reconciliation",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T06:42:59Z",
+      "closedAt": null,
+      "waitingHours": 14.511296388888889,
+      "comments": 2,
+      "labels": [
+        "enhancement",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2365"
+    },
+    {
+      "number": 2364,
+      "title": "host: a Clear that cannot truncate the leaf says nothing and still reads as cleared",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T06:23:14Z",
+      "closedAt": "2026-11-04T07:50:56Z",
+      "waitingHours": null,
+      "comments": 4,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2364"
+    },
+    {
+      "number": 2360,
+      "title": "host: a Clear should report what it actually did (leaf/rotated result instead of a constant ok)",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T05:19:06Z",
+      "closedAt": "2026-11-04T06:43:09Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2360"
+    },
+    {
+      "number": 2358,
+      "title": "host: a Clear that cannot remove the rotated log leaves the leaf untouched and silent",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T05:11:14Z",
+      "closedAt": "2026-11-04T06:07:06Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2358"
+    },
+    {
+      "number": 2354,
+      "title": "client: a schedule row names a connector as carried after its connection failed",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T04:26:10Z",
+      "closedAt": "2026-11-04T05:36:27Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2354"
+    },
+    {
+      "number": 2351,
+      "title": "host: a read-only window creates and repairs the state journal, though it may not write",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T04:14:48Z",
+      "closedAt": "2026-11-04T08:14:28Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "needs-human"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2351"
+    },
+    {
+      "number": 2349,
+      "title": "read_browser cuts a page part inside a character: a stray surrogate pair, and a continuation `from` that lands mid-character",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T04:05:03Z",
+      "closedAt": "2026-11-04T04:41:34Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2349"
+    },
+    {
+      "number": 2347,
+      "title": "明确重启恢复窗口与 Chief inspect 失败分类，打通中断 Attempt 的安全恢复路由",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T03:31:23Z",
+      "closedAt": null,
+      "waitingHours": 17.704629722222222,
+      "comments": 2,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2347"
+    },
+    {
+      "number": 2346,
+      "title": "修复 Task-role 执行绑定含易变 cwd 导致跨 Attempt 无法 resume 的死锁",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T03:27:53Z",
+      "closedAt": null,
+      "waitingHours": 17.762963055555556,
+      "comments": 2,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2346"
+    },
+    {
+      "number": 2345,
+      "title": "host: Clear truncates the error log's leaf but leaves the rotated diagnostics.jsonl.1 on disk",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T03:25:38Z",
+      "closedAt": "2026-11-04T04:45:20Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2345"
+    },
+    {
+      "number": 2342,
+      "title": "完善 Chief 自主推进策略与运维个人代理协同闭环",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T03:01:15Z",
+      "closedAt": null,
+      "waitingHours": 18.206851944444445,
+      "comments": 2,
+      "labels": [
+        "enhancement",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2342"
+    },
+    {
+      "number": 2339,
+      "title": "host: the memory-review and room-context one-line bounds still judge in UTF-16 units",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T02:40:11Z",
+      "closedAt": "2026-11-04T03:11:44Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2339"
+    },
+    {
+      "number": 2338,
+      "title": "Return input-receipt protocol errors to the current role for bounded correction without weakening batch scope",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T02:36:07Z",
+      "closedAt": null,
+      "waitingHours": 18.62574083333333,
+      "comments": 2,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2338"
+    },
+    {
+      "number": 2337,
+      "title": "Fix the unsupported :tmp permission alias and validate Harness configuration with the actual Codex CLI",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T02:35:34Z",
+      "closedAt": null,
+      "waitingHours": 18.6349075,
+      "comments": 2,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2337"
+    },
+    {
+      "number": 2336,
+      "title": "Reclaim orphaned unbound reserved leases from retired Attempts without releasing unknown executions",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T02:35:10Z",
+      "closedAt": null,
+      "waitingHours": 18.64157416666667,
+      "comments": 2,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2336"
+    },
+    {
+      "number": 2334,
+      "title": "Validate dependency readiness and distinguish environment blockers from code test failures",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T02:34:44Z",
+      "closedAt": null,
+      "waitingHours": 18.64879638888889,
+      "comments": 2,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2334"
+    },
+    {
+      "number": 2331,
+      "title": "Automatically enter the host merge flow after Reviewer approval of the current candidate",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T02:14:35Z",
+      "closedAt": null,
+      "waitingHours": 18.984629722222223,
+      "comments": 2,
+      "labels": [
+        "enhancement",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2331"
+    },
+    {
+      "number": 2330,
+      "title": "Recover interrupted Chief inspections and bound scheduled execution lifecycles",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T02:01:23Z",
+      "closedAt": null,
+      "waitingHours": 19.204629722222222,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2330"
+    },
+    {
+      "number": 2328,
+      "title": "Release project execution slots for confirmed-idle input waits and re-admit resumed work",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T01:55:02Z",
+      "closedAt": null,
+      "waitingHours": 19.310463055555555,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2328"
+    },
+    {
+      "number": 2327,
+      "title": "Let Chief autonomously recover from invalid decisions with structured feedback and bounded correction",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T01:51:27Z",
+      "closedAt": null,
+      "waitingHours": 19.37018527777778,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2327"
+    },
+    {
+      "number": 2325,
+      "title": "Fix Attempt workspace baseline drift and missing PR inputs across SDK/docker resources",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T01:40:56Z",
+      "closedAt": null,
+      "waitingHours": 19.545463055555555,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2325"
+    },
+    {
+      "number": 2324,
+      "title": "changelog: 22 version headings render as literal brackets, and [Unreleased] compares from v0.2.0",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T01:06:32Z",
+      "closedAt": "2026-11-04T02:17:31Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2324"
+    },
+    {
+      "number": 2323,
+      "title": "client: a schedule card does not say which connectors its unattended run will carry",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T00:45:59Z",
+      "closedAt": "2026-11-04T04:10:27Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2323"
+    },
+    {
+      "number": 2321,
+      "title": "host: a text bound judges in UTF-16 units, so a cut hits text that is already under its own limit",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T00:45:15Z",
+      "closedAt": "2026-11-04T02:12:37Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2321"
+    },
+    {
+      "number": 2319,
+      "title": "client: a chat bubble's image renders as alt text because #2313's link delegate shadows the host's file resolver",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-04T00:25:11Z",
+      "closedAt": "2026-11-04T01:28:43Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2319"
+    },
+    {
+      "number": 2317,
+      "title": "Release beat missing: 2026-11-04",
+      "author": "github-actions[bot]",
+      "contributionType": "unknown",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-03T23:31:27Z",
+      "closedAt": "2026-11-04T00:30:52Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "area:release"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2317"
+    },
     {
       "number": 2314,
       "title": "bug(gate): gate-ruleset --check finds the ruleset by name, so the live \"main merge queue\" reads as \"main is unprotected\"",
       "author": "HugoXK",
       "contributionType": "internal",
-      "state": "open",
+      "state": "closed",
       "isPullRequest": false,
       "createdAt": "2026-11-03T15:03:21Z",
-      "closedAt": null,
-      "waitingHours": 5.828529722222222,
+      "closedAt": "2026-11-04T01:17:04Z",
+      "waitingHours": null,
       "comments": 0,
       "labels": [],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2314"
@@ -20,13 +1132,15 @@
       "title": "bug(read-only): the rejection toast drops error.code, so a read-only window offers no remedy",
       "author": "HugoXK",
       "contributionType": "internal",
-      "state": "open",
+      "state": "closed",
       "isPullRequest": false,
       "createdAt": "2026-11-03T14:36:22Z",
-      "closedAt": null,
-      "waitingHours": 6.2782519444444445,
-      "comments": 0,
-      "labels": [],
+      "closedAt": "2026-11-04T07:19:48Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2312"
     },
     {
@@ -38,9 +1152,11 @@
       "isPullRequest": false,
       "createdAt": "2026-11-03T14:29:42Z",
       "closedAt": null,
-      "waitingHours": 6.389363055555555,
-      "comments": 0,
-      "labels": [],
+      "waitingHours": 30.73268527777778,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2311"
     },
     {
@@ -48,13 +1164,15 @@
       "title": "bug(read-only): a read-only window still draws Approve/Reject on approval cards and on the held-reply bubble",
       "author": "HugoXK",
       "contributionType": "internal",
-      "state": "open",
+      "state": "closed",
       "isPullRequest": false,
       "createdAt": "2026-11-03T14:23:53Z",
-      "closedAt": null,
-      "waitingHours": 6.4863075,
-      "comments": 0,
-      "labels": [],
+      "closedAt": "2026-11-04T08:42:44Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2310"
     },
     {
@@ -66,9 +1184,11 @@
       "isPullRequest": false,
       "createdAt": "2026-11-03T14:17:29Z",
       "closedAt": null,
-      "waitingHours": 6.592974166666667,
-      "comments": 0,
-      "labels": [],
+      "waitingHours": 30.936296388888888,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2308"
     },
     {
@@ -80,9 +1200,11 @@
       "isPullRequest": false,
       "createdAt": "2026-11-03T13:59:54Z",
       "closedAt": null,
-      "waitingHours": 6.886029722222222,
-      "comments": 0,
-      "labels": [],
+      "waitingHours": 31.229351944444446,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2307"
     },
     {
@@ -94,9 +1216,11 @@
       "isPullRequest": false,
       "createdAt": "2026-11-03T13:51:10Z",
       "closedAt": null,
-      "waitingHours": 7.031585277777777,
-      "comments": 0,
-      "labels": [],
+      "waitingHours": 31.3749075,
+      "comments": 1,
+      "labels": [
+        "needs-human"
+      ],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2306"
     },
     {
@@ -104,13 +1228,15 @@
       "title": "Settings: a read-only window still draws the Projects write controls",
       "author": "HugoXK",
       "contributionType": "internal",
-      "state": "open",
+      "state": "closed",
       "isPullRequest": false,
       "createdAt": "2026-11-03T13:06:07Z",
-      "closedAt": null,
-      "waitingHours": 7.782418611111111,
-      "comments": 1,
-      "labels": [],
+      "closedAt": "2026-11-04T20:06:50Z",
+      "waitingHours": null,
+      "comments": 3,
+      "labels": [
+        "needs-human"
+      ],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2305"
     },
     {
@@ -132,12 +1258,12 @@
       "title": "core: a read-only window's Feedback Clear truncates the shared diagnostics log",
       "author": "HugoXK",
       "contributionType": "internal",
-      "state": "open",
+      "state": "closed",
       "isPullRequest": false,
       "createdAt": "2026-11-03T12:33:59Z",
-      "closedAt": null,
-      "waitingHours": 8.317974166666666,
-      "comments": 0,
+      "closedAt": "2026-11-04T02:44:27Z",
+      "waitingHours": null,
+      "comments": 2,
       "labels": [],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2302"
     },
@@ -164,9 +1290,11 @@
       "isPullRequest": false,
       "createdAt": "2026-11-03T09:02:18Z",
       "closedAt": null,
-      "waitingHours": 11.846029722222223,
-      "comments": 6,
-      "labels": [],
+      "waitingHours": 36.18935194444445,
+      "comments": 7,
+      "labels": [
+        "needs-human"
+      ],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2292"
     },
     {
@@ -1340,9 +2468,11 @@
       "isPullRequest": false,
       "createdAt": "2026-11-02T07:54:19Z",
       "closedAt": null,
-      "waitingHours": 36.97908527777778,
-      "comments": 4,
-      "labels": [],
+      "waitingHours": 61.3224075,
+      "comments": 5,
+      "labels": [
+        "needs-human"
+      ],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2128"
     },
     {
@@ -1354,10 +2484,11 @@
       "isPullRequest": false,
       "createdAt": "2026-11-02T07:00:14Z",
       "closedAt": null,
-      "waitingHours": 37.880474166666666,
-      "comments": 6,
+      "waitingHours": 62.223796388888886,
+      "comments": 7,
       "labels": [
         "bug",
+        "needs-human",
         "area:automation"
       ],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2124"
@@ -3074,7 +4205,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-31T00:34:40Z",
       "closedAt": null,
-      "waitingHours": 92.30658527777778,
+      "waitingHours": 116.6499075,
       "comments": 2,
       "labels": [
         "needs-human"
@@ -3515,7 +4646,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-30T09:28:40Z",
       "closedAt": null,
-      "waitingHours": 107.40658527777778,
+      "waitingHours": 131.7499075,
       "comments": 3,
       "labels": [
         "question",
@@ -3549,7 +4680,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-30T09:26:09Z",
       "closedAt": null,
-      "waitingHours": 107.44852972222222,
+      "waitingHours": 131.79185194444443,
       "comments": 3,
       "labels": [
         "bug",
@@ -3643,7 +4774,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-30T06:46:22Z",
       "closedAt": null,
-      "waitingHours": 110.11158527777778,
+      "waitingHours": 134.4549075,
       "comments": 1,
       "labels": [
         "needs-info"
@@ -3673,7 +4804,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-30T06:17:08Z",
       "closedAt": null,
-      "waitingHours": 110.5988075,
+      "waitingHours": 134.94212972222223,
       "comments": 6,
       "labels": [
         "bug",
@@ -4138,7 +5269,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-30T00:40:36Z",
       "closedAt": null,
-      "waitingHours": 116.20769638888889,
+      "waitingHours": 140.55101861111112,
       "comments": 1,
       "labels": [
         "bug",
@@ -4716,7 +5847,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-29T09:04:08Z",
       "closedAt": null,
-      "waitingHours": 131.81547416666666,
+      "waitingHours": 156.1587963888889,
       "comments": 2,
       "labels": [
         "needs-human"
@@ -5174,7 +6305,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-28T22:56:39Z",
       "closedAt": null,
-      "waitingHours": 141.9401963888889,
+      "waitingHours": 166.2835186111111,
       "comments": 1,
       "labels": [
         "bug",
@@ -5425,7 +6556,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-28T03:53:30Z",
       "closedAt": null,
-      "waitingHours": 160.9926963888889,
+      "waitingHours": 185.33601861111111,
       "comments": 10,
       "labels": [
         "needs-human"
@@ -7667,7 +8798,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-27T01:07:22Z",
       "closedAt": null,
-      "waitingHours": 187.76158527777778,
+      "waitingHours": 212.1049075,
       "comments": 2,
       "labels": [
         "bug",
@@ -8507,7 +9638,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-26T02:39:25Z",
       "closedAt": null,
-      "waitingHours": 210.22741861111112,
+      "waitingHours": 234.57074083333333,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -8862,7 +9993,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-25T12:38:42Z",
       "closedAt": null,
-      "waitingHours": 224.23936305555554,
+      "waitingHours": 248.58268527777778,
       "comments": 3,
       "labels": [
         "bug",
@@ -11619,7 +12750,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-23T12:29:48Z",
       "closedAt": null,
-      "waitingHours": 272.3876963888889,
+      "waitingHours": 296.7310186111111,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -11638,7 +12769,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-23T12:29:01Z",
       "closedAt": null,
-      "waitingHours": 272.40075194444444,
+      "waitingHours": 296.7440741666667,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -12368,7 +13499,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T21:41:06Z",
       "closedAt": null,
-      "waitingHours": 287.1993630555556,
+      "waitingHours": 311.54268527777776,
       "comments": 8,
       "labels": [
         "bug",
@@ -12386,7 +13517,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T15:15:30Z",
       "closedAt": null,
-      "waitingHours": 293.6260297222222,
+      "waitingHours": 317.96935194444444,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -12441,7 +13572,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T15:15:23Z",
       "closedAt": null,
-      "waitingHours": 293.62797416666666,
+      "waitingHours": 317.9712963888889,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -12460,7 +13591,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T15:15:20Z",
       "closedAt": null,
-      "waitingHours": 293.6288075,
+      "waitingHours": 317.97212972222223,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -12478,7 +13609,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T15:15:06Z",
       "closedAt": null,
-      "waitingHours": 293.6326963888889,
+      "waitingHours": 317.9760186111111,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -12496,7 +13627,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T15:15:02Z",
       "closedAt": null,
-      "waitingHours": 293.6338075,
+      "waitingHours": 317.97712972222223,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -12514,7 +13645,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T15:15:00Z",
       "closedAt": null,
-      "waitingHours": 293.6343630555556,
+      "waitingHours": 317.97768527777777,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -12532,7 +13663,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T15:12:57Z",
       "closedAt": null,
-      "waitingHours": 293.6685297222222,
+      "waitingHours": 318.01185194444446,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -12585,7 +13716,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T14:13:26Z",
       "closedAt": null,
-      "waitingHours": 294.6604741666667,
+      "waitingHours": 319.0037963888889,
       "comments": 5,
       "labels": [
         "documentation",
@@ -13502,7 +14633,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-21T15:19:00Z",
       "closedAt": null,
-      "waitingHours": 317.56769638888886,
+      "waitingHours": 341.9110186111111,
       "comments": 3,
       "labels": [
         "enhancement",
@@ -13520,7 +14651,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-21T15:18:57Z",
       "closedAt": null,
-      "waitingHours": 317.5685297222222,
+      "waitingHours": 341.91185194444444,
       "comments": 3,
       "labels": [
         "enhancement",
@@ -13538,7 +14669,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-21T15:18:55Z",
       "closedAt": null,
-      "waitingHours": 317.5690852777778,
+      "waitingHours": 341.9124075,
       "comments": 9,
       "labels": [
         "enhancement",
@@ -13556,7 +14687,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-21T14:41:43Z",
       "closedAt": null,
-      "waitingHours": 318.1890852777778,
+      "waitingHours": 342.5324075,
       "comments": 5,
       "labels": [
         "enhancement",
@@ -14169,7 +15300,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-21T02:15:52Z",
       "closedAt": null,
-      "waitingHours": 330.61991861111113,
+      "waitingHours": 354.9632408333333,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -14218,7 +15349,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-21T02:03:34Z",
       "closedAt": null,
-      "waitingHours": 330.8249186111111,
+      "waitingHours": 355.16824083333336,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -14664,7 +15795,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-20T06:54:42Z",
       "closedAt": null,
-      "waitingHours": 349.9726963888889,
+      "waitingHours": 374.31601861111113,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -15034,7 +16165,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-20T01:05:45Z",
       "closedAt": null,
-      "waitingHours": 355.7885297222222,
+      "waitingHours": 380.13185194444446,
       "comments": 11,
       "labels": [
         "enhancement",
@@ -15199,7 +16330,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-19T13:50:30Z",
       "closedAt": null,
-      "waitingHours": 367.0426963888889,
+      "waitingHours": 391.3860186111111,
       "comments": 4,
       "labels": [
         "enhancement",
@@ -15302,7 +16433,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-19T07:54:10Z",
       "closedAt": null,
-      "waitingHours": 372.98158527777775,
+      "waitingHours": 397.3249075,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -15321,7 +16452,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-19T06:06:26Z",
       "closedAt": null,
-      "waitingHours": 374.7771408333333,
+      "waitingHours": 399.12046305555555,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -15588,7 +16719,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-18T22:47:58Z",
       "closedAt": null,
-      "waitingHours": 382.0849186111111,
+      "waitingHours": 406.42824083333335,
       "comments": 3,
       "labels": [
         "enhancement",
@@ -15665,7 +16796,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-18T18:06:36Z",
       "closedAt": null,
-      "waitingHours": 386.77436305555557,
+      "waitingHours": 411.11768527777775,
       "comments": 3,
       "labels": [
         "enhancement",
@@ -15890,7 +17021,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-18T13:50:02Z",
       "closedAt": null,
-      "waitingHours": 391.0504741666667,
+      "waitingHours": 415.3937963888889,
       "comments": 10,
       "labels": [
         "enhancement",
@@ -15943,7 +17074,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-18T13:43:05Z",
       "closedAt": null,
-      "waitingHours": 391.1663075,
+      "waitingHours": 415.5096297222222,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -15961,7 +17092,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-18T13:40:18Z",
       "closedAt": null,
-      "waitingHours": 391.2126963888889,
+      "waitingHours": 415.5560186111111,
       "comments": 10,
       "labels": [
         "enhancement",
@@ -16982,7 +18113,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-17T16:20:10Z",
       "closedAt": null,
-      "waitingHours": 412.5482519444444,
+      "waitingHours": 436.89157416666666,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -17504,7 +18635,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-16T14:35:59Z",
       "closedAt": null,
-      "waitingHours": 438.28464083333336,
+      "waitingHours": 462.62796305555554,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -18013,7 +19144,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T16:16:05Z",
       "closedAt": null,
-      "waitingHours": 484.6163075,
+      "waitingHours": 508.95962972222225,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -18031,7 +19162,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T16:15:59Z",
       "closedAt": null,
-      "waitingHours": 484.61797416666667,
+      "waitingHours": 508.9612963888889,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -18049,7 +19180,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T16:15:53Z",
       "closedAt": null,
-      "waitingHours": 484.61964083333334,
+      "waitingHours": 508.9629630555556,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -18068,7 +19199,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T16:15:48Z",
       "closedAt": null,
-      "waitingHours": 484.6210297222222,
+      "waitingHours": 508.96435194444445,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -18128,7 +19259,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T16:15:21Z",
       "closedAt": null,
-      "waitingHours": 484.6285297222222,
+      "waitingHours": 508.97185194444444,
       "comments": 4,
       "labels": [
         "enhancement",
@@ -18521,7 +19652,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T08:29:38Z",
       "closedAt": null,
-      "waitingHours": 492.39047416666665,
+      "waitingHours": 516.7337963888889,
       "comments": 0,
       "labels": [
         "enhancement",
@@ -18539,7 +19670,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T08:29:37Z",
       "closedAt": null,
-      "waitingHours": 492.39075194444445,
+      "waitingHours": 516.7340741666667,
       "comments": 0,
       "labels": [
         "enhancement",
@@ -18571,7 +19702,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T08:26:31Z",
       "closedAt": null,
-      "waitingHours": 492.4424186111111,
+      "waitingHours": 516.7857408333333,
       "comments": 0,
       "labels": [
         "enhancement",
