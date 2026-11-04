@@ -1,0 +1,114 @@
+name: Collect DigitalMate test matrix
+
+# Builds the unified DigitalMate test-case matrix (UT / server UT / protocol
+# regressions / ST / E2E / eval) from the private source repository, writes
+# site/data/test-matrix.json to the imported `digitalmate` branch, and
+# redeploys. Per-case ST/E2E status comes from the ledger issue configured in
+# config/digitalmate-test-matrix.json.
+#
+# Requires DIGITALMATE_TOKEN (fine-grained PAT on openJiuwen-ai/DigitalMate)
+# with Contents: read, Issues: read and Actions: read. Without the secret the
+# job is a no-op. Only case identity, titles, paths, owners, statuses,
+# dependency labels and issue/PR links are published; prompts, fixtures,
+# endpoints and logs are never read into the output.
+on:
+  schedule:
+    - cron: '50 */3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: collect-digitalmate-test-matrix
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Check source token
+        id: token
+        env:
+          TOKEN: ${{ secrets.DIGITALMATE_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo 'skip=true' >> "$GITHUB_OUTPUT"
+            echo '::warning::DIGITALMATE_TOKEN is not configured; skipping DigitalMate test matrix collection.'
+          else
+            echo 'skip=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch DigitalMate sources and ledger
+        if: steps.token.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.DIGITALMATE_TOKEN }}
+        run: |
+          set -euo pipefail
+          src=/tmp/digitalmate-src
+          rm -rf "$src"
+          git init -q "$src"
+          git -C "$src" remote add origin https://github.com/openJiuwen-ai/DigitalMate.git
+          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          refs=$(node -e "const c=require('./config/digitalmate-test-matrix.json');console.log((c.refs||[]).map(r=>r.ref.replace(/^origin\//,'')).join(' '))")
+          git -C "$src" -c http.extraheader="$auth" fetch -q --no-tags --depth=1 origin main
+          git -C "$src" checkout -q FETCH_HEAD
+          for ref in $refs; do
+            git -C "$src" -c http.extraheader="$auth" fetch -q --no-tags --depth=1 origin "+refs/heads/$ref:refs/remotes/origin/$ref" \
+              || echo "::notice::DigitalMate branch $ref not found; skipped"
+          done
+          issue=$(node -p "require('./config/digitalmate-test-matrix.json').ledgerIssue")
+          gh api "repos/openJiuwen-ai/DigitalMate/issues/$issue" > /tmp/test-matrix-issue.json
+          run=$(gh api 'repos/openJiuwen-ai/DigitalMate/actions/workflows/nightly.yml/runs?per_page=1&event=schedule&branch=main' --jq '.workflow_runs[0] // empty')
+          if [ -n "$run" ]; then
+            id=$(printf '%s' "$run" | jq -r .id)
+            gh api "repos/openJiuwen-ai/DigitalMate/actions/runs/$id/jobs" \
+              | jq --argjson run "$run" '{created_at: $run.created_at, html_url: $run.html_url, jobs: [.jobs[] | {name, conclusion, status}]}' \
+              > /tmp/test-matrix-nightly.json
+          fi
+
+      - name: Build matrix
+        if: steps.token.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          args=(--source /tmp/digitalmate-src --config config/digitalmate-test-matrix.json --issue /tmp/test-matrix-issue.json --out /tmp/test-matrix.json)
+          [ -f /tmp/test-matrix-nightly.json ] && args+=(--nightly /tmp/test-matrix-nightly.json)
+          node scripts/digitalmate-test-matrix.mjs "${args[@]}"
+
+      - name: Update digitalmate branch
+        id: update
+        if: steps.token.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          git fetch origin digitalmate:refs/remotes/origin/digitalmate
+          git checkout -B digitalmate origin/digitalmate
+          if git cat-file -e HEAD:site/data/test-matrix.json 2>/dev/null; then
+            # generatedAt changes every run; only publish when the cases changed.
+            if node -e "const fs=require('fs');const a=JSON.parse(fs.readFileSync('site/data/test-matrix.json'));const b=JSON.parse(fs.readFileSync('/tmp/test-matrix.json'));delete a.generatedAt;delete b.generatedAt;process.exit(JSON.stringify(a)===JSON.stringify(b)?0:1)"; then
+              echo 'changed=false' >> "$GITHUB_OUTPUT"
+              echo 'test matrix unchanged'
+              exit 0
+            fi
+          fi
+          cp /tmp/test-matrix.json site/data/test-matrix.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site/data/test-matrix.json
+          git commit -m 'chore(digitalmate): update test matrix'
+          git pull --rebase origin digitalmate
+          git push origin HEAD:digitalmate
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+
+      - name: Deploy dashboard
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>DigitalMate 用例矩阵</title>
+    <link rel="stylesheet" href="style.css?v=20261104.1" />
+  </head>
+  <body>
+    <main class="page">
+      <div id="error" class="error" hidden></div>
+
+      <section class="ledger" aria-labelledby="ledger-title">
+        <div class="ledger-head">
+          <h1 id="ledger-title">计划用例 <span id="planned-total">—</span> 条</h1>
+          <p id="source-line" class="muted"></p>
+        </div>
+        <div id="strip" class="strip" role="group" aria-label="按状态着色的计划用例，点击筛选"></div>
+        <div id="legend" class="legend"></div>
+      </section>
+
+      <section class="block" aria-labelledby="layers-title">
+        <h2 id="layers-title">分层盘点</h2>
+        <div class="scroll"><table id="layers" class="grid"></table></div>
+        <p id="lane-note" class="muted small"></p>
+      </section>
+
+      <section class="block" aria-labelledby="deps-title">
+        <h2 id="deps-title">未执行用例的前置依赖</h2>
+        <p class="muted small">按依赖聚类，一条用例可属于多类。先建设覆盖面大的支撑能力，可以成批解锁。</p>
+        <div id="deps" class="deps"></div>
+      </section>
+
+      <section class="block" aria-labelledby="table-title">
+        <h2 id="table-title">用例明细</h2>
+        <div class="filters" role="search">
+          <label>层级 <select id="f-layer"></select></label>
+          <label>状态 <select id="f-status"></select></label>
+          <label>套件 <select id="f-suite"></select></label>
+          <label>实现位置 <select id="f-impl"></select></label>
+          <label>依赖 <select id="f-dep"></select></label>
+          <label class="grow">搜索 <input id="f-q" type="search" placeholder="编号、标题、文件、owner" /></label>
+          <button id="f-reset" type="button" class="btn">清除筛选</button>
+        </div>
+        <p id="count" class="muted small" aria-live="polite"></p>
+        <div class="scroll"><table id="cases" class="grid cases"></table></div>
+      </section>
+    </main>
+    <script src="app.js?v=20261104.1"></script>
+  </body>
+</html>
