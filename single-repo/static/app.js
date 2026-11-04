@@ -1697,9 +1697,59 @@
       clearTimeout(timer);
     }
   }
+  // The snapshot is the one large payload (multiple MB). On a slow or
+  // connection-reset-prone link a single fetch with FETCH_TIMEOUT_MS can never
+  // finish, so fetch it with byte-range resumes: each attempt continues where
+  // the previous one stopped instead of restarting from zero.
+  const SNAPSHOT_FETCH_TIMEOUT_MS = 60000;
+  const SNAPSHOT_FETCH_ATTEMPTS = 4;
+  async function fetchSnapshotJson(url) {
+    let received = new Uint8Array(0);
+    let offset = 0;
+    let lastError = null;
+    for (let attempt = 0; attempt < SNAPSHOT_FETCH_ATTEMPTS; attempt++) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), SNAPSHOT_FETCH_TIMEOUT_MS);
+      try {
+        const headers = {};
+        if (offset > 0) headers.Range = `bytes=${offset}-`;
+        const res = await fetch(url, { cache: 'no-store', headers, signal: ctrl.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (offset > 0 && res.status !== 206) {
+          // Server ignored the range: restart the download from scratch.
+          received = new Uint8Array(0);
+          offset = 0;
+        }
+        const reader = res.body.getReader();
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const next = new Uint8Array(offset + value.length);
+          next.set(received, 0);
+          next.set(value, offset);
+          received = next;
+          offset += value.length;
+        }
+        return JSON.parse(new TextDecoder().decode(received));
+      } catch (err) {
+        lastError = err;
+        if (err instanceof SyntaxError) {
+          // Stitched bytes no longer parse (snapshot redeployed mid-download):
+          // resume offsets are meaningless, restart from the first byte.
+          received = new Uint8Array(0);
+          offset = 0;
+        }
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+    throw lastError || new Error('snapshot fetch failed');
+  }
   async function load() {
     try {
-      const doc = await fetchJson('./data/snapshot.json?ts='+Date.now());
+      // 10-minute cache bust: coarse enough for the CDN edge to serve repeated
+      // loads, fresh enough for hourly snapshot updates.
+      const doc = await fetchSnapshotJson('./data/snapshot.json?m='+Math.floor(Date.now()/6e5));
       if(!doc.sections || !doc.board)throw new Error('快照格式尚未更新，请稍后刷新');
       STATE.snap=doc;STATE.status={refreshing:false};
       if ((returnFocus.pending || returnFocus.e2ePending) && (doc.lines || []).some((line) => line.key === returnFocus.line)) STATE.line = returnFocus.line;
