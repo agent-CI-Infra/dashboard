@@ -1909,7 +1909,7 @@ async function load() {
       location.protocol === 'file:'
         ? '请从 dashboard/e2e-performance 目录启动本地 HTTP 服务，例如：python3 -m http.server 8787'
         : '请配置现网每日聚合数据（production-model-history.json）。';
-    showError(`现网性能指标暂不可用：${error.message}。${hint}`);
+    showError(`现网指标统计暂不可用：${error.message}。${hint}`);
   }
 }
 
