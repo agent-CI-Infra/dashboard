@@ -7,8 +7,9 @@ name: Collect DigitalMate E2E performance
 # the public dashboard keep working.
 on:
   schedule:
-    # DigitalMate nightly starts at 18:00 UTC; leave time for the device run.
-    - cron: '20 20 * * *'
+    # DigitalMate nightly starts at 18:00 UTC and can run past 20:00; poll every
+    # two hours so a late device run still reaches the board the same night.
+    - cron: '20 */2 * * *'
   workflow_dispatch:
 
 permissions:
