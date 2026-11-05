@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-11-05T14:27:47.659Z",
+  "runs": [
+    {
+      "schemaVersion": 1,
+      "kind": "bench",
+      "runId": "nightly-42042744376-1",
+      "commit": "c846c51d2e8b9077cd9bb22dd1460a814b712ef1",
+      "backend": "wss://onlineswarm.openjiuwen.com:20015/digitalmate/ws?binding_id=default",
+      "profile": "pi-bench",
+      "task": "PIB-RESEARCHER-004",
+      "taskCount": 1,
+      "trials": 1,
+      "status": "PASS",
+      "passAt1": 1,
+      "passAtK": 1,
+      "passHatK": 1,
+      "tasks": [
+        {
+          "taskId": "PIB-RESEARCHER-004",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false
+        }
+      ],
+      "detail": "1/1 通过",
+      "costUsd": {
+        "total": 0,
+        "p50": 0,
+        "p95": 0
+      },
+      "latencyMs": {
+        "p50": 59646,
+        "p95": 59646
+      },
+      "generatedAt": "2026-11-05T14:22:06.196Z",
+      "report": "report.md",
+      "runNumber": "42042744376",
+      "runUrl": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/42042744376",
+      "conclusion": null
+    }
+  ]
+}
