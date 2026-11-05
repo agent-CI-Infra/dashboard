@@ -1447,16 +1447,20 @@ h1 {
   width: 1%;
 }
 
-/* Keep sample counts close to their values while aligning change indicators. */
+/* Keep the value, sample count and change together without reserving empty space. */
 .metric-cell {
-  display: flex;
+  display: inline-flex;
   align-items: baseline;
   gap: 4px;
 }
 
 .metric-change {
-  flex: 0 0 56px;
-  margin-left: auto;
+  flex: none;
+}
+
+.token-coverage {
+  margin-left: 6px;
+  color: var(--muted);
 }
 
 .history-table td .metric-change .delta {

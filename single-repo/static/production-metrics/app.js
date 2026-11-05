@@ -1676,13 +1676,6 @@ function modelSummary(days, model, { unit = 'query', failure = null, anchor = nu
       <div class="stat-value">${fmtTpot(latest.tpot_estimated_ms)}</div>
       <div class="stat-hint">流式状态未知 · ${fmtCount(latest.tpot_estimated_samples)} 个样本 · 不并入主均值</div>
     </div>`;
-  const failedCard = Number.isFinite(latest.failed_total_tokens)
-    ? `<div class="stat-card">
-      <div class="stat-label">失败尝试消耗</div>
-      <div class="stat-value">${fmtToken(latest.failed_total_tokens)}</div>
-      <div class="stat-hint">输入 ${fmtToken(latest.failed_input_tokens)} · 输出 ${fmtToken(latest.failed_output_tokens)} · 不计入成功率与均值</div>
-    </div>`
-    : '';
   return `
     <div class="stat-card">
       <div class="stat-label">最新完整日</div>
@@ -1736,7 +1729,6 @@ function modelSummary(days, model, { unit = 'query', failure = null, anchor = nu
       <div class="stat-value">${fmtToken(latest[`total_${suffix}`])}</div>
       <div class="stat-hint">${hint(`当日合计 ${fmtToken(latest.total_tokens)} · 覆盖率 ${esc(tokenCoverage)}`, deltaChip(latest[`total_${suffix}`], previous?.[`total_${suffix}`], { colorDirection: true }))}</div>
     </div>
-    ${failedCard}
     <div class="stat-card">
       <div class="stat-label">请求失败率</div>
       <div class="stat-value ${failure ? (failure.failed ? 'failed' : 'ok') : ''}">${failure ? fmtPercent(failure.failure_rate) : '—'}</div>
@@ -1783,14 +1775,13 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
         <td class="num metric-column"><span class="metric-cell"><span>${esc(p95RangeText(row))}</span><span class="metric-samples">（${fmtCount(row?.duration_samples)}）</span><span class="metric-change">${p95Chip}</span></span></td>
         <td class="num">${fmtToken(row?.[`input_${suffix}`])}</td>
         <td class="num">${fmtToken(row?.[`output_${suffix}`])}</td>
-        <td class="num">${fmtToken(row?.[`total_${suffix}`])}<span class="metric-samples">${Number.isFinite(row?.token_coverage) ? `覆盖率 ${fmtPercent(row.token_coverage * 100)}` : ''}</span></td>
-        <td class="num">${fmtToken(row?.failed_total_tokens)}</td>
+        <td class="num">${fmtToken(row?.[`total_${suffix}`])}${Number.isFinite(row?.token_coverage) ? `<span class="token-coverage">覆盖率 ${fmtPercent(row.token_coverage * 100)}</span>` : ''}</td>
       </tr>`;
     })
     .reverse()
     .join('');
   return `<div class="table-wrap"><table class="history-table">
-    <thead><tr><th>${esc(label)}</th>${versionHead}<th>网关调用数</th><th>成功数</th><th title="所选模型的失败请求占全部请求的比例；未知状态时不显示">请求失败率</th><th class="metric-column">平均 TTFT（流式样本）</th><th class="metric-column">平均 TPOT（流式样本）</th><th class="metric-column">网关 P50 区间（样本）</th><th class="metric-column">网关 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th><th title="失败调用消耗的 Token，不计入成功率与均值">失败尝试 Token</th></tr></thead>
+    <thead><tr><th>${esc(label)}</th>${versionHead}<th>网关调用数</th><th>成功数</th><th title="所选模型的失败请求占全部请求的比例；未知状态时不显示">请求失败率</th><th class="metric-column">平均 TTFT（流式样本）</th><th class="metric-column">平均 TPOT（流式样本）</th><th class="metric-column">网关 P50 区间（样本）</th><th class="metric-column">网关 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th></tr></thead>
     <tbody>${body}</tbody>
   </table></div>`;
 }
