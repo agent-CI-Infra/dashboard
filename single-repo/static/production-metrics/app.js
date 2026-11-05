@@ -24,8 +24,8 @@ const state = {
   latencyVisibility: {
     ttft: true,
     tpot: true,
-    p95_upper: true,
-    p95_lower: true,
+    p50: true,
+    p95: true,
   },
   volumeVisibility: {
     calls: true,
@@ -1369,6 +1369,10 @@ function latencyTrendChart(points, visibility = {}) {
     if (!Number.isFinite(row?.p50_ms)) return null;
     return Number.isFinite(row?.p50_lower_ms) ? row.p50_lower_ms : row.p50_ms;
   });
+  // Multiple model groups can provide only a range, not a pooled percentile.
+  // Plot a single point only when its bounds agree; the tooltip keeps the range.
+  const p50 = p50Upper.map((value, index) => value !== null && value === p50Lower[index] ? value : null);
+  const p95 = upper.map((value, index) => value !== null && value === lower[index] ? value : null);
   const leftUsable = [...ttft, ...ttftEstimate, ...p50Upper, ...upper].filter((value) => value !== null);
   const tpotUsable = [...tpot, ...tpotEstimate].filter((value) => value !== null);
   const hasTpot = tpotUsable.length > 0;
@@ -1379,10 +1383,8 @@ function latencyTrendChart(points, visibility = {}) {
     { key: 'ttft_est', label: 'TTFT 估算（流式未知）', style: 'ttft-est' },
     { key: 'tpot', label: 'TPOT（流式）', style: 'tpot' },
     { key: 'tpot_est', label: 'TPOT 估算（流式未知）', style: 'tpot-est' },
-    { key: 'p50_upper', label: 'P50 上界', style: 'p50' },
-    { key: 'p50_lower', label: 'P50 下界', style: 'p50 lower' },
-    { key: 'p95_upper', label: 'P95 上界', style: 'p95' },
-    { key: 'p95_lower', label: 'P95 下界', style: 'p95 lower' },
+    { key: 'p50', label: 'P50', style: 'p50' },
+    { key: 'p95', label: 'P95', style: 'p95' },
   ]
     .map((item) => {
       const active = isVisible(item.key);
@@ -1420,18 +1422,6 @@ function latencyTrendChart(points, visibility = {}) {
     return `<line class="grid-line" x1="${pad.left}" y1="${yy}" x2="${width - pad.right}" y2="${yy}" />${leftLabel}${rightLabel}`;
   }).join('');
 
-  const runs = [];
-  let run = [];
-  rows.forEach((_, index) => {
-    if (upper[index] === null || lower[index] === null) {
-      if (run.length) runs.push(run);
-      run = [];
-      return;
-    }
-    run.push(index);
-  });
-  if (run.length) runs.push(run);
-
   const linePath = (values, scale = y) => {
     let path = '';
     let open = false;
@@ -1445,21 +1435,6 @@ function latencyTrendChart(points, visibility = {}) {
     });
     return path;
   };
-
-  const bands =
-    isVisible('p95_upper') && isVisible('p95_lower')
-      ? runs
-          .filter((segment) => segment.length > 1)
-          .map((segment) => {
-            const top = segment.map((index) => `${x(index).toFixed(1)},${y(upper[index]).toFixed(1)}`).join('L');
-            const bottom = [...segment]
-              .reverse()
-              .map((index) => `${x(index).toFixed(1)},${y(lower[index]).toFixed(1)}`)
-              .join('L');
-            return `M${top}L${bottom}Z`;
-          })
-          .join(' ')
-      : '';
 
   const layer = (key, values, extraClass, dots = true, scale = y) => {
     const paths = linePath(values, scale);
@@ -1494,10 +1469,8 @@ function latencyTrendChart(points, visibility = {}) {
       if (isVisible('ttft_est') && ttftEstimate[index] !== null) lines.push(`${fmtDuration(ttftEstimate[index])} · TTFT 估算（流式未知）`);
       if (isVisible('tpot') && tpot[index] !== null) lines.push(`${fmtTpot(tpot[index])} · TPOT（流式）`);
       if (isVisible('tpot_est') && tpotEstimate[index] !== null) lines.push(`${fmtTpot(tpotEstimate[index])} · TPOT 估算（流式未知）`);
-      if (isVisible('p50_upper') && p50Upper[index] !== null) lines.push(`${fmtDuration(p50Upper[index])} · P50 上界`);
-      if (isVisible('p50_lower') && p50Lower[index] !== null) lines.push(`${fmtDuration(p50Lower[index])} · P50 下界`);
-      if (isVisible('p95_upper') && upper[index] !== null) lines.push(`${fmtDuration(upper[index])} · P95 上界`);
-      if (isVisible('p95_lower') && lower[index] !== null) lines.push(`${fmtDuration(lower[index])} · P95 下界`);
+      if (isVisible('p50') && p50Upper[index] !== null) lines.push(`${p50RangeText(row)} · P50`);
+      if (isVisible('p95') && upper[index] !== null) lines.push(`${p95RangeText(row)} · P95`);
       if (lines.length === 1) return '';
       const cx = x(index);
       const left = Math.max(pad.left, cx - zoneWidth / 2);
@@ -1509,19 +1482,16 @@ function latencyTrendChart(points, visibility = {}) {
   return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="流式 TTFT、TPOT 与请求级 P50 / P95 趋势">
     ${grid}
     <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
-    ${bands ? `<path class="p95-band" d="${bands}" />` : ''}
     ${layer('ttft', ttft, 'ttft')}
     ${layer('ttft_est', ttftEstimate, 'ttft-est', true)}
     ${hasTpot ? layer('tpot', tpot, 'tpot', true, yRight) : ''}
     ${hasTpot ? layer('tpot_est', tpotEstimate, 'tpot-est', true, yRight) : ''}
-    ${layer('p50_upper', p50Upper, 'p50-upper')}
-    ${layer('p50_lower', p50Lower, 'p50-lower', false)}
-    ${layer('p95_upper', upper, 'p95-upper')}
-    ${layer('p95_lower', lower, 'p95-lower', false)}
+    ${layer('p50', p50, 'p50-upper')}
+    ${layer('p95', p95, 'p95-upper')}
     ${xLabels}
     <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
     ${zones}
-  </svg><p class="chart-note">TTFT 和 TPOT 的流式主曲线只统计 <code>stream === true</code> 的成功调用；流式状态未知的样本单独显示为估算，不并入主均值。P50/P95 为成功调用的请求级分位，至少 20 个样本；TTFT、P50、P95 共用左侧毫秒轴，TPOT 使用右侧 ms/token 轴。</p></div>`;
+  </svg><p class="chart-note">TTFT 和 TPOT 的流式主曲线只统计 <code>stream === true</code> 的成功调用；流式状态未知的样本单独显示为估算，不并入主均值。P50/P95 为成功调用的请求级分位，至少 20 个样本；多个来源仅有区间时在悬浮提示中显示，不绘制单值。TTFT、P50、P95 共用左侧毫秒轴，TPOT 使用右侧 ms/token 轴。</p></div>`;
 }
 
 function tokenTrendChart(points, visibility = {}, unit = 'query') {

@@ -195,6 +195,22 @@ test('latency chart renders estimated TPOT on the right axis and tooltip', () =>
   assert.match(html, /2.5 ms\/token/);
 });
 
+test('percentiles have one legend each and ranges are not plotted as single values', () => {
+  const c = vm.createContext({});
+  vm.runInContext(`const chartSize=()=>({width:1000,height:220}); const niceMax=(v)=>v||1;
+    const fmtAxis=String; const fmtDuration=String; const fmtTpot=String; const esc=String;
+    const p50RangeText=(r)=>r.p50_lower_ms+' – '+r.p50_ms; const p95RangeText=(r)=>r.p95_lower_ms+' – '+r.p95_ms;` +
+    extract('function latencyTrendChart(points', 'function tokenTrendChart(') +
+    '; globalThis.chart=latencyTrendChart;', c);
+  const html = c.chart([{date:'2026-11-04',p50_ms:12,p50_lower_ms:12,p95_ms:80,p95_lower_ms:40}], {});
+  assert.match(html, /data-latency-layer="p50"/);
+  assert.match(html, /data-latency-layer="p95"/);
+  assert.doesNotMatch(html, /上界|下界/);
+  assert.match(html, /40 – 80 · P95/);
+  assert.match(html, /latency-layer p95-upper[^>]*>\s*\s*<\/g>/);
+  assert.doesNotMatch(c.chart([{date:'2026-11-04',p95_ms:80,p95_lower_ms:40}], {p95:false}), /40 – 80 · P95/);
+});
+
 test('model summary does not substitute an older day for the shared anchor', () => {
   const context = vm.createContext({});
   vm.runInContext(extract('function modelSummary(days, model', '// Day-over-day increases') + '; globalThis.summary=modelSummary;', context);
