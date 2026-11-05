@@ -167,7 +167,7 @@ class CollectionTests(unittest.TestCase):
             {'total_pages':1,'total':2,'data':[{'request_id':'a'}, {'request_id':'a'}]},
         ]
         for page in pages:
-            with self.subTest(page=page), patch.object(collector, 'fetch_json', return_value=page):
+            with self.subTest(page=page), patch.object(collector, 'fetch_json', return_value=page), patch.object(collector.time, 'sleep'):
                 with self.assertRaises(ValueError): collector.fetch_rows('dummy', now, now)
 
     def test_deduplicates_overlapping_daily_boundaries(self):
@@ -190,9 +190,50 @@ class CollectionTests(unittest.TestCase):
 
     def test_rejects_changed_pagination(self):
         pages = [{'total_pages': 2, 'total': 2, 'data': [{'request_id':'a'}]}, {'total_pages': 3, 'total': 2, 'data': [{'request_id':'b'}]}]
-        with patch.object(collector, 'fetch_json', side_effect=pages), patch.object(collector.time, 'sleep'):
+        with patch.object(collector, 'fetch_json', side_effect=pages * collector.PAGINATION_ATTEMPTS), patch.object(collector.time, 'sleep'):
             with self.assertRaises(ValueError):
                 collector.fetch_rows('dummy', collector.datetime.now(collector.timezone.utc), collector.datetime.now(collector.timezone.utc))
+
+    def test_retries_the_whole_window_after_pagination_changes(self):
+        pages = [
+            {'total_pages': 2, 'total': 2, 'data': [{'request_id': 'old'}]},
+            {'total_pages': 3, 'total': 3, 'data': [{'request_id': 'unstable'}]},
+            {'total_pages': 2, 'total': 2, 'data': [{'request_id': 'new-a'}]},
+            {'total_pages': 2, 'total': 2, 'data': [{'request_id': 'new-b'}]},
+        ]
+        now = collector.datetime.now(collector.timezone.utc)
+        with patch.object(collector, 'fetch_json', side_effect=pages) as fetch, patch.object(collector.time, 'sleep'):
+            rows = collector.fetch_rows('dummy', now, now + collector.timedelta(hours=1))
+        self.assertEqual([r['request_id'] for r in rows], ['new-a', 'new-b'])
+        self.assertEqual([call.args[2]['page'] for call in fetch.call_args_list], [1, 2, 1, 2])
+
+    def test_splits_persistently_changing_windows_and_deduplicates_boundary(self):
+        start = collector.datetime(2026, 11, 4, tzinfo=collector.timezone.utc)
+        end = start + collector.timedelta(hours=2)
+        midpoint = start + collector.timedelta(hours=1)
+        boundary = {'request_id': 'boundary', 'status': 'success'}
+        def fetch(_, a, b):
+            if (a, b) == (start, end):
+                raise collector.ChangingPagination('changed')
+            if (a, b) == (start, midpoint):
+                return [{'request_id': 'first'}, boundary]
+            if (a, b) == (midpoint, end):
+                return [boundary, {'request_id': 'last'}]
+            self.fail('unexpected window')
+        with patch.object(collector, 'fetch_rows_once', side_effect=fetch), patch.object(collector.time, 'sleep'):
+            rows = collector.fetch_rows('dummy', start, end)
+        self.assertEqual([r['request_id'] for r in rows], ['first', 'boundary', 'last'])
+
+    def test_changed_split_boundary_never_returns_partial_data(self):
+        start = collector.datetime(2026, 11, 4, tzinfo=collector.timezone.utc)
+        end = start + collector.timedelta(hours=2)
+        def fetch(_, a, b):
+            if (a, b) == (start, end):
+                raise collector.ChangingPagination('changed')
+            return [{'request_id': 'boundary', 'status': 'success' if a == start else 'failed'}]
+        with patch.object(collector, 'fetch_rows_once', side_effect=fetch), patch.object(collector.time, 'sleep'):
+            with self.assertRaises(collector.ChangingPagination):
+                collector.fetch_rows('dummy', start, end)
 
     def test_merge_history_replaces_fresh_days_and_prunes_aged_points(self):
         today = collector.datetime.now(collector.SH).date()

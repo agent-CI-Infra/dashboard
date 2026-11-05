@@ -66,6 +66,12 @@ TPOT_MIN_MS = 0.1
 HISTORY_DAYS = 35
 SH = timezone(timedelta(hours=8))
 FAILURE_STATUSES = ('failure', 'failed', 'error')
+PAGINATION_ATTEMPTS = 3
+MIN_SPLIT_WINDOW = timedelta(minutes=15)
+
+
+class ChangingPagination(ValueError):
+    """The gateway's paginated result changed while it was being read."""
 
 
 def fetch_json(path, key, params=None):
@@ -159,7 +165,7 @@ def percentile(values, target, minimum):
     return rounded(percentile_nearest_rank(values, target)) if len(values) >= minimum else None
 
 
-def fetch_rows(key, start, end):
+def fetch_rows_once(key, start, end):
     window = {
         'start_date': start.strftime('%Y-%m-%d %H:%M:%S'),
         'end_date': end.strftime('%Y-%m-%d %H:%M:%S'),
@@ -178,13 +184,44 @@ def fetch_rows(key, start, end):
         batch = fetch_json('/spend/logs/ui', key, {**window, 'page': page, 'page_size': page_size})
         if (not isinstance(batch.get('data'), list) or batch.get('total_pages') != total_pages
                 or batch.get('total') != total or batch.get('total_is_capped')):
-            raise ValueError('Incomplete or changing gateway pagination')
+            raise ChangingPagination('Incomplete or changing gateway pagination')
         rows.extend(batch['data'])
     ids = [row.get('request_id') for row in rows if isinstance(row, dict)]
     if (len(rows) != total or len(ids) != len(rows) or any(not item for item in ids)
             or len(set(ids)) != len(ids)):
-        raise ValueError('Missing, duplicate or incomplete gateway records')
+        raise ChangingPagination('Missing, duplicate or incomplete gateway records')
     return rows
+
+
+def fetch_rows(key, start, end):
+    """Retry a complete window; split persistently changing windows, never publish partial pages."""
+    for attempt in range(PAGINATION_ATTEMPTS):
+        try:
+            return fetch_rows_once(key, start, end)
+        except ChangingPagination:
+            if attempt + 1 < PAGINATION_ATTEMPTS:
+                print(f'Gateway pagination changed for {start:%Y-%m-%d %H:%M:%S}..'
+                      f'{end:%Y-%m-%d %H:%M:%S} UTC; retrying the whole window '
+                      f'({attempt + 1}/{PAGINATION_ATTEMPTS}).', flush=True)
+                time.sleep(attempt + 1)
+                continue
+            if end - start < MIN_SPLIT_WINDOW * 2:
+                raise
+
+    # API times are serialized at second precision; split on a whole second so
+    # adjacent windows overlap only at their shared boundary.
+    midpoint = (start + (end - start) / 2).replace(microsecond=0)
+    if midpoint <= start or midpoint >= end:
+        raise ChangingPagination('Cannot safely split changing gateway window')
+    print(f'Splitting changing gateway window {start:%Y-%m-%d %H:%M:%S}..'
+          f'{end:%Y-%m-%d %H:%M:%S} UTC.', flush=True)
+    combined = {}
+    for row in fetch_rows(key, start, midpoint) + fetch_rows(key, midpoint, end):
+        request_id = row['request_id']
+        if request_id in combined and combined[request_id] != row:
+            raise ChangingPagination('Gateway record changed across split window boundary')
+        combined[request_id] = row
+    return list(combined.values())
 
 
 def fetch_window(key, start, end, workers=3):
