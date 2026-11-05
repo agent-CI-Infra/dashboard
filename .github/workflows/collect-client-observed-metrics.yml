@@ -1,0 +1,70 @@
+name: Collect DigitalMate client-observed metrics
+on:
+  workflow_dispatch:
+  schedule:
+    # Device metrics are small and cheap to read; a delayed or dropped tick is
+    # replaced by the next one. Offsets avoid the production collector's slot.
+    - cron: '45 */3 * * *'
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: collect-client-observed-metrics
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Collect device-reported aggregates
+        env:
+          # A JSON array of {environment, url, token}; deployment export tokens
+          # live only in this secret and are never written to the repository.
+          CLIENT_OBSERVED_DEPLOYMENTS: ${{ secrets.CLIENT_OBSERVED_DEPLOYMENTS }}
+        run: |
+          set -euo pipefail
+          if [ -z "$CLIENT_OBSERVED_DEPLOYMENTS" ]; then
+            echo 'CLIENT_OBSERVED_DEPLOYMENTS is not configured; nothing to collect.'
+            exit 0
+          fi
+          mkdir -p /tmp/client-observed-metrics
+          # Reuse the last published snapshot only as a fallback for a deployment
+          # that is temporarily unreachable; fresh data always wins.
+          git fetch origin digitalmate:refs/remotes/origin/digitalmate
+          previous=''
+          if git cat-file -e origin/digitalmate:site/data/client-observed-metrics.json 2>/dev/null; then
+            git show origin/digitalmate:site/data/client-observed-metrics.json > /tmp/client-observed-metrics/previous.json
+            previous=/tmp/client-observed-metrics/previous.json
+          fi
+          python3 scripts/collect-client-observed-metrics.py /tmp/client-observed-metrics 7 "$previous"
+      - name: Publish aggregate to the DigitalMate data branch
+        id: update
+        run: |
+          set -euo pipefail
+          if [ ! -f /tmp/client-observed-metrics/client-observed-metrics.json ]; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git fetch origin digitalmate:refs/remotes/origin/digitalmate
+          git checkout -B digitalmate origin/digitalmate
+          cp /tmp/client-observed-metrics/client-observed-metrics.json site/data/client-observed-metrics.json
+          if git diff --quiet -- site/data/client-observed-metrics.json && git ls-files --error-unmatch site/data/client-observed-metrics.json >/dev/null 2>&1; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site/data/client-observed-metrics.json
+          git commit -m 'chore(digitalmate): update client-observed metrics'
+          git pull --rebase origin digitalmate
+          git push origin HEAD:digitalmate
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+      - name: Deploy dashboard
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main
