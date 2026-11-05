@@ -1,7 +1,97 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T16:26:59.768Z",
+  "updatedAt": "2026-11-05T18:42:56.849Z",
   "runs": [
+    {
+      "schemaVersion": 1,
+      "kind": "bench",
+      "runId": "bench-42074440895-1",
+      "commit": "af4a71ce1168d6e39471b7db3afa2860376afcc6",
+      "backend": "wss://onlineswarm.openjiuwen.com:20015/digitalmate/ws?binding_id=default",
+      "profile": "all",
+      "status": "PASS",
+      "benchmarks": [
+        {
+          "name": "GAIA (component)",
+          "status": "PASS",
+          "tasks": 6,
+          "trials": 18,
+          "passAt1": 0.5,
+          "passAtK": 0.667,
+          "passHatK": 0.16699999999999998,
+          "detail": "3 flaky",
+          "latencyMs": {
+            "p50": 18900,
+            "p95": 172100
+          }
+        },
+        {
+          "name": "PAST-Bench text proxy",
+          "status": "PASS",
+          "tasks": 6,
+          "trials": 6,
+          "passAt1": 1,
+          "passAtK": 1,
+          "passHatK": 1,
+          "detail": "0 flaky",
+          "latencyMs": {
+            "p50": 6600,
+            "p95": 7200
+          }
+        },
+        {
+          "name": "Pi-Bench text proxy",
+          "status": "PASS",
+          "tasks": 13,
+          "trials": 13,
+          "passAt1": 0.846,
+          "passAtK": 0.846,
+          "passHatK": 0.846,
+          "detail": "0 flaky",
+          "latencyMs": {
+            "p50": 43100,
+            "p95": 86300
+          }
+        },
+        {
+          "name": "VitaBench 2.0 text proxy",
+          "status": "PASS",
+          "tasks": 9,
+          "trials": 9,
+          "passAt1": 0.889,
+          "passAtK": 0.889,
+          "passHatK": 0.889,
+          "detail": "0 flaky",
+          "latencyMs": {
+            "p50": 15200,
+            "p95": 29000
+          }
+        },
+        {
+          "name": "VibeLifeBench office_fitout_15d stage 0",
+          "status": "PASS",
+          "tasks": 1,
+          "trials": 1,
+          "passAt1": null,
+          "passAtK": null,
+          "passHatK": null,
+          "detail": "0.750 (4.5/6.0 weight)",
+          "latencyMs": {
+            "p50": 78900,
+            "p95": null
+          }
+        }
+      ],
+      "generatedAt": "2026-11-05T17:25:16Z",
+      "taskCount": 35,
+      "trials": 47,
+      "passAt1": null,
+      "passAtK": null,
+      "passHatK": null,
+      "runNumber": "42074440895",
+      "runUrl": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/42074440895",
+      "conclusion": "success"
+    },
     {
       "schemaVersion": 1,
       "kind": "bench",
