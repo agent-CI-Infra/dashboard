@@ -83,7 +83,7 @@ jobs:
           echo "run_id=$id" >> "$GITHUB_OUTPUT"
 
       - name: Merge summaries
-        if: steps.fetch.outputs.skip != 'true'
+        if: steps.fetch.outputs.skip == 'false'
         run: |
           set -euo pipefail
           git fetch origin digitalmate:refs/remotes/origin/digitalmate
@@ -96,7 +96,7 @@ jobs:
 
       - name: Update digitalmate branch
         id: update
-        if: steps.fetch.outputs.skip != 'true'
+        if: steps.fetch.outputs.skip == 'false'
         run: |
           set -euo pipefail
           git fetch origin digitalmate:refs/remotes/origin/digitalmate
