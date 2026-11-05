@@ -878,8 +878,12 @@ function newMetricAccumulator() {
     ttft_filtered: 0,
     tpot_sum: 0,
     tpot_samples: 0,
+    tpot_weight: 0,
+    tpot_complete: true,
     tpot_est_sum: 0,
     tpot_est_samples: 0,
+    tpot_est_weight: 0,
+    tpot_est_complete: true,
     tpot_filtered: 0,
     p50_min: null,
     p50_max: null,
@@ -920,7 +924,7 @@ function mergeMetricRow(acc, row) {
     acc.duration_samples += durationSamples;
   }
 
-  for (const key of ['ttft', 'ttft_est', 'tpot', 'tpot_est']) {
+  for (const key of ['ttft', 'ttft_est']) {
     const field = key.endsWith('_est') ? `${key.slice(0, -4)}_estimated` : key;
     const valueField = `${field}_ms`;
     const sampleField = `${field}_samples`;
@@ -932,6 +936,19 @@ function mergeMetricRow(acc, row) {
       const sum = Number.isFinite(reportedSum) && reportedSum >= 0 ? reportedSum : value * samples;
       acc[`${key}_sum`] += sum;
       acc[`${key}_samples`] += samples;
+    }
+  }
+  for (const [key, field] of [['tpot', 'tpot'], ['tpot_est', 'tpot_estimated']]) {
+    const samples = positive(row?.[`${field}_samples`]);
+    if (!samples) continue;
+    acc[`${key}_samples`] += samples;
+    const duration = row?.[`${field}_decode_sum_ms`];
+    const weight = row?.[`${field}_weight_tokens`];
+    if (Number.isFinite(duration) && duration >= 0 && Number.isSafeInteger(weight) && weight > 0) {
+      acc[`${key}_sum`] += duration;
+      acc[`${key}_weight`] += weight;
+    } else {
+      acc[`${key}_complete`] = false;
     }
   }
   acc.ttft_filtered += positive(row?.ttft_filtered_count);
@@ -975,10 +992,14 @@ function finalizeMetricAccumulator(acc) {
     ttft_estimated_ms: acc.ttft_est_samples > 0 ? acc.ttft_est_sum / acc.ttft_est_samples : null,
     ttft_estimated_samples: acc.ttft_est_samples,
     ttft_filtered_count: acc.ttft_filtered,
-    tpot_ms: acc.tpot_samples > 0 ? acc.tpot_sum / acc.tpot_samples : null,
+    tpot_ms: acc.tpot_complete && acc.tpot_weight > 0 ? acc.tpot_sum / acc.tpot_weight : null,
     tpot_samples: acc.tpot_samples,
-    tpot_estimated_ms: acc.tpot_est_samples > 0 ? acc.tpot_est_sum / acc.tpot_est_samples : null,
+    tpot_decode_sum_ms: acc.tpot_complete && acc.tpot_weight > 0 ? acc.tpot_sum : null,
+    tpot_weight_tokens: acc.tpot_weight,
+    tpot_estimated_ms: acc.tpot_est_complete && acc.tpot_est_weight > 0 ? acc.tpot_est_sum / acc.tpot_est_weight : null,
     tpot_estimated_samples: acc.tpot_est_samples,
+    tpot_estimated_decode_sum_ms: acc.tpot_est_complete && acc.tpot_est_weight > 0 ? acc.tpot_est_sum : null,
+    tpot_estimated_weight_tokens: acc.tpot_est_weight,
     tpot_filtered_count: acc.tpot_filtered,
     p50_lower_ms: acc.p50_complete ? acc.p50_min : null,
     p50_ms: acc.p50_complete ? acc.p50_max : null,
@@ -1036,10 +1057,12 @@ function benchmarkRowToMetric(row, point = null) {
     ttft_filtered_count: positive(row?.ttft_filtered_count),
     tpot_ms: metric(row?.tpot_avg_ms),
     tpot_samples: positive(row?.tpot_sample_count),
-    tpot_sum_ms: metric(row?.tpot_sum_ms),
+    tpot_decode_sum_ms: metric(row?.tpot_decode_sum_ms),
+    tpot_weight_tokens: positive(row?.tpot_weight_tokens),
     tpot_estimated_ms: metric(row?.tpot_estimated_avg_ms),
     tpot_estimated_samples: positive(row?.tpot_estimated_sample_count),
-    tpot_estimated_sum_ms: metric(row?.tpot_estimated_sum_ms),
+    tpot_estimated_decode_sum_ms: metric(row?.tpot_estimated_decode_sum_ms),
+    tpot_estimated_weight_tokens: positive(row?.tpot_estimated_weight_tokens),
     tpot_filtered_count: positive(row?.tpot_filtered_count),
     p50_ms: metric(row?.duration_p50_ms ?? point?.duration_p50_ms),
     p95_ms: metric(row?.duration_p95_ms ?? point?.duration_p95_ms),
@@ -1491,7 +1514,7 @@ function latencyTrendChart(points, visibility = {}) {
     ${xLabels}
     <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
     ${zones}
-  </svg><p class="chart-note">TTFT 和 TPOT 的流式主曲线只统计 <code>stream === true</code> 的成功调用；流式状态未知的样本单独显示为估算，不并入主均值。P50/P95 为成功调用的请求级分位，至少 20 个样本；多个来源仅有区间时在悬浮提示中显示，不绘制单值。TTFT、P50、P95 共用左侧毫秒轴，TPOT 使用右侧 ms/token 轴。</p></div>`;
+  </svg><p class="chart-note">TTFT 和 TPOT 的流式主曲线只统计 <code>stream === true</code> 的成功调用；流式状态未知的样本单独显示为估算，不并入主均值。TPOT 按输出 Token 数减一加权，即首个响应之后的总耗时除以对应 Token 总数。P50/P95 为成功调用的请求级分位，至少 20 个样本；多个来源仅有区间时在悬浮提示中显示，不绘制单值。TTFT、P50、P95 共用左侧毫秒轴，TPOT 使用右侧 ms/token 轴。</p></div>`;
 }
 
 function tokenTrendChart(points, visibility = {}, unit = 'query') {
@@ -1644,7 +1667,7 @@ function modelSummary(days, model, { unit = 'query', failure = null, anchor = nu
   const tpotEstimateCard = `<div class="stat-card">
       <div class="stat-label">TPOT 估算（覆盖率 ${esc(tpotEstimateCoverage)}）</div>
       <div class="stat-value">${fmtTpot(latest.tpot_estimated_ms)}</div>
-      <div class="stat-hint">流式状态未知 · ${fmtCount(latest.tpot_estimated_samples)} 个样本 · 不并入主均值</div>
+      <div class="stat-hint">Token 加权 · 流式状态未知 · ${fmtCount(latest.tpot_estimated_samples)} 个样本 · 不并入主均值</div>
     </div>`;
   return `
     <div class="stat-card">
@@ -1681,7 +1704,7 @@ function modelSummary(days, model, { unit = 'query', failure = null, anchor = nu
     <div class="stat-card">
       <div class="stat-label">平均 TPOT（流式）</div>
       <div class="stat-value">${fmtTpot(latest.tpot_ms)}</div>
-      <div class="stat-hint">${hint(`${fmtCount(latest.tpot_samples)} 个已确认流式样本`, deltaChip(latest.tpot_ms, previous?.tpot_ms, { lowerIsBetter: true }))}</div>
+      <div class="stat-hint">${hint(`Token 加权 · ${fmtCount(latest.tpot_samples)} 个已确认流式样本`, deltaChip(latest.tpot_ms, previous?.tpot_ms, { lowerIsBetter: true }))}</div>
     </div>
     ${tpotEstimateCard}
     <div class="stat-card">
@@ -2424,7 +2447,7 @@ async function loadProductionMetrics() {
 }
 
 function requireCurrentMetricsVersion(history) {
-  if (!Number.isInteger(history?.metrics_version) || history.metrics_version < 4) {
+  if (!Number.isInteger(history?.metrics_version) || history.metrics_version < 5) {
     throw new Error('数据口径版本过旧，请等待采集任务完成历史数据重建');
   }
 }

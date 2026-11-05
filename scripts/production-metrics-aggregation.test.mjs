@@ -44,7 +44,7 @@ test('strict and estimated TTFT stay separate and tokens carry coverage', () => 
     calls: 4, success_count: 4, duration_sum_ms: 2000, duration_samples: 4,
     ttft_ms: 100, ttft_samples: 2,
     ttft_estimated_ms: 900, ttft_estimated_samples: 1,
-    tpot_ms: 12, tpot_samples: 2,
+    tpot_ms: 12, tpot_samples: 2, tpot_decode_sum_ms: 120, tpot_weight_tokens: 10,
     total_tokens: 20, input_tokens: 12, output_tokens: 8, token_sample_count: 2,
   });
   const result = ctx.finish(a);
@@ -167,19 +167,31 @@ test('legacy and previous-version snapshots cannot be displayed as current metri
   assert.throws(() => ctx.requireVersion({}), /版本过旧/);
   assert.throws(() => ctx.requireVersion({metrics_version: 2}), /版本过旧/);
   assert.throws(() => ctx.requireVersion({metrics_version: 3}), /版本过旧/);
-  assert.doesNotThrow(() => ctx.requireVersion({metrics_version: 4}));
+  assert.throws(() => ctx.requireVersion({metrics_version: 4}), /版本过旧/);
+  assert.doesNotThrow(() => ctx.requireVersion({metrics_version: 5}));
 });
 
-test('estimated TPOT is weighted separately from confirmed streaming', () => {
+test('estimated TPOT is token-weighted separately and remains mergeable across days', () => {
   const acc = ctx.acc();
   ctx.merge(acc, {calls: 10, success_count: 10, tpot_ms: 1, tpot_samples: 1,
-    tpot_estimated_ms: 2, tpot_estimated_samples: 2, tpot_estimated_sum_ms: 4});
+    tpot_decode_sum_ms: 10, tpot_weight_tokens: 10,
+    tpot_estimated_ms: 2, tpot_estimated_samples: 2, tpot_estimated_decode_sum_ms: 20, tpot_estimated_weight_tokens: 10});
   ctx.merge(acc, {calls: 5, success_count: 5, tpot_estimated_ms: 4,
-    tpot_estimated_samples: 1, tpot_estimated_sum_ms: 4});
+    tpot_estimated_samples: 1, tpot_estimated_decode_sum_ms: 400, tpot_estimated_weight_tokens: 100});
   const result = ctx.finish(acc);
   assert.equal(result.tpot_ms, 1);
   assert.equal(result.tpot_estimated_samples, 3);
-  assert.equal(result.tpot_estimated_ms, 8 / 3);
+  assert.equal(result.tpot_estimated_ms, 420 / 110);
+  const weekly = ctx.acc();
+  ctx.merge(weekly, result);
+  assert.equal(ctx.finish(weekly).tpot_estimated_ms, 420 / 110);
+});
+
+test('TPOT is unavailable if weighted evidence is missing', () => {
+  const acc = ctx.acc();
+  ctx.merge(acc, {tpot_samples:1, tpot_ms:2});
+  ctx.merge(acc, {tpot_samples:1, tpot_decode_sum_ms:40, tpot_weight_tokens:10});
+  assert.equal(ctx.finish(acc).tpot_ms, null);
 });
 
 test('latency chart renders estimated TPOT on the right axis and tooltip', () => {
