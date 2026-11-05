@@ -132,6 +132,210 @@ function latestFinished(entry) {
   return entry?.latest?.finished_at || entry?.points?.[entry.points.length - 1]?.finished_at || '';
 }
 
+// Models with fewer calls than this in the trailing week are folded away from
+// the headline cards: a single failed call must not read as a 100% failure
+// rate, and an idle model must not look like the latest state of the fleet.
+const MIN_RECENT_CALLS = 50;
+const RECENT_WINDOW_DAYS = 7;
+
+function historyLatestDate(history) {
+  let latest = '';
+  for (const entry of Object.values(history?.cases || {})) {
+    for (const point of entry?.points || []) {
+      const date = String(point?.date || '');
+      if (/^\d{4}-\d{2}-\d{2}$/.test(date) && date > latest) latest = date;
+    }
+  }
+  return latest || null;
+}
+
+function historyPartialDay(history) {
+  if (typeof history?.partial_day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(history.partial_day)) {
+    return history.partial_day;
+  }
+  return history?.current_day_partial ? historyLatestDate(history) : null;
+}
+
+// All headline cards share one anchor: the newest day whose collection window
+// is closed. The current Asia/Shanghai day keeps accumulating, so including it
+// would make morning and evening numbers incomparable.
+function historyCompleteThrough(history) {
+  if (typeof history?.complete_through === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(history.complete_through)) {
+    return history.complete_through;
+  }
+  const latest = historyLatestDate(history);
+  if (!latest) return null;
+  return history?.current_day_partial ? addDays(latest, -1) : latest;
+}
+
+function completeDays(days, history) {
+  const through = historyCompleteThrough(history);
+  return (Array.isArray(days) ? days : []).filter((row) => row?.date && (!through || row.date <= through));
+}
+
+// A point carries its own kind of daily aggregate: calls, successes and the
+// sum of successful durations. Re-express it as a mergeable metric row so the
+// suite-wide totals use the exact same weighted accumulator as every card.
+function pointMetricRow(point) {
+  const calls = questionCount(point);
+  // metrics_version 2 always writes duration_sum_ms (null when no call
+  // succeeded). Only a snapshot that predates it may be reconstructed from
+  // query_ms x calls, where every measured call was a successful one.
+  const legacy = !('duration_sum_ms' in (point || {})) && !Number.isFinite(point?.success_count);
+  const samples = Number.isFinite(point?.duration_sample_count) && point.duration_sample_count > 0
+    ? point.duration_sample_count
+    : legacy && Number.isFinite(point?.query_ms) && calls > 0 ? calls : 0;
+  let durationSum = Number.isFinite(point?.duration_sum_ms) && point.duration_sum_ms >= 0
+    ? point.duration_sum_ms
+    : null;
+  if (durationSum === null && legacy && Number.isFinite(point?.query_ms) && samples > 0) {
+    durationSum = point.query_ms * samples;
+  }
+  return {
+    calls,
+    success_count: Number.isFinite(point?.success_count) ? point.success_count : null,
+    duration_sum_ms: durationSum,
+    duration_samples: samples,
+    p50_ms: point?.duration_p50_ms,
+    p95_ms: point?.duration_p95_ms,
+  };
+}
+
+// Suite-wide per-day totals. Percentiles stay request-level: they come from
+// the collector's raw distributions and are only reported when every
+// contributing model day has one.
+function suiteDayStats(history) {
+  const byDate = new Map();
+  for (const entry of Object.values(history?.cases || {})) {
+    for (const point of entry?.points || []) {
+      const date = String(point?.date || '');
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
+      if (!byDate.has(date)) byDate.set(date, { date, acc: newMetricAccumulator(), failed: 0, blocked: 0 });
+      const day = byDate.get(date);
+      mergeMetricRow(day.acc, pointMetricRow(point));
+      const queries = questionCount(point);
+      const failed = Number.isFinite(point?.failed_queries)
+        ? Math.max(0, Math.min(Number(point.failed_queries), queries))
+        : point?.status === 'FAILED'
+          ? queries
+          : 0;
+      const blocked = Number.isFinite(point?.blocked_queries)
+        ? Math.max(0, Math.min(Number(point.blocked_queries), queries - failed))
+        : point?.status === 'BLOCKED'
+          ? queries
+          : 0;
+      day.failed += failed;
+      day.blocked += blocked;
+      day.acc.queries += queries;
+    }
+  }
+  return [...byDate.values()]
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map(({ date, acc, failed, blocked }) => {
+      const row = { date, failed, blocked, ...finalizeMetricAccumulator(acc) };
+      row.failure_rate = row.calls > 0 ? (failed / row.calls) * 100 : null;
+      return row;
+    });
+}
+
+function pointOn(entry, date) {
+  if (!date) return null;
+  return (entry?.points || []).find((point) => point?.date === date) || null;
+}
+
+// The unfinished day is only ever shown as a same-clock-window comparison:
+// today's elapsed whole hours against the same hours on earlier days. The
+// dashboard never compares a half day with a full one.
+function sameClockComparison(history, windowDays = 7) {
+  const partial = historyPartialDay(history);
+  if (!partial) return null;
+  const stamp = history?.updated_at || history?.generated_at;
+  const hour = shanghaiHour(stamp);
+  if (!Number.isFinite(hour) || hour <= 0) return null;
+  const start = addDays(partial, -windowDays);
+  const today = { calls: 0, success: 0, duration_sum_ms: 0, duration_samples: 0 };
+  const prior = { calls: 0, success: 0, duration_sum_ms: 0, duration_samples: 0 };
+  let priorDays = new Set();
+  let hasHours = false;
+  for (const entry of Object.values(history?.cases || {})) {
+    for (const point of entry?.points || []) {
+      if (point?.date !== partial && !(point?.date >= start && point?.date < partial)) continue;
+      if (!Array.isArray(point?.hours) || !point.hours.length) continue;
+      hasHours = true;
+      const window = hoursUntil(point.hours, hour);
+      const target = point.date === partial ? today : prior;
+      target.calls += window.calls;
+      target.success += window.success;
+      target.duration_sum_ms += window.duration_sum_ms;
+      target.duration_samples += window.duration_samples;
+      if (point.date !== partial) priorDays.add(point.date);
+    }
+  }
+  if (!hasHours) return null;
+  const todayAvg = windowAverage(today);
+  const priorAvg = windowAverage(prior);
+  return {
+    partial,
+    cutoff: hour,
+    days: priorDays.size,
+    today,
+    prior,
+    today_ms: todayAvg,
+    prior_ms: priorAvg,
+    change_percent: todayAvg !== null && priorAvg !== null && priorAvg > 0
+      ? ((todayAvg - priorAvg) / priorAvg) * 100
+      : null,
+  };
+}
+
+
+function recentCallsForDays(days, endDate, windowDays = RECENT_WINDOW_DAYS) {
+  if (!endDate) return 0;
+  const start = addDays(endDate, -(windowDays - 1));
+  return (days || [])
+    .filter((row) => row?.date >= start && row?.date <= endDate)
+    .reduce((sum, row) => sum + (Number.isFinite(row?.calls) ? row.calls : 0), 0);
+}
+
+function recentCallsForCase(entry, endDate, windowDays = RECENT_WINDOW_DAYS) {
+  if (!endDate) return 0;
+  const start = addDays(endDate, -(windowDays - 1));
+  return (entry?.points || [])
+    .filter((point) => point?.date >= start && point?.date <= endDate)
+    .reduce((sum, point) => sum + (Number.isFinite(point?.query_count) ? point.query_count : 0), 0);
+}
+
+function hoursUntil(hours, cutoffHour) {
+  const limit = Number.isFinite(cutoffHour) ? cutoffHour : 24;
+  const result = { calls: 0, success: 0, duration_sum_ms: 0, duration_samples: 0 };
+  for (const bucket of Array.isArray(hours) ? hours : []) {
+    const hour = Number(bucket?.hour);
+    if (!Number.isFinite(hour) || hour >= limit) continue;
+    result.calls += Number.isFinite(bucket.calls) ? bucket.calls : 0;
+    result.success += Number.isFinite(bucket.success_count) ? bucket.success_count : 0;
+    result.duration_sum_ms += Number.isFinite(bucket.duration_sum_ms) ? bucket.duration_sum_ms : 0;
+    result.duration_samples += Number.isFinite(bucket.duration_sample_count) ? bucket.duration_sample_count : 0;
+  }
+  return result;
+}
+
+function shanghaiHour(iso) {
+  const date = new Date(iso || '');
+  if (Number.isNaN(date.getTime())) return null;
+  const hour = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Shanghai',
+    hour: '2-digit',
+    hour12: false,
+  }).format(date);
+  const value = Number(hour);
+  return Number.isFinite(value) ? value % 24 : null;
+}
+
+function windowAverage(window) {
+  if (!window || window.duration_samples <= 0) return null;
+  return window.duration_sum_ms / window.duration_samples;
+}
+
 function sortedCases() {
   return entries().sort((a, b) => {
     const at = latestFinished(a);
@@ -165,7 +369,7 @@ function sparkline(points) {
   const lastX = x(usable.length - 1);
   const lastY = y(last.query_ms);
 
-  return `<svg class="spark" viewBox="0 0 ${width} ${height}" role="img" aria-label="每日查询耗时迷你趋势">
+  return `<svg class="spark" viewBox="0 0 ${width} ${height}" role="img" aria-label="每日网关耗时迷你趋势">
     ${usable.length > 1 ? `<path class="spark-line" d="${path}" />` : ''}
     <circle class="spark-dot ${statusClass(last.status)}" cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="2.6" />
   </svg>`;
@@ -176,7 +380,11 @@ function renderHeader() {
   const updated = history.updated_at
     ? `更新于 ${fmtDateTime(history.updated_at)}`
     : '暂无更新时间';
-  $('updated').textContent = updated + (history.current_day_partial ? ' · 采集当日未结束' : '') + (history.excluded_missing_model ? ` · 未识别模型排除 ${fmtCount(history.excluded_missing_model)} 条` : '');
+  const through = historyCompleteThrough(history);
+  const partial = historyPartialDay(history);
+  $('updated').textContent = updated
+    + (partial ? ` · 当日（${partial}）未结束，汇总取完整日 ${through || '—'}` : '')
+    + (history.excluded_missing_model ? ` · 未识别模型排除 ${fmtCount(history.excluded_missing_model)} 条` : '');
 
   const withDevice = sortedCases().find((entry) => entry.latest?.device);
   const device = history.device || withDevice?.latest?.device;
@@ -192,53 +400,75 @@ function renderHeader() {
 }
 
 function renderSummary() {
+  const history = state.history;
   const cases = entries();
-  const completed = cases.filter((entry) => latestPoint(entry)?.status === 'COMPLETED').length;
-  const blocked = cases.filter((entry) => latestPoint(entry)?.status === 'BLOCKED').length;
-  const failed = cases.filter((entry) => latestPoint(entry)?.status === 'FAILED').length;
-  const queryValues = cases.map((entry) => latestPoint(entry)?.query_ms).filter((value) => Number.isFinite(value));
-  const averageQuery = queryValues.length
-    ? Math.round(queryValues.reduce((sum, value) => sum + value, 0) / queryValues.length)
-    : null;
-  const previousQueryValues = cases
-    .map((entry) => {
-      const points = [...(entry.points || [])]
-        .filter((point) => Number.isFinite(point.query_ms))
-        .sort((a, b) => String(a.date).localeCompare(String(b.date)));
-      return points.length > 1 ? points[points.length - 2].query_ms : null;
-    })
-    .filter((value) => Number.isFinite(value));
-  const previousAverageQuery = previousQueryValues.length
-    ? Math.round(previousQueryValues.reduce((sum, value) => sum + value, 0) / previousQueryValues.length)
-    : null;
-  const averageDelta = deltaChip(averageQuery, previousAverageQuery, { lowerIsBetter: true });
-  const lastDate = cases
-    .flatMap((entry) => entry.points || [])
-    .map((point) => point.date)
-    .sort()
-    .pop();
+  const anchor = historyCompleteThrough(history) || historyLatestDate(history);
+  const stats = suiteDayStats(history);
+  const index = anchor ? stats.findIndex((row) => row.date === anchor) : -1;
+  const day = index >= 0 ? stats[index] : stats[stats.length - 1] || null;
+  const previous = index > 0 ? stats[index - 1] : null;
+  const completeLabel = anchor || '—';
+
+  const trailing = newMetricAccumulator();
+  if (day) {
+    for (const row of stats) {
+      if (row.date >= addDays(day.date, -(RECENT_WINDOW_DAYS - 1)) && row.date <= day.date) {
+        mergeMetricRow(trailing, row);
+      }
+    }
+  }
+  const trailingMean = finalizeMetricAccumulator(trailing).duration_ms;
+
+  const active = cases.filter((entry) => anchor && recentCallsForCase(entry, anchor) >= MIN_RECENT_CALLS);
+  const lowVolume = cases.filter((entry) => {
+    const calls = anchor ? recentCallsForCase(entry, anchor) : 0;
+    return calls > 0 && calls < MIN_RECENT_CALLS;
+  });
+  const passed = active.filter((entry) => pointOn(entry, anchor)?.status === 'COMPLETED').length;
+  const failed = active.filter((entry) => pointOn(entry, anchor)?.status === 'FAILED').length;
+
+  const sameClock = sameClockComparison(history);
+  const sameClockTone = !sameClock || !Number.isFinite(sameClock.change_percent)
+    ? ''
+    : sameClock.change_percent < 0 ? 'ok' : 'failed';
+  const sameClockText = sameClock && Number.isFinite(sameClock.change_percent)
+    ? `${sameClock.change_percent > 0 ? '+' : ''}${sameClock.change_percent.toFixed(1)}%`
+    : '—';
+  const sameClockHint = sameClock
+    ? `今日 00:00–${String(sameClock.cutoff).padStart(2, '0')}:00 vs 前 ${sameClock.days} 天同时段 · 不含端侧与网络`
+    : '当日采集未结束或缺少小时数据';
 
   $('summary').innerHTML = `
     <div class="stat-card">
-      <div class="stat-label">用例</div>
-      <div class="stat-value">${cases.length}</div>
-      <div class="stat-hint">${lastDate ? `最新数据 ${esc(lastDate)}` : '暂无数据'}</div>
+      <div class="stat-label">网关调用数</div>
+      <div class="stat-value">${day ? fmtCount(day.calls) : '—'}</div>
+      <div class="stat-hint">${day ? `${esc(completeLabel)} · 成功 ${fmtCount(day.success_count)} / 失败 ${fmtCount(day.failed)}` : '暂无完整日数据'}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">最新通过</div>
-      <div class="stat-value ok">${completed}</div>
-      <div class="stat-hint">${cases.length ? `${Math.round((completed / cases.length) * 100)}% 的用例` : '—'}</div>
+      <div class="stat-label">网关平均耗时</div>
+      <div class="stat-value">${fmtDuration(day?.duration_ms)}</div>
+      <div class="stat-hint">不含端侧与网络 · ${day ? fmtCount(day.duration_samples) : 0} 个成功样本</div>
+      ${deltaChip(day?.duration_ms, previous?.duration_ms, { lowerIsBetter: true }) ? `<div class="stat-delta">${deltaChip(day?.duration_ms, previous?.duration_ms, { lowerIsBetter: true })}</div>` : ''}
     </div>
     <div class="stat-card">
-      <div class="stat-label">阻塞 / 失败</div>
-      <div class="stat-value ${blocked ? 'blocked' : failed ? 'failed' : ''}">${blocked} / ${failed}</div>
-      <div class="stat-hint">阻塞不等于失败</div>
+      <div class="stat-label">网关 P95</div>
+      <div class="stat-value">${esc(p95RangeText(day))}</div>
+      <div class="stat-hint">请求级分位 · 不含端侧与网络 · ${day ? fmtCount(day.duration_samples) : 0} 个成功样本</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">最新平均查询耗时</div>
-      <div class="stat-value">${fmtDuration(averageQuery)}</div>
-      <div class="stat-hint">各用例最近一次 · 不含 E2E 等待</div>
-      ${averageDelta ? `<div class="stat-delta">${averageDelta}</div>` : ''}
+      <div class="stat-label">成功调用平均</div>
+      <div class="stat-value">${fmtDuration(trailingMean)}</div>
+      <div class="stat-hint">近 ${RECENT_WINDOW_DAYS} 天按量加权 · 不含端侧与网络</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">模型状态</div>
+      <div class="stat-value ${failed ? 'failed' : active.length ? 'ok' : ''}">${passed} / ${failed}</div>
+      <div class="stat-hint">${active.length ? `近 7 天 ≥${MIN_RECENT_CALLS} 次调用的模型` : '暂无足量调用模型'}${lowVolume.length ? ` · 低流量折叠 ${lowVolume.length} 个` : ''}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">当日同时段</div>
+      <div class="stat-value ${sameClockTone}">${esc(sameClockText)}</div>
+      <div class="stat-hint">${esc(sameClockHint)}</div>
     </div>
   `;
 }
@@ -338,7 +568,7 @@ function queryWaterfall(latest) {
 
 function dailyChart(points) {
   const usable = (points || []).filter((point) => Number.isFinite(point.query_ms));
-  if (!usable.length) return '<p class="empty">暂无可绘制的查询耗时数据。</p>';
+  if (!usable.length) return '<p class="empty">暂无可绘制的网关耗时数据。</p>';
 
   const { width, height } = chartSize(760, 250, { hostId: 'detail' });
   const pad = { left: 56, right: 18, top: 16, bottom: 38 };
@@ -377,8 +607,8 @@ function dailyChart(points) {
     .join(' ');
   const dots = usable
     .map((point, index) => {
-      const title = `${point.date} · ${statusLabel(point.status)} · 查询 ${fmtDuration(point.query_ms)} · ${point.run_id || ''}`;
-      return `<circle class="point ${statusClass(point.status)}" cx="${x(index).toFixed(1)}" cy="${y(point.query_ms).toFixed(1)}" r="4">
+      const title = `${point.date}${point.partial ? '（部分日）' : ''} · ${statusLabel(point.status)} · 网关 ${fmtDuration(point.query_ms)} · ${point.run_id || ''}`;
+      return `<circle class="point ${statusClass(point.status)}${point.partial ? ' is-partial' : ''}" cx="${x(index).toFixed(1)}" cy="${y(point.query_ms).toFixed(1)}" r="4">
         <title>${esc(title)}</title>
       </circle>`;
     })
@@ -407,7 +637,7 @@ function dailyChart(points) {
       const right = Math.min(width - pad.right, cx + zoneWidth / 2);
       const tip = [
         point.date,
-        `${statusLabel(point.status)} · 查询 ${fmtDuration(point.query_ms)}`,
+        `${statusLabel(point.status)} · 网关 ${fmtDuration(point.query_ms)}${point.partial ? '（部分日）' : ''}`,
         point.run_id ? `run ${point.run_id}` : '',
       ]
         .filter(Boolean)
@@ -417,7 +647,7 @@ function dailyChart(points) {
     .join('');
 
   return `${statusLegend}<div class="chart-wrap">
-    <svg class="chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(state.selected)} 每日查询耗时曲线">
+    <svg class="chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(state.selected)} 每日网关耗时曲线">
       ${grid}
       <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
       ${usable.length > 1 ? `<path class="series" d="${path}" />` : ''}
@@ -455,7 +685,7 @@ function benchmarkMetrics(latest) {
   const callDetails = calls.length
     ? `<details><summary>单次调用${b.calls_truncated ? '（仅前 200 条）' : ''}</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>模型</th><th>状态</th><th>耗时</th><th>TTFT</th><th>TPOT</th><th>输入</th><th>输出</th><th>总 Token</th></tr></thead><tbody>${callRows}</tbody></table></div></details>`
     : '';
-  return `<p class="chart-note">当前用例已关联 ${fmtCount(b.matched_calls)} 次调用；未关联 ${fmtCount(b.unmatched_calls)} 次。P95 至少需要 20 个成功样本；TTFT/TPOT 仅统计已确认的流式成功调用；模型名称为 trace 上报值。</p><div class="table-wrap"><table class="history-table"><thead><tr><th>上报模型</th><th>调用数</th><th>平均 TTFT（样本）</th><th>平均 TPOT（样本）</th><th>耗时 P95（样本）</th><th>输入 Token</th><th>输出 Token</th><th>总 Token</th></tr></thead><tbody>${modelRows}</tbody></table></div>${callDetails}`;
+  return `<p class="chart-note">当前用例已关联 ${fmtCount(b.matched_calls)} 次调用；未关联 ${fmtCount(b.unmatched_calls)} 次。网关 P95 至少需要 20 个成功样本；TTFT/TPOT 仅统计已确认的流式成功调用；Token 仅统计成功调用；模型名称为 trace 上报值。</p><div class="table-wrap"><table class="history-table"><thead><tr><th>上报模型</th><th>调用数</th><th>平均 TTFT（流式样本）</th><th>平均 TPOT（流式样本）</th><th>网关 P95（样本）</th><th>输入 Token</th><th>输出 Token</th><th>总 Token</th></tr></thead><tbody>${modelRows}</tbody></table></div>${callDetails}`;
 }
 function productionMetrics(doc) {
   if (!doc || doc.schema !== 'model-request-metrics@1' || doc.scope !== 'classified-production' || !Array.isArray(doc.models)) return '<p class="empty">未配置现网指标数据源，或采集数据不可用。</p>';
@@ -539,67 +769,6 @@ function questionCount(point) {
   return Number.isFinite(point?.query_ms) ? 1 : 0;
 }
 
-// Suite-wide question stats per day: median question latency plus failed and
-// blocked question counts. Blocked questions are reported separately because
-// the case dashboard treats a blocked run as not failed. Points may carry
-// explicit failed_queries/blocked_queries counts (production gateways know
-// per-request outcomes); benchmark points without them fall back to status.
-function dailyQuestionStats(history) {
-  const byDate = new Map();
-  for (const entry of Object.values(history?.cases || {})) {
-    for (const point of entry?.points || []) {
-      const date = String(point?.date || '');
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
-      if (!byDate.has(date)) byDate.set(date, { date, queries: 0, failed: 0, blocked: 0, values: [] });
-      const day = byDate.get(date);
-      const count = questionCount(point);
-      day.queries += count;
-      const failedCount = Number.isFinite(point?.failed_queries)
-        ? Math.max(0, Math.min(Number(point.failed_queries), count))
-        : point?.status === 'FAILED'
-          ? count
-          : 0;
-      const blockedCount = Number.isFinite(point?.blocked_queries)
-        ? Math.max(0, Math.min(Number(point.blocked_queries), count - failedCount))
-        : point?.status === 'BLOCKED'
-          ? count
-          : 0;
-      day.failed += failedCount;
-      day.blocked += blockedCount;
-      if (Number.isFinite(point?.query_ms)) day.values.push(point.query_ms);
-    }
-  }
-  return [...byDate.values()]
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .map(({ values, ...day }) => ({
-      ...day,
-      median_ms: median(values),
-      failure_rate: day.queries > 0 ? (day.failed / day.queries) * 100 : null,
-    }));
-}
-
-// The baseline is the median of the previous days' daily medians; the upper
-// limit keeps the reference dashboard's 1.5x rule.
-function baselineStats(history, ratio = 1.5) {
-  const days = dailyQuestionStats(history);
-  const withMedian = days.filter((day) => Number.isFinite(day.median_ms));
-  if (!withMedian.length) return null;
-  const current = withMedian[withMedian.length - 1];
-  const prior = withMedian.slice(0, -1);
-  const baseline = median(prior.map((day) => day.median_ms));
-  const limit = Number.isFinite(baseline) ? Math.round(baseline * ratio) : null;
-  const change = Number.isFinite(baseline) && baseline > 0 ? ((current.median_ms - baseline) / baseline) * 100 : null;
-  const failure = [...days].reverse().find((day) => day.queries > 0) || null;
-  return {
-    current,
-    baseline_ms: baseline,
-    limit_ms: limit,
-    change_percent: change,
-    baseline_days: prior.length,
-    failure,
-  };
-}
-
 // Attribute failures only when the source point describes exactly one model.
 function failureSeries(history, dates, model) {
   const wanted = new Set((dates || []).map((day) => day?.date).filter(Boolean));
@@ -649,97 +818,143 @@ function weeklyFailureRates(failures) {
   return new Map([...weeks].map(([start, row]) => [start, row.complete && row.queries > 0 ? row.failed / row.queries * 100 : null]));
 }
 
+// The strip summarizes the latest complete day with request-level numbers:
+// a volume-weighted mean and raw-distribution percentiles, never a median of
+// daily means. Values the collector could not establish stay as "—".
 function perfStrip(history) {
-  const stats = baselineStats(history);
-  if (!stats) return '';
-  const { current, baseline_ms, limit_ms, change_percent, baseline_days } = stats;
-  const changeTone = !Number.isFinite(change_percent) || Math.abs(change_percent) < 0.05
-    ? ''
-    : change_percent < 0 ? 'ok' : 'failed';
-  const changeText = Number.isFinite(change_percent)
-    ? `${change_percent > 0 ? '+' : ''}${change_percent.toFixed(1)}%`
-    : '—';
-  const changeHint = Number.isFinite(change_percent)
-    ? `${change_percent < 0 ? '低于' : '高于'}基线 ${fmtDuration(Math.abs(current.median_ms - baseline_ms))}`
-    : '暂无可比基线';
-  const failure = stats.failure;
+  const anchor = historyCompleteThrough(history);
+  const days = suiteDayStats(history).filter((row) => !anchor || row.date <= anchor);
+  if (!days.length) return '';
+  const latest = anchor ? days.find((row) => row.date === anchor) || days[days.length - 1] : days[days.length - 1];
+  const previous = [...days].reverse().find((row) => row.date < latest.date) || null;
+  const historyDays = days.length;
   return `
     <div class="stat-card">
-      <div class="stat-label">当前请求中位数</div>
-      <div class="stat-value">${fmtDuration(current.median_ms)}</div>
-      <div class="stat-hint">${esc(current.date)} · 全部用例 · ${fmtCount(current.queries)} 个请求</div>
+      <div class="stat-label">最新完整日</div>
+      <div class="stat-value">${esc(latest.date)}</div>
+      <div class="stat-hint">${historyDays} 天历史 · 成功 ${fmtCount(latest.success_count)} / 调用 ${fmtCount(latest.calls)}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">基线中位数</div>
-      <div class="stat-value">${fmtDuration(baseline_ms)}</div>
-      <div class="stat-hint">${baseline_days ? `此前 ${baseline_days} 天每日中位数` : '暂无历史基线'}</div>
+      <div class="stat-label">网关平均耗时</div>
+      <div class="stat-value">${fmtDuration(latest.duration_ms)}</div>
+      <div class="stat-hint">不含端侧与网络 · ${fmtCount(latest.duration_samples)} 个成功样本</div>
+      ${deltaChip(latest.duration_ms, previous?.duration_ms, { lowerIsBetter: true }) ? `<div class="stat-delta">${deltaChip(latest.duration_ms, previous?.duration_ms, { lowerIsBetter: true })}</div>` : ''}
     </div>
     <div class="stat-card">
-      <div class="stat-label">上限</div>
-      <div class="stat-value">${fmtDuration(limit_ms)}</div>
-      <div class="stat-hint">基线中位数 × 1.5</div>
+      <div class="stat-label">网关 P50 区间</div>
+      <div class="stat-value">${esc(p50RangeText(latest))}</div>
+      <div class="stat-hint">请求级分位 · 各模型区间</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">较基线</div>
-      <div class="stat-value ${changeTone}">${esc(changeText)}</div>
-      <div class="stat-hint">${esc(changeHint)}</div>
+      <div class="stat-label">网关 P95 区间</div>
+      <div class="stat-value">${esc(p95RangeText(latest))}</div>
+      <div class="stat-hint">请求级分位 · 至少 20 个成功样本</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">请求失败率</div>
-      <div class="stat-value ${failure?.failed ? 'failed' : 'ok'}">${failure ? fmtPercent(failure.failure_rate) : '—'}</div>
-      <div class="stat-hint">${failure ? `失败 ${fmtCount(failure.failed)} / 请求 ${fmtCount(failure.queries)}${failure.blocked ? ` · 阻塞 ${fmtCount(failure.blocked)}` : ''}` : '暂无请求数据'}</div>
+      <div class="stat-value ${latest.failed ? 'failed' : 'ok'}">${fmtPercent(latest.failure_rate)}</div>
+      <div class="stat-hint">失败 ${fmtCount(latest.failed)} / 调用 ${fmtCount(latest.calls)}${latest.blocked ? ` · 阻塞 ${fmtCount(latest.blocked)}` : ''}</div>
     </div>
   `;
+}
+
+function newTokenTally() {
+  return { sum: 0, samples: 0 };
 }
 
 function newMetricAccumulator() {
   return {
     calls: 0,
     queries: 0,
+    success: 0,
+    duration_sum: 0,
+    duration_samples: 0,
     ttft_sum: 0,
     ttft_samples: 0,
+    ttft_est_sum: 0,
+    ttft_est_samples: 0,
+    ttft_filtered: 0,
     tpot_sum: 0,
     tpot_samples: 0,
+    tpot_filtered: 0,
+    p50_min: null,
+    p50_max: null,
+    p50_complete: true,
     p95_min: null,
     p95_max: null,
     p95_complete: true,
-    duration_samples: 0,
-    input_sum: 0,
-    input_complete: true,
-    output_sum: 0,
-    output_complete: true,
-    total_sum: 0,
-    total_complete: true,
+    input: newTokenTally(),
+    output: newTokenTally(),
+    total: newTokenTally(),
+    failed_input: newTokenTally(),
+    failed_output: newTokenTally(),
+    failed_total: newTokenTally(),
   };
 }
 
 // Raw benchmark rows (and already-finalized day rows) share the same metric
 // fields, so both can be folded with one accumulator.
 function mergeMetricRow(acc, row) {
-  acc.calls += Number.isFinite(row?.calls) && row.calls > 0 ? row.calls : 0;
-  acc.queries += Number.isFinite(row?.queries) && row.queries > 0 ? row.queries : 0;
-  for (const key of ['ttft', 'tpot']) {
-    const value = row?.[`${key}_ms`];
-    const samples = row?.[`${key}_samples`];
+  const positive = (value) => (Number.isFinite(value) && value > 0 ? value : 0);
+  acc.calls += positive(row?.calls);
+  acc.queries += positive(row?.queries);
+
+  const durationSamples = positive(row?.duration_samples) || positive(row?.duration_sample_count);
+  // A snapshot without success counts predates metrics_version 2; its measured
+  // durations are by definition successful calls, so use them as the fallback.
+  acc.success += Number.isFinite(row?.success_count)
+    ? positive(row.success_count)
+    : Number.isFinite(row?.success) ? positive(row.success) : durationSamples;
+  let durationSum = Number.isFinite(row?.duration_sum_ms) && row.duration_sum_ms >= 0
+    ? row.duration_sum_ms
+    : null;
+  if (durationSum === null && Number.isFinite(row?.duration_ms) && durationSamples > 0) {
+    durationSum = row.duration_ms * durationSamples;
+  }
+  if (durationSum !== null && durationSamples > 0) {
+    acc.duration_sum += durationSum;
+    acc.duration_samples += durationSamples;
+  }
+
+  for (const key of ['ttft', 'ttft_est', 'tpot']) {
+    const valueField = key === 'ttft_est' ? 'ttft_estimated_ms' : `${key}_ms`;
+    const sampleField = key === 'ttft_est' ? 'ttft_estimated_samples' : `${key}_samples`;
+    const value = Number.isFinite(row?.[valueField]) ? row[valueField] : null;
+    const sampleCount = positive(row?.[sampleField]) || positive(row?.[`${key}_samples`]);
+    const samples = sampleCount;
     if (Number.isFinite(value) && value >= 0 && Number.isFinite(samples) && samples > 0) {
-      acc[`${key}_sum`] += value * samples;
+      const reportedSum = row?.[`${key}_sum_ms`];
+      const sum = Number.isFinite(reportedSum) && reportedSum >= 0 ? reportedSum : value * samples;
+      acc[`${key}_sum`] += sum;
       acc[`${key}_samples`] += samples;
     }
   }
-  if (Number.isFinite(row?.p95_ms) && row.p95_ms >= 0) {
-    const upper = row.p95_ms;
-    const lower = Number.isFinite(row.p95_lower_ms) && row.p95_lower_ms >= 0 ? row.p95_lower_ms : upper;
-    acc.p95_min = acc.p95_min === null ? lower : Math.min(acc.p95_min, lower);
-    acc.p95_max = acc.p95_max === null ? upper : Math.max(acc.p95_max, upper);
+  acc.ttft_filtered += positive(row?.ttft_filtered_count);
+  acc.tpot_filtered += positive(row?.tpot_filtered_count);
+  for (const key of ['p50', 'p95']) {
+    const upper = row?.[`${key}_ms`];
+    if (Number.isFinite(upper) && upper >= 0) {
+      const lower = Number.isFinite(row?.[`${key}_lower_ms`]) && row[`${key}_lower_ms`] >= 0
+        ? row[`${key}_lower_ms`]
+        : upper;
+      acc[`${key}_min`] = acc[`${key}_min`] === null ? lower : Math.min(acc[`${key}_min`], lower);
+      acc[`${key}_max`] = acc[`${key}_max`] === null ? upper : Math.max(acc[`${key}_max`], upper);
+    }
+    if (durationSamples > 0 && !Number.isFinite(upper)) acc[`${key}_complete`] = false;
   }
-  if (Number.isFinite(row?.duration_samples) && row.duration_samples > 0) {
-    acc.duration_samples += row.duration_samples;
-    if (!Number.isFinite(row.p95_ms)) acc.p95_complete = false;
-  }
+  const tokenSamples = positive(row?.token_sample_count) || durationSamples;
   for (const key of ['input', 'output', 'total']) {
     const value = row?.[`${key}_tokens`];
-    if (Number.isFinite(value) && value >= 0) acc[`${key}_sum`] += value;
-    else acc[`${key}_complete`] = false;
+    if (Number.isFinite(value) && value >= 0 && tokenSamples > 0) {
+      acc[key].sum += value;
+      acc[key].samples += tokenSamples;
+    }
+    const failed = row?.[`failed_${key}_tokens`];
+    const failedSamples = positive(row?.failed_token_sample_count);
+    if (Number.isFinite(failed) && failed >= 0 && failedSamples > 0) {
+      acc[`failed_${key}`].sum += failed;
+      acc[`failed_${key}`].samples += failedSamples;
+    }
   }
 }
 
@@ -747,37 +962,85 @@ function finalizeMetricAccumulator(acc) {
   const result = {
     calls: acc.calls,
     queries: acc.queries,
+    success_count: acc.success,
+    duration_samples: acc.duration_samples,
+    duration_ms: acc.duration_samples > 0 ? acc.duration_sum / acc.duration_samples : null,
     ttft_ms: acc.ttft_samples > 0 ? acc.ttft_sum / acc.ttft_samples : null,
     ttft_samples: acc.ttft_samples,
+    ttft_estimated_ms: acc.ttft_est_samples > 0 ? acc.ttft_est_sum / acc.ttft_est_samples : null,
+    ttft_estimated_samples: acc.ttft_est_samples,
+    ttft_filtered_count: acc.ttft_filtered,
     tpot_ms: acc.tpot_samples > 0 ? acc.tpot_sum / acc.tpot_samples : null,
     tpot_samples: acc.tpot_samples,
+    tpot_filtered_count: acc.tpot_filtered,
+    p50_lower_ms: acc.p50_complete ? acc.p50_min : null,
+    p50_ms: acc.p50_complete ? acc.p50_max : null,
     p95_lower_ms: acc.p95_complete ? acc.p95_min : null,
     p95_ms: acc.p95_complete ? acc.p95_max : null,
-    duration_samples: acc.duration_samples,
   };
+  result.token_sample_count = acc.total.samples;
+  result.failed_token_sample_count = acc.failed_total.samples;
+  result.token_coverage = acc.success > 0 && acc.total.samples > 0
+    ? Math.min(1, acc.total.samples / acc.success)
+    : null;
   for (const key of ['input', 'output', 'total']) {
-    const total = acc[`${key}_complete`] ? acc[`${key}_sum`] : null;
+    const tally = acc[key];
+    const total = tally.samples > 0 ? tally.sum : null;
     result[`${key}_tokens`] = total;
-    result[`${key}_per_request`] = total !== null && acc.calls > 0 ? total / acc.calls : null;
+    result[`${key}_per_request`] = total !== null ? total / tally.samples : null;
     result[`${key}_per_query`] = total !== null && acc.queries > 0 ? total / acc.queries : null;
+    const failed = acc[`failed_${key}`];
+    result[`failed_${key}_tokens`] = failed.samples > 0 ? failed.sum : null;
   }
   return result;
 }
 
-function benchmarkRowToMetric(row) {
+// Older snapshots carry only per-row means. The duration sum can still be
+// reconstructed exactly from mean x samples; TTFT/TPOT and tokens likewise.
+// Fields the snapshot never recorded stay absent and are reported as such.
+function benchmarkRowToMetric(row, point = null) {
   const positive = (value) => (Number.isFinite(value) && value > 0 ? value : 0);
   const metric = (value) => (Number.isFinite(value) && value >= 0 ? value : null);
+  // A v2 row states its successful sample count through success_count and
+  // duration_sum_ms; a null sum means no call succeeded, not a missing mean.
+  const legacy = !('duration_sum_ms' in (row || {})) && !Number.isFinite(row?.success_count);
+  const samples = positive(row?.duration_sample_count)
+    || (legacy ? positive(row?.call_count) : 0);
+  let durationSum = metric(row?.duration_sum_ms);
+  // A snapshot written before rows carried their own sum can still be rebuilt
+  // exactly when the point describes a single model: point.query_ms is then
+  // that model's successful mean for the day.
+  const soleModel = (point?.benchmark_models || []).length <= 1;
+  if (durationSum === null && point && samples > 0 && (legacy || soleModel)
+      && Number.isFinite(point.query_ms)) {
+    durationSum = point.query_ms * samples;
+  }
   return {
     calls: positive(row?.call_count),
+    success_count: Number.isFinite(row?.success_count) ? positive(row.success_count) : null,
+    duration_sum_ms: durationSum,
+    duration_samples: samples,
     ttft_ms: metric(row?.ttft_avg_ms),
     ttft_samples: positive(row?.ttft_sample_count),
+    ttft_sum_ms: metric(row?.ttft_sum_ms),
+    ttft_estimated_ms: metric(row?.ttft_estimated_avg_ms),
+    ttft_estimated_samples: positive(row?.ttft_estimated_sample_count),
+    ttft_estimated_sum_ms: metric(row?.ttft_estimated_sum_ms),
+    ttft_filtered_count: positive(row?.ttft_filtered_count),
     tpot_ms: metric(row?.tpot_avg_ms),
     tpot_samples: positive(row?.tpot_sample_count),
-    p95_ms: metric(row?.duration_p95_ms),
-    duration_samples: positive(row?.duration_sample_count),
+    tpot_sum_ms: metric(row?.tpot_sum_ms),
+    tpot_filtered_count: positive(row?.tpot_filtered_count),
+    p50_ms: metric(row?.duration_p50_ms ?? point?.duration_p50_ms),
+    p95_ms: metric(row?.duration_p95_ms ?? point?.duration_p95_ms),
     input_tokens: metric(row?.input_tokens),
     output_tokens: metric(row?.output_tokens),
     total_tokens: metric(row?.total_tokens),
+    token_sample_count: positive(row?.token_sample_count),
+    failed_input_tokens: metric(row?.failed_input_tokens),
+    failed_output_tokens: metric(row?.failed_output_tokens),
+    failed_total_tokens: metric(row?.failed_total_tokens),
+    failed_token_sample_count: positive(row?.failed_token_sample_count),
   };
 }
 
@@ -793,7 +1056,7 @@ function modelSeries(history, model) {
       if (!matched.length) continue;
       if (!byDate.has(date)) byDate.set(date, { acc: newMetricAccumulator(), version: null });
       const slot = byDate.get(date);
-      for (const row of matched) mergeMetricRow(slot.acc, benchmarkRowToMetric(row));
+      for (const row of matched) mergeMetricRow(slot.acc, benchmarkRowToMetric(row, point));
       // Count the day's questions once per model, not once per model row.
       slot.acc.queries += questionCount(point);
       // Keep the freshest contributing point's provenance so the daily table
@@ -810,6 +1073,7 @@ function modelSeries(history, model) {
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([date, slot]) => ({
       date,
+      partial: date === historyPartialDay(history),
       run_id: slot.version?.run_id || '',
       commit: slot.version?.commit || '',
       ...finalizeMetricAccumulator(slot.acc),
@@ -868,6 +1132,20 @@ function latestModelDate(history) {
     if (date > latest) latest = date;
   }
   return latest;
+}
+
+function busiestModel(history, names = benchmarkModelNames(history)) {
+  const anchor = historyCompleteThrough(history) || latestModelDate(history);
+  let best = names[0] || null;
+  let bestCalls = -1;
+  for (const name of names) {
+    const calls = recentCallsForDays(modelSeries(history, name), anchor);
+    if (calls > bestCalls) {
+      best = name;
+      bestCalls = calls;
+    }
+  }
+  return best;
 }
 
 // SVG charts scale their whole viewBox, labels included. On a phone a fixed
@@ -1042,11 +1320,22 @@ function volumeTrendChart(days, failures, visibility = {}) {
   </svg><p class="chart-note">调用数使用左侧计数轴，请求失败率使用右侧百分比轴（所选模型的请求）。</p></div>`;
 }
 
-function p95RangeText(row) {
-  const upper = row?.p95_ms;
+// A merged row joins several models, so its P50/P95 are ranges: the lowest and
+// highest request-level percentile among contributing models. A single day
+// with one model collapses to one number.
+function percentileRangeText(row, key) {
+  const upper = row?.[`${key}_ms`];
   if (!Number.isFinite(upper)) return '—';
-  const lower = Number.isFinite(row?.p95_lower_ms) ? row.p95_lower_ms : upper;
+  const lower = Number.isFinite(row?.[`${key}_lower_ms`]) ? row[`${key}_lower_ms`] : upper;
   return lower === upper ? fmtDuration(upper) : `${fmtDuration(lower)} – ${fmtDuration(upper)}`;
+}
+
+function p50RangeText(row) {
+  return percentileRangeText(row, 'p50');
+}
+
+function p95RangeText(row) {
+  return percentileRangeText(row, 'p95');
 }
 
 // TTFT and P95 are both milliseconds on the left axis. TPOT joins the same
@@ -1057,20 +1346,29 @@ function latencyTrendChart(points, visibility = {}) {
   const isVisible = (key) => visibility?.[key] !== false;
   const series = (key) => rows.map((row) => (Number.isFinite(row?.[key]) ? row[key] : null));
   const ttft = series('ttft_ms');
+  const ttftEstimate = series('ttft_estimated_ms');
   const tpot = series('tpot_ms');
   const upper = series('p95_ms');
   const lower = rows.map((row) => {
     if (!Number.isFinite(row?.p95_ms)) return null;
     return Number.isFinite(row?.p95_lower_ms) ? row.p95_lower_ms : row.p95_ms;
   });
-  const leftUsable = [...ttft, ...upper].filter((value) => value !== null);
+  const p50Upper = series('p50_ms');
+  const p50Lower = rows.map((row) => {
+    if (!Number.isFinite(row?.p50_ms)) return null;
+    return Number.isFinite(row?.p50_lower_ms) ? row.p50_lower_ms : row.p50_ms;
+  });
+  const leftUsable = [...ttft, ...ttftEstimate, ...p50Upper, ...upper].filter((value) => value !== null);
   const tpotUsable = tpot.filter((value) => value !== null);
   const hasTpot = tpotUsable.length > 0;
   const usable = [...leftUsable, ...tpotUsable];
 
   const legend = [
-    { key: 'ttft', label: '平均 TTFT', style: 'ttft' },
-    { key: 'tpot', label: '平均 TPOT', style: 'tpot' },
+    { key: 'ttft', label: 'TTFT（流式）', style: 'ttft' },
+    { key: 'ttft_est', label: 'TTFT 估算（流式未知）', style: 'ttft-est' },
+    { key: 'tpot', label: 'TPOT（流式）', style: 'tpot' },
+    { key: 'p50_upper', label: 'P50 上界', style: 'p50' },
+    { key: 'p50_lower', label: 'P50 下界', style: 'p50 lower' },
     { key: 'p95_upper', label: 'P95 上界', style: 'p95' },
     { key: 'p95_lower', label: 'P95 下界', style: 'p95 lower' },
   ]
@@ -1081,7 +1379,7 @@ function latencyTrendChart(points, visibility = {}) {
       </button>`;
     })
     .join('');
-  const head = `<div class="trend-head"><h3>延迟（TTFT · TPOT · P95）</h3><div class="trend-legend">${legend}</div></div>`;
+  const head = `<div class="trend-head"><h3>网关延迟（TTFT · TPOT · P50 / P95）</h3><div class="trend-legend">${legend}</div></div>`;
   if (!usable.length) return `<div class="trend-card wide">${head}<p class="empty">暂无数据</p></div>`;
 
   const { width, height } = chartSize(1000, 220);
@@ -1179,9 +1477,12 @@ function latencyTrendChart(points, visibility = {}) {
   const zoneWidth = rows.length > 1 ? innerWidth / (rows.length - 1) : innerWidth;
   const zones = rows
     .map((row, index) => {
-      const lines = [String(row?.date || '')];
-      if (isVisible('ttft') && ttft[index] !== null) lines.push(`${fmtDuration(ttft[index])} · 平均 TTFT`);
-      if (isVisible('tpot') && tpot[index] !== null) lines.push(`${fmtTpot(tpot[index])} · 平均 TPOT`);
+      const lines = [String(row?.date || '') + (row?.partial ? ' · 部分日' : '')];
+      if (isVisible('ttft') && ttft[index] !== null) lines.push(`${fmtDuration(ttft[index])} · TTFT（流式）`);
+      if (isVisible('ttft_est') && ttftEstimate[index] !== null) lines.push(`${fmtDuration(ttftEstimate[index])} · TTFT 估算（流式未知）`);
+      if (isVisible('tpot') && tpot[index] !== null) lines.push(`${fmtTpot(tpot[index])} · TPOT（流式）`);
+      if (isVisible('p50_upper') && p50Upper[index] !== null) lines.push(`${fmtDuration(p50Upper[index])} · P50 上界`);
+      if (isVisible('p50_lower') && p50Lower[index] !== null) lines.push(`${fmtDuration(p50Lower[index])} · P50 下界`);
       if (isVisible('p95_upper') && upper[index] !== null) lines.push(`${fmtDuration(upper[index])} · P95 上界`);
       if (isVisible('p95_lower') && lower[index] !== null) lines.push(`${fmtDuration(lower[index])} · P95 下界`);
       if (lines.length === 1) return '';
@@ -1192,24 +1493,27 @@ function latencyTrendChart(points, visibility = {}) {
     })
     .join('');
 
-  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="平均 TTFT、TPOT 与耗时 P95 区间趋势">
+  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="流式 TTFT、TPOT 与请求级 P50 / P95 趋势">
     ${grid}
     <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
     ${bands ? `<path class="p95-band" d="${bands}" />` : ''}
     ${layer('ttft', ttft, 'ttft')}
+    ${layer('ttft_est', ttftEstimate, 'ttft-est', true)}
     ${hasTpot ? layer('tpot', tpot, 'tpot', true, yRight) : ''}
+    ${layer('p50_upper', p50Upper, 'p50-upper')}
+    ${layer('p50_lower', p50Lower, 'p50-lower', false)}
     ${layer('p95_upper', upper, 'p95-upper')}
     ${layer('p95_lower', lower, 'p95-lower', false)}
     ${xLabels}
     <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
     ${zones}
-  </svg><p class="chart-note">TTFT 与 P95 共用左侧毫秒轴，TPOT 使用右侧 ms/token 轴；P95 实线为上界、虚线为下界，阴影为区间。</p></div>`;
+  </svg><p class="chart-note">TTFT 只统计 <code>stream === true</code> 的成功调用；流式状态未知的样本单独成虚线（估算），不并入主均值。P50/P95 为成功调用的请求级分位，至少 20 个样本；TTFT、P50、P95 共用左侧毫秒轴，TPOT 使用右侧 ms/token 轴。</p></div>`;
 }
 
 function tokenTrendChart(points, visibility = {}, unit = 'query') {
   const rows = Array.isArray(points) ? points : [];
   const suffix = unit === 'request' ? 'per_request' : 'per_query';
-  const unitLabel = unit === 'request' ? '请求' : '提问';
+  const unitLabel = unit === 'request' ? '成功调用' : '网关调用';
   const definitions = [
     { key: 'input_per_request', field: 'input', label: `输入 / ${unitLabel}`, layer: 'input' },
     { key: 'output_per_request', field: 'output', label: `输出 / ${unitLabel}`, layer: 'output' },
@@ -1331,53 +1635,85 @@ function modelTrends(days, tokenVisibility = {}, latencyVisibility = {}, { token
 }
 
 function modelSummary(days, model, { unit = 'query', failure = null } = {}) {
-  if (!days.length) return '<p class="empty">暂无该模型的按日数据。</p>';
+  if (!days.length) return '<p class="empty">暂无该模型的完整日数据。</p>';
   const latest = days[days.length - 1];
   const previous = previousRow(days);
   const hint = (base, delta) => `${base}${delta ? ` · ${delta}` : ''}`;
   const suffix = unit === 'request' ? 'per_request' : 'per_query';
-  const unitLabel = unit === 'request' ? '请求' : '提问';
+  const unitLabel = unit === 'request' ? '成功调用' : '网关调用';
+  const tokenCoverage = Number.isFinite(latest.token_coverage)
+    ? fmtPercent(latest.token_coverage * 100)
+    : '—';
+  const estimateCoverage = latest.success_count > 0
+    ? fmtPercent((latest.ttft_estimated_samples / latest.success_count) * 100)
+    : '—';
+  const estimateCard = latest.ttft_estimated_samples > 0
+    ? `<div class="stat-card">
+      <div class="stat-label">TTFT 估算（覆盖率 ${esc(estimateCoverage)}）</div>
+      <div class="stat-value">${fmtDuration(latest.ttft_estimated_ms)}</div>
+      <div class="stat-hint">流式状态未知 · ${fmtCount(latest.ttft_estimated_samples)} 个样本 · 不并入主均值</div>
+    </div>`
+    : '';
+  const failedCard = Number.isFinite(latest.failed_total_tokens)
+    ? `<div class="stat-card">
+      <div class="stat-label">失败尝试消耗</div>
+      <div class="stat-value">${fmtToken(latest.failed_total_tokens)}</div>
+      <div class="stat-hint">输入 ${fmtToken(latest.failed_input_tokens)} · 输出 ${fmtToken(latest.failed_output_tokens)} · 不计入成功率与均值</div>
+    </div>`
+    : '';
   return `
     <div class="stat-card">
-      <div class="stat-label">最新数据</div>
+      <div class="stat-label">最新完整日</div>
       <div class="stat-value">${esc(latest.date)}</div>
-      <div class="stat-hint">${days.length} 天 · ${esc(model)}</div>
+      <div class="stat-hint">${days.length} 个完整日 · ${esc(model)}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">当日调用数</div>
+      <div class="stat-label">网关调用数</div>
       <div class="stat-value">${fmtCount(latest.calls)}</div>
-      <div class="stat-hint">${hint('现网调用', deltaChip(latest.calls, previous?.calls))}</div>
+      <div class="stat-hint">${hint(`成功 ${fmtCount(latest.success_count)} / 失败 ${fmtCount(latest.calls - latest.success_count)}`, deltaChip(latest.calls, previous?.calls))}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">平均 TTFT</div>
-      <div class="stat-value">${fmtDuration(latest.ttft_ms)}</div>
-      <div class="stat-hint">${hint(`${fmtCount(latest.ttft_samples)} 个样本`, deltaChip(latest.ttft_ms, previous?.ttft_ms, { lowerIsBetter: true }))}</div>
+      <div class="stat-label">网关平均耗时</div>
+      <div class="stat-value">${fmtDuration(latest.duration_ms)}</div>
+      <div class="stat-hint">${hint(`不含端侧与网络 · ${fmtCount(latest.duration_samples)} 个成功样本`, deltaChip(latest.duration_ms, previous?.duration_ms, { lowerIsBetter: true }))}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">平均 TPOT</div>
-      <div class="stat-value">${fmtTpot(latest.tpot_ms)}</div>
-      <div class="stat-hint">${hint(`${fmtCount(latest.tpot_samples)} 个样本`, deltaChip(latest.tpot_ms, previous?.tpot_ms, { lowerIsBetter: true }))}</div>
+      <div class="stat-label">网关 P50 区间</div>
+      <div class="stat-value">${esc(p50RangeText(latest))}</div>
+      <div class="stat-hint">请求级分位 · ${fmtCount(latest.duration_samples)} 个成功样本</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">耗时 P95 区间</div>
+      <div class="stat-label">网关 P95 区间</div>
       <div class="stat-value">${esc(p95RangeText(latest))}</div>
-      <div class="stat-hint">${hint(`${fmtCount(latest.duration_samples)} 个样本`, deltaChip(latest.p95_ms, previous?.p95_ms, { lowerIsBetter: true }))}</div>
+      <div class="stat-hint">请求级分位 · ${fmtCount(latest.duration_samples)} 个成功样本</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">平均 TTFT（流式）</div>
+      <div class="stat-value">${fmtDuration(latest.ttft_ms)}</div>
+      <div class="stat-hint">${latest.ttft_samples ? `${fmtCount(latest.ttft_samples)} 个已确认流式成功样本` : '无已确认流式成功调用'}</div>
+    </div>
+    ${estimateCard}
+    <div class="stat-card">
+      <div class="stat-label">平均 TPOT（流式）</div>
+      <div class="stat-value">${fmtTpot(latest.tpot_ms)}</div>
+      <div class="stat-hint">${hint(`${fmtCount(latest.tpot_samples)} 个已确认流式样本`, deltaChip(latest.tpot_ms, previous?.tpot_ms, { lowerIsBetter: true }))}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">输入 Token / ${unitLabel}</div>
       <div class="stat-value">${fmtToken(latest[`input_${suffix}`])}</div>
-      <div class="stat-hint">${hint(`当日合计 ${fmtToken(latest.input_tokens)}`, deltaChip(latest[`input_${suffix}`], previous?.[`input_${suffix}`], { colorDirection: true }))}</div>
+      <div class="stat-hint">${hint(`当日合计 ${fmtToken(latest.input_tokens)} · 覆盖率 ${esc(tokenCoverage)}`, deltaChip(latest[`input_${suffix}`], previous?.[`input_${suffix}`], { colorDirection: true }))}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">输出 Token / ${unitLabel}</div>
       <div class="stat-value">${fmtToken(latest[`output_${suffix}`])}</div>
-      <div class="stat-hint">${hint(`当日合计 ${fmtToken(latest.output_tokens)}`, deltaChip(latest[`output_${suffix}`], previous?.[`output_${suffix}`], { colorDirection: true }))}</div>
+      <div class="stat-hint">${hint(`当日合计 ${fmtToken(latest.output_tokens)} · 覆盖率 ${esc(tokenCoverage)}`, deltaChip(latest[`output_${suffix}`], previous?.[`output_${suffix}`], { colorDirection: true }))}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">总 Token / ${unitLabel}</div>
       <div class="stat-value">${fmtToken(latest[`total_${suffix}`])}</div>
-      <div class="stat-hint">${hint(`当日合计 ${fmtToken(latest.total_tokens)}`, deltaChip(latest[`total_${suffix}`], previous?.[`total_${suffix}`], { colorDirection: true }))}</div>
+      <div class="stat-hint">${hint(`当日合计 ${fmtToken(latest.total_tokens)} · 覆盖率 ${esc(tokenCoverage)}`, deltaChip(latest[`total_${suffix}`], previous?.[`total_${suffix}`], { colorDirection: true }))}</div>
     </div>
+    ${failedCard}
     <div class="stat-card">
       <div class="stat-label">请求失败率</div>
       <div class="stat-value ${failure ? (failure.failed ? 'failed' : 'ok') : ''}">${failure ? fmtPercent(failure.failure_rate) : '—'}</div>
@@ -1393,7 +1729,7 @@ const REGRESSION_THRESHOLD = 20;
 function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'query', showVersion = false } = {}) {
   if (!Array.isArray(rows) || !rows.length) return '<p class="empty">暂无统计数据。</p>';
   const suffix = unit === 'request' ? 'per_request' : 'per_query';
-  const unitLabel = unit === 'request' ? '请求' : '提问';
+  const unitLabel = unit === 'request' ? '成功调用' : '网关调用';
   const versionHead = showVersion ? '<th>版本</th>' : '';
   const body = [...rows]
     .map((row, index) => {
@@ -1401,27 +1737,34 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
       const previous = prior && (!row.date || addDays(prior.date, 1) === row.date) ? prior : null;
       const ttftChip = deltaChip(row?.ttft_ms, previous?.ttft_ms, { lowerIsBetter: true, label: '' });
       const tpotChip = deltaChip(row?.tpot_ms, previous?.tpot_ms, { lowerIsBetter: true, label: '' });
+      const p50Chip = deltaChip(row?.p50_ms, previous?.p50_ms, { lowerIsBetter: true, label: '' });
       const p95Chip = deltaChip(row?.p95_ms, previous?.p95_ms, { lowerIsBetter: true, label: '' });
       const versionCell = showVersion
         ? `<td class="run-id" title="${esc([row?.run_id, row?.commit].filter(Boolean).join(' · '))}">${esc(shortVersion(row) || '—')}</td>`
         : '';
-      return `<tr>
-        <td>${esc(row?.[dateKey] ?? '—')}</td>${versionCell}
+      const partialBadge = row?.partial ? ' <span class="badge partial" title="当日采集尚未结束">部分日</span>' : '';
+      const estimate = row?.ttft_estimated_samples
+        ? `<span class="metric-samples">估算 ${fmtDuration(row.ttft_estimated_ms)}（${fmtCount(row.ttft_estimated_samples)}）</span>`
+        : '';
+      return `<tr${row?.partial ? ' class="is-partial"' : ''}>
+        <td>${esc(row?.[dateKey] ?? '—')}${partialBadge}</td>${versionCell}
         <td class="num">${fmtCount(row?.calls)}</td>
-        <td class="num">${fmtCount(row?.queries)}</td>
+        <td class="num">${fmtCount(row?.success_count)}</td>
         <td class="num">${fmtPercent(row?.failure_rate)}</td>
-        <td class="num metric-column"><span class="metric-cell"><span>${fmtDuration(row?.ttft_ms)}</span><span class="metric-samples">（${fmtCount(row?.ttft_samples)}）</span><span class="metric-change">${ttftChip}</span></span></td>
+        <td class="num metric-column"><span class="metric-cell"><span>${fmtDuration(row?.ttft_ms)}</span><span class="metric-samples">（${fmtCount(row?.ttft_samples)}）</span>${estimate}<span class="metric-change">${ttftChip}</span></span></td>
         <td class="num metric-column"><span class="metric-cell"><span>${fmtTpot(row?.tpot_ms)}</span><span class="metric-samples">（${fmtCount(row?.tpot_samples)}）</span><span class="metric-change">${tpotChip}</span></span></td>
+        <td class="num metric-column"><span class="metric-cell"><span>${esc(p50RangeText(row))}</span><span class="metric-samples">（${fmtCount(row?.duration_samples)}）</span><span class="metric-change">${p50Chip}</span></span></td>
         <td class="num metric-column"><span class="metric-cell"><span>${esc(p95RangeText(row))}</span><span class="metric-samples">（${fmtCount(row?.duration_samples)}）</span><span class="metric-change">${p95Chip}</span></span></td>
         <td class="num">${fmtToken(row?.[`input_${suffix}`])}</td>
         <td class="num">${fmtToken(row?.[`output_${suffix}`])}</td>
-        <td class="num">${fmtToken(row?.[`total_${suffix}`])}</td>
+        <td class="num">${fmtToken(row?.[`total_${suffix}`])}<span class="metric-samples">${Number.isFinite(row?.token_coverage) ? `覆盖率 ${fmtPercent(row.token_coverage * 100)}` : ''}</span></td>
+        <td class="num">${fmtToken(row?.failed_total_tokens)}</td>
       </tr>`;
     })
     .reverse()
     .join('');
   return `<div class="table-wrap"><table class="history-table">
-    <thead><tr><th>${esc(label)}</th>${versionHead}<th>调用数</th><th>请求数</th><th title="所选模型的失败请求占全部请求的比例；未知状态时不显示">请求失败率</th><th class="metric-column">平均 TTFT（样本）</th><th class="metric-column">平均 TPOT（样本）</th><th class="metric-column">耗时 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th></tr></thead>
+    <thead><tr><th>${esc(label)}</th>${versionHead}<th>网关调用数</th><th>成功数</th><th title="所选模型的失败请求占全部请求的比例；未知状态时不显示">请求失败率</th><th class="metric-column">平均 TTFT（流式样本）</th><th class="metric-column">平均 TPOT（流式样本）</th><th class="metric-column">网关 P50 区间（样本）</th><th class="metric-column">网关 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th><th title="失败调用消耗的 Token，不计入成功率与均值">失败尝试 Token</th></tr></thead>
     <tbody>${body}</tbody>
   </table></div>`;
 }
@@ -1493,45 +1836,77 @@ function modelComparison(history, rangeDays = 0) {
     if (days.length) end = end > days[days.length - 1].date ? end : days[days.length - 1].date;
     perModel.set(name, days);
   }
+  // The comparison is anchored on the newest day every model could have
+  // finished; the in-progress day never reaches a headline row.
+  const anchor = historyCompleteThrough(history) || historyLatestDate(history);
+  if (anchor && (!end || end > anchor)) end = anchor;
   const span = Number(rangeDays);
   const start = Number.isFinite(span) && span > 0 && end ? addDays(end, -(Math.floor(span) - 1)) : '';
   const rows = [];
   for (const [name, days] of perModel) {
-    const scoped = start ? days.filter((day) => day.date >= start && day.date <= end) : days;
+    const scoped = days.filter((day) => (!end || day.date <= end) && (!start || day.date >= start));
     const acc = newMetricAccumulator();
     for (const day of scoped) mergeMetricRow(acc, day);
+    const failures = failureSeries(history, scoped, name);
+    let failed = 0;
+    let queries = 0;
+    let complete = failures.length > 0;
+    for (const row of failures) {
+      if (!Number.isFinite(row.failure_rate)) complete = false;
+      else {
+        failed += row.failed;
+        queries += row.queries;
+      }
+    }
+    const recentCalls = recentCallsForDays(days, end);
     rows.push({
       name,
       hasData: scoped.length > 0,
       totals: finalizeMetricAccumulator(acc),
       latest: scoped[scoped.length - 1],
       previous: previousRow(scoped),
+      recentCalls,
+      lowVolume: recentCalls < MIN_RECENT_CALLS,
+      failure_rate: complete && queries > 0 ? (failed / queries) * 100 : null,
+      failed,
+      queries,
     });
   }
-  return rows;
+  return rows.sort((a, b) => (Number(a.lowVolume) - Number(b.lowVolume))
+    || (b.totals.calls - a.totals.calls)
+    || a.name.localeCompare(b.name));
 }
 
 function modelCompareCard(rows, { selected = null } = {}) {
   if (!Array.isArray(rows) || !rows.length) return '<p class="empty">暂无模型数据。</p>';
-  const body = rows
-    .map((row) => {
-      const regressing = regressionFindings(row.latest, row.previous).length > 0;
-      const chip = deltaChip(row.latest?.ttft_ms, row.previous?.ttft_ms, { lowerIsBetter: true, label: '' });
-      return `<tr data-compare-model="${esc(row.name)}"${row.name === selected ? ' class="is-selected"' : ''}>
-        <td class="mono-cell"><button type="button" class="compare-model-button" data-select-model="${esc(row.name)}" aria-pressed="${row.name === selected}">${esc(row.name)}</button>${row.name === selected ? ' <span class="selected-model-badge">当前查看</span>' : ''}${regressing ? ' <span class="badge failed">回退</span>' : ''}</td>
-        <td class="num">${row.hasData ? fmtCount(row.totals.calls) : '无数据'}</td>
-        <td class="num">${fmtDuration(row.totals.ttft_ms)}</td>
-        <td class="num">${fmtTpot(row.totals.tpot_ms)}</td>
-        <td class="num">${esc(p95RangeText(row.totals))}</td>
-        <td class="num">${fmtToken(row.totals.output_per_query)}</td>
-        <td class="num">${fmtDuration(row.latest?.ttft_ms)}${chip ? ` ${chip}` : ''}</td>
-      </tr>`;
-    })
-    .join('');
-  return `<div class="table-wrap"><table class="history-table compare-table">
-    <thead><tr><th>模型</th><th>调用数</th><th>平均 TTFT</th><th>平均 TPOT</th><th>耗时 P95 区间</th><th>输出 / 请求</th><th>最新 TTFT 较前日</th></tr></thead>
-    <tbody>${body}</tbody>
-  </table></div>`;
+  const renderRow = (row) => {
+    const regressing = regressionFindings(row.latest, row.previous).length > 0;
+    const chip = deltaChip(row.latest?.ttft_ms, row.previous?.ttft_ms, { lowerIsBetter: true, label: '' });
+    return `<tr data-compare-model="${esc(row.name)}"${row.name === selected ? ' class="is-selected"' : ''}>
+      <td class="mono-cell"><button type="button" class="compare-model-button" data-select-model="${esc(row.name)}" aria-pressed="${row.name === selected}">${esc(row.name)}</button>${row.name === selected ? ' <span class="selected-model-badge">当前查看</span>' : ''}${regressing ? ' <span class="badge failed">回退</span>' : ''}${row.lowVolume ? ` <span class="badge low">低流量</span>` : ''}</td>
+      <td class="num">${row.hasData ? fmtCount(row.totals.calls) : '无数据'}</td>
+      <td class="num">${fmtDuration(row.totals.duration_ms)}</td>
+      <td class="num">${esc(p50RangeText(row.totals))}</td>
+      <td class="num">${esc(p95RangeText(row.totals))}</td>
+      <td class="num">${fmtDuration(row.totals.ttft_ms)}</td>
+      <td class="num">${fmtPercent(row.failure_rate)}${Number.isFinite(row.queries) && row.queries > 0 ? `<span class="metric-samples">（${fmtCount(row.failed)} / ${fmtCount(row.queries)}）</span>` : ''}</td>
+      <td class="num">${fmtDuration(row.latest?.ttft_ms)}${chip ? ` ${chip}` : ''}</td>
+    </tr>`;
+  };
+  const head = `<thead><tr><th>模型</th><th>网关调用数</th><th>网关平均耗时</th><th>网关 P50 区间</th><th>网关 P95 区间</th><th>平均 TTFT（流式）</th><th>请求失败率</th><th>最新 TTFT 较前日</th></tr></thead>`;
+  const active = rows.filter((row) => !row.lowVolume);
+  const quiet = rows.filter((row) => row.lowVolume);
+  const activeTable = active.length
+    ? `<div class="table-wrap"><table class="history-table compare-table">${head}<tbody>${active.map(renderRow).join('')}</tbody></table></div>`
+    : '<p class="empty">所选范围内暂无足量调用的模型。</p>';
+  const quietTable = quiet.length
+    ? `<details class="low-volume"${quiet.some((row) => row.name === selected) ? ' open' : ''}>
+      <summary>低流量模型（近 ${RECENT_WINDOW_DAYS} 天 &lt; ${MIN_RECENT_CALLS} 次调用）· ${quiet.length} 个</summary>
+      <p class="chart-note">这些模型的调用量不足以支撑可靠的分位与失败率，仅折叠展示，不参与首页结论。</p>
+      <div class="table-wrap"><table class="history-table compare-table">${head}<tbody>${quiet.map(renderRow).join('')}</tbody></table></div>
+    </details>`
+    : '';
+  return activeTable + quietTable;
 }
 
 // The freshest point across all cases identifies the current data drop.
@@ -1560,7 +1935,7 @@ function historyTable(points) {
   const rows = [...(points || [])].reverse();
   if (!rows.length) return '<p class="empty">暂无执行历史。</p>';
   return `<div class="table-wrap"><table class="history-table">
-    <thead><tr><th>日期</th><th>状态</th><th>平均查询</th><th>查询数</th><th>运行</th><th>commit</th></tr></thead>
+    <thead><tr><th>日期</th><th>状态</th><th>网关平均耗时</th><th>调用数</th><th>运行</th><th>commit</th></tr></thead>
     <tbody>${rows
       .map(
         (point) => `<tr>
@@ -1583,9 +1958,10 @@ function renderDetail() {
     return;
   }
 
-  const latest = entry.latest;
   const points = [...(entry.points || [])].sort((a, b) => a.date.localeCompare(b.date));
-  const point = latestPoint(entry);
+  const complete = completeDays(points, state.history);
+  const point = complete[complete.length - 1] || latestPoint(entry);
+  const latest = point || entry.latest;
   const status = latest?.status || point?.status || 'UNKNOWN';
   const queries = Array.isArray(latest?.queries) ? latest.queries : [];
   const durations = points.map((item) => item.query_ms).filter(Number.isFinite);
@@ -1603,8 +1979,8 @@ function renderDetail() {
 
   const chartNote =
     points.length === 1
-      ? `当前只有 1 个按日数据点（${esc(points[0].date)}）；后续 nightly 每天追加一个点，形成查询耗时曲线。`
-      : '按 Asia/Shanghai 日历日聚合；每点为当轮 query 平均耗时，仅 profiling，不含 E2E 步骤等待；同一天重跑只保留最新完成的一次。';
+      ? `当前只有 1 个按日数据点（${esc(points[0].date)}）；后续每天追加一个点，形成网关耗时曲线。`
+      : '按 Asia/Shanghai 日历日聚合；每点为当日成功调用的网关耗时（按调用量加权），不含端侧与网络；当天未结束的数据单独标记为部分日，汇总卡不使用该日。';
 
   $('detail').innerHTML = `
     <div class="detail-head">
@@ -1617,15 +1993,15 @@ function renderDetail() {
     </div>
 
     <div class="stat-grid">
-      <div class="small-stat"><div class="k">本轮平均查询</div><div class="v">${fmtDuration(point?.query_ms)}</div></div>
-      <div class="small-stat"><div class="k">历史中位数</div><div class="v">${fmtDuration(median(durations))}</div></div>
-      <div class="small-stat"><div class="k">查询次数</div><div class="v">${queryCount}</div></div>
+      <div class="small-stat"><div class="k">网关平均耗时（${esc(point?.date || '最新完整日')}）</div><div class="v">${fmtDuration(point?.query_ms)}</div></div>
+      <div class="small-stat"><div class="k">日均值中位数</div><div class="v">${fmtDuration(median(durations))}</div></div>
+      <div class="small-stat"><div class="k">调用次数</div><div class="v">${queryCount}</div></div>
       <div class="small-stat"><div class="k">记录天数</div><div class="v">${points.length}</div></div>
     </div>
 
     <section class="card">
       <div class="card-head">
-        <h2>最近一次 Profiling · 查询耗时</h2>
+        <h2>最近一次 Profiling · 网关耗时</h2>
         <span class="muted">${latest ? `${queryCount} 次查询 · ${esc(latest.screenshots ?? 0)} 截图 · ${esc(latest.profiling_files ?? 0)} profiling` : '—'}</span>
       </div>
       ${queryWaterfall(latest)}
@@ -1638,7 +2014,7 @@ function renderDetail() {
 
     <section class="card">
       <div class="card-head">
-        <h2>每日平均查询耗时</h2>
+        <h2>每日网关平均耗时</h2>
         <span class="muted">一天一个点 · Asia/Shanghai</span>
       </div>
       ${dailyChart(points)}
@@ -1695,7 +2071,9 @@ function renderModels() {
     if (names.includes(state.hashModel)) state.model = state.hashModel;
     state.hashModel = null;
   } else if (!names.includes(state.model)) {
-    state.model = names[0] || null;
+    // Default to the busiest recent model; an idle model with a single call
+    // must not become the headline drill-down.
+    state.model = busiestModel(history, names);
   }
 
   const granularitySelect = $('granularity-select');
@@ -1715,7 +2093,7 @@ function renderModels() {
   if (!names.length) {
     if (currentModel) currentModel.textContent = '';
     const empty =
-      '<p class="empty">历史中没有可确认关联的基准模型调用。nightly 产生 <code>points[].benchmark_models</code> 后，这里会按天展示 TTFT、TPOT、耗时 P95 与 Token 曲线。</p>';
+      '<p class="empty">历史中没有可确认关联的基准模型调用。nightly 产生 <code>points[].benchmark_models</code> 后，这里会按天展示流式 TTFT、TPOT、请求级 P50 / P95 与 Token 曲线。</p>';
     if (summary) summary.innerHTML = '';
     if (trends) trends.innerHTML = empty;
     if (stats) stats.innerHTML = '<p class="empty">暂无统计数据。</p>';
@@ -1728,26 +2106,38 @@ function renderModels() {
     return;
   }
 
-  if (currentModel) currentModel.textContent = `当前模型：${state.model}`;
   const days = currentModelDays();
-  const weeks = weekSeries(days);
-  const failures = failureSeries(history, days, state.model);
+  const complete = completeDays(days, history);
+  const anchor = historyCompleteThrough(history) || latestModelDate(history);
+  const recentCalls = recentCallsForDays(modelSeries(history, state.model), anchor);
+  if (currentModel) {
+    currentModel.textContent = `当前模型：${state.model}`
+      + (recentCalls < MIN_RECENT_CALLS ? ` · 低流量（近 ${RECENT_WINDOW_DAYS} 天 ${recentCalls} 次调用，指标仅供参考）` : '');
+  }
+  const weeks = weekSeries(complete);
+  const failures = failureSeries(history, complete, state.model);
   const dailyRates = new Map(failures.map((row) => [row.date, row.failure_rate]));
   const weeklyRates = weeklyFailureRates(failures);
-  const latestFailure = failures.find((row) => row.date === days.at(-1)?.date && Number.isFinite(row.failure_rate)) || null;
+  const latestFailure = anchor
+    ? failures.find((row) => row.date === anchor && Number.isFinite(row.failure_rate)) || null
+    : null;
   const span = days.length
     ? `${days[0].date} 至 ${days[days.length - 1].date} · ${days.length} 天`
     : '暂无数据';
-  if (insights) insights.innerHTML = regressionBanner(days, failures);
+  if (insights) {
+    // A low-volume model cannot raise a reliable regression claim either.
+    insights.innerHTML = recentCalls >= MIN_RECENT_CALLS ? regressionBanner(complete, failures) : '';
+  }
   if (compare) {
     compare.innerHTML = modelCompareCard(modelComparison(history, state.rangeDays), { selected: state.model });
   }
   if (compareVersion) compareVersion.textContent = versionLine(history);
-  if (summary) summary.innerHTML = modelSummary(days, state.model, { unit: state.tokenUnit, failure: latestFailure });
+  if (summary) summary.innerHTML = modelSummary(complete, state.model, { unit: state.tokenUnit, failure: latestFailure });
   if (trends) {
+    const trendFailures = failureSeries(history, days, state.model);
     trends.innerHTML = modelTrends(days, state.tokenVisibility, state.latencyVisibility, {
       tokenUnit: state.tokenUnit,
-      failures,
+      failures: trendFailures,
       volumeVisibility: state.volumeVisibility,
     });
   }

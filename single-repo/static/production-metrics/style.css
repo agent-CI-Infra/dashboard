@@ -442,6 +442,32 @@ h1 {
   color: var(--unknown);
 }
 
+.badge.partial,
+.badge.low {
+  background: var(--unknown-bg);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.history-table tr.is-partial td {
+  opacity: 0.72;
+}
+
+.low-volume {
+  margin-top: 12px;
+}
+
+.low-volume > summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 6px 0;
+}
+
+.low-volume > summary:hover {
+  color: var(--ink);
+}
+
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1125,6 +1151,21 @@ h1 {
   opacity: 0.65;
 }
 
+.legend-line.p50 {
+  border-top-color: var(--series-2);
+  border-top-style: dashed;
+}
+
+.legend-line.p50.lower {
+  opacity: 0.5;
+}
+
+.legend-line.ttft-est {
+  border-top-color: var(--series-1);
+  border-top-style: dotted;
+  opacity: 0.7;
+}
+
 .latency-layer.ttft .trend-series {
   stroke: var(--series-1);
 }
@@ -1189,6 +1230,32 @@ h1 {
   stroke: var(--series-2);
   stroke-dasharray: 5 4;
   opacity: 0.65;
+}
+
+.latency-layer.ttft-est .trend-series {
+  stroke: var(--series-1);
+  stroke-dasharray: 2 3;
+  opacity: 0.7;
+}
+
+.latency-layer.ttft-est .trend-dot {
+  fill: var(--series-1);
+  opacity: 0.7;
+}
+
+.latency-layer.p50-upper .trend-series {
+  stroke: var(--series-2);
+  stroke-dasharray: 2 3;
+}
+
+.latency-layer.p50-upper .trend-dot {
+  fill: var(--series-2);
+}
+
+.latency-layer.p50-lower .trend-series {
+  stroke: var(--series-2);
+  stroke-dasharray: 2 3;
+  opacity: 0.5;
 }
 
 .trend-chart .trend-all-hidden {
