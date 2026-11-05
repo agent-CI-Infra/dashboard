@@ -1883,27 +1883,41 @@ const GATEWAY_BASE = 'https://onlineswarm.openjiuwen.com:31474'
 
 function requestMetricsFromRow(row) {
   if (!row || typeof row !== 'object') return null
-  const start = Date.parse(row.startTime || '')
-  const first = Date.parse(row.completionStartTime || '')
-  const end = Date.parse(row.endTime || '')
+  // LiteLLM can return microseconds; Date.parse alone truncates them to milliseconds.
+  const timestampUs = (value) => {
+    if (typeof value !== 'string') return NaN
+    const ms = Date.parse(value)
+    if (!Number.isFinite(ms)) return NaN
+    const fraction = /T\d{2}:\d{2}:\d{2}\.(\d+)/.exec(value)?.[1] || ''
+    const micros = Number((fraction + '000000').slice(0, 6))
+    return ms * 1000 + micros % 1000
+  }
+  const start = timestampUs(row.startTime)
+  const first = timestampUs(row.completionStartTime)
+  const end = timestampUs(row.endTime)
   const completionTokens = Number.isFinite(row.completion_tokens) ? row.completion_tokens : null
+  const streamMetadata = row.metadata?.spend_logs_metadata
+  const eligible = String(row.status || '').toLowerCase() === 'success'
+    && row.stream !== false && streamMetadata?.stream !== false
+    && Number.isFinite(start) && Number.isFinite(first) && Number.isFinite(end)
+    && start <= first && first < end
   return {
     requestId: row.request_id || '',
     model: row.model || '',
     status: row.status || '',
     callType: row.call_type || '',
     durationMs: Number.isFinite(row.request_duration_ms) ? row.request_duration_ms : null,
-    ttftMs: Number.isFinite(start) && Number.isFinite(first) && first >= start ? first - start : null,
+    ttftMs: eligible ? (first - start) / 1000 : null,
     tpotMs:
-      Number.isFinite(first) && Number.isFinite(end) && end >= first && completionTokens > 1
-        ? (end - first) / (completionTokens - 1)
+      eligible && Number.isInteger(completionTokens) && completionTokens > 1
+        ? (end - first) / 1000 / (completionTokens - 1)
         : null,
     promptTokens: Number.isFinite(row.prompt_tokens) ? row.prompt_tokens : null,
     completionTokens,
     totalTokens: Number.isFinite(row.total_tokens) ? row.total_tokens : null,
     spend: Number.isFinite(row.spend) ? row.spend : null,
-    startIso: Number.isFinite(start) ? new Date(start).toISOString() : null,
-    endIso: Number.isFinite(end) ? new Date(end).toISOString() : null,
+    startIso: Number.isFinite(start) ? new Date(start / 1000).toISOString() : null,
+    endIso: Number.isFinite(end) ? new Date(end / 1000).toISOString() : null,
   }
 }
 

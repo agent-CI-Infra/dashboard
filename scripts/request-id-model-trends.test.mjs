@@ -12,6 +12,11 @@ test('gateway lookup returns only exact matching id',async()=>{
  rows.push({request_id:'requested',model:'correct'});assert.equal((await ctx.lookup('requested','key')).model,'correct');
 });
 test('TPOT uses generated tokens minus one and excludes one-token output',()=>{
- const row={startTime:'2026-11-01T00:00:00Z',completionStartTime:'2026-11-01T00:00:01Z',endTime:'2026-11-01T00:00:02Z',completion_tokens:3};
+ const row={status:'success',startTime:'2026-11-01T00:00:00Z',completionStartTime:'2026-11-01T00:00:01Z',endTime:'2026-11-01T00:00:02Z',completion_tokens:3};
  assert.equal(ctx.metrics(row).tpotMs,500);assert.equal(ctx.metrics({...row,completion_tokens:1}).tpotMs,null);
+ assert.equal(ctx.metrics({...row,stream:false}).tpotMs,null);
+ assert.equal(ctx.metrics({...row,metadata:{spend_logs_metadata:{stream:false}}}).ttftMs,null);
+ assert.equal(ctx.metrics({...row,status:'failure'}).tpotMs,null);
+ assert.equal(ctx.metrics({...row,endTime:row.completionStartTime}).tpotMs,null);
+ assert.equal(ctx.metrics({...row,completionStartTime:'2026-11-01T00:00:01.000100Z',endTime:'2026-11-01T00:00:01.000900Z'}).tpotMs,0.4);
 });
