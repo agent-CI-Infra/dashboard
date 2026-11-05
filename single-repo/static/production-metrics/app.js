@@ -1937,7 +1937,7 @@ function requestMetricsHtml(m) {
   if (!m) return '<p class="empty">未找到该请求 ID。</p>'
   const stat = (label, value) => `<div class="small-stat"><div class="k">${label}</div><div class="v">${value}</div></div>`
   return `<div class="lookup-meta"><code>${esc(m.requestId || '—')}</code>${m.callType ? ` · ${esc(m.callType)}` : ''}</div>
-  <div class="stat-grid">
+  <div class="stat-grid lookup-stats">
     ${stat('模型', esc(m.model || '—'))}
     ${stat('状态', esc(m.status || '—'))}
     ${stat('网关总耗时', m.durationMs == null ? '—' : fmtDuration(m.durationMs))}
@@ -1989,7 +1989,9 @@ function bindRequestLookup() {
     const local = findLocalRequest(state.productionDoc, requestId)
     if (local) {
       result.innerHTML =
-        '<p class="muted">命中看板近 24h 快照（快照不含请求时间戳与花费）</p>' +
+        (state.productionDoc?.demo === true
+          ? '<p class="muted">模拟数据 · 命中本地演示快照</p>'
+          : '<p class="muted">命中看板快照（快照不含请求时间戳与花费）</p>') +
         requestMetricsHtml(requestMetricsFromCall(local))
       return
     }
