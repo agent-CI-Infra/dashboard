@@ -7,7 +7,8 @@ on:
 
 jobs:
   install-lint-build:
-    runs-on: ubuntu-latest
+    # Playwright 1.59.1 does not support ubuntu-26.04 browser dependencies.
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
