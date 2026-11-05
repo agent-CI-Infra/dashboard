@@ -1948,10 +1948,7 @@ function requestMetricsHtml(m) {
     ${stat('总 Token', m.totalTokens == null ? '—' : fmtToken(m.totalTokens))}
     ${m.spend != null ? stat('花费（USD）', esc(String(Math.round(m.spend * 1e6) / 1e6))) : ''}
   </div>
-  ${m.startIso ? `<p class="muted lookup-time">${esc(fmtDateTime(m.startIso))} → ${esc(fmtDateTime(m.endIso))}</p>` : ''}
-  ${benchmarkModelNames(state.history).includes(m.model)
-    ? `<p class="chart-note">每日曲线统计该请求对应模型的所有网关请求，而非这个请求 ID 的多日数据。</p><button type="button" data-request-model="${esc(m.model)}">查看此模型每日指标曲线</button>`
-    : '<p class="chart-note">当前看板历史中没有与该请求完全匹配的模型，暂无法显示该模型每日曲线。</p>'}`
+  ${m.startIso ? `<p class="muted lookup-time">${esc(fmtDateTime(m.startIso))} → ${esc(fmtDateTime(m.endIso))}</p>` : ''}`
 }
 
 function lookupErrorMessage(err) {
@@ -1983,13 +1980,6 @@ function bindRequestLookup() {
   const idInput = $('lookup-id')
   const keyInput = $('lookup-key')
   const result = $('lookup-result')
-  result.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-request-model]');
-    if (!button || !benchmarkModelNames(state.history).includes(button.dataset.requestModel)) return;
-    state.model = button.dataset.requestModel;
-    renderModels();
-    $('model-trends')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
   form.addEventListener('submit', async (event) => {
     event.preventDefault()
     const requestId = String(idInput?.value || '').trim()
