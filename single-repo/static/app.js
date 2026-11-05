@@ -52,7 +52,7 @@
   const loadViews = () => { try { return { issues: 'table', prs: 'table', ...JSON.parse(localStorage.getItem(VIEW_KEY) || '{}') }; } catch (e) { return { issues: 'table', prs: 'table' }; } };
   const loadLine = () => { try { return localStorage.getItem(LINE_KEY); } catch (e) { return null; } };
   const loadCovSort = () => { try { return localStorage.getItem(COV_SORT_KEY) === 'lines' ? 'lines' : 'name'; } catch (e) { return 'name'; } };
-  const STATE = { snap: null, status: null, tab: 'overview', views: loadViews(), line: loadLine(), covOpen: new Set(), covSort: loadCovSort(), sort: {}, filters: { issueQ: '', issueLabel: '', issueAssignee: '', runBranch: '' }, ageFilter: { issues: null, prs: null }, coverageWeekOffset: 0, e2e: null, e2eSteps: {}, e2eFilter: { status: '', q: '' }, e2eLoading: new Set(), e2eErrors: new Set(), e2eCollapsed: new Set(), performance: null, perfCase: null, pollTimer: null };
+  const STATE = { snap: null, status: null, tab: 'overview', views: loadViews(), line: loadLine(), covOpen: new Set(), covSort: loadCovSort(), sort: {}, filters: { issueQ: '', issueLabel: '', issueAssignee: '', runBranch: '' }, ageFilter: { issues: null, prs: null }, coverageWeekOffset: 0, e2e: null, e2eSteps: {}, e2eFilter: { status: '', q: '' }, e2eLoading: new Set(), e2eErrors: new Set(), e2eCollapsed: new Set(), performance: null, perfCase: null, pollTimer: null, loadedAt: 0 };
   const returnParams = new URLSearchParams(location.search);
   const returnFocus = { line: returnParams.get('returnLine'), caseName: returnParams.get('returnCase'), pending: !!returnParams.get('returnCase'),
     e2eKey: returnParams.get('returnE2E'), e2ePending: !!returnParams.get('returnE2E') };
@@ -1608,7 +1608,8 @@
 
   function renderShell() {
     const snap=STATE.snap, btn=$('#refresh-btn'), banner=$('#global-banner');
-    // DigitalMate-only iframe tabs: hidden on other boards, loaded on first visit.
+    // DigitalMate-only iframe tabs: hidden on other boards, mounted on first visit
+    // or warmed in the background once the snapshot is on screen.
     const isDigitalMate = !!snap && String(snap.repo || '').toLowerCase() === 'openjiuwen-ai/digitalmate';
     for (const [name, src] of Object.entries(DIGITALMATE_TABS)) {
       const tab = document.querySelector(`[data-tab="${name}"]`);
@@ -1681,6 +1682,21 @@
 
   function renderAll() { renderShell(); renderTabs(); }
 
+  // The DigitalMate iframe tabs are separate mini-apps. Warm them once the snapshot is
+  // on screen so the first click shows content instead of waiting for another round of
+  // HTML/JS/data over the same connection.
+  function prefetchDigitalMateTabs() {
+    if (!STATE.snap || String(STATE.snap.repo || '').toLowerCase() !== 'openjiuwen-ai/digitalmate') return;
+    const mount = () => {
+      for (const [name, src] of Object.entries(DIGITALMATE_TABS)) {
+        const frame = document.querySelector(`#tab-${name} iframe`);
+        if (frame && frame.getAttribute('src') === 'about:blank') frame.src = src;
+      }
+    };
+    if (typeof requestIdleCallback === 'function') requestIdleCallback(mount, { timeout: 10000 });
+    else setTimeout(mount, 2000);
+  }
+
   // ------------------------------------------------------------ data flow
   // Every request has a hard timeout and every code path ends in schedulePoll(), so a hung
   // request, a proxy that drops a response, or a render exception can never freeze the page
@@ -1703,7 +1719,13 @@
   // the previous one stopped instead of restarting from zero.
   const SNAPSHOT_FETCH_TIMEOUT_MS = 60000;
   const SNAPSHOT_FETCH_ATTEMPTS = 4;
-  async function fetchSnapshotJson(url) {
+  // The snapshot changes hourly. Re-downloading it every minute kept the link busy
+  // (each pass is a full multi-MB payload) and starved everything else on the page,
+  // including the iframe tabs. Poll on a slower rhythm and let the HTTP cache answer
+  // repeats: Pages serves the snapshot with max-age=600, so at most one full transfer
+  // happens per cache window.
+  const SNAPSHOT_REFRESH_MS = 300000;
+  async function fetchSnapshotJson(url, cacheMode = 'default') {
     let received = new Uint8Array(0);
     let offset = 0;
     let lastError = null;
@@ -1713,7 +1735,7 @@
       try {
         const headers = {};
         if (offset > 0) headers.Range = `bytes=${offset}-`;
-        const res = await fetch(url, { cache: 'no-store', headers, signal: ctrl.signal });
+        const res = await fetch(url, { cache: cacheMode, headers, signal: ctrl.signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         if (offset > 0 && res.status !== 206) {
           // Server ignored the range: restart the download from scratch.
@@ -1745,13 +1767,15 @@
     }
     throw lastError || new Error('snapshot fetch failed');
   }
-  async function load() {
+  async function load(force = false) {
     try {
-      // 10-minute cache bust: coarse enough for the CDN edge to serve repeated
-      // loads, fresh enough for hourly snapshot updates.
-      const doc = await fetchSnapshotJson('./data/snapshot.json?m='+Math.floor(Date.now()/6e5));
+      // 10-minute cache bucket: coarse enough for the CDN edge and the browser cache
+      // to answer repeated polls, fresh enough for hourly snapshot updates. Only an
+      // explicit refresh bypasses the cache.
+      const url = './data/snapshot.json?m=' + Math.floor(Date.now() / 6e5) + (force ? '&r=' + Date.now() : '');
+      const doc = await fetchSnapshotJson(url, force ? 'no-store' : 'default');
       if(!doc.sections || !doc.board)throw new Error('快照格式尚未更新，请稍后刷新');
-      STATE.snap=doc;STATE.status={refreshing:false};
+      STATE.snap=doc;STATE.status={refreshing:false};STATE.loadedAt=Date.now();
       if ((returnFocus.pending || returnFocus.e2ePending) && (doc.lines || []).some((line) => line.key === returnFocus.line)) STATE.line = returnFocus.line;
       window.GSBLocalBoard?.setSnapshot(doc);
       STATE.clientError = null;
@@ -1768,6 +1792,7 @@
     }
     try {
       renderAll();
+      prefetchDigitalMateTabs();
       await loadE2EHistory();
     } catch (err) {
       showRenderError(err);
@@ -1777,14 +1802,15 @@
   function schedulePoll() {
     clearTimeout(STATE.pollTimer);
     const st = STATE.status || {};
-    // Quick retry after a client-side failure; 3s while a refresh runs; otherwise 60s to pick up auto refreshes.
-    const delay = STATE.clientError ? 5000 : st.refreshing ? 3000 : 60000;
+    // Quick retry after a client-side failure; 3s while a refresh runs; otherwise the
+    // slower steady-state rhythm that matches the snapshot's cache window.
+    const delay = STATE.clientError ? 5000 : st.refreshing ? 3000 : SNAPSHOT_REFRESH_MS;
     STATE.pollTimer = setTimeout(load, delay);
   }
   async function refresh() {
     if(STATE.status?.refreshing)return;
     STATE.status={refreshing:true};renderShell();
-    await load();
+    await load(true);
   }
   function showRenderError(err) {
     const banner = $('#global-banner');
@@ -1888,8 +1914,15 @@
     if (again && again.tagName === 'INPUT') { again.focus(); try { again.setSelectionRange(pos, pos); } catch (e) { /* select elements */ } }
   });
   $('#refresh-btn').addEventListener('click', refresh);
-  // Browsers throttle timers in background tabs; re-sync as soon as the tab is visible again.
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { clearTimeout(STATE.pollTimer); load(); } });
+  // Browsers throttle timers in background tabs. Returning to the tab used to refetch
+  // the whole snapshot every time, which on a slow link competed with whatever the user
+  // opened next; only reload when the data is actually due.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return;
+    clearTimeout(STATE.pollTimer);
+    if (!STATE.snap || Date.now() - STATE.loadedAt >= SNAPSHOT_REFRESH_MS) load();
+    else schedulePoll();
+  });
   window.addEventListener('message', (event) => {
     const name = String(event.data?.type || '').replace(/-height$/, '');
     if (!DIGITALMATE_TABS[name]) return;
