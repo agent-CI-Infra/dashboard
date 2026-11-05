@@ -57,7 +57,7 @@ from pathlib import Path
 
 BASE = 'https://onlineswarm.openjiuwen.com:31474'
 SCHEMA = 'digitalmate/e2e-performance-history@1'
-METRICS_VERSION = 3
+METRICS_VERSION = 4
 RUN_ID = 'prod-adx-jiuwen'
 P50_MIN_SAMPLES = 20
 P95_MIN_SAMPLES = 20
@@ -282,6 +282,7 @@ def aggregate_point(day_rows, date, physical, partial_day=None):
     ttft_strict = []
     ttft_estimated = []
     tpot_strict = []
+    tpot_estimated = []
     ttft_filtered = 0
     tpot_filtered = 0
     hours = {}
@@ -329,14 +330,14 @@ def aggregate_point(day_rows, date, physical, partial_day=None):
         elif ttft >= 0:
             (ttft_strict if stream is True else ttft_estimated).append(ttft)
         completion = row.get('completion_tokens')
-        if stream is True and timestamp_anomaly and isinstance(completion, int) and completion > 1:
+        if timestamp_anomaly and isinstance(completion, int) and completion > 1:
             tpot_filtered += 1
-        elif stream is True and isinstance(completion, int) and completion > 1:
+        elif isinstance(completion, int) and completion > 1:
             tpot = (end_dt - first_dt).total_seconds() * 1000 / (completion - 1)
             if tpot < TPOT_MIN_MS:
                 tpot_filtered += 1
             elif tpot >= 0:
-                tpot_strict.append(tpot)
+                (tpot_strict if stream is True else tpot_estimated).append(tpot)
 
     prompt, completion_tokens, total, token_samples = token_sums(success_rows)
     failed_prompt, failed_completion, failed_total, failed_samples = token_sums(failed_rows)
@@ -356,6 +357,9 @@ def aggregate_point(day_rows, date, physical, partial_day=None):
         'tpot_avg_ms': rounded(mean(tpot_strict), 2) if tpot_strict else None,
         'tpot_sample_count': len(tpot_strict),
         'tpot_sum_ms': rounded(sum(tpot_strict), 2) if tpot_strict else None,
+        'tpot_estimated_avg_ms': rounded(mean(tpot_estimated), 2) if tpot_estimated else None,
+        'tpot_estimated_sample_count': len(tpot_estimated),
+        'tpot_estimated_sum_ms': rounded(sum(tpot_estimated), 2) if tpot_estimated else None,
         'tpot_filtered_count': tpot_filtered,
         # The sum lets the dashboard weight this model-day against every other
         # model-day without ever averaging daily means.

@@ -78,6 +78,21 @@ class CollectionTests(unittest.TestCase):
         row = {'stream': True, 'metadata': {'spend_logs_metadata': {'stream': False}}}
         self.assertIsNone(collector.stream_state(row))
 
+    def test_tpot_estimate_keeps_unknown_stream_separate_and_filters_invalid(self):
+        base = {'status': 'success', 'startTime': '2026-11-03T00:00:00Z',
+                'completionStartTime': '2026-11-03T00:00:01Z',
+                'endTime': '2026-11-03T00:00:03Z', 'completion_tokens': 11}
+        rows = [dict(base), dict(base, stream=True), dict(base, stream=False),
+                dict(base, status='failed'), dict(base, completion_tokens=1),
+                dict(base, completion_tokens=100000000),
+                dict(base, completionStartTime='2026-11-03T00:00:02.99Z')]
+        metrics = collector.aggregate_point(rows, '2026-11-03', 'model')['benchmark_models'][0]
+        self.assertEqual(metrics['tpot_estimated_sample_count'], 1)
+        self.assertEqual(metrics['tpot_estimated_avg_ms'], 200)
+        self.assertEqual(metrics['tpot_sample_count'], 1)
+        self.assertEqual(metrics['tpot_avg_ms'], 200)
+        self.assertEqual(metrics['tpot_filtered_count'], 2)
+
     def test_unknown_status_cannot_be_counted_as_passed(self):
         point = collector.aggregate_point([{'status': 'unknown'}], '2026-11-03', 'model')
         self.assertEqual(point['status'], 'UNKNOWN')

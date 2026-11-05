@@ -1187,6 +1187,12 @@ h1 {
   border-top-style: dashed;
 }
 
+.legend-line.tpot-est {
+  border-top-color: var(--series-3);
+  border-top-style: dotted;
+  opacity: 0.65;
+}
+
 .latency-layer.tpot .trend-series {
   stroke: var(--series-3);
   stroke-dasharray: 2 3;
@@ -1194,6 +1200,17 @@ h1 {
 
 .latency-layer.tpot .trend-dot {
   fill: var(--series-3);
+}
+
+.latency-layer.tpot-est .trend-series {
+  stroke: var(--series-3);
+  stroke-dasharray: 1 5;
+  opacity: 0.65;
+}
+
+.latency-layer.tpot-est .trend-dot {
+  fill: var(--series-3);
+  opacity: 0.65;
 }
 
 .legend-line.calls {

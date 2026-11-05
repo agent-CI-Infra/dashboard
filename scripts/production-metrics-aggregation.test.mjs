@@ -166,7 +166,33 @@ test('suite failure rate is unavailable if any status is unknown', () => {
 test('legacy and previous-version snapshots cannot be displayed as current metrics', () => {
   assert.throws(() => ctx.requireVersion({}), /版本过旧/);
   assert.throws(() => ctx.requireVersion({metrics_version: 2}), /版本过旧/);
-  assert.doesNotThrow(() => ctx.requireVersion({metrics_version: 3}));
+  assert.throws(() => ctx.requireVersion({metrics_version: 3}), /版本过旧/);
+  assert.doesNotThrow(() => ctx.requireVersion({metrics_version: 4}));
+});
+
+test('estimated TPOT is weighted separately from confirmed streaming', () => {
+  const acc = ctx.acc();
+  ctx.merge(acc, {calls: 10, success_count: 10, tpot_ms: 1, tpot_samples: 1,
+    tpot_estimated_ms: 2, tpot_estimated_samples: 2, tpot_estimated_sum_ms: 4});
+  ctx.merge(acc, {calls: 5, success_count: 5, tpot_estimated_ms: 4,
+    tpot_estimated_samples: 1, tpot_estimated_sum_ms: 4});
+  const result = ctx.finish(acc);
+  assert.equal(result.tpot_ms, 1);
+  assert.equal(result.tpot_estimated_samples, 3);
+  assert.equal(result.tpot_estimated_ms, 8 / 3);
+});
+
+test('latency chart renders estimated TPOT on the right axis and tooltip', () => {
+  const c = vm.createContext({});
+  vm.runInContext(`const chartSize=()=>({width:1000,height:220}); const niceMax=(v)=>v||1;
+    const fmtAxis=String; const fmtDuration=String; const fmtTpot=(v)=>v+' ms/token'; const esc=String;` +
+    extract('function latencyTrendChart(points', 'function tokenTrendChart(') +
+    '; globalThis.chart=latencyTrendChart;', c);
+  const html = c.chart([{date:'2026-11-04',tpot_estimated_ms:2.5}], {});
+  assert.match(html, /TPOT 估算（流式未知）/);
+  assert.match(html, /latency-layer tpot-est/);
+  assert.match(html, /axis-right/);
+  assert.match(html, /2.5 ms\/token/);
 });
 
 test('model summary does not substitute an older day for the shared anchor', () => {
