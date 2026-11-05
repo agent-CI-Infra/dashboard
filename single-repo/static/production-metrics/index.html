@@ -53,6 +53,23 @@
       <section id="view-models" class="view" role="tabpanel" aria-labelledby="tab-models" hidden>
         <div id="model-insights"></div>
 
+        <section class="card" id="request-lookup">
+          <div class="card-head">
+            <h2>按请求 ID 查询</h2>
+            <span class="muted">单请求性能诊断</span>
+          </div>
+          <form id="lookup-form" class="lookup-form">
+            <input id="lookup-id" type="text" placeholder="粘贴网关请求 ID（request_id）" autocomplete="off" spellcheck="false" required>
+            <button type="submit">查询</button>
+          </form>
+          <details class="lookup-key">
+            <summary>网关访问凭据（仅当前页面有效）</summary>
+            <input id="lookup-key" type="password" placeholder="sk-…（prod / adx-jiuwen admin key）" autocomplete="off" spellcheck="false">
+            <p class="chart-note">凭据仅保留在当前页面内，直查时发送至网关；不填时仅搜索已加载的本地快照。结果只展示性能指标，不展示消息内容。</p>
+          </details>
+          <div id="lookup-result" aria-live="polite"></div>
+        </section>
+
         <section class="card">
           <div class="card-head comparison-head">
             <h2>模型对比</h2>

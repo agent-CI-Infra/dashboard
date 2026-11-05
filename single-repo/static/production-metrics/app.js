@@ -9,6 +9,7 @@ const STATUS_LABEL = {
 
 const state = {
   history: null,
+  productionDoc: null,
   selected: null,
   model: null,
   hashModel: null,
@@ -1873,19 +1874,171 @@ async function fetchDataJson(name, options) {
   throw lastError || new Error(`无法加载 ${name}`)
 }
 
+// ---- 按请求 ID 查询（单请求性能诊断） -----------------------------------
+// The page ships without credentials: the gateway admin key comes only from
+// the user's own input (kept in localStorage) and is used for direct
+// browser→gateway calls. Result rendering is restricted to an allowlist of
+// metric fields; request messages and responses are never displayed.
+const GATEWAY_BASE = 'https://onlineswarm.openjiuwen.com:31474'
+
+function requestMetricsFromRow(row) {
+  if (!row || typeof row !== 'object') return null
+  // LiteLLM can return microseconds; Date.parse alone truncates them to milliseconds.
+  const timestampUs = (value) => {
+    if (typeof value !== 'string') return NaN
+    const ms = Date.parse(value)
+    if (!Number.isFinite(ms)) return NaN
+    const fraction = /T\d{2}:\d{2}:\d{2}\.(\d+)/.exec(value)?.[1] || ''
+    const micros = Number((fraction + '000000').slice(0, 6))
+    return ms * 1000 + micros % 1000
+  }
+  const start = timestampUs(row.startTime)
+  const first = timestampUs(row.completionStartTime)
+  const end = timestampUs(row.endTime)
+  const completionTokens = Number.isFinite(row.completion_tokens) ? row.completion_tokens : null
+  const streamMetadata = row.metadata?.spend_logs_metadata
+  const eligible = String(row.status || '').toLowerCase() === 'success'
+    && row.stream !== false && streamMetadata?.stream !== false
+    && Number.isFinite(start) && Number.isFinite(first) && Number.isFinite(end)
+    && start <= first && first < end
+  return {
+    requestId: row.request_id || '',
+    model: row.model || '',
+    status: row.status || '',
+    callType: row.call_type || '',
+    durationMs: Number.isFinite(row.request_duration_ms) ? row.request_duration_ms : null,
+    ttftMs: eligible ? (first - start) / 1000 : null,
+    tpotMs:
+      eligible && Number.isInteger(completionTokens) && completionTokens > 1
+        ? (end - first) / 1000 / (completionTokens - 1)
+        : null,
+    promptTokens: Number.isFinite(row.prompt_tokens) ? row.prompt_tokens : null,
+    completionTokens,
+    totalTokens: Number.isFinite(row.total_tokens) ? row.total_tokens : null,
+    spend: Number.isFinite(row.spend) ? row.spend : null,
+    startIso: Number.isFinite(start) ? new Date(start / 1000).toISOString() : null,
+    endIso: Number.isFinite(end) ? new Date(end / 1000).toISOString() : null,
+  }
+}
+
+function requestMetricsFromCall(call) {
+  if (!call || typeof call !== 'object') return null
+  return {
+    requestId: call.request_id || '',
+    model: call.model || '',
+    status: call.status || '',
+    callType: '',
+    durationMs: Number.isFinite(call.duration_ms) ? call.duration_ms : null,
+    ttftMs: Number.isFinite(call.ttft_ms) ? call.ttft_ms : null,
+    tpotMs: Number.isFinite(call.tpot_ms) ? call.tpot_ms : null,
+    promptTokens: Number.isFinite(call.prompt_tokens) ? call.prompt_tokens : null,
+    completionTokens: Number.isFinite(call.completion_tokens) ? call.completion_tokens : null,
+    totalTokens: Number.isFinite(call.total_tokens) ? call.total_tokens : null,
+    spend: null,
+    startIso: null,
+    endIso: null,
+  }
+}
+
+function findLocalRequest(doc, requestId) {
+  const id = String(requestId || '').trim()
+  if (!id) return null
+  const calls = Array.isArray(doc?.calls) ? doc.calls : []
+  return calls.find((call) => call && call.request_id === id) || null
+}
+
+function requestMetricsHtml(m) {
+  if (!m) return '<p class="empty">未找到该请求 ID。</p>'
+  const stat = (label, value) => `<div class="small-stat"><div class="k">${label}</div><div class="v">${value}</div></div>`
+  return `<div class="lookup-meta"><code>${esc(m.requestId || '—')}</code>${m.callType ? ` · ${esc(m.callType)}` : ''}</div>
+  <div class="stat-grid lookup-stats">
+    ${stat('模型', esc(m.model || '—'))}
+    ${stat('状态', esc(m.status || '—'))}
+    ${stat('网关总耗时', m.durationMs == null ? '—' : fmtDuration(m.durationMs))}
+    ${stat('TTFT', m.ttftMs == null ? '—' : fmtDuration(m.ttftMs))}
+    ${stat('TPOT', m.tpotMs == null ? '—' : fmtTpot(m.tpotMs))}
+    ${stat('输入 Token', m.promptTokens == null ? '—' : fmtToken(m.promptTokens))}
+    ${stat('输出 Token', m.completionTokens == null ? '—' : fmtToken(m.completionTokens))}
+    ${stat('总 Token', m.totalTokens == null ? '—' : fmtToken(m.totalTokens))}
+    ${m.spend != null ? stat('花费（USD）', esc(String(Math.round(m.spend * 1e6) / 1e6))) : ''}
+  </div>
+  ${m.startIso ? `<p class="muted lookup-time">${esc(fmtDateTime(m.startIso))} → ${esc(fmtDateTime(m.endIso))}</p>` : ''}`
+}
+
+function lookupErrorMessage(err) {
+  if (err && err.message === 'gateway-auth')
+    return '网关鉴权失败：请检查访问凭据是否为 prod / adx-jiuwen 的有效 admin key。'
+  if (err && err.name === 'AbortError') return '网关查询超时，请稍后重试。'
+  return `网关查询失败：${esc(err && err.message ? err.message : '未知错误')}`
+}
+
+async function queryGatewayRequest(requestId, key) {
+  const signal =
+    typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'
+      ? AbortSignal.timeout(20000)
+      : undefined
+  const response = await fetch(`${GATEWAY_BASE}/spend/logs?request_id=${encodeURIComponent(requestId)}`, {
+    cache: 'no-store',
+    signal,
+    headers: { Authorization: `Bearer ${key}` },
+  })
+  if (response.status === 401 || response.status === 403) throw new Error('gateway-auth')
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+  const rows = await response.json()
+  return Array.isArray(rows) ? requestMetricsFromRow(rows.find((row) => row?.request_id === requestId)) : null
+}
+
+function bindRequestLookup() {
+  const form = $('lookup-form')
+  if (!form) return
+  const idInput = $('lookup-id')
+  const keyInput = $('lookup-key')
+  const result = $('lookup-result')
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault()
+    const requestId = String(idInput?.value || '').trim()
+    if (!requestId) return
+    const key = String(keyInput?.value || '').trim()
+    result.innerHTML = '<p class="empty">查询中…</p>'
+    const local = findLocalRequest(state.productionDoc, requestId)
+    if (local) {
+      result.innerHTML =
+        (state.productionDoc?.demo === true
+          ? '<p class="muted">模拟数据 · 命中本地演示快照</p>'
+          : '<p class="muted">命中看板快照（快照不含请求时间戳与花费）</p>') +
+        requestMetricsHtml(requestMetricsFromCall(local))
+      return
+    }
+    if (!key) {
+      result.innerHTML =
+        '<p class="empty">看板快照中未找到该请求 ID。展开「网关访问凭据」填入 admin key 可直接查询网关（仅展示性能指标，不展示消息内容）。</p>'
+      return
+    }
+    try {
+      const metrics = await queryGatewayRequest(requestId, key)
+      result.innerHTML = metrics
+        ? requestMetricsHtml(metrics)
+        : '<p class="empty">网关中没有该请求 ID，可能已超出日志保留期或 ID 有误。</p>'
+    } catch (error) {
+      result.innerHTML = `<p class="error">${lookupErrorMessage(error)}</p>`
+    }
+  })
+}
+
 // The production snapshot is optional and may live behind a slow private data
 // path. Load it independently so it can never delay or fail the history view.
 async function loadProductionMetrics() {
   const target = $('production-metrics');
-  if (!target) return;
   const signal = typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'
     ? AbortSignal.timeout(10000)
     : undefined;
   try {
     const response = await fetchDataJson('model-request-metrics.json', { cache: 'no-store', signal });
-    target.innerHTML = productionMetrics(await response.json());
+    state.productionDoc = await response.json();
+    if (target) target.innerHTML = productionMetrics(state.productionDoc);
   } catch {
-    target.innerHTML = productionMetrics(null);
+    state.productionDoc = null;
+    if (target) target.innerHTML = productionMetrics(null);
   }
 }
 
@@ -2073,6 +2226,7 @@ window.addEventListener('resize', () => {
 });
 
 showView(viewFromHash(), { updateHash: false });
+bindRequestLookup();
 load();
 
 // Keep the embedded view as tall as its content.
