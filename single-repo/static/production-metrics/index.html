@@ -63,9 +63,9 @@
             <button type="submit">查询</button>
           </form>
           <details class="lookup-key">
-            <summary>网关访问凭据（仅保存在本机浏览器）</summary>
+            <summary>网关访问凭据（仅当前页面有效）</summary>
             <input id="lookup-key" type="password" placeholder="sk-…（prod / adx-jiuwen admin key）" autocomplete="off" spellcheck="false">
-            <p class="chart-note">凭据只用于浏览器直连网关查询该请求的指标，不会写入页面代码、仓库或上传到任何服务器；不填时仅搜索看板已加载的近 24h 快照。结果只展示性能指标，不展示消息内容。</p>
+            <p class="chart-note">凭据仅保留在当前页面内，直查时发送至网关；不填时仅搜索已加载的本地快照。结果只展示性能指标，不展示消息内容。</p>
           </details>
           <div id="lookup-result" aria-live="polite"></div>
         </section>

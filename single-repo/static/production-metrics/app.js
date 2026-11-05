@@ -1880,7 +1880,6 @@ async function fetchDataJson(name, options) {
 // browser→gateway calls. Result rendering is restricted to an allowlist of
 // metric fields; request messages and responses are never displayed.
 const GATEWAY_BASE = 'https://onlineswarm.openjiuwen.com:31474'
-const GATEWAY_KEY_STORAGE = 'dm-gateway-key'
 
 function requestMetricsFromRow(row) {
   if (!row || typeof row !== 'object') return null
@@ -1896,8 +1895,8 @@ function requestMetricsFromRow(row) {
     durationMs: Number.isFinite(row.request_duration_ms) ? row.request_duration_ms : null,
     ttftMs: Number.isFinite(start) && Number.isFinite(first) && first >= start ? first - start : null,
     tpotMs:
-      Number.isFinite(first) && Number.isFinite(end) && end >= first && completionTokens > 0
-        ? (end - first) / completionTokens
+      Number.isFinite(first) && Number.isFinite(end) && end >= first && completionTokens > 1
+        ? (end - first) / (completionTokens - 1)
         : null,
     promptTokens: Number.isFinite(row.prompt_tokens) ? row.prompt_tokens : null,
     completionTokens,
@@ -1949,7 +1948,10 @@ function requestMetricsHtml(m) {
     ${stat('总 Token', m.totalTokens == null ? '—' : fmtToken(m.totalTokens))}
     ${m.spend != null ? stat('花费（USD）', esc(String(Math.round(m.spend * 1e6) / 1e6))) : ''}
   </div>
-  ${m.startIso ? `<p class="muted lookup-time">${esc(fmtDateTime(m.startIso))} → ${esc(fmtDateTime(m.endIso))}</p>` : ''}`
+  ${m.startIso ? `<p class="muted lookup-time">${esc(fmtDateTime(m.startIso))} → ${esc(fmtDateTime(m.endIso))}</p>` : ''}
+  ${benchmarkModelNames(state.history).includes(m.model)
+    ? `<p class="chart-note">每日曲线统计该请求对应模型的所有网关请求，而非这个请求 ID 的多日数据。</p><button type="button" data-request-model="${esc(m.model)}">查看此模型每日指标曲线</button>`
+    : '<p class="chart-note">当前看板历史中没有与该请求完全匹配的模型，暂无法显示该模型每日曲线。</p>'}`
 }
 
 function lookupErrorMessage(err) {
@@ -1972,7 +1974,7 @@ async function queryGatewayRequest(requestId, key) {
   if (response.status === 401 || response.status === 403) throw new Error('gateway-auth')
   if (!response.ok) throw new Error(`HTTP ${response.status}`)
   const rows = await response.json()
-  return Array.isArray(rows) ? requestMetricsFromRow(rows[0]) : null
+  return Array.isArray(rows) ? requestMetricsFromRow(rows.find((row) => row?.request_id === requestId)) : null
 }
 
 function bindRequestLookup() {
@@ -1981,24 +1983,18 @@ function bindRequestLookup() {
   const idInput = $('lookup-id')
   const keyInput = $('lookup-key')
   const result = $('lookup-result')
-  try {
-    const saved = localStorage.getItem(GATEWAY_KEY_STORAGE)
-    if (saved && keyInput) keyInput.value = saved
-  } catch {}
+  result.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-request-model]');
+    if (!button || !benchmarkModelNames(state.history).includes(button.dataset.requestModel)) return;
+    state.model = button.dataset.requestModel;
+    renderModels();
+    $('model-trends')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
   form.addEventListener('submit', async (event) => {
     event.preventDefault()
     const requestId = String(idInput?.value || '').trim()
     if (!requestId) return
-    let key = String(keyInput?.value || '').trim()
-    if (key) {
-      try {
-        localStorage.setItem(GATEWAY_KEY_STORAGE, key)
-      } catch {}
-    } else {
-      try {
-        key = localStorage.getItem(GATEWAY_KEY_STORAGE) || ''
-      } catch {}
-    }
+    const key = String(keyInput?.value || '').trim()
     result.innerHTML = '<p class="empty">查询中…</p>'
     const local = findLocalRequest(state.productionDoc, requestId)
     if (local) {
@@ -2027,17 +2023,16 @@ function bindRequestLookup() {
 // path. Load it independently so it can never delay or fail the history view.
 async function loadProductionMetrics() {
   const target = $('production-metrics');
-  if (!target) return;
   const signal = typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'
     ? AbortSignal.timeout(10000)
     : undefined;
   try {
     const response = await fetchDataJson('model-request-metrics.json', { cache: 'no-store', signal });
     state.productionDoc = await response.json();
-    target.innerHTML = productionMetrics(state.productionDoc);
+    if (target) target.innerHTML = productionMetrics(state.productionDoc);
   } catch {
     state.productionDoc = null;
-    target.innerHTML = productionMetrics(null);
+    if (target) target.innerHTML = productionMetrics(null);
   }
 }
 
