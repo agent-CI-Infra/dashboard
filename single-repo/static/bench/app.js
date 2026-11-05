@@ -91,6 +91,24 @@
     return profile || task || '—'
   }
 
+  const benchmarksOf = (bench) => {
+    if (Array.isArray(bench && bench.benchmarks) && bench.benchmarks.length) return bench.benchmarks
+    return [
+      {
+        name: benchmarkName(bench),
+        status: bench.status,
+        tasks: taskCount(bench),
+        trials: trialsOf(bench),
+        passAt1: bench.passAt1,
+        passAtK: bench.passAtK,
+        passHatK: bench.passHatK,
+        detail: detailOf(bench),
+        latencyMs: bench.latencyMs,
+      },
+    ]
+  }
+  const totalOf = (benchmarks, key) => benchmarks.reduce((sum, item) => sum + (Number(item[key]) || 0), 0)
+
   function renderLatest(runs) {
     const latest = runs[0]
     if (!latest) {
@@ -102,16 +120,18 @@
       $('#latest').innerHTML = '<div class="empty">最近一次 Nightly 没有产出 bench summary。</div>'
       return
     }
+    const benchmarks = benchmarksOf(bench)
+    const many = benchmarks.length > 1
     $('#latest').innerHTML = [
       card('Bench 结果', statusChip(bench.status), [
-        ['Benchmark', benchmarkName(bench)],
-        ['pass@1', `${pct(bench.passAt1)} · ${passedOf(bench)}/${trialsOf(bench)}`],
-        ['pass@k', pct(bench.passAtK)],
+        ['Benchmark', many ? `${benchmarks.length} benchmarks` : benchmarks[0].name],
+        ['pass@1', many ? '—' : `${pct(benchmarks[0].passAt1)} · ${passedOf(bench)}/${trialsOf(bench)}`],
+        ['pass@k', many ? '—' : pct(benchmarks[0].passAtK)],
       ]),
-      card('规模', `<span class="mono">${taskCount(bench)} task</span>`, [
-        ['Tasks', String(taskCount(bench))],
-        ['Trials', String(trialsOf(bench))],
-        ['p50 / p95', latency(bench)],
+      card('规模', `<span class="mono">${totalOf(benchmarks, 'tasks')} task</span>`, [
+        ['Tasks', String(totalOf(benchmarks, 'tasks'))],
+        ['Trials', String(totalOf(benchmarks, 'trials'))],
+        ['p50 / p95', many ? '—' : latency(bench)],
       ]),
       card('运行', `<span class="mono">${esc(shortSha(latest.commit || bench.commit))}</span>`, [
         ['时间', fmt(runTime(latest))],
@@ -139,23 +159,25 @@
 
   const SUMMARY_HEAD = ['benchmark', 'result', 'tasks', 'trials', 'pass@1', 'pass@k', 'pass^k', 'score / detail', 'p50 / p95', '运行']
 
-  function summaryRow(run) {
+  function summaryRows(run) {
     const bench = benchOf(run)
     if (!bench) {
-      return `<tr><td class="muted">—</td><td>${statusChip('ERROR')}</td>${'<td class="muted">—</td>'.repeat(7)}<td>${runLink(run)}</td></tr>`
+      return [`<tr><td class="muted">—</td><td>${statusChip('ERROR')}</td>${'<td class="muted">—</td>'.repeat(7)}<td>${runLink(run)}</td></tr>`]
     }
-    return `<tr>
-      <td>${esc(benchmarkName(bench))}</td>
-      <td>${statusChip(bench.status)}</td>
-      <td class="num">${taskCount(bench)}</td>
-      <td class="num">${trialsOf(bench)}</td>
-      <td class="num">${pct(bench.passAt1)}</td>
-      <td class="num">${pct(bench.passAtK)}</td>
-      <td class="num">${pct(bench.passHatK)}</td>
-      <td>${esc(detailOf(bench))}</td>
-      <td class="nowrap">${latency(bench)}</td>
+    return benchmarksOf(bench).map(
+      (item) => `<tr>
+      <td>${esc(item.name)}</td>
+      <td>${statusChip(item.status)}</td>
+      <td class="num">${item.tasks || 0}</td>
+      <td class="num">${item.trials || 0}</td>
+      <td class="num">${pct(item.passAt1)}</td>
+      <td class="num">${pct(item.passAtK)}</td>
+      <td class="num">${pct(item.passHatK)}</td>
+      <td>${esc(item.detail || '—')}</td>
+      <td class="nowrap">${latency(item)}</td>
       <td>${runLink(run)}</td>
-    </tr>`
+    </tr>`,
+    )
   }
 
   function renderTables(runs) {
@@ -164,7 +186,7 @@
       summary.innerHTML = '<tbody><tr><td class="empty">暂无记录</td></tr></tbody>'
     } else {
       summary.innerHTML = `<thead><tr>${SUMMARY_HEAD.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead>
-        <tbody>${summaryRow(runs[0])}</tbody>`
+        <tbody>${summaryRows(runs[0]).join('')}</tbody>`
     }
 
     const history = $('#history')
@@ -175,9 +197,11 @@
     const rows = runs
       .map((run) => {
         const bench = benchOf(run)
+        const benchmarks = bench ? benchmarksOf(bench) : []
+        const label = benchmarks.length > 1 ? `all (${benchmarks.length})` : benchmarks[0] ? benchmarks[0].name : ''
         return `<tr>
           <td class="nowrap">${esc(fmt(runTime(run)))}</td>
-          <td>${bench ? esc(benchmarkName(bench)) : '<span class="muted">—</span>'}</td>
+          <td>${bench ? esc(label) : '<span class="muted">—</span>'}</td>
           <td>${bench ? statusChip(bench.status) : statusChip('ERROR')}</td>
           <td class="num">${bench ? pct(bench.passAt1) : '—'}</td>
           <td class="mono">${esc(shortSha(run.commit || (bench && bench.commit)))}</td>

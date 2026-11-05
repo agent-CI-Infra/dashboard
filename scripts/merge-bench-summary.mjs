@@ -59,6 +59,81 @@ function findFirst(dir, base) {
   return file ? readJson(file) : null
 }
 
+function findFile(dir, base) {
+  return walk(dir).find((candidate) => path.basename(candidate) === base) || null
+}
+
+function fraction(value) {
+  const text = String(value || '').trim()
+  if (!text || text === '—') return null
+  const match = text.match(/^([0-9.]+)%$/)
+  return match ? Number(match[1]) / 100 : null
+}
+
+function milliseconds(value) {
+  const parts = String(value || '').split('/').map((part) => part.trim())
+  const parse = (part) => {
+    if (!part) return null
+    const match = part.match(/^([0-9.]+)(ms|s)$/)
+    if (!match) return null
+    return Number(match[1]) * (match[2] === 's' ? 1000 : 1)
+  }
+  const p50 = parse(parts[0])
+  const p95 = parse(parts[1])
+  return p50 === null && p95 === null ? null : { p50, p95 }
+}
+
+// The manual Bench workflow publishes one Markdown table for all profiles.
+// Parse it rather than reading five different report schemas; `render_report.py`
+// is the single source of truth for the table.
+function reportEntry(file, run) {
+  const lines = readFileSync(file, 'utf8').split(/\r?\n/)
+  const benchmarks = []
+  let inTable = false
+  for (const line of lines) {
+    if (!line.startsWith('|')) {
+      if (inTable) inTable = false
+      continue
+    }
+    if (/^\|\s*-/.test(line)) {
+      inTable = true
+      continue
+    }
+    if (!inTable) continue
+    const cells = line.split('|').slice(1, -1).map((cell) => cell.trim())
+    if (cells.length < 9 || cells[0] === 'benchmark') continue
+    const [name, result, tasks, trials, passAt1, passAtK, passHatK, detail, latency] = cells
+    if (/not run/i.test(result)) continue
+    benchmarks.push({
+      name,
+      status: result,
+      tasks: Number.parseInt(tasks, 10) || 0,
+      trials: Number.parseInt(trials, 10) || 0,
+      passAt1: fraction(passAt1),
+      passAtK: fraction(passAtK),
+      passHatK: fraction(passHatK),
+      detail,
+      latencyMs: milliseconds(latency),
+    })
+  }
+  if (!benchmarks.length) return null
+  const runId = run && run.id ? `bench-${run.id}-${run.run_attempt || 1}` : ''
+  const overall = benchmarks.every((item) => item.status === 'PASS') ? 'PASS' : 'FAIL'
+  const backendLine = lines.find((line) => line.startsWith('| backend |')) || ''
+  const backend = (backendLine.match(/`([^`]+)`/) || [])[1] || ''
+  return {
+    schemaVersion: 1,
+    kind: 'bench',
+    runId,
+    commit: (run && run.head_sha) || '',
+    backend,
+    profile: 'all',
+    status: overall,
+    benchmarks,
+    generatedAt: (run && run.created_at) || new Date().toISOString(),
+  }
+}
+
 function previousRuns(previous) {
   const raw = readJson(previous)
   if (!raw) return []
@@ -80,13 +155,23 @@ function entryFrom({ bench, run }) {
         runId,
         commit: bench.commit || (run && run.head_sha) || '',
         generatedAt: bench.generatedAt || (run && run.created_at) || new Date().toISOString(),
-        taskCount: Number.isFinite(Number(bench.taskCount))
-          ? Number(bench.taskCount)
-          : Array.isArray(bench.tasks)
-            ? bench.tasks.length
-            : bench.task
-              ? 1
-              : 0,
+        ...(Array.isArray(bench.benchmarks)
+          ? {
+              taskCount: bench.benchmarks.reduce((sum, item) => sum + (Number(item.tasks) || 0), 0),
+              trials: bench.benchmarks.reduce((sum, item) => sum + (Number(item.trials) || 0), 0),
+              passAt1: null,
+              passAtK: null,
+              passHatK: null,
+            }
+          : {
+              taskCount: Number.isFinite(Number(bench.taskCount))
+                ? Number(bench.taskCount)
+                : Array.isArray(bench.tasks)
+                  ? bench.tasks.length
+                  : bench.task
+                    ? 1
+                    : 0,
+            }),
       }
     : {
         schemaVersion: 1,
@@ -116,8 +201,12 @@ function entryFrom({ bench, run }) {
 
 function main() {
   const args = parse(process.argv.slice(2))
-  const bench = findFirst(args.bench, 'bench-summary.json')
   const run = readJson(args.run)
+  let bench = findFirst(args.bench, 'bench-summary.json')
+  if (!bench) {
+    const report = findFile(args.bench, 'bench-report.md')
+    if (report) bench = reportEntry(report, run)
+  }
   const entry = entryFrom({ bench, run })
   if (!entry.runNumber && !entry.runId) throw new Error('no run id in artifacts or run metadata')
   if (!entry.runId) entry.runId = `nightly-${numberFromRunId(entry.runNumber) || entry.runNumber}`

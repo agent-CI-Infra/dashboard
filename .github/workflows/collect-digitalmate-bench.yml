@@ -72,7 +72,7 @@ jobs:
           gh api "repos/$repo/actions/runs/$id" \
             --jq '{id,html_url,conclusion,status,created_at,head_sha,event}' > /tmp/nightly-run.json
           gh api "repos/$repo/actions/runs/$id/artifacts?per_page=100" > /tmp/nightly-artifacts.json
-          bench_name=$(jq -r '.artifacts[] | select(.name == "bench-results") | .name' /tmp/nightly-artifacts.json | head -1)
+          bench_name=$(jq -r '[.artifacts[] | select(.name == "bench-results" or (.name | startswith("bench-"))) | .name] | first // empty' /tmp/nightly-artifacts.json)
           rm -rf /tmp/bench
           if [ -n "$bench_name" ]; then
             gh run download "$id" -R "$repo" -n "$bench_name" -D /tmp/bench
