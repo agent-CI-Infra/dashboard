@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>DigitalMate · 端侧观测</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-main">
+        <p class="eyebrow">DigitalMate · client-observed</p>
+        <h1>端侧观测看板</h1>
+        <p class="subtitle">
+          设备实测：从点击到首字、到渲染完成的端到端分段，按模型与环境对比。
+          数据由端侧上报，只在本页展示，不并入现网指标。
+        </p>
+      </div>
+      <div class="topbar-meta">
+        <span id="generated" class="meta-line"></span>
+        <span id="window" class="meta-line"></span>
+      </div>
+    </header>
+
+    <main class="page">
+      <p class="scope-note">
+        <strong>仅端侧自述数据（client-observed）</strong>
+        与现网指标（classified-production）分开统计，不做合并或加权。
+        数据来自设备上报，不含消息内容、提示词、响应正文或任何本地标识。
+      </p>
+
+      <div id="error" class="error" hidden></div>
+
+      <div class="toolbar">
+        <label class="env-picker" for="environment-select">
+          <span class="muted">环境</span>
+          <select id="environment-select" aria-label="选择环境"></select>
+        </label>
+        <span id="scope-hint" class="muted"></span>
+      </div>
+
+      <section id="summary" class="summary" aria-label="汇总">
+        <p class="empty">加载中…</p>
+      </section>
+
+      <section class="card" id="segments-card">
+        <div class="card-head">
+          <h2>端到端分段</h2>
+          <span class="muted">相邻时间戳差值 · 平均耗时</span>
+        </div>
+        <div id="segment-bars"><p class="empty">加载中…</p></div>
+        <p class="chart-note">
+          端侧按 9 个累计时间戳记录一轮请求，相邻两个时间戳都有记录时才计入该段，因此各段样本数可能不同。
+          均值跨环境按样本数加权；P95 只在单环境时给出，跨环境无法精确合并。
+        </p>
+      </section>
+
+      <section class="card" id="environments-card">
+        <div class="card-head">
+          <h2>环境对比</h2>
+          <span id="environment-count" class="muted"></span>
+        </div>
+        <div id="environment-table" class="table-wrap"><p class="empty">加载中…</p></div>
+        <p class="chart-note">
+          环境标签来自部署配置，不是端侧上报的字段；端侧声明的环境名不参与聚合。
+          标记「历史快照」的环境表示本轮采集失败，展示的是上一次成功的数据。
+        </p>
+      </section>
+
+      <section class="card" id="models-card">
+        <div class="card-head">
+          <h2>模型对比</h2>
+          <span id="model-scope" class="muted"></span>
+        </div>
+        <div id="model-table" class="table-wrap"><p class="empty">加载中…</p></div>
+        <p class="chart-note">
+          按端侧记录的模型调用聚合；成功率为状态为 completed / ok / success 的调用占比。
+          跨环境视图按调用数加权平均，P95 仅在单环境视图给出。
+        </p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>数据：端侧上报 · 窗口由采集器决定</span>
+      <span>仅供诊断参考；现网指标请看「现网指标统计」。</span>
+    </footer>
+
+    <div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>
+    <script src="app.js"></script>
+  </body>
+</html>
