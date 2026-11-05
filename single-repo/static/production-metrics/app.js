@@ -210,7 +210,7 @@ function suiteDayStats(history) {
     for (const point of entry?.points || []) {
       const date = String(point?.date || '');
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
-      if (!byDate.has(date)) byDate.set(date, { date, acc: newMetricAccumulator(), failed: 0, blocked: 0 });
+      if (!byDate.has(date)) byDate.set(date, { date, acc: newMetricAccumulator(), failed: 0, blocked: 0, unknown: 0 });
       const day = byDate.get(date);
       mergeMetricRow(day.acc, pointMetricRow(point));
       const queries = questionCount(point);
@@ -226,14 +226,15 @@ function suiteDayStats(history) {
           : 0;
       day.failed += failed;
       day.blocked += blocked;
+      day.unknown += Number.isFinite(point?.unknown_status_count) ? point.unknown_status_count : queries;
       day.acc.queries += queries;
     }
   }
   return [...byDate.values()]
     .sort((a, b) => a.date.localeCompare(b.date))
-    .map(({ date, acc, failed, blocked }) => {
-      const row = { date, failed, blocked, ...finalizeMetricAccumulator(acc) };
-      row.failure_rate = row.calls > 0 ? (failed / row.calls) * 100 : null;
+    .map(({ date, acc, failed, blocked, unknown }) => {
+      const row = { date, failed, blocked, unknown, ...finalizeMetricAccumulator(acc) };
+      row.failure_rate = row.calls > 0 && unknown === 0 ? (failed / row.calls) * 100 : null;
       return row;
     });
 }
@@ -249,7 +250,7 @@ function pointOn(entry, date) {
 function sameClockComparison(history, windowDays = 7) {
   const partial = historyPartialDay(history);
   if (!partial) return null;
-  const stamp = history?.updated_at || history?.generated_at;
+  const stamp = history?.window_end;
   const hour = shanghaiHour(stamp);
   if (!Number.isFinite(hour) || hour <= 0) return null;
   const start = addDays(partial, -windowDays);
@@ -405,8 +406,8 @@ function renderSummary() {
   const anchor = historyCompleteThrough(history) || historyLatestDate(history);
   const stats = suiteDayStats(history);
   const index = anchor ? stats.findIndex((row) => row.date === anchor) : -1;
-  const day = index >= 0 ? stats[index] : stats[stats.length - 1] || null;
-  const previous = index > 0 ? stats[index - 1] : null;
+  const day = index >= 0 ? stats[index] : null;
+  const previous = index > 0 && stats[index - 1].date === addDays(anchor, -1) ? stats[index - 1] : null;
   const completeLabel = anchor || '—';
 
   const trailing = newMetricAccumulator();
@@ -442,7 +443,7 @@ function renderSummary() {
     <div class="stat-card">
       <div class="stat-label">网关调用数</div>
       <div class="stat-value">${day ? fmtCount(day.calls) : '—'}</div>
-      <div class="stat-hint">${day ? `${esc(completeLabel)} · 成功 ${fmtCount(day.success_count)} / 失败 ${fmtCount(day.failed)}` : '暂无完整日数据'}</div>
+      <div class="stat-hint">${day ? `${esc(completeLabel)} · 成功 ${fmtCount(day.success_count)} / 失败 ${fmtCount(day.failed)}${day.unknown ? ` / 未知 ${fmtCount(day.unknown)}` : ''}` : '暂无完整日数据'}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">网关平均耗时</div>
@@ -825,8 +826,9 @@ function perfStrip(history) {
   const anchor = historyCompleteThrough(history);
   const days = suiteDayStats(history).filter((row) => !anchor || row.date <= anchor);
   if (!days.length) return '';
-  const latest = anchor ? days.find((row) => row.date === anchor) || days[days.length - 1] : days[days.length - 1];
-  const previous = [...days].reverse().find((row) => row.date < latest.date) || null;
+  const latest = anchor ? days.find((row) => row.date === anchor) : null;
+  if (!latest) return '<p class="empty">最新完整日暂无数据。</p>';
+  const previous = days.find((row) => row.date === addDays(latest.date, -1)) || null;
   const historyDays = days.length;
   return `
     <div class="stat-card">
@@ -852,8 +854,8 @@ function perfStrip(history) {
     </div>
     <div class="stat-card">
       <div class="stat-label">请求失败率</div>
-      <div class="stat-value ${latest.failed ? 'failed' : 'ok'}">${fmtPercent(latest.failure_rate)}</div>
-      <div class="stat-hint">失败 ${fmtCount(latest.failed)} / 调用 ${fmtCount(latest.calls)}${latest.blocked ? ` · 阻塞 ${fmtCount(latest.blocked)}` : ''}</div>
+      <div class="stat-value ${Number.isFinite(latest.failure_rate) ? (latest.failed ? 'failed' : 'ok') : ''}">${fmtPercent(latest.failure_rate)}</div>
+      <div class="stat-hint">失败 ${fmtCount(latest.failed)} / 调用 ${fmtCount(latest.calls)}${latest.unknown ? ` · 未知 ${fmtCount(latest.unknown)}` : ''}${latest.blocked ? ` · 阻塞 ${fmtCount(latest.blocked)}` : ''}</div>
     </div>
   `;
 }
@@ -1634,10 +1636,10 @@ function modelTrends(days, tokenVisibility = {}, latencyVisibility = {}, { token
     + tokenTrendChart(days, tokenVisibility, tokenUnit);
 }
 
-function modelSummary(days, model, { unit = 'query', failure = null } = {}) {
-  if (!days.length) return '<p class="empty">暂无该模型的完整日数据。</p>';
-  const latest = days[days.length - 1];
-  const previous = previousRow(days);
+function modelSummary(days, model, { unit = 'query', failure = null, anchor = null } = {}) {
+  const latest = days.find((day) => day.date === anchor);
+  if (!latest) return '<p class="empty">该模型在最新完整日暂无数据。</p>';
+  const previous = days.find((day) => day.date === addDays(anchor, -1));
   const hint = (base, delta) => `${base}${delta ? ` · ${delta}` : ''}`;
   const suffix = unit === 'request' ? 'per_request' : 'per_query';
   const unitLabel = unit === 'request' ? '成功调用' : '网关调用';
@@ -1670,7 +1672,7 @@ function modelSummary(days, model, { unit = 'query', failure = null } = {}) {
     <div class="stat-card">
       <div class="stat-label">网关调用数</div>
       <div class="stat-value">${fmtCount(latest.calls)}</div>
-      <div class="stat-hint">${hint(`成功 ${fmtCount(latest.success_count)} / 失败 ${fmtCount(latest.calls - latest.success_count)}`, deltaChip(latest.calls, previous?.calls))}</div>
+      <div class="stat-hint">${hint(`成功 ${fmtCount(latest.success_count)} / 失败 ${failure ? fmtCount(failure.failed) : '—（含未知状态或无数据）'}`, deltaChip(latest.calls, previous?.calls))}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">网关平均耗时</div>
@@ -1839,7 +1841,7 @@ function modelComparison(history, rangeDays = 0) {
   // The comparison is anchored on the newest day every model could have
   // finished; the in-progress day never reaches a headline row.
   const anchor = historyCompleteThrough(history) || historyLatestDate(history);
-  if (anchor && (!end || end > anchor)) end = anchor;
+  if (anchor) end = anchor;
   const span = Number(rangeDays);
   const start = Number.isFinite(span) && span > 0 && end ? addDays(end, -(Math.floor(span) - 1)) : '';
   const rows = [];
@@ -1863,8 +1865,8 @@ function modelComparison(history, rangeDays = 0) {
       name,
       hasData: scoped.length > 0,
       totals: finalizeMetricAccumulator(acc),
-      latest: scoped[scoped.length - 1],
-      previous: previousRow(scoped),
+      latest: scoped.find((row) => row.date === anchor) || null,
+      previous: scoped.find((row) => row.date === addDays(anchor, -1)) || null,
       recentCalls,
       lowVolume: recentCalls < MIN_RECENT_CALLS,
       failure_rate: complete && queries > 0 ? (failed / queries) * 100 : null,
@@ -1960,8 +1962,8 @@ function renderDetail() {
 
   const points = [...(entry.points || [])].sort((a, b) => a.date.localeCompare(b.date));
   const complete = completeDays(points, state.history);
-  const point = complete[complete.length - 1] || latestPoint(entry);
-  const latest = point || entry.latest;
+  const point = complete.find((item) => item.date === historyCompleteThrough(state.history)) || null;
+  const latest = point;
   const status = latest?.status || point?.status || 'UNKNOWN';
   const queries = Array.isArray(latest?.queries) ? latest.queries : [];
   const durations = points.map((item) => item.query_ms).filter(Number.isFinite);
@@ -2042,7 +2044,11 @@ function syncRangeButtons(disabled = false) {
 
 function currentModelDays() {
   if (!state.history || !state.model) return [];
-  return inRange(modelSeries(state.history, state.model), state.rangeDays, latestModelDate(state.history));
+  const rows = modelSeries(state.history, state.model);
+  const anchor = historyCompleteThrough(state.history);
+  const partial = historyPartialDay(state.history);
+  const completed = inRange(completeDays(rows, state.history), state.rangeDays, anchor);
+  return completed.concat(rows.filter((row) => row.date === partial));
 }
 
 function renderTrends() {
@@ -2116,7 +2122,7 @@ function renderModels() {
   }
   const weeks = weekSeries(complete);
   const failures = failureSeries(history, complete, state.model);
-  const dailyRates = new Map(failures.map((row) => [row.date, row.failure_rate]));
+  const dailyRates = new Map(failureSeries(history, days, state.model).map((row) => [row.date, row.failure_rate]));
   const weeklyRates = weeklyFailureRates(failures);
   const latestFailure = anchor
     ? failures.find((row) => row.date === anchor && Number.isFinite(row.failure_rate)) || null
@@ -2126,13 +2132,13 @@ function renderModels() {
     : '暂无数据';
   if (insights) {
     // A low-volume model cannot raise a reliable regression claim either.
-    insights.innerHTML = recentCalls >= MIN_RECENT_CALLS ? regressionBanner(complete, failures) : '';
+    insights.innerHTML = recentCalls >= MIN_RECENT_CALLS && complete.some((row) => row.date === anchor) ? regressionBanner(complete, failures) : '';
   }
   if (compare) {
     compare.innerHTML = modelCompareCard(modelComparison(history, state.rangeDays), { selected: state.model });
   }
   if (compareVersion) compareVersion.textContent = versionLine(history);
-  if (summary) summary.innerHTML = modelSummary(complete, state.model, { unit: state.tokenUnit, failure: latestFailure });
+  if (summary) summary.innerHTML = modelSummary(complete, state.model, { unit: state.tokenUnit, failure: latestFailure, anchor });
   if (trends) {
     const trendFailures = failureSeries(history, days, state.model);
     trends.innerHTML = modelTrends(days, state.tokenVisibility, state.latencyVisibility, {
@@ -2432,6 +2438,12 @@ async function loadProductionMetrics() {
   }
 }
 
+function requireCurrentMetricsVersion(history) {
+  if (!Number.isInteger(history?.metrics_version) || history.metrics_version < 3) {
+    throw new Error('数据口径版本过旧，请等待采集任务完成历史数据重建');
+  }
+}
+
 async function load() {
   try {
     const response = await fetch('../data/production-model-history.json', { cache: 'no-store' });
@@ -2440,8 +2452,9 @@ async function load() {
     if (!history || typeof history !== 'object' || !history.cases) {
       throw new Error('history.json 缺少 cases');
     }
+    requireCurrentMetricsVersion(history);
     state.history = history;
-    state.model = benchmarkModelNames(history)[0] || null;
+    state.model = busiestModel(history);
     void loadProductionMetrics();
     const cases = sortedCases();
     state.selected = cases.find((entry) => entry.id === 'DM-WF-BACK-01')?.id || cases[0]?.id || null;

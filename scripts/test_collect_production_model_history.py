@@ -59,8 +59,28 @@ class CollectionTests(unittest.TestCase):
             metrics = point['benchmark_models'][0]
             self.assertEqual(metrics['ttft_sample_count'], 2)
             self.assertEqual(metrics['ttft_filtered_count'], 1)
-            self.assertEqual(metrics['tpot_filtered_count'], 1)
-            self.assertEqual(metrics['tpot_sample_count'], 2)
+            self.assertEqual(metrics['tpot_filtered_count'], 2)
+            self.assertEqual(metrics['tpot_sample_count'], 1)
+
+    def test_near_end_ttft_excludes_tpot_even_above_minimum(self):
+        row = {'status': 'success', 'stream': True,
+               'startTime': '2026-11-03T00:00:00Z',
+               'completionStartTime': '2026-11-03T00:00:09.9Z',
+               'endTime': '2026-11-03T00:00:10Z',
+               'request_duration_ms': 10000, 'completion_tokens': 3}
+        metrics = collector.aggregate_point([row], '2026-11-03', 'model')['benchmark_models'][0]
+        self.assertEqual(metrics['ttft_filtered_count'], 1)
+        self.assertEqual(metrics['tpot_filtered_count'], 1)
+        self.assertEqual(metrics['tpot_sample_count'], 0)
+        self.assertIsNone(metrics['tpot_avg_ms'])
+
+    def test_conflicting_stream_flags_are_unknown(self):
+        row = {'stream': True, 'metadata': {'spend_logs_metadata': {'stream': False}}}
+        self.assertIsNone(collector.stream_state(row))
+
+    def test_unknown_status_cannot_be_counted_as_passed(self):
+        point = collector.aggregate_point([{'status': 'unknown'}], '2026-11-03', 'model')
+        self.assertEqual(point['status'], 'UNKNOWN')
 
     def test_tokens_count_successes_and_failed_attempts_separately(self):
         rows = [

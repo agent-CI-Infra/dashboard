@@ -30,3 +30,11 @@ test('comparison retains selectable models outside the selected time window', ()
  assert.equal(rows.length,2);
  assert.equal(rows.find((row)=>row.name==='inactive').hasData,false);
 });
+
+test('comparison does not treat a stale model day as the latest complete day', () => {
+ const c=vm.createContext({});
+ vm.runInContext(`const MIN_RECENT_CALLS=50; const RECENT_WINDOW_DAYS=7; const benchmarkModelNames=()=>['idle']; const modelSeries=()=>[{date:'2026-11-02',calls:100,ttft_ms:10}]; const addDays=(d)=>d==='2026-11-04'?'2026-11-03':'2026-10-29'; const newMetricAccumulator=()=>({}); const mergeMetricRow=()=>{}; const finalizeMetricAccumulator=()=>({calls:100}); const historyCompleteThrough=()=>'2026-11-04'; const historyLatestDate=()=>'2026-11-04'; const recentCallsForDays=()=>100; const failureSeries=()=>[];`+extract('function modelComparison(', 'function modelCompareCard(')+'; globalThis.comparison=modelComparison;',c);
+ const [row]=c.comparison({},0);
+ assert.equal(row.latest,null);
+ assert.equal(row.previous,null);
+});

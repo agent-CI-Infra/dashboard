@@ -57,7 +57,7 @@ from pathlib import Path
 
 BASE = 'https://onlineswarm.openjiuwen.com:31474'
 SCHEMA = 'digitalmate/e2e-performance-history@1'
-METRICS_VERSION = 2
+METRICS_VERSION = 3
 RUN_ID = 'prod-adx-jiuwen'
 P50_MIN_SAMPLES = 20
 P95_MIN_SAMPLES = 20
@@ -124,7 +124,7 @@ def stream_state(row):
     known = [flag for flag in flags if isinstance(flag, bool)]
     if not known:
         return None
-    return all(known)
+    return known[0] if all(flag == known[0] for flag in known) else None
 
 
 def token_sums(rows):
@@ -321,14 +321,17 @@ def aggregate_point(day_rows, date, physical, partial_day=None):
             continue
         ttft = (first_dt - start_dt).total_seconds() * 1000
         total_ms = duration if duration and duration > 0 else None
-        if total_ms and ttft >= TTFT_ANOMALY_RATIO * total_ms:
+        timestamp_anomaly = bool(total_ms and ttft >= TTFT_ANOMALY_RATIO * total_ms)
+        if timestamp_anomaly:
             # first token arriving with the last token means the timestamp is a
             # completion time, not a measurable TTFT.
             ttft_filtered += 1
         elif ttft >= 0:
             (ttft_strict if stream is True else ttft_estimated).append(ttft)
         completion = row.get('completion_tokens')
-        if stream is True and isinstance(completion, int) and completion > 1:
+        if stream is True and timestamp_anomaly and isinstance(completion, int) and completion > 1:
+            tpot_filtered += 1
+        elif stream is True and isinstance(completion, int) and completion > 1:
             tpot = (end_dt - first_dt).total_seconds() * 1000 / (completion - 1)
             if tpot < TPOT_MIN_MS:
                 tpot_filtered += 1
@@ -373,7 +376,7 @@ def aggregate_point(day_rows, date, physical, partial_day=None):
     last_end = max((dt for r in day_rows if (dt := parse_dt(r.get('endTime'))) is not None), default=None)
     return {
         'date': date,
-        'status': 'FAILED' if failed > len(day_rows) - failed else 'COMPLETED',
+        'status': 'UNKNOWN' if unknown else ('FAILED' if failed > len(success_rows) else 'COMPLETED'),
         'partial': date == partial_day,
         'query_ms': rounded(mean(durations)) if durations else None,
         'duration_sum_ms': rounded(sum(durations)) if durations else None,
