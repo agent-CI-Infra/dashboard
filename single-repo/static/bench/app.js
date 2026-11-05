@@ -7,7 +7,7 @@
 
   const $ = (s) => document.querySelector(s)
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
-  const pct = (v) => (Number.isFinite(Number(v)) ? `${Math.round(Number(v) * 100)}%` : '—')
+  const pct = (v) => (v === null || v === undefined || v === '' || !Number.isFinite(Number(v)) ? '—' : `${Math.round(Number(v) * 100)}%`)
   const fmt = (v) => {
     if (!v) return '—'
     const d = new Date(v)
@@ -69,7 +69,7 @@
     return tasksOf(bench).length || (bench.task ? 1 : 0)
   }
   const fmtMs = (value) => {
-    if (!Number.isFinite(Number(value))) return '—'
+    if (value === null || value === undefined || !Number.isFinite(Number(value))) return '—'
     const ms = Number(value)
     return ms >= 1000 ? `${(ms / 1000).toFixed(1)}s` : `${Math.round(ms)}ms`
   }
