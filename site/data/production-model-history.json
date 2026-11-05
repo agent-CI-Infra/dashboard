@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/e2e-performance-history@1",
- "generated_at": "2026-11-04T19:44:29Z",
- "updated_at": "2026-11-04T19:44:29Z",
+ "generated_at": "2026-11-05T01:27:45Z",
+ "updated_at": "2026-11-05T01:27:45Z",
  "window_start": "2026-10-01T16:00:00+00:00",
- "window_end": "2026-11-04T19:44:21+00:00",
+ "window_end": "2026-11-05T01:27:35+00:00",
  "current_day_partial": true,
  "source_scope": "gateway-all-requests",
  "excluded_missing_model": 0,
@@ -234,27 +234,27 @@
     {
      "date": "2026-11-05",
      "status": "COMPLETED",
-     "query_ms": 6271,
-     "query_count": 25,
+     "query_ms": 6013,
+     "query_count": 404,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-04T19:26:28Z",
+     "finished_at": "2026-11-05T01:24:32Z",
      "failed_queries": 0,
      "unknown_status_count": 0,
      "blocked_queries": 0,
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 25,
-       "ttft_avg_ms": 1906,
-       "ttft_sample_count": 22,
-       "tpot_avg_ms": 3.35,
-       "tpot_sample_count": 22,
-       "duration_p95_ms": 22202,
-       "duration_sample_count": 25,
-       "input_tokens": 1472504,
-       "output_tokens": 22288,
-       "total_tokens": 1494792
+       "call_count": 404,
+       "ttft_avg_ms": 3151,
+       "ttft_sample_count": 303,
+       "tpot_avg_ms": 2.84,
+       "tpot_sample_count": 303,
+       "duration_p95_ms": 21765,
+       "duration_sample_count": 404,
+       "input_tokens": 15690398,
+       "output_tokens": 376960,
+       "total_tokens": 16067358
       }
      ]
     }
@@ -262,27 +262,27 @@
    "latest": {
     "date": "2026-11-05",
     "status": "COMPLETED",
-    "query_ms": 6271,
-    "query_count": 25,
+    "query_ms": 6013,
+    "query_count": 404,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-04T19:26:28Z",
+    "finished_at": "2026-11-05T01:24:32Z",
     "failed_queries": 0,
     "unknown_status_count": 0,
     "blocked_queries": 0,
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 25,
-      "ttft_avg_ms": 1906,
-      "ttft_sample_count": 22,
-      "tpot_avg_ms": 3.35,
-      "tpot_sample_count": 22,
-      "duration_p95_ms": 22202,
-      "duration_sample_count": 25,
-      "input_tokens": 1472504,
-      "output_tokens": 22288,
-      "total_tokens": 1494792
+      "call_count": 404,
+      "ttft_avg_ms": 3151,
+      "ttft_sample_count": 303,
+      "tpot_avg_ms": 2.84,
+      "tpot_sample_count": 303,
+      "duration_p95_ms": 21765,
+      "duration_sample_count": 404,
+      "input_tokens": 15690398,
+      "output_tokens": 376960,
+      "total_tokens": 16067358
      }
     ]
    }
