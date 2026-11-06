@@ -11,7 +11,8 @@
   "overhead": "gateway − workswarm（逐请求差值取均值）",
   "ttft": "云端调用口径：模型调用开始 → 首个 Token（运行时 ttft_ms，每次模型调用一条记录）",
   "tpot": "云端调用口径：首 Token → 调用结束，按输出 Token 数（N−1）加权（运行时 tpot_ms）",
-  "failure": "失败调用 = llm_call_error 事件（如 422 预算超限、408 超时）；失败率 = 失败 ÷（成功 + 失败）"
+  "failure": "失败调用 = llm_call_error 事件（如 422 预算超限、408 超时）；失败率 = 失败 ÷（成功 + 失败）",
+  "tokens": "成功调用的 Token 累计：llm_usage 记录 usage_metadata 的 input_tokens / output_tokens 求和"
  },
  "days": [
   {
@@ -48,6 +49,11 @@
     "mean": 5.96,
     "p50": 5.25,
     "p95": 8.48
+   },
+   "tokens": {
+    "input": 4284810,
+    "output": 80216,
+    "total": 4365026
    },
    "calls": {
     "total": 101,
@@ -91,6 +97,11 @@
     "p50": 4.95,
     "p95": 12.19
    },
+   "tokens": {
+    "input": 7121400,
+    "output": 141465,
+    "total": 7262865
+   },
    "calls": {
     "total": 342,
     "success": 187,
@@ -132,6 +143,11 @@
     "mean": 5.53,
     "p50": 4.67,
     "p95": 9.94
+   },
+   "tokens": {
+    "input": 5699563,
+    "output": 105521,
+    "total": 5805084
    },
    "calls": {
     "total": 152,
@@ -175,6 +191,11 @@
     "p50": 9.17,
     "p95": 94.06
    },
+   "tokens": {
+    "input": 22648202,
+    "output": 288753,
+    "total": 22936955
+   },
    "calls": {
     "total": 629,
     "success": 629,
@@ -216,6 +237,11 @@
     "mean": 5.84,
     "p50": 5.33,
     "p95": 69.61
+   },
+   "tokens": {
+    "input": 27514888,
+    "output": 412333,
+    "total": 27927221
    },
    "calls": {
     "total": 495,
