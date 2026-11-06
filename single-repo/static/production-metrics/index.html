@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <style>.topbar, .footer { display: none; } .page { padding-top: 0; }</style>
+    <style>.topbar, #tabs, .footer { display: none; } .page { padding-top: 0; }</style>
     <header class="topbar">
       <div class="topbar-main">
         <p class="eyebrow">DigitalMate · Nightly E2E</p>
@@ -25,11 +25,6 @@
 
     <main class="page">
       <div id="error" class="error" hidden></div>
-
-      <div class="board-head">
-        <h1 class="board-title">DigitalMate · Nightly E2E 性能看板</h1>
-        <span class="muted">现网模型请求 · Asia/Shanghai · 只含聚合指标</span>
-      </div>
 
       <nav id="tabs" class="tabs" role="tablist" aria-label="看板视图">
         <button id="tab-cases" class="tab active" type="button" role="tab" aria-selected="true"

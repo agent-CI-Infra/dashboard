@@ -859,24 +859,8 @@ h1 {
 
 .wf-subhead { margin: 12px 0 4px; color: var(--muted); font-size: 12px; font-weight: 600; }
 
-/* Compact standalone header: the topbar stays parked, but the page still
-   names itself and offers the view tabs. */
-.board-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 4px 16px;
-  margin: 6px 0 8px;
-}
-
-.board-title {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
+/* The page is embedded in the DigitalMate board iframe: parent chrome supplies
+   the title and navigation, so the local topbar and view tabs stay hidden. */
 .tabs {
   display: flex;
   gap: 4px;
