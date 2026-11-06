@@ -1407,12 +1407,21 @@ function volumeTrendChart(days, failures, visibility = {}) {
         path += `${open ? 'L' : 'M'}${x(index).toFixed(1)},${scale(value).toFixed(1)}`;
         open = true;
       });
+      const dense = rows.length > 16;
       const dots = item.values
         .map((value, index) => {
           if (value === null) return '';
-          return `<circle class="trend-dot" cx="${x(index).toFixed(1)}" cy="${scale(value).toFixed(1)}" r="2.5">
+          const cx = x(index);
+          const cy = scale(value);
+          const label = pointLabel(cx, cy, value, item.values[index - 1], {
+            format: item.format,
+            below: item.axis === 'right',
+            lowerIsBetter: item.key === 'failure',
+            dense,
+          });
+          return `<circle class="trend-dot" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="2.5">
             <title>${esc(`${rows[index]?.date || ''} · ${item.label} ${item.format(value)}`)}</title>
-          </circle>`;
+          </circle>${label}`;
         })
         .join('');
       return `<g class="volume-layer ${item.layer}${active ? '' : ' is-hidden'}" data-layer="${item.key}">
