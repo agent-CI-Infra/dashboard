@@ -912,6 +912,40 @@ function envTpotTrend(doc) {
   });
 }
 
+// Headline tiles for the cloud-side agent, mirroring the model summary: one
+// card per metric family, values joined by "/", anchored on the latest
+// complete day so a partial day never sets the numbers.
+function envSummary(doc) {
+  const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date && row.gateway) : [];
+  if (!rows.length) return '';
+  const anchor = [...rows].reverse().find((row) => !row.partial) || rows[rows.length - 1];
+  const seconds = (value) => fmtSecondsBare(value);
+  const rate = Number.isFinite(anchor.failure_rate) ? fmtPercent(anchor.failure_rate * 100) : '—';
+  const failureTone = Number.isFinite(anchor.failure_rate) && anchor.failure_rate > 0 ? 'failed' : 'ok';
+  return `<section class="summary env-summary" aria-label="云侧 Agent 指标">
+    <div class="stat-card">
+      <div class="stat-label">云侧 Agent<strong>调用数</strong> / <strong>请求失败率</strong></div>
+      <div class="stat-value combo">${fmtCount(anchor.calls?.total)} / <span class="${failureTone}">${rate}</span></div>
+      <div class="stat-hint">成功 ${fmtCount(anchor.calls?.success)} / 失败 ${fmtCount(anchor.calls?.failed)} · ${esc(anchor.date)}${anchor.partial ? ' 部分日' : ''}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">云侧 Agent<strong>请求耗时</strong>平均 / P50 / P95（s）</div>
+      <div class="stat-value combo">${seconds(anchor.gateway.mean)} / ${seconds(anchor.gateway.p50)} / ${seconds(anchor.gateway.p95)}</div>
+      <div class="stat-hint">${fmtCount(anchor.gateway.n)} 个成功请求 · 不含端侧与网络</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">云侧 Agent<strong>TTFT</strong> 平均 / P50 / P95（s）</div>
+      <div class="stat-value combo">${seconds(anchor.ttft?.mean)} / ${seconds(anchor.ttft?.p50)} / ${seconds(anchor.ttft?.p95)}</div>
+      <div class="stat-hint">${fmtCount(anchor.ttft?.n)} 次模型调用 · 调用级分位</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">云侧 Agent<strong>TPOT</strong> 平均 / P50 / P95（ms/token）</div>
+      <div class="stat-value combo">${fmtTpotBare(anchor.tpot?.mean)} / ${fmtTpotBare(anchor.tpot?.p50)} / ${fmtTpotBare(anchor.tpot?.p95)}</div>
+      <div class="stat-hint">${fmtCount(anchor.tpot?.n)} 次调用 · ${fmtCount(anchor.tpot?.tokens)} token 加权</div>
+    </div>
+  </section>`;
+}
+
 // Cloud call volume and failure rate share one card: counts on the left axis,
 // the failure percentage on the right. Failed calls come from llm_call_error
 // events (budget exceeded, timeouts), successful ones from llm_usage records.
@@ -959,6 +993,7 @@ function envCallTrend(doc) {
       const label = pointLabel(labelX, scale(value), value, values[index - 1], {
         format,
         lowerIsBetter: !!opts.lowerIsBetter,
+        colorDirection: !opts.lowerIsBetter,
         below: !!opts.below,
         dense: rows.length > 16,
       });
@@ -1068,7 +1103,7 @@ function fmtInUnit(value, div = 1) {
 // Latency-family charts color the glyph by "lower is better"; volume charts
 // keep it neutral so growth never reads as an alarm. Skipped entirely when the
 // selected range packs too many points for legible labels.
-function pointLabel(cx, cy, value, previous, { format, below = false, lowerIsBetter = false, dense = false } = {}) {
+function pointLabel(cx, cy, value, previous, { format, below = false, lowerIsBetter = false, colorDirection = false, dense = false } = {}) {
   if (dense || !Number.isFinite(value)) return '';
   let glyph = '';
   let pctText = '';
@@ -1080,7 +1115,7 @@ function pointLabel(cx, cy, value, previous, { format, below = false, lowerIsBet
       const pct = Math.abs(delta) * 100;
       glyph = up ? '▲' : '▼';
       pctText = pct < 10 ? `${pct.toFixed(1)}%` : `${Math.round(pct)}%`;
-      tone = lowerIsBetter ? (up ? 'bad' : 'good') : 'flat';
+      tone = lowerIsBetter || colorDirection ? (up ? 'bad' : 'good') : 'flat';
     }
   }
   const yy = cy + (below ? 14 : -8);
@@ -1720,6 +1755,7 @@ function volumeTrendChart(days, failures, visibility = {}) {
             format: item.format,
             below: item.axis === 'right',
             lowerIsBetter: item.key === 'failure',
+            colorDirection: item.key !== 'failure',
             dense,
           });
           return `<circle class="trend-dot" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="2.5">
@@ -2081,7 +2117,7 @@ function tokenTrendChart(points, visibility = {}, unit = 'query') {
       const dots = item.values
         .map((value, index) => {
           if (value === null) return '';
-          const label = pointLabel(x(index), y(value), value, item.values[index - 1], { format: fmtTokenCompact, below: item.below, dense: rows.length > 16 });
+          const label = pointLabel(x(index), y(value), value, item.values[index - 1], { format: fmtTokenCompact, below: item.below, colorDirection: true, dense: rows.length > 16 });
           return `<circle class="trend-dot" cx="${x(index).toFixed(1)}" cy="${y(value).toFixed(1)}" r="2.5">
             <title>${esc(`${rows[index]?.date || ''} · ${item.label} ${fmtTokenCompact(value)}`)}</title>
           </circle>${label}`;
@@ -2182,7 +2218,7 @@ function modelSummary(days, model, { unit = 'query', failure = null, anchor = nu
       <div class="stat-hint">Token 加权 · ${fmtCount(latest.tpot_estimated_samples)} 个样本 · 规则过滤 ${fmtCount(latest.tpot_filtered_count)} 个</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">输入 / 输出 / 总 Token${tokenUnit ? `（${tokenUnit}）` : ''}</div>
+      <div class="stat-label">模型侧输入 / 输出 / 总 Token${tokenUnit ? `（${tokenUnit}）` : ''}</div>
       <div class="stat-value combo">${tokenBare(latest.input_tokens)} / ${tokenBare(latest.output_tokens)} / ${tokenBare(latest.total_tokens)}</div>
       <div class="stat-hint">成功调用 ${fmtCount(latest.success_count)} 次</div>
     </div>
@@ -2915,7 +2951,7 @@ async function loadEnvLatency() {
     daily = null;
   }
   const charts = daily && daily.schema === 'digitalmate/env-request-latency-daily@1'
-    ? `${envLatencyTrend(daily)}${envTtftTrend(daily)}${envTpotTrend(daily)}${envCallTrend(daily)}${envCallDetail(daily)}`
+    ? `${envSummary(daily)}${envCallTrend(daily)}${envLatencyTrend(daily)}${envTtftTrend(daily)}${envTpotTrend(daily)}${envCallDetail(daily)}`
     : '';
   // The per-environment GateWay / WorkSwarm table is parked for now; the daily
   // charts carry the same measurements in a more readable form.
