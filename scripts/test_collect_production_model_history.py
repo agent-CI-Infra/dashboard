@@ -93,6 +93,32 @@ class CollectionTests(unittest.TestCase):
         self.assertEqual(metrics['tpot_avg_ms'], 200)
         self.assertEqual(metrics['tpot_filtered_count'], 2)
 
+    def test_tpot_uses_generated_token_weight_not_per_call_mean(self):
+        base = {'status': 'success', 'startTime': '2026-11-03T00:00:00Z',
+                'completionStartTime': '2026-11-03T00:00:01Z'}
+        rows = [dict(base, stream=True, endTime='2026-11-03T00:00:02Z', completion_tokens=11),
+                dict(base, stream=True, endTime='2026-11-03T00:00:03Z', completion_tokens=101),
+                dict(base, endTime='2026-11-03T00:00:02Z', completion_tokens=11),
+                dict(base, endTime='2026-11-03T00:00:03Z', completion_tokens=101)]
+        metrics = collector.aggregate_point(rows, '2026-11-03', 'model')['benchmark_models'][0]
+        self.assertEqual(metrics['tpot_weight_tokens'], 110)
+        self.assertEqual(metrics['tpot_decode_sum_ms'], 3000)
+        self.assertAlmostEqual(metrics['tpot_avg_ms'], 3000 / 110)
+        self.assertAlmostEqual(metrics['tpot_estimated_avg_ms'], 3000 / 110)
+        self.assertEqual(metrics['tpot_estimated_weight_tokens'], 110)
+
+    def test_tpot_histogram_preserves_request_counts_and_extremes(self):
+        samples = [(1000, 250)] * 19 + [(10000, 10)]
+        histogram = collector.metric_histogram(duration / tokens for duration, tokens in samples)
+        self.assertEqual(sum(count for _, count in histogram), 20)
+        self.assertEqual(sorted(count for _, count in histogram), [1, 19])
+        self.assertLess(abs(1.02 ** (histogram[0][0] + 0.5) / 4 - 1), 0.01)
+
+    def test_ttft_estimate_histogram_includes_zero(self):
+        hist = collector.metric_histogram([0, 1000, 1000])
+        self.assertEqual(hist[0], (-1001, 1))
+        self.assertEqual(sum(count for _, count in hist), 3)
+
     def test_unknown_status_cannot_be_counted_as_passed(self):
         point = collector.aggregate_point([{'status': 'unknown'}], '2026-11-03', 'model')
         self.assertEqual(point['status'], 'UNKNOWN')

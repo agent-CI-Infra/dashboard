@@ -44,7 +44,7 @@ test('strict and estimated TTFT stay separate and tokens carry coverage', () => 
     calls: 4, success_count: 4, duration_sum_ms: 2000, duration_samples: 4,
     ttft_ms: 100, ttft_samples: 2,
     ttft_estimated_ms: 900, ttft_estimated_samples: 1,
-    tpot_ms: 12, tpot_samples: 2,
+    tpot_ms: 12, tpot_samples: 2, tpot_decode_sum_ms: 120, tpot_weight_tokens: 10,
     total_tokens: 20, input_tokens: 12, output_tokens: 8, token_sample_count: 2,
   });
   const result = ctx.finish(a);
@@ -167,31 +167,45 @@ test('legacy and previous-version snapshots cannot be displayed as current metri
   assert.throws(() => ctx.requireVersion({}), /版本过旧/);
   assert.throws(() => ctx.requireVersion({metrics_version: 2}), /版本过旧/);
   assert.throws(() => ctx.requireVersion({metrics_version: 3}), /版本过旧/);
-  assert.doesNotThrow(() => ctx.requireVersion({metrics_version: 4}));
+  assert.throws(() => ctx.requireVersion({metrics_version: 4}), /版本过旧/);
+  assert.throws(() => ctx.requireVersion({metrics_version: 5}), /版本过旧/);
+  assert.doesNotThrow(() => ctx.requireVersion({metrics_version: 6}));
 });
 
-test('estimated TPOT is weighted separately from confirmed streaming', () => {
+test('estimated TPOT is token-weighted separately and remains mergeable across days', () => {
   const acc = ctx.acc();
   ctx.merge(acc, {calls: 10, success_count: 10, tpot_ms: 1, tpot_samples: 1,
-    tpot_estimated_ms: 2, tpot_estimated_samples: 2, tpot_estimated_sum_ms: 4});
+    tpot_decode_sum_ms: 10, tpot_weight_tokens: 10,
+    tpot_estimated_ms: 2, tpot_estimated_samples: 2, tpot_estimated_decode_sum_ms: 20, tpot_estimated_weight_tokens: 10});
   ctx.merge(acc, {calls: 5, success_count: 5, tpot_estimated_ms: 4,
-    tpot_estimated_samples: 1, tpot_estimated_sum_ms: 4});
+    tpot_estimated_samples: 1, tpot_estimated_decode_sum_ms: 400, tpot_estimated_weight_tokens: 100});
   const result = ctx.finish(acc);
   assert.equal(result.tpot_ms, 1);
   assert.equal(result.tpot_estimated_samples, 3);
-  assert.equal(result.tpot_estimated_ms, 8 / 3);
+  assert.equal(result.tpot_estimated_ms, 420 / 110);
+  const weekly = ctx.acc();
+  ctx.merge(weekly, result);
+  assert.equal(ctx.finish(weekly).tpot_estimated_ms, 420 / 110);
 });
 
-test('latency chart renders estimated TPOT on the right axis and tooltip', () => {
+test('TPOT is unavailable if weighted evidence is missing', () => {
+  const acc = ctx.acc();
+  ctx.merge(acc, {tpot_samples:1, tpot_ms:2});
+  ctx.merge(acc, {tpot_samples:1, tpot_decode_sum_ms:40, tpot_weight_tokens:10});
+  assert.equal(ctx.finish(acc).tpot_ms, null);
+});
+
+test('separate TPOT chart renders estimated values and tooltip', () => {
   const c = vm.createContext({});
   vm.runInContext(`const chartSize=()=>({width:1000,height:220}); const niceMax=(v)=>v||1;
     const fmtAxis=String; const fmtDuration=String; const fmtTpot=(v)=>v+' ms/token'; const esc=String;` +
     extract('function latencyTrendChart(points', 'function tokenTrendChart(') +
-    '; globalThis.chart=latencyTrendChart;', c);
+    '; globalThis.chart=tpotTrendChart;', c);
   const html = c.chart([{date:'2026-11-04',tpot_estimated_ms:2.5}], {});
-  assert.match(html, /TPOT 估算（流式未知）/);
+  assert.match(html, /TPOT 加权估算/);
+  assert.doesNotMatch(html, /TPOT 加权（流式）|TPOT P50（流式）|TPOT P95（流式）/);
   assert.match(html, /latency-layer tpot-est/);
-  assert.match(html, /axis-right/);
+  assert.match(html, /TPOT 趋势（ms\/token）/);
   assert.match(html, /2.5 ms\/token/);
 });
 
@@ -246,4 +260,44 @@ test('seven-day range includes seven complete days plus the separate partial day
   assert.equal(context.days.length, 8);
   assert.equal(context.days[0].date, '2026-10-29');
   assert.equal(context.days[7].date, '2026-11-05');
+});
+
+
+test('request TPOT histograms merge across days without mixing unknown streams', () => {
+  const a = ctx.acc();
+  ctx.merge(a, {tpot_samples: 10, tpot_decode_sum_ms: 100, tpot_weight_tokens: 10, tpot_histogram:[[0,10]],
+    tpot_estimated_samples: 20, tpot_estimated_decode_sum_ms: 200, tpot_estimated_weight_tokens: 20, tpot_estimated_histogram:[[35,20]]});
+  ctx.merge(a, {tpot_samples: 10, tpot_decode_sum_ms: 200, tpot_weight_tokens: 10, tpot_histogram:[[35,9],[200,1]]});
+  const daily = ctx.finish(a);
+  assert.ok(Math.abs(daily.tpot_p50_ms - 1) < 0.02);
+  assert.ok(Math.abs(daily.tpot_p95_ms - 2) < 0.04);
+  assert.ok(Math.abs(daily.tpot_estimated_p50_ms - 2) < 0.04);
+  const weekly = ctx.acc(); ctx.merge(weekly, daily);
+  assert.equal(ctx.finish(weekly).tpot_p95_ms, daily.tpot_p95_ms);
+  const missing = ctx.acc(); ctx.merge(missing, {tpot_samples:20,tpot_histogram:[[0,19]]});
+  assert.equal(ctx.finish(missing).tpot_p50_ms, null);
+});
+
+
+test('estimated TTFT histogram is mergeable, keeps zeros and separate from strict TTFT', () => {
+  const a=ctx.acc();
+  ctx.merge(a,{ttft_estimated_samples:10,ttft_estimated_ms:0,ttft_estimated_histogram:[[-1001,10]]});
+  ctx.merge(a,{ttft_estimated_samples:10,ttft_estimated_ms:1000,ttft_estimated_histogram:[[348,10]]});
+  const daily=ctx.finish(a);
+  assert.equal(daily.ttft_estimated_p50_ms,0);
+  assert.ok(Math.abs(daily.ttft_estimated_p95_ms-1000)<20);
+  const combined=ctx.acc(); ctx.merge(combined,daily);
+  assert.equal(ctx.finish(combined).ttft_estimated_p95_ms,daily.ttft_estimated_p95_ms);
+});
+
+
+test('TTFT chart has only estimated mean and request percentiles', () => {
+  const c=vm.createContext({});
+  vm.runInContext(`const chartSize=()=>({width:1000,height:220}); const niceMax=(v)=>v||1;
+    const fmtAxis=String; const fmtDuration=(v)=>v+' ms'; const fmtTpot=String; const esc=String;` +
+    extract('function latencyTrendChart(points', 'function tokenTrendChart(') + ';globalThis.chart=ttftTrendChart;', c);
+  const html=c.chart([{date:'2026-11-05',ttft_estimated_ms:2000,ttft_estimated_p50_ms:1800,ttft_estimated_p95_ms:6000}],{});
+  assert.match(html,/TTFT 趋势/); assert.match(html,/TTFT 平均估算/);
+  assert.match(html,/TTFT P50 估算/); assert.match(html,/TTFT P95 估算/);
+  assert.doesNotMatch(html,/TTFT（流式）/); assert.match(html,/1800 ms/);
 });
