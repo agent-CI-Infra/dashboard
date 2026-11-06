@@ -714,6 +714,27 @@ function productionMetrics(doc) {
   return `<p class="chart-note">${esc(doc.environment || '未知环境')} · ${esc(doc.start || '—')} 至 ${esc(doc.end || '—')} UTC · 更新 ${esc(doc.generated_at || '—')} · ${excludedNote}。P95 为模型请求总耗时，至少 20 个成功样本，不代表纯模型耗时。</p>${rows ? `<div class="table-wrap"><table class="history-table"><thead><tr><th>物理模型</th><th>调用数</th><th>TTFT 均值（样本）</th><th>TPOT 均值（样本）</th><th>模型请求 P95（样本）</th><th>输入 Token</th><th>输出 Token</th><th>总 Token</th></tr></thead><tbody>${rows}</tbody></table></div>` : '<p class="empty">无已分类现网调用。</p>'}${callDetails}`;
 }
 
+// Per-environment request latency measured from the agent container's own
+// process log. The GateWay span (message_handler dispatch to stream finished)
+// contains the WorkSwarm span ([E2A] input to run_stream_task finished); the
+// difference is gateway-side transport and bookkeeping.
+function envLatency(doc) {
+  if (!doc || doc.schema !== 'digitalmate/env-request-latency@1' || !Array.isArray(doc.envs)) {
+    return '<p class="empty">未配置环境请求耗时数据源，或采集数据不可用。</p>';
+  }
+  const rows = doc.envs.map((e) => {
+    const g = e.gateway_ms || {};
+    const w = e.workswarm_ms || {};
+    const o = e.overhead_ms || {};
+    const note = e.note ? `<br><span class="muted">${esc(e.note)}</span>` : '';
+    return `<tr><td><strong>${esc(e.label || e.env || '未知')}</strong><br><span class="muted">${esc(e.env || '')}</span>${note}</td><td>${fmtCount(e.n)}</td><td>${fmtDuration(g.mean)}</td><td>${fmtDuration(g.p50)}</td><td>${fmtDuration(g.p95)}</td><td>${fmtDuration(w.mean)}</td><td>${fmtDuration(w.p50)}</td><td>${fmtDuration(w.p95)}</td><td>${fmtDuration(o.mean)}</td></tr>`;
+  }).join('');
+  const defs = doc.definitions || {};
+  const window = doc.envs.find((e) => e.window)?.window;
+  const windowNote = window ? ` · 采集窗口 ${esc(window.start || '—')} 至 ${esc(window.end || '—')}` : '';
+  return `<p class="chart-note">数据源 ${esc(doc.source || '—')} · 更新 ${esc(doc.generated_at || '—')}${windowNote}。GateWay 为 ${esc(defs.gateway || '请求进入网关至流式响应结束')}；WorkSwarm 为 ${esc(defs.workswarm || 'AgentServer 收到输入至 run_stream_task 结束')}；网关开销为两者之差。P50/P95 为最近排名分位。</p><div class="table-wrap"><table class="history-table"><thead><tr><th>环境</th><th>请求数</th><th>GateWay 均值</th><th>GateWay P50</th><th>GateWay P95</th><th>WorkSwarm 均值</th><th>WorkSwarm P50</th><th>WorkSwarm P95</th><th>网关开销均值</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
 function fmtToken(value) {
   if (!Number.isFinite(value) || value < 0) return '—';
   fmtToken.formatter ??= new Intl.NumberFormat('zh-CN', { maximumFractionDigits: 1 });
@@ -2591,6 +2612,20 @@ async function loadProductionMetrics() {
   }
 }
 
+// Environment latency is optional as well: a missing file or a failed fetch
+// must leave the rest of the view untouched.
+async function loadEnvLatency() {
+  const target = $('env-latency');
+  if (!target) return;
+  try {
+    const response = await fetch('../data/env-request-latency.json', { cache: 'no-store' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    target.innerHTML = envLatency(await response.json());
+  } catch {
+    target.innerHTML = envLatency(null);
+  }
+}
+
 function requireCurrentMetricsVersion(history) {
   if (!Number.isInteger(history?.metrics_version) || history.metrics_version < 6) {
     throw new Error('数据口径版本过旧，请等待采集任务完成历史数据重建');
@@ -2609,6 +2644,7 @@ async function load() {
     state.history = history;
     state.model = busiestModel(history);
     void loadProductionMetrics();
+    void loadEnvLatency();
     const cases = sortedCases();
     state.selected = cases.find((entry) => entry.id === 'DM-WF-BACK-01')?.id || cases[0]?.id || null;
     render();
