@@ -1525,18 +1525,18 @@ h1 {
   min-width: 1000px;
 }
 
-/* Keep the value, sample count and change together without reserving empty space.
-   The cell spans the column so every change chip in a column lines up vertically. */
+/* Keep the value and its change chip side by side: the chip follows the value
+   with a small gap instead of being pushed to the far edge of the column. */
 .metric-cell {
   display: flex;
   width: 100%;
   align-items: baseline;
-  gap: 4px;
+  justify-content: flex-start;
+  gap: 6px;
 }
 
 .metric-change {
   flex: none;
-  margin-left: auto;
 }
 
 .token-coverage {
