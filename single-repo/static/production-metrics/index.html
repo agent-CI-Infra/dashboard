@@ -14,7 +14,7 @@
         <p class="eyebrow">DigitalMate · Nightly E2E</p>
         <h1>用例性能看板</h1>
         <p class="subtitle">
-          现网模型请求的每日网关耗时与 TTFT、TPOT、P95、Token 指标，按模型和 Asia/Shanghai 自然日聚合。
+          现网模型请求的每日模型请求耗时与 TTFT、TPOT、P95、Token 指标，按模型和 Asia/Shanghai 自然日聚合。
         </p>
       </div>
       <div class="topbar-meta">
@@ -35,7 +35,7 @@
 
       <section id="view-cases" class="view" role="tabpanel" aria-labelledby="tab-cases">
         <section id="summary" class="summary" aria-label="汇总"></section>
-        <section id="perf-strip" class="perf-strip" aria-label="网关最新完整日指标"></section>
+        <section id="perf-strip" class="perf-strip" aria-label="模型请求最新完整日指标"></section>
 
         <div class="layout">
           <aside class="panel case-panel">
@@ -59,7 +59,7 @@
             <span class="muted">单请求性能诊断</span>
           </div>
           <form id="lookup-form" class="lookup-form">
-            <input id="lookup-id" type="text" placeholder="粘贴网关请求 ID（request_id）" autocomplete="off" spellcheck="false" required>
+            <input id="lookup-id" type="text" placeholder="粘贴模型请求 ID（request_id）" autocomplete="off" spellcheck="false" required>
             <button type="submit">查询</button>
           </form>
           <details class="lookup-key">
@@ -85,9 +85,9 @@
           </div>
           <div id="model-compare"><p class="empty">加载中…</p></div>
           <p class="chart-note">
-            所选时间范围内全部模型的汇总指标，按调用数排序；汇总锚定最新完整日，未结束的当日不计入。
-            近 7 天少于 50 次调用的模型折叠在「低流量模型」中，不参与首页结论；「最新 TTFT 较前日」达到 20% 升幅即标记为回退。
-            点击模型名称或对应行可切换下方明细。
+            所选时间范围内全部模型，按调用数排序；汇总锚定最新完整日，未结束的当日不计入。
+            近 7 天少于 50 次调用的模型折叠在「低流量模型」中，不参与首页结论；最新完整日 TTFT 较前日升幅达到 20% 的模型标记为回退。
+            点击模型名称可切换下方汇总与明细。
             <span id="compare-version" class="muted">—</span>
           </p>
         </section>
@@ -99,16 +99,16 @@
 
         <section class="card">
           <div class="card-head">
-            <h2>现网模型性能指标</h2>
+            <h2>现网模型指标统计</h2>
             <span class="muted">按日聚合 · Asia/Shanghai</span>
           </div>
           <div id="model-trends" class="trend-grid"><p class="empty">加载中…</p></div>
           <p class="chart-note">
-            统计此网关的模型请求（未区分测试或其他业务），耗时口径为网关耗时（不含端侧与网络）。
-            TTFT/TPOT 只统计 <code>stream === true</code> 的成功调用；流式状态未知的样本分别展示 TTFT 和 TPOT 估算及覆盖率，不并入主均值；TTFT ≥ 95% 总耗时、TPOT &lt; 0.1 ms/token 视为时间戳异常并剔除。
-            P50/P95 是成功调用的请求级分位，至少需要 20 个样本；网关平均耗时按成功调用量加权，TPOT 按输出 Token 数减一加权；TTFT 估算和 TPOT 的 P50/P95 是请求级分位，基于可合并分桶近似计算（误差约 1%），每类至少 20 个样本。
-            Token 只统计成功调用并给出覆盖率；当日未结束的数据标记为「部分日」，汇总卡不使用该日。
-            趋势图均可点击图例单独显示或隐藏曲线；请求失败率按所选模型统计；含未知状态的日期留空；缺失值留空，不补 0。
+            统计此网关的模型请求（未区分测试或其他业务），耗时口径为模型请求耗时（不含端侧与网络）。
+            TTFT/TPOT 只统计 <code>stream === true</code> 的成功调用；无流式标记的样本按分桶近似单独统计 TTFT 与 TPOT；TTFT ≥ 95% 总耗时、TPOT &lt; 0.1 ms/token 视为时间戳异常并剔除。
+            P50/P95 是成功调用的请求级分位，至少需要 20 个样本；模型请求平均耗时按成功调用量加权，TPOT 按输出 Token 数减一加权；TTFT 和 TPOT 的 P50/P95 是请求级分位，基于可合并分桶近似计算（误差约 1%），每类至少 20 个样本。
+            Token 展示当日成功调用的累计值；当日未结束的数据标记为「部分日」，汇总卡不使用该日。
+            趋势图均可点击图例单独显示或隐藏曲线；模型请求失败率按所选模型统计；含未知状态的日期留空；缺失值留空，不补 0。
           </p>
         </section>
 
@@ -134,7 +134,7 @@
 
     <footer class="footer">
       <span>数据：现网网关日志 · 时区：Asia/Shanghai</span>
-      <span>按模型 × 自然日聚合；不含消息正文，耗时口径为网关耗时，不含端侧与网络。</span>
+      <span>按模型 × 自然日聚合；不含消息正文，耗时口径为模型请求耗时，不含端侧与网络。</span>
     </footer>
 
     <div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>
