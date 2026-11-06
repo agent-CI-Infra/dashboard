@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/e2e-performance-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updated_at": "2026-11-05T18:02:58.401Z",
+  "updated_at": "2026-11-06T03:21:51.609Z",
   "cases": {
     "DM-WF-CHROME-01": {
       "id": "DM-WF-CHROME-01",
@@ -20,24 +20,24 @@
         },
         {
           "date": "2026-11-06",
-          "status": "BLOCKED",
+          "status": "COMPLETED",
           "query_ms": null,
           "query_count": 0,
-          "duration_ms": 1728,
-          "run_id": "nightly-42074440895-1",
-          "commit": "af4a71ce1168d6e39471b7db3afa2860376afcc6",
-          "finished_at": "2026-11-05T17:43:08.467Z"
+          "duration_ms": 110306,
+          "run_id": "rerun-5cases-20261106-112151",
+          "commit": "2c2b175d",
+          "finished_at": "2026-11-06T01:57:39.111Z"
         }
       ],
       "latest": {
         "id": "DM-WF-CHROME-01",
         "title": "对话固定页脚与状态栏：AI 提示与长回复滚动",
         "mode": "single-turn",
-        "status": "BLOCKED",
-        "failure": "Live test controls unavailable: cloud.inspect; no business actions were attempted",
-        "started_at": "2026-11-05T17:43:06.739Z",
-        "finished_at": "2026-11-05T17:43:08.467Z",
-        "duration_ms": 1728,
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-11-06T01:55:48.805Z",
+        "finished_at": "2026-11-06T01:57:39.111Z",
+        "duration_ms": 110306,
         "query_count": 0,
         "query_ms": null,
         "first_text_ms": null,
@@ -63,30 +63,158 @@
             "measured": true
           }
         },
-        "step_count": 2,
+        "step_count": 18,
         "steps": [
           {
-            "id": "S-setup",
-            "action": "environment",
-            "status": "failed",
-            "started_at": "2026-11-05T17:43:06.739Z",
-            "duration_ms": 1728,
-            "detail": "Live test controls unavailable: cloud.inspect; no business actions were attempted"
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-11-06T01:55:48.805Z",
+            "duration_ms": 4762,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
-            "id": "S-failure",
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-11-06T01:55:53.567Z",
+            "duration_ms": 10019,
+            "detail": "DigitalMate 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S00",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-05T17:43:08.467Z",
-            "duration_ms": 0,
+            "started_at": "2026-11-06T01:56:03.586Z",
+            "duration_ms": 1926,
+            "detail": "截图 00-before-send"
+          },
+          {
+            "id": "G-S00",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-06T01:56:05.512Z",
+            "duration_ms": 2,
+            "detail": "Deterministic assertions passed"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-11-06T01:56:05.514Z",
+            "duration_ms": 18083,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S02",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T01:56:23.597Z",
+            "duration_ms": 1936,
+            "detail": "截图 01-after-send"
+          },
+          {
+            "id": "S03",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-11-06T01:56:25.533Z",
+            "duration_ms": 14146,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "G-original",
+            "action": "cloud.inspect",
+            "status": "ok",
+            "started_at": "2026-11-06T01:56:39.679Z",
+            "duration_ms": 6318,
             "detail": null
+          },
+          {
+            "id": "G-fixed",
+            "action": "assert.cloud",
+            "status": "ok",
+            "started_at": "2026-11-06T01:56:45.997Z",
+            "duration_ms": 1,
+            "detail": "Deterministic assertions passed"
+          },
+          {
+            "id": "S04",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-11-06T01:56:45.998Z",
+            "duration_ms": 4782,
+            "detail": "键盘已收起"
+          },
+          {
+            "id": "S05",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T01:56:50.780Z",
+            "duration_ms": 1938,
+            "detail": "截图 02-complete"
+          },
+          {
+            "id": "G-S05",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-06T01:56:52.718Z",
+            "duration_ms": 4,
+            "detail": "Deterministic assertions passed"
+          },
+          {
+            "id": "S06",
+            "action": "scroll.up",
+            "status": "ok",
+            "started_at": "2026-11-06T01:56:52.722Z",
+            "duration_ms": 14639,
+            "detail": "上滑 3 次"
+          },
+          {
+            "id": "S07",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T01:57:07.361Z",
+            "duration_ms": 2099,
+            "detail": "截图 03-scroll-up"
+          },
+          {
+            "id": "S08",
+            "action": "scroll.down",
+            "status": "ok",
+            "started_at": "2026-11-06T01:57:09.460Z",
+            "duration_ms": 27731,
+            "detail": "下滑 2 次"
+          },
+          {
+            "id": "S09",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T01:57:37.191Z",
+            "duration_ms": 1907,
+            "detail": "截图 04-scroll-down"
+          },
+          {
+            "id": "G-S09",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-06T01:57:39.098Z",
+            "duration_ms": 9,
+            "detail": "Deterministic assertions passed"
+          },
+          {
+            "id": "G-ui",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-06T01:57:39.107Z",
+            "duration_ms": 4,
+            "detail": "Deterministic assertions passed"
           }
         ],
-        "screenshots": 1,
+        "screenshots": 5,
         "profiling_files": 0,
-        "run_id": "nightly-42074440895-1",
-        "commit": "af4a71ce1168d6e39471b7db3afa2860376afcc6",
-        "generated_at": "2026-11-05T18:02:58.401Z"
+        "run_id": "rerun-5cases-20261106-112151",
+        "commit": "2c2b175d",
+        "generated_at": "2026-11-06T03:21:51.609Z"
       }
     },
     "DM-WF-BACK-01": {
@@ -1728,24 +1856,24 @@
         },
         {
           "date": "2026-11-06",
-          "status": "BLOCKED",
+          "status": "COMPLETED",
           "query_ms": null,
           "query_count": 0,
-          "duration_ms": 1807,
-          "run_id": "nightly-42074440895-1",
-          "commit": "af4a71ce1168d6e39471b7db3afa2860376afcc6",
-          "finished_at": "2026-11-05T17:49:25.091Z"
+          "duration_ms": 75886,
+          "run_id": "rerun-5cases-20261106-112151",
+          "commit": "2c2b175d",
+          "finished_at": "2026-11-06T02:01:56.897Z"
         }
       ],
       "latest": {
         "id": "DM-WF-MATH-01",
         "title": "LaTeX公式：行内、块级和矩阵排版，滚动后结果保留",
         "mode": "single-turn",
-        "status": "BLOCKED",
-        "failure": "Live test controls unavailable: cloud.inspect; no business actions were attempted",
-        "started_at": "2026-11-05T17:49:23.284Z",
-        "finished_at": "2026-11-05T17:49:25.091Z",
-        "duration_ms": 1807,
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-11-06T02:00:41.011Z",
+        "finished_at": "2026-11-06T02:01:56.897Z",
+        "duration_ms": 75886,
         "query_count": 0,
         "query_ms": null,
         "first_text_ms": null,
@@ -1771,30 +1899,150 @@
             "measured": true
           }
         },
-        "step_count": 2,
+        "step_count": 17,
         "steps": [
           {
-            "id": "S-setup",
-            "action": "environment",
-            "status": "failed",
-            "started_at": "2026-11-05T17:49:23.284Z",
-            "duration_ms": 1807,
-            "detail": "Live test controls unavailable: cloud.inspect; no business actions were attempted"
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-11-06T02:00:41.011Z",
+            "duration_ms": 4853,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
-            "id": "S-failure",
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-11-06T02:00:45.864Z",
+            "duration_ms": 5718,
+            "detail": "DigitalMate 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S00",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-05T17:49:25.091Z",
-            "duration_ms": 0,
+            "started_at": "2026-11-06T02:00:51.582Z",
+            "duration_ms": 1863,
+            "detail": "截图 00-before"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-11-06T02:00:53.445Z",
+            "duration_ms": 18392,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S02",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-11-06T02:01:11.837Z",
+            "duration_ms": 12245,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "G-original",
+            "action": "cloud.inspect",
+            "status": "ok",
+            "started_at": "2026-11-06T02:01:24.082Z",
+            "duration_ms": 3587,
             "detail": null
+          },
+          {
+            "id": "G-fixed",
+            "action": "assert.cloud",
+            "status": "ok",
+            "started_at": "2026-11-06T02:01:27.669Z",
+            "duration_ms": 1,
+            "detail": "Deterministic assertions passed"
+          },
+          {
+            "id": "S03",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-11-06T02:01:27.670Z",
+            "duration_ms": 1428,
+            "detail": "键盘未弹出，无需收起"
+          },
+          {
+            "id": "S04",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T02:01:29.098Z",
+            "duration_ms": 1888,
+            "detail": "截图 01-rendered"
+          },
+          {
+            "id": "G-S04",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-06T02:01:30.986Z",
+            "duration_ms": 6,
+            "detail": "Deterministic assertions passed"
+          },
+          {
+            "id": "S05",
+            "action": "scroll.up",
+            "status": "ok",
+            "started_at": "2026-11-06T02:01:30.992Z",
+            "duration_ms": 6252,
+            "detail": "上滑 1 次"
+          },
+          {
+            "id": "S06",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T02:01:37.244Z",
+            "duration_ms": 1714,
+            "detail": "截图 02-inline-and-matrix"
+          },
+          {
+            "id": "G-S06",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-06T02:01:38.958Z",
+            "duration_ms": 3,
+            "detail": "Deterministic assertions passed"
+          },
+          {
+            "id": "S07",
+            "action": "scroll.down",
+            "status": "ok",
+            "started_at": "2026-11-06T02:01:38.961Z",
+            "duration_ms": 16037,
+            "detail": "下滑 1 次"
+          },
+          {
+            "id": "S08",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T02:01:54.998Z",
+            "duration_ms": 1891,
+            "detail": "截图 03-returned"
+          },
+          {
+            "id": "G-S08",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-06T02:01:56.889Z",
+            "duration_ms": 5,
+            "detail": "Deterministic assertions passed"
+          },
+          {
+            "id": "G-ui",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-06T02:01:56.894Z",
+            "duration_ms": 3,
+            "detail": "Deterministic assertions passed"
           }
         ],
-        "screenshots": 1,
+        "screenshots": 4,
         "profiling_files": 0,
-        "run_id": "nightly-42074440895-1",
-        "commit": "af4a71ce1168d6e39471b7db3afa2860376afcc6",
-        "generated_at": "2026-11-05T18:02:58.401Z"
+        "run_id": "rerun-5cases-20261106-112151",
+        "commit": "2c2b175d",
+        "generated_at": "2026-11-06T03:21:51.609Z"
       }
     },
     "DM-WF-MEMORY-01": {
@@ -2152,24 +2400,24 @@
         },
         {
           "date": "2026-11-06",
-          "status": "BLOCKED",
+          "status": "FAIL",
           "query_ms": null,
           "query_count": 0,
-          "duration_ms": 1863,
-          "run_id": "nightly-42074440895-1",
-          "commit": "af4a71ce1168d6e39471b7db3afa2860376afcc6",
-          "finished_at": "2026-11-05T17:54:32.348Z"
+          "duration_ms": 85017,
+          "run_id": "rerun-5cases-20261106-112151",
+          "commit": "2c2b175d",
+          "finished_at": "2026-11-06T02:06:11.174Z"
         }
       ],
       "latest": {
         "id": "DM-WF-QUOTE-01",
         "title": "引用发送：同一用户气泡内显示竖线与单行摘要",
         "mode": "multi-turn",
-        "status": "BLOCKED",
-        "failure": "Live test controls unavailable: cloud.inspect; no business actions were attempted",
-        "started_at": "2026-11-05T17:54:30.485Z",
-        "finished_at": "2026-11-05T17:54:32.348Z",
-        "duration_ms": 1863,
+        "status": "FAIL",
+        "failure": "G-S09 assert.ui 失败：text contains failed; quotePrefixMatches equals failed; quoteInUserBubble equals failed",
+        "started_at": "2026-11-06T02:04:46.157Z",
+        "finished_at": "2026-11-06T02:06:11.174Z",
+        "duration_ms": 85017,
         "query_count": 0,
         "query_ms": null,
         "first_text_ms": null,
@@ -2195,30 +2443,182 @@
             "measured": true
           }
         },
-        "step_count": 2,
+        "step_count": 21,
         "steps": [
           {
-            "id": "S-setup",
-            "action": "environment",
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-11-06T02:04:46.157Z",
+            "duration_ms": 4754,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-11-06T02:04:50.911Z",
+            "duration_ms": 5569,
+            "detail": "DigitalMate 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S00",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T02:04:56.480Z",
+            "duration_ms": 1780,
+            "detail": "截图 00-before"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-11-06T02:04:58.260Z",
+            "duration_ms": 17221,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S02",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-11-06T02:05:15.481Z",
+            "duration_ms": 8284,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "G-original",
+            "action": "cloud.inspect",
+            "status": "ok",
+            "started_at": "2026-11-06T02:05:23.765Z",
+            "duration_ms": 2532,
+            "detail": null
+          },
+          {
+            "id": "G-fixed",
+            "action": "assert.cloud",
+            "status": "ok",
+            "started_at": "2026-11-06T02:05:26.297Z",
+            "duration_ms": 2,
+            "detail": "Deterministic assertions passed"
+          },
+          {
+            "id": "S03",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-11-06T02:05:26.299Z",
+            "duration_ms": 3714,
+            "detail": "键盘已收起"
+          },
+          {
+            "id": "S04",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T02:05:30.013Z",
+            "duration_ms": 1662,
+            "detail": "截图 01-source"
+          },
+          {
+            "id": "S05",
+            "action": "chat.quoteLatest",
+            "status": "ok",
+            "started_at": "2026-11-06T02:05:31.675Z",
+            "duration_ms": 2724,
+            "detail": "点击最新可见回复的引用图标，未发送消息"
+          },
+          {
+            "id": "S06",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T02:05:34.399Z",
+            "duration_ms": 1532,
+            "detail": "截图 02-selected"
+          },
+          {
+            "id": "S07",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-11-06T02:05:35.931Z",
+            "duration_ms": 17139,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S08",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-11-06T02:05:53.070Z",
+            "duration_ms": 3734,
+            "detail": "键盘已收起"
+          },
+          {
+            "id": "S09",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T02:05:56.804Z",
+            "duration_ms": 1688,
+            "detail": "截图 03-sent"
+          },
+          {
+            "id": "S10",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-11-06T02:05:58.492Z",
+            "duration_ms": 8285,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S11",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-11-06T02:06:06.777Z",
+            "duration_ms": 1096,
+            "detail": "键盘未弹出，无需收起"
+          },
+          {
+            "id": "S12",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T02:06:07.873Z",
+            "duration_ms": 1572,
+            "detail": "截图 04-complete"
+          },
+          {
+            "id": "G-ui",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-06T02:06:09.445Z",
+            "duration_ms": 4,
+            "detail": "Deterministic assertions passed"
+          },
+          {
+            "id": "G-preview",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-06T02:06:09.449Z",
+            "duration_ms": 1,
+            "detail": "Deterministic assertions passed"
+          },
+          {
+            "id": "G-S09",
+            "action": "assert.ui",
             "status": "failed",
-            "started_at": "2026-11-05T17:54:30.485Z",
-            "duration_ms": 1863,
-            "detail": "Live test controls unavailable: cloud.inspect; no business actions were attempted"
+            "started_at": "2026-11-06T02:06:09.450Z",
+            "duration_ms": 1724,
+            "detail": "text contains failed; quotePrefixMatches equals failed; quoteInUserBubble equals failed"
           },
           {
             "id": "S-failure",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-05T17:54:32.348Z",
+            "started_at": "2026-11-06T02:06:11.174Z",
             "duration_ms": 0,
             "detail": null
           }
         ],
-        "screenshots": 1,
+        "screenshots": 6,
         "profiling_files": 0,
-        "run_id": "nightly-42074440895-1",
-        "commit": "af4a71ce1168d6e39471b7db3afa2860376afcc6",
-        "generated_at": "2026-11-05T18:02:58.401Z"
+        "run_id": "rerun-5cases-20261106-112151",
+        "commit": "2c2b175d",
+        "generated_at": "2026-11-06T03:21:51.609Z"
       }
     },
     "DM-WF-RESET-01": {
@@ -2448,24 +2848,24 @@
         },
         {
           "date": "2026-11-06",
-          "status": "BLOCKED",
+          "status": "COMPLETED",
           "query_ms": null,
           "query_count": 0,
-          "duration_ms": 1837,
-          "run_id": "nightly-42074440895-1",
-          "commit": "af4a71ce1168d6e39471b7db3afa2860376afcc6",
-          "finished_at": "2026-11-05T17:55:55.582Z"
+          "duration_ms": 223860,
+          "run_id": "rerun-5cases-20261106-112151",
+          "commit": "2c2b175d",
+          "finished_at": "2026-11-06T02:09:58.362Z"
         }
       ],
       "latest": {
         "id": "DM-WF-STRUCTURED-01",
         "title": "结构化结果：表格/预算/多天行程正确渲染，坏 Markdown 降级为可读文本",
         "mode": "single-turn",
-        "status": "BLOCKED",
-        "failure": "Live test controls unavailable: cloud.inspect; no business actions were attempted",
-        "started_at": "2026-11-05T17:55:53.745Z",
-        "finished_at": "2026-11-05T17:55:55.582Z",
-        "duration_ms": 1837,
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-11-06T02:06:14.502Z",
+        "finished_at": "2026-11-06T02:09:58.362Z",
+        "duration_ms": 223860,
         "query_count": 0,
         "query_ms": null,
         "first_text_ms": null,
@@ -2491,30 +2891,142 @@
             "measured": true
           }
         },
-        "step_count": 2,
+        "step_count": 16,
         "steps": [
           {
-            "id": "S-setup",
-            "action": "environment",
-            "status": "failed",
-            "started_at": "2026-11-05T17:55:53.745Z",
-            "duration_ms": 1837,
-            "detail": "Live test controls unavailable: cloud.inspect; no business actions were attempted"
+            "id": "S-start",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-11-06T02:06:14.502Z",
+            "duration_ms": 4676,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
-            "id": "S-failure",
+            "id": "S-fresh",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-11-06T02:06:19.178Z",
+            "duration_ms": 5629,
+            "detail": "DigitalMate 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S-reset",
+            "action": "app.resetState",
+            "status": "ok",
+            "started_at": "2026-11-06T02:06:24.807Z",
+            "duration_ms": 166883,
+            "detail": "已重置到初始状态（11-06 10:06:34.063 55161 55161 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-c070983303c94bca910d2f85f10894b5）"
+          },
+          {
+            "id": "S00",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-05T17:55:55.582Z",
-            "duration_ms": 0,
+            "started_at": "2026-11-06T02:09:11.690Z",
+            "duration_ms": 1781,
+            "detail": "截图 00-before"
+          },
+          {
+            "id": "S01",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-11-06T02:09:13.471Z",
+            "duration_ms": 18053,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S03",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-11-06T02:09:31.524Z",
+            "duration_ms": 9287,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "G-original",
+            "action": "cloud.inspect",
+            "status": "ok",
+            "started_at": "2026-11-06T02:09:40.811Z",
+            "duration_ms": 3047,
             "detail": null
+          },
+          {
+            "id": "G-fixed",
+            "action": "assert.cloud",
+            "status": "ok",
+            "started_at": "2026-11-06T02:09:43.858Z",
+            "duration_ms": 2,
+            "detail": "Deterministic assertions passed"
+          },
+          {
+            "id": "S03H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-11-06T02:09:43.860Z",
+            "duration_ms": 4122,
+            "detail": "键盘已收起"
+          },
+          {
+            "id": "S04",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T02:09:47.982Z",
+            "duration_ms": 1879,
+            "detail": "截图 01-plan-top"
+          },
+          {
+            "id": "S05",
+            "action": "wait.settled",
+            "status": "ok",
+            "started_at": "2026-11-06T02:09:49.861Z",
+            "duration_ms": 3450,
+            "detail": null
+          },
+          {
+            "id": "S06",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T02:09:53.311Z",
+            "duration_ms": 1924,
+            "detail": "截图 02-plan-bottom"
+          },
+          {
+            "id": "S07",
+            "action": "expand.execution",
+            "status": "ok",
+            "started_at": "2026-11-06T02:09:55.235Z",
+            "duration_ms": 1299,
+            "detail": "展开 0 处执行细节"
+          },
+          {
+            "id": "S08",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T02:09:56.534Z",
+            "duration_ms": 1824,
+            "detail": "截图 03-details"
+          },
+          {
+            "id": "G-ui",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-06T02:09:58.358Z",
+            "duration_ms": 2,
+            "detail": "Deterministic assertions passed"
+          },
+          {
+            "id": "G-table",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-06T02:09:58.360Z",
+            "duration_ms": 2,
+            "detail": "Deterministic assertions passed"
           }
         ],
-        "screenshots": 1,
+        "screenshots": 4,
         "profiling_files": 0,
-        "run_id": "nightly-42074440895-1",
-        "commit": "af4a71ce1168d6e39471b7db3afa2860376afcc6",
-        "generated_at": "2026-11-05T18:02:58.401Z"
+        "run_id": "rerun-5cases-20261106-112151",
+        "commit": "2c2b175d",
+        "generated_at": "2026-11-06T03:21:51.609Z"
       }
     },
     "DM-WF-TOPIC-01": {
@@ -2977,10 +3489,10 @@
           "status": "BLOCKED",
           "query_ms": null,
           "query_count": 0,
-          "duration_ms": 150622,
-          "run_id": "nightly-42074440895-1",
-          "commit": "af4a71ce1168d6e39471b7db3afa2860376afcc6",
-          "finished_at": "2026-11-05T18:02:56.738Z"
+          "duration_ms": 301710,
+          "run_id": "rerun-5cases-20261106-112151",
+          "commit": "2c2b175d",
+          "finished_at": "2026-11-06T02:16:17.197Z"
         }
       ],
       "latest": {
@@ -2989,9 +3501,9 @@
         "mode": "multi-turn",
         "status": "BLOCKED",
         "failure": "S04 requirements.answer 失败：[SETUP_FAIL] Requested option is absent from the selected interaction",
-        "started_at": "2026-11-05T18:00:26.116Z",
-        "finished_at": "2026-11-05T18:02:56.738Z",
-        "duration_ms": 150622,
+        "started_at": "2026-11-06T02:11:15.487Z",
+        "finished_at": "2026-11-06T02:16:17.197Z",
+        "duration_ms": 301710,
         "query_count": 0,
         "query_ms": null,
         "first_text_ms": null,
@@ -3023,96 +3535,96 @@
             "id": "S-start",
             "action": "app.coldStart",
             "status": "ok",
-            "started_at": "2026-11-05T18:00:26.116Z",
-            "duration_ms": 4857,
+            "started_at": "2026-11-06T02:11:15.488Z",
+            "duration_ms": 4777,
             "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
             "id": "S-fresh",
             "action": "app.freshConversation",
             "status": "ok",
-            "started_at": "2026-11-05T18:00:30.973Z",
-            "duration_ms": 5771,
+            "started_at": "2026-11-06T02:11:20.265Z",
+            "duration_ms": 6512,
             "detail": "DigitalMate 单会话 Home（设置入口不作为新对话抽屉）"
           },
           {
             "id": "S-reset",
             "action": "app.resetState",
             "status": "ok",
-            "started_at": "2026-11-05T18:00:36.744Z",
-            "duration_ms": 15396,
-            "detail": "已重置到初始状态（11-06 02:00:43.297 19881 19881 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-01cb40ab87bd4a4da54742b512fd8b2c）"
+            "started_at": "2026-11-06T02:11:26.777Z",
+            "duration_ms": 166074,
+            "detail": "已重置到初始状态（11-06 10:11:35.999 58549 58549 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-2687c33cc9434a4991052257820267e3）"
           },
           {
             "id": "S00",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-05T18:00:52.140Z",
-            "duration_ms": 1796,
+            "started_at": "2026-11-06T02:14:12.851Z",
+            "duration_ms": 1852,
             "detail": "截图 00-before"
           },
           {
             "id": "S01",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-05T18:00:53.936Z",
-            "duration_ms": 18395,
+            "started_at": "2026-11-06T02:14:14.703Z",
+            "duration_ms": 18111,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S01A",
             "action": "approval.allow",
             "status": "skipped",
-            "started_at": "2026-11-05T18:01:12.331Z",
-            "duration_ms": 91257,
+            "started_at": "2026-11-06T02:14:32.814Z",
+            "duration_ms": 90318,
             "detail": "没有出现工具审批卡"
           },
           {
             "id": "S02",
             "action": "wait.optionCard",
             "status": "ok",
-            "started_at": "2026-11-05T18:02:43.588Z",
-            "duration_ms": 4981,
+            "started_at": "2026-11-06T02:16:03.132Z",
+            "duration_ms": 5269,
             "detail": null
           },
           {
             "id": "S02H",
             "action": "ui.hideKeyboard",
             "status": "ok",
-            "started_at": "2026-11-05T18:02:48.569Z",
-            "duration_ms": 1190,
+            "started_at": "2026-11-06T02:16:08.401Z",
+            "duration_ms": 1242,
             "detail": "键盘未弹出，无需收起"
           },
           {
             "id": "S03",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-05T18:02:49.759Z",
-            "duration_ms": 1740,
+            "started_at": "2026-11-06T02:16:09.643Z",
+            "duration_ms": 1858,
             "detail": "截图 01-requirements-card"
           },
           {
             "id": "S04",
             "action": "requirements.answer",
             "status": "failed",
-            "started_at": "2026-11-05T18:02:51.499Z",
-            "duration_ms": 5239,
+            "started_at": "2026-11-06T02:16:11.501Z",
+            "duration_ms": 5696,
             "detail": "[SETUP_FAIL] Requested option is absent from the selected interaction"
           },
           {
             "id": "S-failure",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-05T18:02:56.738Z",
+            "started_at": "2026-11-06T02:16:17.197Z",
             "duration_ms": 0,
             "detail": null
           }
         ],
         "screenshots": 3,
-        "profiling_files": 1,
-        "run_id": "nightly-42074440895-1",
-        "commit": "af4a71ce1168d6e39471b7db3afa2860376afcc6",
-        "generated_at": "2026-11-05T18:02:58.401Z"
+        "profiling_files": 0,
+        "run_id": "rerun-5cases-20261106-112151",
+        "commit": "2c2b175d",
+        "generated_at": "2026-11-06T03:21:51.609Z"
       }
     }
   }
