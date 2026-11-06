@@ -1,0 +1,130 @@
+{
+ "schema": "digitalmate/env-request-latency-daily@1",
+ "generated_at": "2026-11-06T07:29:35Z",
+ "env": "adx-jiuwen-test-0",
+ "label": "test-0",
+ "unit": "ms",
+ "source": "workswarm process.log（agent 容器，毫秒精度），按 Asia/Shanghai 自然日聚合",
+ "definitions": {
+  "gateway": "[MessageHandler] dispatch → [MessageHandler] Stream 正常完成（total_chunks）",
+  "workswarm": "[E2A][in] → run_stream_task finished",
+  "overhead": "gateway − workswarm（逐请求差值取均值）"
+ },
+ "days": [
+  {
+   "date": "2026-11-02",
+   "partial": true,
+   "n": 26,
+   "gateway": {
+    "n": 26,
+    "mean": 43071.9,
+    "p50": 20324.0,
+    "p95": 154408.0
+   },
+   "workswarm": {
+    "n": 26,
+    "mean": 42291.9,
+    "p50": 19497.0,
+    "p95": 153595.0
+   },
+   "overhead": {
+    "n": 26,
+    "mean": 780.0,
+    "p50": 823.0,
+    "p95": 846.0
+   }
+  },
+  {
+   "date": "2026-11-03",
+   "partial": false,
+   "n": 82,
+   "gateway": {
+    "n": 82,
+    "mean": 27506.0,
+    "p50": 12101.0,
+    "p95": 95810.0
+   },
+   "workswarm": {
+    "n": 82,
+    "mean": 26849.5,
+    "p50": 11273.0,
+    "p95": 94974.0
+   },
+   "overhead": {
+    "n": 82,
+    "mean": 656.5,
+    "p50": 820.0,
+    "p95": 853.0
+   }
+  },
+  {
+   "date": "2026-11-04",
+   "partial": false,
+   "n": 42,
+   "gateway": {
+    "n": 42,
+    "mean": 56749.2,
+    "p50": 25300.0,
+    "p95": 195381.0
+   },
+   "workswarm": {
+    "n": 42,
+    "mean": 56519.3,
+    "p50": 25155.0,
+    "p95": 194557.0
+   },
+   "overhead": {
+    "n": 42,
+    "mean": 229.9,
+    "p50": 813.0,
+    "p95": 844.0
+   }
+  },
+  {
+   "date": "2026-11-05",
+   "partial": false,
+   "n": 431,
+   "gateway": {
+    "n": 431,
+    "mean": 16763.1,
+    "p50": 7257.0,
+    "p95": 63985.0
+   },
+   "workswarm": {
+    "n": 431,
+    "mean": 15853.5,
+    "p50": 6417.0,
+    "p95": 62666.0
+   },
+   "overhead": {
+    "n": 431,
+    "mean": 909.6,
+    "p50": 839.0,
+    "p95": 1467.0
+   }
+  },
+  {
+   "date": "2026-11-06",
+   "partial": true,
+   "n": 191,
+   "gateway": {
+    "n": 191,
+    "mean": 29782.7,
+    "p50": 7595.0,
+    "p95": 164779.0
+   },
+   "workswarm": {
+    "n": 189,
+    "mean": 27435.6,
+    "p50": 6703.0,
+    "p95": 166841.0
+   },
+   "overhead": {
+    "n": 189,
+    "mean": 629.1,
+    "p50": 839.0,
+    "p95": 899.0
+   }
+  }
+ ]
+}
