@@ -1,6 +1,179 @@
 {
-  "generatedAt": "2026-11-05T21:25:45.861Z",
+  "generatedAt": "2026-11-06T20:41:29.355Z",
   "items": [
+    {
+      "number": 2571,
+      "title": "bench: the mock bench cannot run on this host — the only deepseek-harness checkout needs a build, and the host has neither git nor a C compiler",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-06T17:05:42Z",
+      "closedAt": null,
+      "waitingHours": 3.5964875,
+      "comments": 0,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2571"
+    },
+    {
+      "number": 2566,
+      "title": "Live E2E clones the harness and never builds it, so `dsh web` would die at startup even with the key present",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-06T10:34:13Z",
+      "closedAt": "2026-11-06T11:34:09Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "bug",
+        "area:automation",
+        "area:release"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2566"
+    },
+    {
+      "number": 2565,
+      "title": "A browser E2E that runs without DEEPSEEK_API_KEY: drive the web UI against the scripted mock",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-06T10:08:30Z",
+      "closedAt": "2026-11-06T11:12:21Z",
+      "waitingHours": null,
+      "comments": 4,
+      "labels": [
+        "enhancement",
+        "area:ui",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2565"
+    },
+    {
+      "number": 2564,
+      "title": "Settings 里要能开启/关闭 FlyBot 的四个插件（social / tree / timeline / workflow）",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-06T10:07:53Z",
+      "closedAt": "2026-11-06T12:44:04Z",
+      "waitingHours": null,
+      "comments": 3,
+      "labels": [
+        "enhancement",
+        "area:ui",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2564"
+    },
+    {
+      "number": 2561,
+      "title": "host: a memory review that keeps failing at the same lines calls the model on every turn end and never backs off",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-06T01:56:15Z",
+      "closedAt": "2026-11-06T02:14:45Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2561"
+    },
+    {
+      "number": 2560,
+      "title": "Let Chief start-next reference validated continuation facts instead of copying snapshot fields",
+      "author": "zy95-12",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-06T01:33:25Z",
+      "closedAt": "2026-11-06T02:15:52Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2560"
+    },
+    {
+      "number": 2558,
+      "title": "host: one over-long entry in a memory review answer discards the whole answer and the review never moves past those lines",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-06T01:09:24Z",
+      "closedAt": "2026-11-06T01:38:05Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2558"
+    },
+    {
+      "number": 2556,
+      "title": "host: the memory review's short user line and Bot line keep an unpaired surrogate in the prompt",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-06T00:34:52Z",
+      "closedAt": "2026-11-06T01:08:45Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2556"
+    },
+    {
+      "number": 2553,
+      "title": "host: the memory review's long user line keeps half its 3,000-character budget when the text is dense in astral characters",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-06T00:08:22Z",
+      "closedAt": "2026-11-06T00:27:53Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2553"
+    },
+    {
+      "number": 2552,
+      "title": "host: the steward's long-message view keeps 1000 characters, not its 1500-character budget, when the text is dense in astral characters",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-06T00:07:18Z",
+      "closedAt": "2026-11-06T00:35:03Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2552"
+    },
+    {
+      "number": 2550,
+      "title": "Release beat missing: 2026-11-06",
+      "author": "github-actions[bot]",
+      "contributionType": "unknown",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-05T23:44:15Z",
+      "closedAt": "2026-11-06T00:12:50Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "area:release"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2550"
+    },
     {
       "number": 2546,
       "title": "host: shorten a long message for the steward on character boundaries",
@@ -24,9 +197,13 @@
       "isPullRequest": false,
       "createdAt": "2026-11-05T14:32:47Z",
       "closedAt": null,
-      "waitingHours": 6.883016944444444,
+      "waitingHours": 30.145098611111113,
       "comments": 2,
-      "labels": [],
+      "labels": [
+        "bug",
+        "agent-pr",
+        "area:automation"
+      ],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2544"
     },
     {
@@ -81,7 +258,7 @@
       "createdAt": "2026-11-05T13:24:12Z",
       "closedAt": "2026-11-05T14:10:14Z",
       "waitingHours": null,
-      "comments": 1,
+      "comments": 2,
       "labels": [],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2534"
     },
@@ -95,7 +272,7 @@
       "createdAt": "2026-11-05T13:04:18Z",
       "closedAt": "2026-11-05T14:16:28Z",
       "waitingHours": null,
-      "comments": 0,
+      "comments": 1,
       "labels": [],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2528"
     },
@@ -123,7 +300,7 @@
       "createdAt": "2026-11-05T11:16:09Z",
       "closedAt": "2026-11-05T14:13:23Z",
       "waitingHours": null,
-      "comments": 0,
+      "comments": 1,
       "labels": [],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2524"
     },
@@ -137,7 +314,7 @@
       "createdAt": "2026-11-05T10:38:11Z",
       "closedAt": "2026-11-05T14:40:26Z",
       "waitingHours": null,
-      "comments": 1,
+      "comments": 2,
       "labels": [],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2521"
     },
@@ -377,7 +554,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-05T01:22:36Z",
       "closedAt": null,
-      "waitingHours": 20.052739166666665,
+      "waitingHours": 43.314820833333336,
       "comments": 16,
       "labels": [
         "bug",
@@ -443,7 +620,7 @@
       "createdAt": "2026-11-05T00:43:48Z",
       "closedAt": "2026-11-05T01:09:42Z",
       "waitingHours": null,
-      "comments": 2,
+      "comments": 3,
       "labels": [
         "bug"
       ],
@@ -475,7 +652,7 @@
       "createdAt": "2026-11-05T00:21:30Z",
       "closedAt": "2026-11-05T00:44:45Z",
       "waitingHours": null,
-      "comments": 0,
+      "comments": 1,
       "labels": [
         "bug"
       ],
@@ -619,7 +796,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T17:50:17Z",
       "closedAt": null,
-      "waitingHours": 27.591350277777778,
+      "waitingHours": 50.853431944444445,
       "comments": 2,
       "labels": [
         "needs-human"
@@ -635,7 +812,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T17:49:19Z",
       "closedAt": null,
-      "waitingHours": 27.60746138888889,
+      "waitingHours": 50.86954305555555,
       "comments": 1,
       "labels": [
         "needs-human"
@@ -651,7 +828,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T17:44:11Z",
       "closedAt": null,
-      "waitingHours": 27.693016944444445,
+      "waitingHours": 50.95509861111111,
       "comments": 1,
       "labels": [
         "needs-human"
@@ -667,7 +844,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T17:41:51Z",
       "closedAt": null,
-      "waitingHours": 27.731905833333332,
+      "waitingHours": 50.9939875,
       "comments": 2,
       "labels": [
         "needs-human"
@@ -755,7 +932,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T17:31:48Z",
       "closedAt": null,
-      "waitingHours": 27.899405833333333,
+      "waitingHours": 51.1614875,
       "comments": 1,
       "labels": [
         "needs-human"
@@ -907,7 +1084,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T14:16:35Z",
       "closedAt": null,
-      "waitingHours": 31.153016944444445,
+      "waitingHours": 54.41509861111111,
       "comments": 9,
       "labels": [
         "bug",
@@ -1006,7 +1183,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T12:21:37Z",
       "closedAt": null,
-      "waitingHours": 33.06912805555555,
+      "waitingHours": 56.33120972222222,
       "comments": 2,
       "labels": [
         "bug",
@@ -1124,7 +1301,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T09:38:48Z",
       "closedAt": null,
-      "waitingHours": 35.782739166666666,
+      "waitingHours": 59.04482083333333,
       "comments": 2,
       "labels": [
         "bug",
@@ -1142,7 +1319,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T09:30:58Z",
       "closedAt": null,
-      "waitingHours": 35.913294722222226,
+      "waitingHours": 59.175376388888886,
       "comments": 2,
       "labels": [
         "bug",
@@ -1160,7 +1337,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T09:20:40Z",
       "closedAt": null,
-      "waitingHours": 36.084961388888885,
+      "waitingHours": 59.34704305555555,
       "comments": 3,
       "labels": [
         "bug",
@@ -1192,7 +1369,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T06:42:59Z",
       "closedAt": null,
-      "waitingHours": 38.71301694444445,
+      "waitingHours": 61.975098611111115,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -1298,7 +1475,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T03:31:23Z",
       "closedAt": null,
-      "waitingHours": 41.906350277777776,
+      "waitingHours": 65.16843194444445,
       "comments": 2,
       "labels": [
         "bug",
@@ -1316,7 +1493,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T03:27:53Z",
       "closedAt": null,
-      "waitingHours": 41.96468361111111,
+      "waitingHours": 65.22676527777777,
       "comments": 2,
       "labels": [
         "bug",
@@ -1348,7 +1525,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T03:01:15Z",
       "closedAt": null,
-      "waitingHours": 42.4085725,
+      "waitingHours": 65.67065416666667,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -1380,7 +1557,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T02:36:07Z",
       "closedAt": null,
-      "waitingHours": 42.82746138888889,
+      "waitingHours": 66.08954305555555,
       "comments": 2,
       "labels": [
         "bug",
@@ -1398,7 +1575,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T02:35:34Z",
       "closedAt": null,
-      "waitingHours": 42.83662805555556,
+      "waitingHours": 66.09870972222222,
       "comments": 2,
       "labels": [
         "bug",
@@ -1416,7 +1593,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T02:35:10Z",
       "closedAt": null,
-      "waitingHours": 42.843294722222225,
+      "waitingHours": 66.10537638888889,
       "comments": 2,
       "labels": [
         "bug",
@@ -1434,7 +1611,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T02:34:44Z",
       "closedAt": null,
-      "waitingHours": 42.85051694444444,
+      "waitingHours": 66.11259861111111,
       "comments": 2,
       "labels": [
         "bug",
@@ -1452,7 +1629,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T02:14:35Z",
       "closedAt": null,
-      "waitingHours": 43.18635027777778,
+      "waitingHours": 66.44843194444445,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -1470,7 +1647,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T02:01:23Z",
       "closedAt": null,
-      "waitingHours": 43.406350277777776,
+      "waitingHours": 66.66843194444445,
       "comments": 1,
       "labels": [
         "bug",
@@ -1488,7 +1665,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T01:55:02Z",
       "closedAt": null,
-      "waitingHours": 43.51218361111111,
+      "waitingHours": 66.77426527777777,
       "comments": 1,
       "labels": [
         "bug",
@@ -1506,7 +1683,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T01:51:27Z",
       "closedAt": null,
-      "waitingHours": 43.57190583333333,
+      "waitingHours": 66.8339875,
       "comments": 1,
       "labels": [
         "bug",
@@ -1524,7 +1701,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T01:40:56Z",
       "closedAt": null,
-      "waitingHours": 43.74718361111111,
+      "waitingHours": 67.00926527777777,
       "comments": 1,
       "labels": [
         "bug",
@@ -1645,7 +1822,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-03T14:29:42Z",
       "closedAt": null,
-      "waitingHours": 54.93440583333334,
+      "waitingHours": 78.1964875,
       "comments": 1,
       "labels": [
         "needs-human"
@@ -1677,7 +1854,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-03T14:17:29Z",
       "closedAt": null,
-      "waitingHours": 55.138016944444445,
+      "waitingHours": 78.4000986111111,
       "comments": 1,
       "labels": [
         "needs-human"
@@ -1781,7 +1958,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-03T09:02:18Z",
       "closedAt": null,
-      "waitingHours": 60.3910725,
+      "waitingHours": 83.65315416666667,
       "comments": 7,
       "labels": [
         "needs-human"
@@ -2955,12 +3132,12 @@
       "title": "feat(host): an unauthenticated GET /api/health with exactly four fields",
       "author": "HugoXK",
       "contributionType": "internal",
-      "state": "open",
+      "state": "closed",
       "isPullRequest": false,
       "createdAt": "2026-11-02T07:54:19Z",
-      "closedAt": null,
-      "waitingHours": 85.52412805555555,
-      "comments": 5,
+      "closedAt": "2026-11-06T10:05:02Z",
+      "waitingHours": null,
+      "comments": 6,
       "labels": [
         "needs-human"
       ],
@@ -2975,7 +3152,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-02T07:00:14Z",
       "closedAt": null,
-      "waitingHours": 86.42551694444444,
+      "waitingHours": 109.68759861111111,
       "comments": 7,
       "labels": [
         "bug",
@@ -5137,7 +5314,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-30T09:28:40Z",
       "closedAt": null,
-      "waitingHours": 155.95162805555555,
+      "waitingHours": 179.21370972222223,
       "comments": 3,
       "labels": [
         "question",
@@ -5171,7 +5348,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-30T09:26:09Z",
       "closedAt": null,
-      "waitingHours": 155.9935725,
+      "waitingHours": 179.25565416666666,
       "comments": 3,
       "labels": [
         "bug",
@@ -5265,7 +5442,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-30T06:46:22Z",
       "closedAt": null,
-      "waitingHours": 158.65662805555556,
+      "waitingHours": 181.91870972222222,
       "comments": 2,
       "labels": [
         "needs-info",
@@ -5292,12 +5469,12 @@
       "title": "点击聊天消息中的 GitHub 链接后中间面板空白（无内容、无错误提示）",
       "author": "hsliuustc0106",
       "contributionType": "internal",
-      "state": "open",
+      "state": "closed",
       "isPullRequest": false,
       "createdAt": "2026-10-30T06:17:08Z",
-      "closedAt": null,
-      "waitingHours": 159.14385027777777,
-      "comments": 6,
+      "closedAt": "2026-11-06T13:11:51Z",
+      "waitingHours": null,
+      "comments": 7,
       "labels": [
         "bug",
         "needs-human",
@@ -5761,7 +5938,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-30T00:40:36Z",
       "closedAt": null,
-      "waitingHours": 164.75273916666666,
+      "waitingHours": 188.01482083333335,
       "comments": 1,
       "labels": [
         "bug",
@@ -7045,7 +7222,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-28T03:53:30Z",
       "closedAt": null,
-      "waitingHours": 209.53773916666665,
+      "waitingHours": 232.79982083333334,
       "comments": 10,
       "labels": [
         "needs-human"
@@ -9287,7 +9464,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-27T01:07:22Z",
       "closedAt": null,
-      "waitingHours": 236.30662805555556,
+      "waitingHours": 259.5687097222222,
       "comments": 2,
       "labels": [
         "bug",
@@ -10127,7 +10304,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-26T02:39:25Z",
       "closedAt": null,
-      "waitingHours": 258.77246138888887,
+      "waitingHours": 282.03454305555556,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -10482,7 +10659,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-25T12:38:42Z",
       "closedAt": null,
-      "waitingHours": 272.7844058333333,
+      "waitingHours": 296.0464875,
       "comments": 3,
       "labels": [
         "bug",
@@ -13239,7 +13416,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-23T12:29:48Z",
       "closedAt": null,
-      "waitingHours": 320.9327391666667,
+      "waitingHours": 344.1948208333333,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -13258,7 +13435,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-23T12:29:01Z",
       "closedAt": null,
-      "waitingHours": 320.9457947222222,
+      "waitingHours": 344.2078763888889,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -13988,8 +14165,8 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T21:41:06Z",
       "closedAt": null,
-      "waitingHours": 335.74440583333336,
-      "comments": 8,
+      "waitingHours": 359.0064875,
+      "comments": 10,
       "labels": [
         "bug",
         "needs-human",
@@ -14006,7 +14183,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T15:15:30Z",
       "closedAt": null,
-      "waitingHours": 342.1710725,
+      "waitingHours": 365.43315416666667,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -14061,7 +14238,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T15:15:23Z",
       "closedAt": null,
-      "waitingHours": 342.17301694444444,
+      "waitingHours": 365.43509861111113,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -14080,7 +14257,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T15:15:20Z",
       "closedAt": null,
-      "waitingHours": 342.1738502777778,
+      "waitingHours": 365.43593194444446,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -14098,7 +14275,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T15:15:06Z",
       "closedAt": null,
-      "waitingHours": 342.17773916666664,
+      "waitingHours": 365.43982083333333,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -14116,7 +14293,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T15:15:02Z",
       "closedAt": null,
-      "waitingHours": 342.17885027777777,
+      "waitingHours": 365.44093194444446,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -14134,7 +14311,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T15:15:00Z",
       "closedAt": null,
-      "waitingHours": 342.1794058333333,
+      "waitingHours": 365.4414875,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -14152,8 +14329,8 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T15:12:57Z",
       "closedAt": null,
-      "waitingHours": 342.2135725,
-      "comments": 1,
+      "waitingHours": 365.4756541666667,
+      "comments": 2,
       "labels": [
         "enhancement",
         "needs-human",
@@ -14205,7 +14382,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T14:13:26Z",
       "closedAt": null,
-      "waitingHours": 343.20551694444447,
+      "waitingHours": 366.4675986111111,
       "comments": 5,
       "labels": [
         "documentation",
@@ -15118,12 +15295,12 @@
       "title": "[Mobile] 鸿蒙（HarmonyOS NEXT）客户端支持",
       "author": "hsliuustc0106",
       "contributionType": "internal",
-      "state": "open",
+      "state": "closed",
       "isPullRequest": false,
       "createdAt": "2026-10-21T15:19:00Z",
-      "closedAt": null,
-      "waitingHours": 366.11273916666664,
-      "comments": 3,
+      "closedAt": "2026-11-06T13:11:48Z",
+      "waitingHours": null,
+      "comments": 4,
       "labels": [
         "enhancement",
         "needs-human",
@@ -15136,12 +15313,12 @@
       "title": "[Mobile] iOS 客户端支持",
       "author": "hsliuustc0106",
       "contributionType": "internal",
-      "state": "open",
+      "state": "closed",
       "isPullRequest": false,
       "createdAt": "2026-10-21T15:18:57Z",
-      "closedAt": null,
-      "waitingHours": 366.1135725,
-      "comments": 3,
+      "closedAt": "2026-11-06T13:11:46Z",
+      "waitingHours": null,
+      "comments": 4,
       "labels": [
         "enhancement",
         "needs-human",
@@ -15154,12 +15331,12 @@
       "title": "[Mobile] Android 客户端支持",
       "author": "hsliuustc0106",
       "contributionType": "internal",
-      "state": "open",
+      "state": "closed",
       "isPullRequest": false,
       "createdAt": "2026-10-21T15:18:55Z",
-      "closedAt": null,
-      "waitingHours": 366.11412805555557,
-      "comments": 9,
+      "closedAt": "2026-11-06T13:11:44Z",
+      "waitingHours": null,
+      "comments": 10,
       "labels": [
         "enhancement",
         "needs-human",
@@ -15176,7 +15353,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-21T14:41:43Z",
       "closedAt": null,
-      "waitingHours": 366.7341280555556,
+      "waitingHours": 389.9962097222222,
       "comments": 5,
       "labels": [
         "enhancement",
@@ -15789,7 +15966,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-21T02:15:52Z",
       "closedAt": null,
-      "waitingHours": 379.1649613888889,
+      "waitingHours": 402.42704305555554,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -15838,7 +16015,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-21T02:03:34Z",
       "closedAt": null,
-      "waitingHours": 379.3699613888889,
+      "waitingHours": 402.6320430555555,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -16284,7 +16461,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-20T06:54:42Z",
       "closedAt": null,
-      "waitingHours": 398.5177391666667,
+      "waitingHours": 421.77982083333336,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -16654,8 +16831,8 @@
       "isPullRequest": false,
       "createdAt": "2026-10-20T01:05:45Z",
       "closedAt": null,
-      "waitingHours": 404.3335725,
-      "comments": 11,
+      "waitingHours": 427.5956541666667,
+      "comments": 12,
       "labels": [
         "enhancement",
         "needs-human",
@@ -16819,8 +16996,8 @@
       "isPullRequest": false,
       "createdAt": "2026-10-19T13:50:30Z",
       "closedAt": null,
-      "waitingHours": 415.58773916666667,
-      "comments": 4,
+      "waitingHours": 438.84982083333335,
+      "comments": 5,
       "labels": [
         "enhancement",
         "needs-human",
@@ -16922,8 +17099,8 @@
       "isPullRequest": false,
       "createdAt": "2026-10-19T07:54:10Z",
       "closedAt": null,
-      "waitingHours": 421.52662805555553,
-      "comments": 1,
+      "waitingHours": 444.7887097222222,
+      "comments": 2,
       "labels": [
         "enhancement",
         "needs-human",
@@ -16937,12 +17114,12 @@
       "title": "DSH request: let a plugin hide the shell's Sessions rows in a room's @ menu (replace FlyBot's filter)",
       "author": "Birfy",
       "contributionType": "internal",
-      "state": "open",
+      "state": "closed",
       "isPullRequest": false,
       "createdAt": "2026-10-19T06:06:26Z",
-      "closedAt": null,
-      "waitingHours": 423.3221836111111,
-      "comments": 2,
+      "closedAt": "2026-11-06T19:12:07Z",
+      "waitingHours": null,
+      "comments": 3,
       "labels": [
         "enhancement",
         "needs-human",
@@ -17208,8 +17385,8 @@
       "isPullRequest": false,
       "createdAt": "2026-10-18T22:47:58Z",
       "closedAt": null,
-      "waitingHours": 430.6299613888889,
-      "comments": 3,
+      "waitingHours": 453.8920430555556,
+      "comments": 4,
       "labels": [
         "enhancement",
         "needs-human",
@@ -17281,12 +17458,12 @@
       "title": "RFC: layered safety for always-on Bots (grants, action gates, visible channels, decision log)",
       "author": "hsliuustc0106",
       "contributionType": "internal",
-      "state": "open",
+      "state": "closed",
       "isPullRequest": false,
       "createdAt": "2026-10-18T18:06:36Z",
-      "closedAt": null,
-      "waitingHours": 435.31940583333335,
-      "comments": 3,
+      "closedAt": "2026-11-06T19:12:04Z",
+      "waitingHours": null,
+      "comments": 4,
       "labels": [
         "enhancement",
         "needs-human",
@@ -17510,7 +17687,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-18T13:50:02Z",
       "closedAt": null,
-      "waitingHours": 439.59551694444446,
+      "waitingHours": 462.8575986111111,
       "comments": 10,
       "labels": [
         "enhancement",
@@ -17563,8 +17740,8 @@
       "isPullRequest": false,
       "createdAt": "2026-10-18T13:43:05Z",
       "closedAt": null,
-      "waitingHours": 439.7113502777778,
-      "comments": 2,
+      "waitingHours": 462.9734319444444,
+      "comments": 3,
       "labels": [
         "enhancement",
         "needs-human",
@@ -17577,15 +17754,14 @@
       "title": "Performance baseline: measure current smoothness (help wanted)",
       "author": "hsliuustc0106",
       "contributionType": "internal",
-      "state": "open",
+      "state": "closed",
       "isPullRequest": false,
       "createdAt": "2026-10-18T13:40:18Z",
-      "closedAt": null,
-      "waitingHours": 439.7577391666667,
-      "comments": 10,
+      "closedAt": "2026-11-06T17:25:37Z",
+      "waitingHours": null,
+      "comments": 14,
       "labels": [
         "enhancement",
-        "needs-human",
         "area:automation"
       ],
       "url": "https://github.com/ThinkFlowLab/FlyBot/issues/356"
@@ -18598,12 +18774,12 @@
       "title": "Run the #204 live-E2E scenarios on Orbit (adapter + entrypoint, not exercised)",
       "author": "hsliuustc0106",
       "contributionType": "internal",
-      "state": "open",
+      "state": "closed",
       "isPullRequest": false,
       "createdAt": "2026-10-17T16:20:10Z",
-      "closedAt": null,
-      "waitingHours": 461.0932947222222,
-      "comments": 2,
+      "closedAt": "2026-11-06T19:12:01Z",
+      "waitingHours": null,
+      "comments": 3,
       "labels": [
         "enhancement",
         "needs-human",
@@ -19124,8 +19300,8 @@
       "isPullRequest": false,
       "createdAt": "2026-10-16T14:35:59Z",
       "closedAt": null,
-      "waitingHours": 486.82968361111114,
-      "comments": 2,
+      "waitingHours": 510.09176527777777,
+      "comments": 3,
       "labels": [
         "enhancement",
         "needs-human",
@@ -19633,7 +19809,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T16:16:05Z",
       "closedAt": null,
-      "waitingHours": 533.1613502777777,
+      "waitingHours": 556.4234319444445,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -19651,7 +19827,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T16:15:59Z",
       "closedAt": null,
-      "waitingHours": 533.1630169444444,
+      "waitingHours": 556.4250986111111,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -19669,7 +19845,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T16:15:53Z",
       "closedAt": null,
-      "waitingHours": 533.1646836111111,
+      "waitingHours": 556.4267652777778,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -19688,7 +19864,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T16:15:48Z",
       "closedAt": null,
-      "waitingHours": 533.1660725,
+      "waitingHours": 556.4281541666667,
       "comments": 1,
       "labels": [
         "enhancement",
@@ -19748,8 +19924,8 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T16:15:21Z",
       "closedAt": null,
-      "waitingHours": 533.1735725,
-      "comments": 4,
+      "waitingHours": 556.4356541666667,
+      "comments": 5,
       "labels": [
         "enhancement",
         "needs-human",
@@ -20141,7 +20317,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T08:29:38Z",
       "closedAt": null,
-      "waitingHours": 540.9355169444444,
+      "waitingHours": 564.1975986111111,
       "comments": 0,
       "labels": [
         "enhancement",
@@ -20159,7 +20335,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T08:29:37Z",
       "closedAt": null,
-      "waitingHours": 540.9357947222222,
+      "waitingHours": 564.1978763888889,
       "comments": 0,
       "labels": [
         "enhancement",
@@ -20191,7 +20367,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T08:26:31Z",
       "closedAt": null,
-      "waitingHours": 540.9874613888888,
+      "waitingHours": 564.2495430555556,
       "comments": 0,
       "labels": [
         "enhancement",
