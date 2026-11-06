@@ -920,8 +920,69 @@ h1 {
   display: none;
 }
 
+/* One card per metric family; fixed columns keep every row band aligned. */
 .model-summary {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* Combined "a / b / c" values need a smaller face than single values. */
+.model-summary .stat-value.combo {
+  font-size: 1.5rem;
+}
+
+/* Per-point value + day-over-day glyph on trend charts. */
+.point-label {
+  font-size: 9px;
+  fill: var(--muted);
+}
+
+.point-label .bad {
+  fill: var(--failed);
+}
+
+.point-label .good {
+  fill: var(--ok);
+}
+
+.stat-value.combo .failed {
+  color: var(--failed);
+}
+
+.stat-value.combo .ok {
+  color: var(--ok);
+}
+
+@media (max-width: 1100px) {
+  .model-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .model-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.compare-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.compare-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.compare-item.is-selected {
+  padding: 2px 8px;
+  border-radius: 8px;
+  outline: 1px solid var(--line);
 }
 
 .perf-strip {
@@ -1454,9 +1515,14 @@ h1 {
   }
 }
 
-/* Size metric columns to their contents; other columns absorb spare table width. */
-.history-table .metric-column {
-  width: 1%;
+/* Even column rhythm on the stats table: every column gets an equal share so
+   the gaps between columns stay roughly uniform. */
+.metric-table th {
+  width: 10%;
+}
+
+.metric-table {
+  min-width: 1000px;
 }
 
 /* Keep the value, sample count and change together without reserving empty space.
