@@ -1425,6 +1425,7 @@ function latencyTrendChart(points, visibility = {}) {
   const rows = Array.isArray(points) ? points : [];
   const isVisible = (key) => visibility?.[key] !== false;
   const series = (key) => rows.map((row) => (Number.isFinite(row?.[key]) ? row[key] : null));
+  const mean = series('duration_ms');
   const upper = series('p95_ms');
   const lower = rows.map((row) => {
     if (!Number.isFinite(row?.p95_ms)) return null;
@@ -1439,10 +1440,11 @@ function latencyTrendChart(points, visibility = {}) {
   // Plot a single point only when its bounds agree; the tooltip keeps the range.
   const p50 = p50Upper.map((value, index) => value !== null && value === p50Lower[index] ? value : null);
   const p95 = upper.map((value, index) => value !== null && value === lower[index] ? value : null);
-  const leftUsable = [...p50Upper, ...upper].filter((value) => value !== null);
+  const leftUsable = [...mean, ...p50Upper, ...upper].filter((value) => value !== null);
   const usable = leftUsable;
 
   const legend = [
+    { key: 'duration', label: '网关平均耗时', style: 'ttft' },
     { key: 'p50', label: 'P50', style: 'p50' },
     { key: 'p95', label: 'P95', style: 'p95' },
   ]
@@ -1453,7 +1455,7 @@ function latencyTrendChart(points, visibility = {}) {
       </button>`;
     })
     .join('');
-  const head = `<div class="trend-head"><h3>网关耗时（P50 / P95）</h3><div class="trend-legend">${legend}</div></div>`;
+  const head = `<div class="trend-head"><h3>网关耗时（平均 · P50 / P95）</h3><div class="trend-legend">${legend}</div></div>`;
   if (!usable.length) return `<div class="trend-card wide">${head}<p class="empty">暂无数据</p></div>`;
 
   const { width, height } = chartSize(1000, 220);
@@ -1518,6 +1520,7 @@ function latencyTrendChart(points, visibility = {}) {
   const zones = rows
     .map((row, index) => {
       const lines = [String(row?.date || '') + (row?.partial ? ' · 部分日' : '')];
+      if (isVisible('duration') && mean[index] !== null) lines.push(`${fmtDuration(mean[index])} · 网关平均耗时`);
       if (isVisible('p50') && p50Upper[index] !== null) lines.push(`${p50RangeText(row)} · P50`);
       if (isVisible('p95') && upper[index] !== null) lines.push(`${p95RangeText(row)} · P95`);
       if (lines.length === 1) return '';
@@ -1528,15 +1531,16 @@ function latencyTrendChart(points, visibility = {}) {
     })
     .join('');
 
-  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="网关耗时 P50 / P95 趋势">
+  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="网关平均耗时及 P50 / P95 趋势">
     ${grid}
     <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
+    ${layer('duration', mean, 'ttft')}
     ${layer('p50', p50, 'p50-upper')}
     ${layer('p95', p95, 'p95-upper')}
     ${xLabels}
     <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
     ${zones}
-  </svg><p class="chart-note">P50/P95 为成功调用的请求级分位，至少 20 个样本；多个来源仅有区间时在悬浮提示中显示，不绘制单值。网关耗时使用毫秒轴。</p></div>`;
+  </svg><p class="chart-note">平均耗时按成功调用量加权，不含端侧与网络；P50/P95 为成功调用的请求级分位，至少 20 个样本；多个来源仅有区间时在悬浮提示中显示，不绘制单值。网关耗时使用毫秒轴。</p></div>`;
 }
 
 function ttftTrendChart(points, visibility = {}) {

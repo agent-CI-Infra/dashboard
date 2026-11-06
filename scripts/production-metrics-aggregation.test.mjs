@@ -301,3 +301,17 @@ test('TTFT chart has only estimated mean and request percentiles', () => {
   assert.match(html,/TTFT P50 估算/); assert.match(html,/TTFT P95 估算/);
   assert.doesNotMatch(html,/TTFT（流式）/); assert.match(html,/1800 ms/);
 });
+
+
+test('gateway latency chart includes successful-call mean and honors legend toggle', () => {
+  const c=vm.createContext({});
+  vm.runInContext(`const chartSize=()=>({width:1000,height:220}); const niceMax=(v)=>v||1;
+    const fmtAxis=String; const fmtDuration=(v)=>v+' ms'; const fmtTpot=String; const esc=String;
+    const p50RangeText=String; const p95RangeText=String;` +
+    extract('function latencyTrendChart(points', 'function tokenTrendChart(') + ';globalThis.chart=latencyTrendChart;', c);
+  const data=[{date:'2026-11-05',duration_ms:8500,p50_ms:3800,p95_ms:29900}];
+  const shown=c.chart(data,{}); assert.match(shown,/data-latency-layer="duration"/);
+  assert.match(shown,/8500 ms · 网关平均耗时/); assert.match(shown,/latency-layer ttft/);
+  const hidden=c.chart(data,{duration:false}); assert.doesNotMatch(hidden,/8500 ms · 网关平均耗时/);
+  assert.match(hidden,/latency-layer ttft is-hidden/);
+});
