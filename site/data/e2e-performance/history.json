@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/e2e-performance-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updated_at": "2026-11-06T03:21:51.609Z",
+  "updated_at": "2026-11-06T04:23:11.617Z",
   "cases": {
     "DM-WF-CHROME-01": {
       "id": "DM-WF-CHROME-01",
@@ -2437,17 +2437,27 @@
           "run_id": "rerun-5cases-20261106-112151",
           "commit": "2c2b175d",
           "finished_at": "2026-11-06T02:06:11.174Z"
+        },
+        {
+          "date": "2026-11-06",
+          "status": "COMPLETED",
+          "query_ms": null,
+          "query_count": 0,
+          "duration_ms": 80508,
+          "run_id": "fixed-2cases-20261106-122311",
+          "commit": "90c7b8bb",
+          "finished_at": "2026-11-06T03:51:11.979Z"
         }
       ],
       "latest": {
         "id": "DM-WF-QUOTE-01",
         "title": "引用发送：同一用户气泡内显示竖线与单行摘要",
         "mode": "multi-turn",
-        "status": "FAIL",
-        "failure": "G-S09 assert.ui 失败：text contains failed; quotePrefixMatches equals failed; quoteInUserBubble equals failed",
-        "started_at": "2026-11-06T02:04:46.157Z",
-        "finished_at": "2026-11-06T02:06:11.174Z",
-        "duration_ms": 85017,
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-11-06T03:49:51.471Z",
+        "finished_at": "2026-11-06T03:51:11.979Z",
+        "duration_ms": 80508,
         "query_count": 0,
         "query_ms": null,
         "first_text_ms": null,
@@ -2479,176 +2489,176 @@
             "id": "S-start",
             "action": "app.coldStart",
             "status": "ok",
-            "started_at": "2026-11-06T02:04:46.157Z",
-            "duration_ms": 4754,
+            "started_at": "2026-11-06T03:49:51.472Z",
+            "duration_ms": 4829,
             "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
             "id": "S-fresh",
             "action": "app.freshConversation",
             "status": "ok",
-            "started_at": "2026-11-06T02:04:50.911Z",
-            "duration_ms": 5569,
+            "started_at": "2026-11-06T03:49:56.301Z",
+            "duration_ms": 5366,
             "detail": "DigitalMate 单会话 Home（设置入口不作为新对话抽屉）"
           },
           {
             "id": "S00",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-06T02:04:56.480Z",
-            "duration_ms": 1780,
+            "started_at": "2026-11-06T03:50:01.667Z",
+            "duration_ms": 1864,
             "detail": "截图 00-before"
           },
           {
             "id": "S01",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-06T02:04:58.260Z",
-            "duration_ms": 17221,
+            "started_at": "2026-11-06T03:50:03.531Z",
+            "duration_ms": 16997,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S02",
             "action": "wait.turn.complete",
             "status": "ok",
-            "started_at": "2026-11-06T02:05:15.481Z",
-            "duration_ms": 8284,
+            "started_at": "2026-11-06T03:50:20.528Z",
+            "duration_ms": 8408,
             "detail": "完成行 0 → 0（new-text-any）"
           },
           {
             "id": "G-original",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-06T02:05:23.765Z",
-            "duration_ms": 2532,
+            "started_at": "2026-11-06T03:50:28.936Z",
+            "duration_ms": 3028,
             "detail": null
           },
           {
             "id": "G-fixed",
             "action": "assert.cloud",
             "status": "ok",
-            "started_at": "2026-11-06T02:05:26.297Z",
-            "duration_ms": 2,
+            "started_at": "2026-11-06T03:50:31.964Z",
+            "duration_ms": 1,
             "detail": "Deterministic assertions passed"
           },
           {
             "id": "S03",
             "action": "ui.hideKeyboard",
             "status": "ok",
-            "started_at": "2026-11-06T02:05:26.299Z",
-            "duration_ms": 3714,
+            "started_at": "2026-11-06T03:50:31.965Z",
+            "duration_ms": 3837,
             "detail": "键盘已收起"
           },
           {
             "id": "S04",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-06T02:05:30.013Z",
-            "duration_ms": 1662,
+            "started_at": "2026-11-06T03:50:35.802Z",
+            "duration_ms": 1560,
             "detail": "截图 01-source"
           },
           {
             "id": "S05",
             "action": "chat.quoteLatest",
             "status": "ok",
-            "started_at": "2026-11-06T02:05:31.675Z",
-            "duration_ms": 2724,
+            "started_at": "2026-11-06T03:50:37.362Z",
+            "duration_ms": 2978,
             "detail": "点击最新可见回复的引用图标，未发送消息"
           },
           {
             "id": "S06",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-06T02:05:34.399Z",
-            "duration_ms": 1532,
+            "started_at": "2026-11-06T03:50:40.340Z",
+            "duration_ms": 1527,
             "detail": "截图 02-selected"
           },
           {
             "id": "S07",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-06T02:05:35.931Z",
-            "duration_ms": 17139,
+            "started_at": "2026-11-06T03:50:41.867Z",
+            "duration_ms": 16925,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S08",
             "action": "ui.hideKeyboard",
             "status": "ok",
-            "started_at": "2026-11-06T02:05:53.070Z",
-            "duration_ms": 3734,
+            "started_at": "2026-11-06T03:50:58.792Z",
+            "duration_ms": 3679,
             "detail": "键盘已收起"
           },
           {
             "id": "S09",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-06T02:05:56.804Z",
-            "duration_ms": 1688,
+            "started_at": "2026-11-06T03:51:02.471Z",
+            "duration_ms": 1565,
             "detail": "截图 03-sent"
           },
           {
             "id": "S10",
             "action": "wait.turn.complete",
             "status": "ok",
-            "started_at": "2026-11-06T02:05:58.492Z",
-            "duration_ms": 8285,
+            "started_at": "2026-11-06T03:51:04.036Z",
+            "duration_ms": 5125,
             "detail": "完成行 0 → 0（new-text-any）"
           },
           {
             "id": "S11",
             "action": "ui.hideKeyboard",
             "status": "ok",
-            "started_at": "2026-11-06T02:06:06.777Z",
-            "duration_ms": 1096,
+            "started_at": "2026-11-06T03:51:09.161Z",
+            "duration_ms": 1113,
             "detail": "键盘未弹出，无需收起"
           },
           {
             "id": "S12",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-06T02:06:07.873Z",
-            "duration_ms": 1572,
+            "started_at": "2026-11-06T03:51:10.274Z",
+            "duration_ms": 1695,
             "detail": "截图 04-complete"
           },
           {
             "id": "G-ui",
             "action": "assert.ui",
             "status": "ok",
-            "started_at": "2026-11-06T02:06:09.445Z",
-            "duration_ms": 4,
+            "started_at": "2026-11-06T03:51:11.969Z",
+            "duration_ms": 5,
             "detail": "Deterministic assertions passed"
           },
           {
             "id": "G-preview",
             "action": "assert.ui",
             "status": "ok",
-            "started_at": "2026-11-06T02:06:09.449Z",
+            "started_at": "2026-11-06T03:51:11.974Z",
             "duration_ms": 1,
             "detail": "Deterministic assertions passed"
           },
           {
             "id": "G-S09",
             "action": "assert.ui",
-            "status": "failed",
-            "started_at": "2026-11-06T02:06:09.450Z",
-            "duration_ms": 1724,
-            "detail": "text contains failed; quotePrefixMatches equals failed; quoteInUserBubble equals failed"
+            "status": "ok",
+            "started_at": "2026-11-06T03:51:11.975Z",
+            "duration_ms": 2,
+            "detail": "Deterministic assertions passed"
           },
           {
-            "id": "S-failure",
-            "action": "snapshot",
+            "id": "G-S12",
+            "action": "assert.ui",
             "status": "ok",
-            "started_at": "2026-11-06T02:06:11.174Z",
-            "duration_ms": 0,
-            "detail": null
+            "started_at": "2026-11-06T03:51:11.977Z",
+            "duration_ms": 2,
+            "detail": "Deterministic assertions passed"
           }
         ],
-        "screenshots": 6,
+        "screenshots": 5,
         "profiling_files": 0,
-        "run_id": "rerun-5cases-20261106-112151",
-        "commit": "2c2b175d",
-        "generated_at": "2026-11-06T03:21:51.609Z"
+        "run_id": "fixed-2cases-20261106-122311",
+        "commit": "90c7b8bb",
+        "generated_at": "2026-11-06T04:23:11.617Z"
       }
     },
     "DM-WF-RESET-01": {
@@ -3543,17 +3553,27 @@
           "run_id": "rerun-5cases-20261106-112151",
           "commit": "2c2b175d",
           "finished_at": "2026-11-06T02:16:17.197Z"
+        },
+        {
+          "date": "2026-11-06",
+          "status": "COMPLETED",
+          "query_ms": null,
+          "query_count": 0,
+          "duration_ms": 407963,
+          "run_id": "fixed-2cases-20261106-122311",
+          "commit": "90c7b8bb",
+          "finished_at": "2026-11-06T04:22:58.304Z"
         }
       ],
       "latest": {
         "id": "DM-WF-TRAVEL-01",
         "title": "多轮旅程规划：帮我规划新疆旅程 → 需求卡 → 逐题选择 → 生成方案",
         "mode": "multi-turn",
-        "status": "BLOCKED",
-        "failure": "S04 requirements.answer 失败：[SETUP_FAIL] Requested option is absent from the selected interaction",
-        "started_at": "2026-11-06T02:11:15.487Z",
-        "finished_at": "2026-11-06T02:16:17.197Z",
-        "duration_ms": 301710,
+        "status": "COMPLETED",
+        "failure": null,
+        "started_at": "2026-11-06T04:16:10.341Z",
+        "finished_at": "2026-11-06T04:22:58.304Z",
+        "duration_ms": 407963,
         "query_count": 0,
         "query_ms": null,
         "first_text_ms": null,
@@ -3579,102 +3599,158 @@
             "measured": true
           }
         },
-        "step_count": 11,
+        "step_count": 18,
         "steps": [
           {
             "id": "S-start",
             "action": "app.coldStart",
             "status": "ok",
-            "started_at": "2026-11-06T02:11:15.488Z",
-            "duration_ms": 4777,
+            "started_at": "2026-11-06T04:16:10.341Z",
+            "duration_ms": 5874,
             "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
             "id": "S-fresh",
             "action": "app.freshConversation",
             "status": "ok",
-            "started_at": "2026-11-06T02:11:20.265Z",
-            "duration_ms": 6512,
+            "started_at": "2026-11-06T04:16:16.215Z",
+            "duration_ms": 6341,
             "detail": "DigitalMate 单会话 Home（设置入口不作为新对话抽屉）"
           },
           {
             "id": "S-reset",
             "action": "app.resetState",
             "status": "ok",
-            "started_at": "2026-11-06T02:11:26.777Z",
-            "duration_ms": 166074,
-            "detail": "已重置到初始状态（11-06 10:11:35.999 58549 58549 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-2687c33cc9434a4991052257820267e3）"
+            "started_at": "2026-11-06T04:16:22.556Z",
+            "duration_ms": 160680,
+            "detail": "已重置到初始状态（11-06 12:16:31.032 24466 24466 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-aa150c2fbbd64d0bb8e4cfc7677b7891）"
           },
           {
             "id": "S00",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-06T02:14:12.851Z",
-            "duration_ms": 1852,
+            "started_at": "2026-11-06T04:19:03.236Z",
+            "duration_ms": 1741,
             "detail": "截图 00-before"
           },
           {
             "id": "S01",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-06T02:14:14.703Z",
-            "duration_ms": 18111,
+            "started_at": "2026-11-06T04:19:04.977Z",
+            "duration_ms": 16589,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S01A",
             "action": "approval.allow",
             "status": "skipped",
-            "started_at": "2026-11-06T02:14:32.814Z",
-            "duration_ms": 90318,
+            "started_at": "2026-11-06T04:19:21.566Z",
+            "duration_ms": 90405,
             "detail": "没有出现工具审批卡"
           },
           {
             "id": "S02",
             "action": "wait.optionCard",
             "status": "ok",
-            "started_at": "2026-11-06T02:16:03.132Z",
-            "duration_ms": 5269,
+            "started_at": "2026-11-06T04:20:51.971Z",
+            "duration_ms": 4849,
             "detail": null
           },
           {
             "id": "S02H",
             "action": "ui.hideKeyboard",
             "status": "ok",
-            "started_at": "2026-11-06T02:16:08.401Z",
-            "duration_ms": 1242,
+            "started_at": "2026-11-06T04:20:56.820Z",
+            "duration_ms": 1134,
             "detail": "键盘未弹出，无需收起"
           },
           {
             "id": "S03",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-06T02:16:09.643Z",
-            "duration_ms": 1858,
+            "started_at": "2026-11-06T04:20:57.954Z",
+            "duration_ms": 1626,
             "detail": "截图 01-requirements-card"
           },
           {
             "id": "S04",
             "action": "requirements.answer",
-            "status": "failed",
-            "started_at": "2026-11-06T02:16:11.501Z",
-            "duration_ms": 5696,
-            "detail": "[SETUP_FAIL] Requested option is absent from the selected interaction"
+            "status": "ok",
+            "started_at": "2026-11-06T04:20:59.580Z",
+            "duration_ms": 23339,
+            "detail": "Answered only the selected production interaction"
           },
           {
-            "id": "S-failure",
+            "id": "S05",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-11-06T04:21:22.919Z",
+            "duration_ms": 42493,
+            "detail": "完成行 0 → 0（plan-prose）"
+          },
+          {
+            "id": "S05H",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-11-06T04:22:05.412Z",
+            "duration_ms": 1170,
+            "detail": "键盘未弹出，无需收起"
+          },
+          {
+            "id": "S05U",
+            "action": "scroll.up",
+            "status": "ok",
+            "started_at": "2026-11-06T04:22:06.582Z",
+            "duration_ms": 30033,
+            "detail": "上滑 8 次"
+          },
+          {
+            "id": "S06",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-06T02:16:17.197Z",
-            "duration_ms": 0,
-            "detail": null
+            "started_at": "2026-11-06T04:22:36.615Z",
+            "duration_ms": 1725,
+            "detail": "截图 02-plan"
+          },
+          {
+            "id": "S07",
+            "action": "expand.execution",
+            "status": "ok",
+            "started_at": "2026-11-06T04:22:38.340Z",
+            "duration_ms": 1131,
+            "detail": "展开 0 处执行细节"
+          },
+          {
+            "id": "S08",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T04:22:39.471Z",
+            "duration_ms": 1795,
+            "detail": "截图 03-details"
+          },
+          {
+            "id": "S09",
+            "action": "scroll.down",
+            "status": "ok",
+            "started_at": "2026-11-06T04:22:41.266Z",
+            "duration_ms": 15285,
+            "detail": "下滑 4 次"
+          },
+          {
+            "id": "S10",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-06T04:22:56.551Z",
+            "duration_ms": 1753,
+            "detail": "截图 04-plan-bottom"
           }
         ],
-        "screenshots": 3,
+        "screenshots": 5,
         "profiling_files": 0,
-        "run_id": "rerun-5cases-20261106-112151",
-        "commit": "2c2b175d",
-        "generated_at": "2026-11-06T03:21:51.609Z"
+        "run_id": "fixed-2cases-20261106-122311",
+        "commit": "90c7b8bb",
+        "generated_at": "2026-11-06T04:23:11.617Z"
       }
     }
   }
