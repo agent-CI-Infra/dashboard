@@ -129,8 +129,10 @@ function niceMax(value) {
   return Math.ceil(padded / step) * step;
 }
 
+// Case records are keyed by their id in the history document; carry the key
+// onto the entry so selection (data-case-id, state.selected) always has an id.
 function entries() {
-  return Object.values(state.history?.cases || {});
+  return Object.entries(state.history?.cases || {}).map(([id, entry]) => ({ ...entry, id: entry?.id || id }));
 }
 
 function latestPoint(entry) {
@@ -419,80 +421,6 @@ function renderHeader() {
   } else {
     $('device').textContent = '设备信息未记录';
   }
-}
-
-function renderSummary() {
-  const history = state.history;
-  const cases = entries();
-  const anchor = historyCompleteThrough(history) || historyLatestDate(history);
-  const stats = suiteDayStats(history);
-  const index = anchor ? stats.findIndex((row) => row.date === anchor) : -1;
-  const day = index >= 0 ? stats[index] : null;
-  const previous = index > 0 && stats[index - 1].date === addDays(anchor, -1) ? stats[index - 1] : null;
-  const completeLabel = anchor || '—';
-
-  const trailing = newMetricAccumulator();
-  if (day) {
-    for (const row of stats) {
-      if (row.date >= addDays(day.date, -(RECENT_WINDOW_DAYS - 1)) && row.date <= day.date) {
-        mergeMetricRow(trailing, row);
-      }
-    }
-  }
-  const trailingMean = finalizeMetricAccumulator(trailing).duration_ms;
-
-  const active = cases.filter((entry) => anchor && recentCallsForCase(entry, anchor) >= MIN_RECENT_CALLS);
-  const lowVolume = cases.filter((entry) => {
-    const calls = anchor ? recentCallsForCase(entry, anchor) : 0;
-    return calls > 0 && calls < MIN_RECENT_CALLS;
-  });
-  const passed = active.filter((entry) => pointOn(entry, anchor)?.status === 'COMPLETED').length;
-  const failed = active.filter((entry) => pointOn(entry, anchor)?.status === 'FAILED').length;
-
-  const sameClock = sameClockComparison(history);
-  const sameClockTone = !sameClock || !Number.isFinite(sameClock.change_percent)
-    ? ''
-    : sameClock.change_percent < 0 ? 'ok' : 'failed';
-  const sameClockText = sameClock && Number.isFinite(sameClock.change_percent)
-    ? `${sameClock.change_percent > 0 ? '+' : ''}${sameClock.change_percent.toFixed(1)}%`
-    : '—';
-  const sameClockHint = sameClock
-    ? `今日 00:00–${String(sameClock.cutoff).padStart(2, '0')}:00 vs 前 ${sameClock.days} 天同时段 · 不含端侧与网络`
-    : '当日采集未结束或缺少小时数据';
-
-  $('summary').innerHTML = `
-    <div class="stat-card">
-      <div class="stat-label">模型请求数</div>
-      <div class="stat-value">${day ? fmtCount(day.calls) : '—'}</div>
-      <div class="stat-hint">${day ? `${esc(completeLabel)} · 成功 ${fmtCount(day.success_count)} / 失败 ${fmtCount(day.failed)}${day.unknown ? ` / 未知 ${fmtCount(day.unknown)}` : ''}` : '暂无完整日数据'}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">模型请求平均耗时</div>
-      <div class="stat-value">${fmtDuration(day?.duration_ms)}</div>
-      <div class="stat-hint">不含端侧与网络 · ${day ? fmtCount(day.duration_samples) : 0} 个成功样本</div>
-      ${deltaChip(day?.duration_ms, previous?.duration_ms, { lowerIsBetter: true }) ? `<div class="stat-delta">${deltaChip(day?.duration_ms, previous?.duration_ms, { lowerIsBetter: true })}</div>` : ''}
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">模型请求 P95</div>
-      <div class="stat-value">${esc(p95RangeText(day))}</div>
-      <div class="stat-hint">请求级分位 · 不含端侧与网络 · ${day ? fmtCount(day.duration_samples) : 0} 个成功样本</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">成功调用平均</div>
-      <div class="stat-value">${fmtDuration(trailingMean)}</div>
-      <div class="stat-hint">近 ${RECENT_WINDOW_DAYS} 天按量加权 · 不含端侧与网络</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">模型状态</div>
-      <div class="stat-value ${failed ? 'failed' : active.length ? 'ok' : ''}">${passed} / ${failed}</div>
-      <div class="stat-hint">${active.length ? `近 7 天 ≥${MIN_RECENT_CALLS} 次调用的模型` : '暂无足量调用模型'}${lowVolume.length ? ` · 低流量折叠 ${lowVolume.length} 个` : ''}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">当日同时段</div>
-      <div class="stat-value ${sameClockTone}">${esc(sameClockText)}</div>
-      <div class="stat-hint">${esc(sameClockHint)}</div>
-    </div>
-  `;
 }
 
 function renderPerfStrip() {
@@ -950,7 +878,7 @@ function envSummary(doc) {
       <div class="stat-hint">${fmtCount(anchor.tpot?.n)} 次调用 · ${fmtCount(anchor.tpot?.tokens)} token 加权</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">云侧 Agent输入 / 输出 / 总 Token${tokenUnit ? `（${tokenUnit}）` : ''}</div>
+      <div class="stat-label">云侧 Agent 输入 / 输出 / 总 Token${tokenUnit ? `（${tokenUnit}）` : ''}</div>
       <div class="stat-value combo">${tokenBare(anchor.tokens?.input)} / ${tokenBare(anchor.tokens?.output)} / ${tokenBare(anchor.tokens?.total)}</div>
       <div class="stat-hint">成功调用 ${fmtCount(anchor.calls?.success)} 次 · llm_usage 累计</div>
     </div>
@@ -972,7 +900,9 @@ function envCallTrend(doc) {
   const innerWidth = width - pad.left - pad.right;
   const innerHeight = height - pad.top - pad.bottom;
   const callMax = niceMax(Math.max(1, ...calls.filter((value) => value !== null)));
-  const rateMax = 100;
+  // Scale the right axis to the observed rates: a fixed 0–100% flattened the
+  // 0–5% range onto the baseline.
+  const rateMax = Math.min(100, Math.max(10, Math.ceil((Math.max(0, ...rates.filter((value) => value !== null)) * 1.1) / 5) * 5));
   const x = (index) => (rows.length === 1 ? pad.left + innerWidth / 2 : pad.left + (index * innerWidth) / (rows.length - 1));
   const yCall = (value) => pad.top + innerHeight - (Math.max(0, value) / callMax) * innerHeight;
   const yRate = (value) => pad.top + innerHeight - (Math.max(0, value) / rateMax) * innerHeight;
@@ -980,7 +910,7 @@ function envCallTrend(doc) {
   const grid = Array.from({ length: 5 }, (_, index) => {
     const fraction = index / 4;
     const yy = pad.top + innerHeight - fraction * innerHeight;
-    return `<line class="grid-line" x1="${pad.left}" y1="${yy}" x2="${width - pad.right}" y2="${yy}" /><text class="axis-text" x="${pad.left - 8}" y="${yy + 3}" text-anchor="end">${esc(fmtCount(Math.round(callMax * fraction)))}</text><text class="axis-text" x="${width - pad.right + 8}" y="${yy + 3}" text-anchor="start">${Math.round(rateMax * fraction)}%</text>`;
+    return `<line class="grid-line" x1="${pad.left}" y1="${yy}" x2="${width - pad.right}" y2="${yy}" /><text class="axis-text" x="${pad.left - 8}" y="${yy + 3}" text-anchor="end">${esc(fmtCount(Math.round(callMax * fraction)))}</text><text class="axis-text" x="${width - pad.right + 8}" y="${yy + 3}" text-anchor="start">${Number((rateMax * fraction).toFixed(1))}%</text>`;
   }).join('');
 
   const linePath = (values, scale) => {
@@ -1255,6 +1185,29 @@ function perfStrip(history) {
   if (!latest) return '<p class="empty">最新完整日暂无数据。</p>';
   const previous = days.find((row) => row.date === addDays(latest.date, -1)) || null;
   const historyDays = days.length;
+
+  // Case outcomes render in this same row; a second summary block above the
+  // case list only repeated the request numbers.
+  const cases = entries();
+  const active = cases.filter((entry) => anchor && recentCallsForCase(entry, anchor) >= MIN_RECENT_CALLS);
+  const lowVolume = cases.filter((entry) => {
+    const calls = anchor ? recentCallsForCase(entry, anchor) : 0;
+    return calls > 0 && calls < MIN_RECENT_CALLS;
+  });
+  const passed = active.filter((entry) => pointOn(entry, anchor)?.status === 'COMPLETED').length;
+  const failedCases = active.filter((entry) => pointOn(entry, anchor)?.status === 'FAILED').length;
+
+  const sameClock = sameClockComparison(history);
+  const sameClockTone = !sameClock || !Number.isFinite(sameClock.change_percent)
+    ? ''
+    : sameClock.change_percent < 0 ? 'ok' : 'failed';
+  const sameClockText = sameClock && Number.isFinite(sameClock.change_percent)
+    ? `${sameClock.change_percent > 0 ? '+' : ''}${sameClock.change_percent.toFixed(1)}%`
+    : '—';
+  const sameClockHint = sameClock
+    ? `今日 00:00–${String(sameClock.cutoff).padStart(2, '0')}:00 vs 前 ${sameClock.days} 天同时段 · 不含端侧与网络`
+    : '当日采集未结束或缺少小时数据';
+
   return `
     <div class="stat-card">
       <div class="stat-label">最新完整日</div>
@@ -1268,19 +1221,24 @@ function perfStrip(history) {
       ${deltaChip(latest.duration_ms, previous?.duration_ms, { lowerIsBetter: true }) ? `<div class="stat-delta">${deltaChip(latest.duration_ms, previous?.duration_ms, { lowerIsBetter: true })}</div>` : ''}
     </div>
     <div class="stat-card">
-      <div class="stat-label">模型请求平均耗时 P50 区间</div>
-      <div class="stat-value">${esc(p50RangeText(latest))}</div>
-      <div class="stat-hint">请求级分位 · 各模型区间</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">模型请求平均耗时 P95 区间</div>
-      <div class="stat-value">${esc(p95RangeText(latest))}</div>
-      <div class="stat-hint">请求级分位 · 至少 20 个成功样本</div>
+      <div class="stat-label">模型请求耗时 <strong>P50</strong> / <strong>P95</strong> 区间</div>
+      <div class="stat-value combo">${esc(p50RangeText(latest))} / ${esc(p95RangeText(latest))}</div>
+      <div class="stat-hint">请求级分位 · 各模型区间 · 至少 20 个成功样本</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">模型请求失败率</div>
       <div class="stat-value ${Number.isFinite(latest.failure_rate) ? (latest.failed ? 'failed' : 'ok') : ''}">${fmtPercent(latest.failure_rate)}</div>
       <div class="stat-hint">失败 ${fmtCount(latest.failed)} / 调用 ${fmtCount(latest.calls)}${latest.unknown ? ` · 未知 ${fmtCount(latest.unknown)}` : ''}${latest.blocked ? ` · 阻塞 ${fmtCount(latest.blocked)}` : ''}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">用例模型状态</div>
+      <div class="stat-value ${failedCases ? 'failed' : active.length ? 'ok' : ''}">${passed} / ${failedCases}</div>
+      <div class="stat-hint">${active.length ? `近 ${RECENT_WINDOW_DAYS} 天 ≥${MIN_RECENT_CALLS} 次调用的用例` : '暂无足量调用用例'}${lowVolume.length ? ` · 低流量折叠 ${lowVolume.length} 个` : ''}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">当日同时段</div>
+      <div class="stat-value ${sameClockTone}">${esc(sameClockText)}</div>
+      <div class="stat-hint">${esc(sameClockHint)}</div>
     </div>
   `;
 }
@@ -1981,19 +1939,20 @@ function latencyTrendChart(points, visibility = {}) {
   </svg><p class="chart-note">平均耗时按成功调用量加权，不含端侧与网络；P50/P95 为成功调用的请求级分位，至少 20 个样本；多个来源仅有区间时在悬浮提示中显示，不绘制单值。模型请求耗时使用毫秒轴。</p></div>`;
 }
 
-function ttftTrendChart(points, visibility = {}) {
+function ttftTrendChart(points, visibility = {}, { columns = 1 } = {}) {
   const rows = Array.isArray(points) ? points : [];
   const defs = [
-    ['ttft_est', '模型平均 TTFT', 'ttft_estimated_ms', 'tpot-est', {}],
-    ['ttft_est_p50', '模型平均 TTFT P50 区间', 'ttft_estimated_p50_ms', 'tpot-est-p50', { below: true }],
-    ['ttft_est_p95', '模型平均 TTFT P95 区间', 'ttft_estimated_p95_ms', 'tpot-est-p95', {}],
+    ['ttft_est', '均值', 'ttft_estimated_ms', 'tpot-est', {}],
+    ['ttft_est_p50', 'P50 区间', 'ttft_estimated_p50_ms', 'tpot-est-p50', { below: true }],
+    ['ttft_est_p95', 'P95 区间', 'ttft_estimated_p95_ms', 'tpot-est-p95', {}],
   ];
   const visible = key => visibility[key] !== false;
   const legend = defs.map(([key, label, , style]) => `<button class="legend-toggle latency-toggle${visible(key) ? '' : ' off'}" type="button" data-latency-layer="${key}" aria-pressed="${visible(key)}"><i class="legend-line ${style}"></i><span>${label}</span></button>`).join('');
   const head = `<div class="trend-head"><h3>模型平均 TTFT（s）</h3><div class="trend-legend">${legend}</div></div>`;
   const values = defs.flatMap(([, , field]) => rows.map(row => row[field]).filter(v => Number.isFinite(v) && v >= 0));
-  if (!values.length) return `<div class="trend-card wide">${head}<p class="empty">暂无 TTFT 数据</p></div>`;
-  const {width, height} = chartSize(1000, 220);
+  const cardClass = columns > 1 ? '' : ' wide';
+  if (!values.length) return `<div class="trend-card${cardClass}">${head}<p class="empty">暂无 TTFT 数据</p></div>`;
+  const {width, height} = chartSize(1000, 220, { columns });
   const pad = {left:58, right:18, top:14, bottom:30};
   const iw = width - pad.left - pad.right, ih = height - pad.top - pad.bottom;
   const max = niceMax(Math.max(...values));
@@ -2006,7 +1965,11 @@ function ttftTrendChart(points, visibility = {}) {
     const dots = rows.map((row, i) => { const value = row[field];
       if (!Number.isFinite(value) || value < 0) { open = false; return ''; }
       path += `${open ? 'L' : 'M'}${x(i).toFixed(1)},${y(value).toFixed(1)}`; open = true;
-      const label = pointLabel(x(i), y(value), value, rows[i - 1]?.[field], { format: fmtDuration, lowerIsBetter: true, dense: rows.length > 16, ...pointOpts });
+      // Half-width cards only label the mean and P95: P50 sits next to the
+      // mean and its labels would collide with it.
+      const label = columns > 1 && key.endsWith('_p50')
+        ? ''
+        : pointLabel(x(i), y(value), value, rows[i - 1]?.[field], { format: fmtDuration, lowerIsBetter: true, dense: rows.length > 16, ...pointOpts });
       return `<circle class="trend-dot" cx="${x(i).toFixed(1)}" cy="${y(value).toFixed(1)}" r="3" />${label}`;
     }).join('');
     return `<g class="latency-layer ${style}${visible(key) ? '' : ' is-hidden'}">${path ? `<path class="trend-series" d="${path}" />` : ''}${dots}</g>`;
@@ -2015,27 +1978,28 @@ function ttftTrendChart(points, visibility = {}) {
   const zoneWidth = rows.length > 1 ? iw / (rows.length-1) : iw;
   const zones = rows.map((row,i) => {
     const lines = [String(row.date || '') + (row.partial ? ' · 部分日' : '')];
-    for (const [key,label,field] of defs) if (visible(key) && Number.isFinite(row[field])) lines.push(`${fmtDuration(row[field])} · ${label}`);
+    for (const [key,label,field] of defs) if (visible(key) && Number.isFinite(row[field])) lines.push(`TTFT ${label} ${fmtDuration(row[field])}`);
     if (lines.length === 1) return '';
     const cx=x(i), left=Math.max(pad.left,cx-zoneWidth/2), right=Math.min(width-pad.right,cx+zoneWidth/2);
     return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right-left).toFixed(1)}" height="${ih}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
   }).join('');
-  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="TTFT 请求级均值与 P50 P95 趋势">${grid}<line class="axis-line" x1="${pad.left}" y1="${pad.top+ih}" x2="${width-pad.right}" y2="${pad.top+ih}" />${layers}${labels}<line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top+ih}" hidden />${zones}</svg><p class="chart-note">均值按请求数加权；P50/P95 为请求级分位（分桶近似，每类至少 20 个样本）。</p></div>`;
+  return `<div class="trend-card${cardClass}">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="TTFT 请求级均值与 P50 P95 趋势">${grid}<line class="axis-line" x1="${pad.left}" y1="${pad.top+ih}" x2="${width-pad.right}" y2="${pad.top+ih}" />${layers}${labels}<line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top+ih}" hidden />${zones}</svg><p class="chart-note">均值按请求数加权；P50/P95 为请求级分位（分桶近似，每类至少 20 个样本）。</p></div>`;
 }
 
-function tpotTrendChart(points, visibility = {}) {
+function tpotTrendChart(points, visibility = {}, { columns = 1 } = {}) {
   const rows = Array.isArray(points) ? points : [];
   const defs = [
-    ['tpot_est', '模型平均 TPOT', 'tpot_estimated_ms', 'tpot-est', {}],
-    ['tpot_est_p50', '模型平均 TPOT P50 区间', 'tpot_estimated_p50_ms', 'tpot-est-p50', { below: true }],
-    ['tpot_est_p95', '模型平均 TPOT P95 区间', 'tpot_estimated_p95_ms', 'tpot-est-p95', {}],
+    ['tpot_est', '均值', 'tpot_estimated_ms', 'tpot-est', {}],
+    ['tpot_est_p50', 'P50 区间', 'tpot_estimated_p50_ms', 'tpot-est-p50', { below: true }],
+    ['tpot_est_p95', 'P95 区间', 'tpot_estimated_p95_ms', 'tpot-est-p95', {}],
   ];
   const visible = key => visibility[key] !== false;
   const legend = defs.map(([key, label, , style]) => `<button class="legend-toggle latency-toggle${visible(key) ? '' : ' off'}" type="button" data-latency-layer="${key}" aria-pressed="${visible(key)}"><i class="legend-line ${style}"></i><span>${label}</span></button>`).join('');
   const head = `<div class="trend-head"><h3>模型平均 TPOT（ms/token）</h3><div class="trend-legend">${legend}</div></div>`;
   const values = defs.flatMap(([, , field]) => rows.map(row => row[field]).filter(v => Number.isFinite(v) && v >= 0));
-  if (!values.length) return `<div class="trend-card wide">${head}<p class="empty">暂无 TPOT 数据</p></div>`;
-  const {width, height} = chartSize(1000, 220);
+  const cardClass = columns > 1 ? '' : ' wide';
+  if (!values.length) return `<div class="trend-card${cardClass}">${head}<p class="empty">暂无 TPOT 数据</p></div>`;
+  const {width, height} = chartSize(1000, 220, { columns });
   const pad = {left:58, right:18, top:14, bottom:30};
   const iw = width - pad.left - pad.right, ih = height - pad.top - pad.bottom;
   const max = niceMax(Math.max(...values));
@@ -2048,7 +2012,11 @@ function tpotTrendChart(points, visibility = {}) {
     const dots = rows.map((row, i) => { const value = row[field];
       if (!Number.isFinite(value) || value < 0) { open = false; return ''; }
       path += `${open ? 'L' : 'M'}${x(i).toFixed(1)},${y(value).toFixed(1)}`; open = true;
-      const label = pointLabel(x(i), y(value), value, rows[i - 1]?.[field], { format: fmtTpotBare, lowerIsBetter: true, dense: rows.length > 16, ...pointOpts });
+      // Half-width cards only label the mean and P95: P50 sits next to the
+      // mean and its labels would collide with it.
+      const label = columns > 1 && key.endsWith('_p50')
+        ? ''
+        : pointLabel(x(i), y(value), value, rows[i - 1]?.[field], { format: fmtTpotBare, lowerIsBetter: true, dense: rows.length > 16, ...pointOpts });
       return `<circle class="trend-dot" cx="${x(i).toFixed(1)}" cy="${y(value).toFixed(1)}" r="3" />${label}`;
     }).join('');
     return `<g class="latency-layer ${style}${visible(key) ? '' : ' is-hidden'}">${path ? `<path class="trend-series" d="${path}" />` : ''}${dots}</g>`;
@@ -2057,12 +2025,12 @@ function tpotTrendChart(points, visibility = {}) {
   const zoneWidth = rows.length > 1 ? iw / (rows.length-1) : iw;
   const zones = rows.map((row,i) => {
     const lines = [String(row.date || '') + (row.partial ? ' · 部分日' : '')];
-    for (const [key,label,field] of defs) if (visible(key) && Number.isFinite(row[field])) lines.push(`${fmtTpot(row[field])} · ${label}`);
+    for (const [key,label,field] of defs) if (visible(key) && Number.isFinite(row[field])) lines.push(`TPOT ${label} ${fmtTpot(row[field])}`);
     if (lines.length === 1) return '';
     const cx=x(i), left=Math.max(pad.left,cx-zoneWidth/2), right=Math.min(width-pad.right,cx+zoneWidth/2);
     return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right-left).toFixed(1)}" height="${ih}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
   }).join('');
-  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="TPOT 加权均值与请求级 P50 P95 趋势">${grid}<line class="axis-line" x1="${pad.left}" y1="${pad.top+ih}" x2="${width-pad.right}" y2="${pad.top+ih}" />${layers}${labels}<line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top+ih}" hidden />${zones}</svg><p class="chart-note">均值按输出 Token 数减一加权；P50/P95 为请求级分位（分桶近似，每类至少 20 个样本）。</p></div>`;
+  return `<div class="trend-card${cardClass}">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="TPOT 加权均值与请求级 P50 P95 趋势">${grid}<line class="axis-line" x1="${pad.left}" y1="${pad.top+ih}" x2="${width-pad.right}" y2="${pad.top+ih}" />${layers}${labels}<line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top+ih}" hidden />${zones}</svg><p class="chart-note">均值按输出 Token 数减一加权；P50/P95 为请求级分位（分桶近似，每类至少 20 个样本）。</p></div>`;
 }
 
 function tokenTrendChart(points, visibility = {}, unit = 'query') {
@@ -2185,8 +2153,8 @@ function tokenTrendChart(points, visibility = {}, unit = 'query') {
 function modelTrends(days, tokenVisibility = {}, latencyVisibility = {}, { tokenUnit = 'query', failures = [], volumeVisibility = {} } = {}) {
   return volumeTrendChart(days, failures, volumeVisibility)
     + latencyTrendChart(days, latencyVisibility)
-    + ttftTrendChart(days, latencyVisibility)
-    + tpotTrendChart(days, latencyVisibility)
+    + ttftTrendChart(days, latencyVisibility, { columns: 2 })
+    + tpotTrendChart(days, latencyVisibility, { columns: 2 })
     + tokenTrendChart(days, tokenVisibility, tokenUnit);
 }
 
@@ -2279,7 +2247,7 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
     .reverse()
     .join('');
   return `<div class="table-wrap"><table class="history-table metric-table">
-    <thead><tr><th>${esc(label)}</th>${versionHead}<th class="num">模型请求数</th><th class="num" title="所选模型的失败请求占全部请求的比例；未知状态时不显示">模型请求失败率</th><th class="num metric-column" title="全部请求的 TTFT 均值（分桶近似）">平均 TTFT（s）</th><th class="num metric-column" title="全部请求的 TPOT 均值（按输出 Token 数减一加权）">平均 TPOT（ms/token）</th><th class="num metric-column" title="按成功调用量加权，不含端侧与网络">模型请求平均耗时（s）</th><th class="num" title="当日成功调用的输入 Token 累计数">输入 Token${unitSuffix(inputUnit)}</th><th class="num" title="当日成功调用的输出 Token 累计数">输出 Token${unitSuffix(outputUnit)}</th><th class="num" title="当日成功调用的总 Token 累计数">总 Token${unitSuffix(totalUnit)}</th></tr></thead>
+    <thead><tr><th scope="col">${esc(label)}</th>${versionHead}<th scope="col" class="num">模型请求数</th><th scope="col" class="num" title="所选模型的失败请求占全部请求的比例；未知状态时不显示">模型请求失败率</th><th scope="col" class="num metric-column" title="全部请求的 TTFT 均值（分桶近似）">平均 TTFT（s）</th><th scope="col" class="num metric-column" title="全部请求的 TPOT 均值（按输出 Token 数减一加权）">平均 TPOT（ms/token）</th><th scope="col" class="num metric-column" title="按成功调用量加权，不含端侧与网络">模型请求平均耗时（s）</th><th scope="col" class="num" title="当日成功调用的输入 Token 累计数">输入 Token${unitSuffix(inputUnit)}</th><th scope="col" class="num" title="当日成功调用的输出 Token 累计数">输出 Token${unitSuffix(outputUnit)}</th><th scope="col" class="num" title="当日成功调用的总 Token 累计数">总 Token${unitSuffix(totalUnit)}</th></tr></thead>
     <tbody>${body}</tbody>
   </table></div>`;
 }
@@ -2312,7 +2280,7 @@ function regressionFindings(latest, previous) {
 
 // A slim banner above the model cards when the latest day regresses; an empty
 // string keeps the page clean on quiet days.
-function regressionBanner(days, failures = []) {
+function regressionBanner(days, failures = [], { model = '' } = {}) {
   if (!Array.isArray(days) || days.length < 2) return '';
   const latest = days[days.length - 1];
   const previous = previousRow(days);
@@ -2334,7 +2302,13 @@ function regressionBanner(days, failures = []) {
     }
   }
   if (!notes.length) return '';
-  return `<div class="insight-banner" role="status">⚠ ${esc(latest.date)} 较前一日：${esc(notes.join(' · '))}（回退阈值 ≥${REGRESSION_THRESHOLD}%）</div>`;
+  // The banner sits at the top of the page, away from the curve it describes,
+  // so it names the model and jumps to the chart card.
+  const subject = model ? `模型侧 · ${modelDisplayName(model)}` : '模型侧';
+  return `<div class="insight-banner" role="status">
+    <span>⚠ <strong>${esc(subject)}</strong> · ${esc(latest.date)} 较前一日：${esc(notes.join(' · '))}（回退阈值 ≥${REGRESSION_THRESHOLD}%）</span>
+    <button type="button" class="insight-action" data-jump="model-trends-card">查看曲线 ↓</button>
+  </div>`;
 }
 
 // Range-wide totals per model so the comparison card can sit above the
@@ -2390,28 +2364,49 @@ function modelComparison(history, rangeDays = 0) {
     || a.name.localeCompare(b.name));
 }
 
+// The comparison is a compact table: one row per model, range-wide totals in
+// the columns, and the row doubles as the switcher for the drill-down below.
 function modelCompareCard(rows, { selected = null } = {}) {
   if (!Array.isArray(rows) || !rows.length) return '<p class="empty">暂无模型数据。</p>';
-  // Names only: the comparison area is a switcher, not a metric table.
-  const renderItem = (row) => {
+  const tokenMax = Math.max(...rows.map((row) => (Number.isFinite(row?.totals?.total_tokens) ? row.totals.total_tokens : 0)), 0);
+  const [tokenDiv, tokenSuffix] = tokenMax >= 1e9 ? [1e9, 'B'] : tokenMax >= 1e6 ? [1e6, 'M'] : tokenMax >= 1e3 ? [1e3, 'k'] : [1, ''];
+  // Stripping the provider prefix can make two distinct models read alike; in
+  // that case keep the raw name so the rows stay tellable apart.
+  const displayCounts = new Map();
+  for (const row of rows) {
+    const label = modelDisplayName(row.name);
+    displayCounts.set(label, (displayCounts.get(label) || 0) + 1);
+  }
+  const labelFor = (row) => (displayCounts.get(modelDisplayName(row.name)) > 1 ? row.name : modelDisplayName(row.name));
+  const renderRow = (row) => {
     const regressing = regressionFindings(row.latest, row.previous).length > 0;
-    return `<span class="compare-item${row.name === selected ? ' is-selected' : ''}">
-      <button type="button" class="compare-model-button" data-select-model="${esc(row.name)}" aria-pressed="${row.name === selected}">${esc(modelDisplayName(row.name))}</button>${row.name === selected ? ' <span class="selected-model-badge">当前查看</span>' : ''}${regressing ? ' <span class="badge failed">回退</span>' : ''}${row.lowVolume ? ' <span class="badge low">低流量</span>' : ''}
-    </span>`;
+    const totals = row.totals || {};
+    return `<tr class="${row.name === selected ? 'is-selected' : ''}" data-select-model="${esc(row.name)}"${row.name === selected ? ' aria-current="true"' : ''}>
+      <td class="compare-name"><button type="button" class="compare-model-button" data-select-model="${esc(row.name)}" aria-pressed="${row.name === selected}">${esc(labelFor(row))}</button>${regressing ? ' <span class="badge failed">回退</span>' : ''}${row.lowVolume ? ' <span class="badge low">低流量</span>' : ''}</td>
+      <td class="num">${row.hasData ? fmtCount(totals.calls) : '—'}</td>
+      <td class="num">${fmtPercent(row.failure_rate)}</td>
+      <td class="num">${fmtSecondsBare(totals.duration_ms)}</td>
+      <td class="num">${fmtSecondsBare(totals.p95_ms)}</td>
+      <td class="num">${fmtSecondsBare(totals.ttft_estimated_ms)}</td>
+      <td class="num">${fmtTpotBare(totals.tpot_estimated_ms)}</td>
+      <td class="num">${fmtInUnit(totals.total_tokens, tokenDiv)}</td>
+    </tr>`;
   };
+  const table = (list) => `<div class="table-wrap compare-wrap"><table class="history-table compare-table">
+    <thead><tr><th scope="col">模型</th><th scope="col" class="num">请求数</th><th scope="col" class="num" title="失败请求占全部已知终态请求的比例">失败率</th><th scope="col" class="num" title="按成功调用量加权，不含端侧与网络">平均耗时（s）</th><th scope="col" class="num">P95（s）</th><th scope="col" class="num" title="分桶近似">TTFT（s）</th><th scope="col" class="num" title="按输出 Token 数减一加权">TPOT（ms/token）</th><th scope="col" class="num" title="所选范围内成功调用的总 Token 累计">总 Token${tokenSuffix ? `（${tokenSuffix}）` : ''}</th></tr></thead>
+    <tbody>${list.map(renderRow).join('')}</tbody>
+  </table></div>`;
   const active = rows.filter((row) => !row.lowVolume);
   const quiet = rows.filter((row) => row.lowVolume);
-  const activeList = active.length
-    ? `<div class="compare-list">${active.map(renderItem).join('')}</div>`
-    : '<p class="empty">所选范围内暂无足量调用的模型。</p>';
-  const quietList = quiet.length
+  const activeTable = active.length ? table(active) : '<p class="empty">所选范围内暂无足量调用的模型。</p>';
+  const quietTable = quiet.length
     ? `<details class="low-volume"${quiet.some((row) => row.name === selected) ? ' open' : ''}>
       <summary>低流量模型（近 ${RECENT_WINDOW_DAYS} 天 &lt; ${MIN_RECENT_CALLS} 次调用）· ${quiet.length} 个</summary>
       <p class="chart-note">这些模型的调用量不足以支撑可靠的分位与失败率，仅折叠展示，不参与首页结论。</p>
-      <div class="compare-list">${quiet.map(renderItem).join('')}</div>
+      ${table(quiet)}
     </details>`
     : '';
-  return activeList + quietList;
+  return activeTable + quietTable;
 }
 
 // The freshest point across all cases identifies the current data drop.
@@ -2490,8 +2485,8 @@ function renderDetail() {
   $('detail').innerHTML = `
     <div class="detail-head">
       <div>
-        <h2 class="detail-id">${esc(entry.id)}</h2>
-        <p class="detail-title">${esc(entry.title || '')}</p>
+        <h2 class="detail-id">${esc(entry.title || entry.id || state.selected || '')}</h2>
+        <p class="detail-title">${esc(entry.title ? (entry.id || state.selected || '') : '')}</p>
         <p class="detail-meta">${esc(latestMeta || '暂无最近一次运行信息')}</p>
       </div>
       <span class="badge ${statusClass(status)}">${esc(statusLabel(status))}</span>
@@ -2568,6 +2563,7 @@ function renderTrends() {
     failures: failureSeries(state.history, days, state.model),
     volumeVisibility: state.volumeVisibility,
   });
+  refineCharts(target);
 }
 
 function renderModels() {
@@ -2590,7 +2586,7 @@ function renderModels() {
     granularitySelect.value = state.granularity;
   }
 
-  const currentModel = $('current-model');
+  const compareCurrent = $('compare-current');
   const summary = $('model-summary');
   const trends = $('model-trends');
   const stats = $('model-stats');
@@ -2600,7 +2596,7 @@ function renderModels() {
   const compare = $('model-compare');
   const compareVersion = $('compare-version');
   if (!names.length) {
-    if (currentModel) currentModel.textContent = '';
+    if (compareCurrent) compareCurrent.textContent = '';
     const empty =
       '<p class="empty">历史中没有可确认关联的基准模型调用。nightly 产生 <code>points[].benchmark_models</code> 后，这里会按天展示流式 TTFT、TPOT、请求级 P50 / P95 与 Token 曲线。</p>';
     if (summary) summary.innerHTML = '';
@@ -2619,9 +2615,10 @@ function renderModels() {
   const complete = completeDays(days, history);
   const anchor = historyCompleteThrough(history) || latestModelDate(history);
   const recentCalls = recentCallsForDays(modelSeries(history, state.model), anchor);
-  if (currentModel) {
-    currentModel.textContent = `当前模型：${modelDisplayName(state.model)}`
-      + (isLowVolumeModel(state.model, recentCalls) ? ` · 低流量（近 ${RECENT_WINDOW_DAYS} 天 ${recentCalls} 次调用，指标仅供参考）` : '');
+  if (compareCurrent) {
+    compareCurrent.textContent = isLowVolumeModel(state.model, recentCalls)
+      ? `当前：${modelDisplayName(state.model)} · 低流量（指标仅供参考）`
+      : `当前：${modelDisplayName(state.model)}`;
   }
   const weeks = weekSeries(complete);
   const failures = failureSeries(history, complete, state.model);
@@ -2635,7 +2632,9 @@ function renderModels() {
     : '暂无数据';
   if (insights) {
     // A low-volume model cannot raise a reliable regression claim either.
-    insights.innerHTML = !isLowVolumeModel(state.model, recentCalls) && complete.some((row) => row.date === anchor) ? regressionBanner(complete, failures) : '';
+    insights.innerHTML = !isLowVolumeModel(state.model, recentCalls) && complete.some((row) => row.date === anchor)
+      ? regressionBanner(complete, failures, { model: state.model })
+      : '';
   }
   if (compare) {
     compare.innerHTML = modelCompareCard(modelComparison(history, state.rangeDays), { selected: state.model });
@@ -2649,6 +2648,7 @@ function renderModels() {
       failures: trendFailures,
       volumeVisibility: state.volumeVisibility,
     });
+    refineCharts(trends);
   }
   if (stats) {
     stats.innerHTML =
@@ -2731,7 +2731,6 @@ function viewFromHash() {
 function render() {
   if (!state.history) return;
   renderHeader();
-  renderSummary();
   renderPerfStrip();
   renderCaseList();
   renderDetail();
@@ -2741,7 +2740,6 @@ function showError(message) {
   const banner = $('error');
   banner.hidden = false;
   banner.textContent = message;
-  $('summary').innerHTML = '';
   $('case-list').innerHTML = '';
   $('detail').innerHTML = '<div class="detail-placeholder">无法加载数据。</div>';
   $('model-summary').innerHTML = '';
@@ -2967,6 +2965,7 @@ async function loadEnvLatency() {
   // The per-environment GateWay / WorkSwarm table is parked for now; the daily
   // charts carry the same measurements in a more readable form.
   target.innerHTML = charts;
+  refineCharts(target);
 }
 
 function requireCurrentMetricsVersion(history) {
@@ -3023,6 +3022,14 @@ $('model-compare').addEventListener('click', (event) => {
   renderModels();
   const focused = [...document.querySelectorAll('[data-select-model]')].find((item) => item.dataset.selectModel === state.model);
   focused?.focus();
+});
+
+// The regression banner jumps to the curve card without touching the hash:
+// the hash routes the view, so a real anchor would read as navigation.
+$('model-insights').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-jump]');
+  if (!button) return;
+  document.getElementById(button.dataset.jump)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
 $('granularity-select').addEventListener('change', (event) => {
@@ -3082,6 +3089,44 @@ $('env-latency').addEventListener('click', (event) => {
 // a single tooltip reports that point. Values also live in the tables below.
 const chartTooltip = $('chart-tooltip');
 let activeChart = null;
+
+// Post-render polish for charts: the 9px per-point labels collide when two
+// series sit close together, and the methodology paragraphs push the curves
+// apart. Keep the first label of each overlapping cluster and fold long notes.
+function refineCharts(root) {
+  if (!root) return;
+  root.querySelectorAll('.trend-chart').forEach((svg) => {
+    const kept = [];
+    svg.querySelectorAll('text.point-label').forEach((label) => {
+      let box = null;
+      try {
+        box = label.getBBox();
+      } catch {
+        return;
+      }
+      if (!box || !box.width) return;
+      // Leave a little breathing room so near-touching labels also drop one.
+      const gap = 3;
+      const overlaps = kept.some((other) => (
+        box.x < other.x + other.width + gap
+        && other.x < box.x + box.width + gap
+        && box.y < other.y + other.height + gap
+        && other.y < box.y + box.height + gap
+      ));
+      if (overlaps) label.style.display = 'none';
+      else kept.push(box);
+    });
+  });
+  root.querySelectorAll('p.chart-note').forEach((note) => {
+    if (note.closest('details')) return;
+    const details = document.createElement('details');
+    details.className = 'chart-note-details';
+    const summary = document.createElement('summary');
+    summary.textContent = '统计口径';
+    note.replaceWith(details);
+    details.append(summary, note);
+  });
+}
 
 function hideChartHover() {
   if (activeChart) {

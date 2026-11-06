@@ -580,6 +580,39 @@ h1 {
   font-size: 11px;
 }
 
+/* Methodology paragraphs are reference material, not headline content. */
+.chart-note-details {
+  margin-top: 8px;
+}
+
+.chart-note-details > summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 11px;
+  list-style: none;
+}
+
+.chart-note-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.chart-note-details > summary::before {
+  content: '▸ ';
+}
+
+.chart-note-details[open] > summary::before {
+  content: '▾ ';
+}
+
+.chart-note-details > summary:hover {
+  color: var(--ink);
+}
+
+.chart-note-details > .chart-note {
+  margin-top: 6px;
+  line-height: 1.6;
+}
+
 .waterfall {
   display: flex;
   max-height: 420px;
@@ -706,6 +739,28 @@ h1 {
   text-overflow: ellipsis;
 }
 
+/* Keep the date / model column visible while the wide metric table scrolls. */
+.history-table thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+}
+
+.history-table tbody td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--panel);
+}
+
+.history-table tbody tr:hover td:first-child {
+  background: var(--panel-soft);
+}
+
+.history-table tbody tr.is-selected td:first-child {
+  background: var(--accent-soft);
+}
+
 .empty {
   margin: 0;
   padding: 24px 0;
@@ -803,6 +858,24 @@ h1 {
 }
 
 .wf-subhead { margin: 12px 0 4px; color: var(--muted); font-size: 12px; font-weight: 600; }
+
+/* Compact standalone header: the topbar stays parked, but the page still
+   names itself and offers the view tabs. */
+.board-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 6px 0 8px;
+}
+
+.board-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
 
 .tabs {
   display: flex;
@@ -920,16 +993,17 @@ h1 {
   display: none;
 }
 
-/* One card per metric family; fixed columns keep every row band aligned. */
+/* One card per metric family; auto-fit keeps the last row from leaving a
+   gap when the count is not a multiple of the column count. */
 .model-summary {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px;
 }
 
 /* Combined "a / b / c" values need a smaller face than single values. */
 .model-summary .stat-value.combo {
-  font-size: 1.5rem;
+  font-size: 1.35rem;
 }
 
 /* Per-point value + day-over-day glyph on trend charts. */
@@ -954,37 +1028,10 @@ h1 {
   color: var(--ok);
 }
 
-@media (max-width: 1100px) {
-  .model-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 620px) {
   .model-summary {
     grid-template-columns: minmax(0, 1fr);
   }
-}
-
-.compare-list {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 16px;
-  margin-top: 12px;
-}
-
-.compare-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.compare-item.is-selected {
-  padding: 3px 10px;
-  border-radius: 8px;
-  outline: 1px solid var(--line);
-  background: var(--panel-2, rgba(148, 163, 184, 0.08));
 }
 
 .perf-strip {
@@ -992,6 +1039,11 @@ h1 {
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
   margin: -8px 0 20px;
+}
+
+/* P50 / P95 share one card, so the combined value needs a smaller face. */
+.perf-strip .stat-value.combo {
+  font-size: 1.35rem;
 }
 
 .model-picker {
@@ -1471,6 +1523,76 @@ h1 {
   font-size: 12px;
 }
 
+/* The banner names its model and links to the chart card it describes. */
+.insight-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.insight-action {
+  margin-left: auto;
+  padding: 2px 10px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.insight-action:hover {
+  background: rgba(207, 34, 46, 0.08);
+}
+
+/* Group headers split the models view into 模型侧 / 云侧 Agent / 工具. */
+.view-section-head {
+  margin: 30px 0 14px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+#view-models > .view-section-head:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.view-section-head h2 {
+  margin: 2px 0 4px;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.view-section-head .section-note {
+  margin: 0;
+  max-width: 900px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+#model-trends-card {
+  scroll-margin-top: 16px;
+}
+
+/* The comparison is a metric table, not a chip list. */
+.compare-wrap {
+  max-height: none;
+}
+
+.compare-table {
+  min-width: 760px;
+}
+
+.compare-table .compare-name {
+  white-space: nowrap;
+}
+
 .compare-table tbody tr {
   cursor: pointer;
 }
@@ -1495,10 +1617,6 @@ h1 {
 @media (max-width: 860px) {
   .trend-grid {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .model-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .card-head {
@@ -1570,15 +1688,6 @@ h1 {
   font: 600 11px/1.5 system-ui, sans-serif;
   white-space: nowrap;
 }
-.current-model {
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-  margin-bottom: -6px;
-}
-.current-model:empty { display: none; }
-
 /* The time range applies to both the comparison and model details. */
 .comparison-head {
   display: flex;

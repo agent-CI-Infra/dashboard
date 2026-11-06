@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <style>.topbar, #tabs, .footer { display: none; } .page { padding-top: 0; }</style>
+    <style>.topbar, .footer { display: none; } .page { padding-top: 0; }</style>
     <header class="topbar">
       <div class="topbar-main">
         <p class="eyebrow">DigitalMate · Nightly E2E</p>
@@ -26,6 +26,11 @@
     <main class="page">
       <div id="error" class="error" hidden></div>
 
+      <div class="board-head">
+        <h1 class="board-title">DigitalMate · Nightly E2E 性能看板</h1>
+        <span class="muted">现网模型请求 · Asia/Shanghai · 只含聚合指标</span>
+      </div>
+
       <nav id="tabs" class="tabs" role="tablist" aria-label="看板视图">
         <button id="tab-cases" class="tab active" type="button" role="tab" aria-selected="true"
           aria-controls="view-cases" data-view="cases">用例看板</button>
@@ -34,7 +39,6 @@
       </nav>
 
       <section id="view-cases" class="view" role="tabpanel" aria-labelledby="tab-cases">
-        <section id="summary" class="summary" aria-label="汇总"></section>
         <section id="perf-strip" class="perf-strip" aria-label="模型请求最新完整日指标"></section>
 
         <div class="layout">
@@ -51,33 +55,21 @@
       </section>
 
       <section id="view-models" class="view" role="tabpanel" aria-labelledby="tab-models" hidden>
-        <div id="model-insights"></div>
-
-        <section class="card" id="env-latency-card">
-          <div id="env-latency"><p class="empty">加载中…</p></div>
-        </section>
-
-        <section class="card" id="request-lookup">
-          <div class="card-head">
-            <h2>按请求 ID 查询</h2>
-            <span class="muted">单请求性能诊断</span>
+        <header class="view-section-head">
+          <div>
+            <p class="eyebrow">模型侧 · 现网模型请求</p>
+            <h2>模型请求指标</h2>
+            <p class="section-note">按模型 × Asia/Shanghai 自然日聚合：请求数与失败率、请求耗时、TTFT / TPOT、Token。模型对比列出所选时间范围内的全部模型；下方汇总、曲线与明细只针对当前所选模型。</p>
           </div>
-          <form id="lookup-form" class="lookup-form">
-            <input id="lookup-id" type="text" placeholder="粘贴模型请求 ID（request_id）" autocomplete="off" spellcheck="false" required>
-            <button type="submit">查询</button>
-          </form>
-          <details class="lookup-key">
-            <summary>网关访问凭据（仅当前页面有效）</summary>
-            <input id="lookup-key" type="password" placeholder="sk-…（prod / adx-jiuwen admin key）" autocomplete="off" spellcheck="false">
-            <p class="chart-note">凭据仅保留在当前页面内，直查时发送至网关；不填时仅搜索已加载的本地快照。结果只展示性能指标，不展示消息内容。</p>
-          </details>
-          <div id="lookup-result" aria-live="polite"></div>
-        </section>
+        </header>
+
+        <div id="model-insights"></div>
 
         <section class="card">
           <div class="card-head comparison-head">
             <div class="comparison-title">
               <h2>模型对比</h2>
+              <span id="compare-current" class="selected-model-badge">—</span>
               <span id="model-range" class="muted">—</span>
             </div>
             <div id="model-controls" class="comparison-controls">
@@ -95,30 +87,33 @@
             <p>
               所选时间范围内全部模型，按调用数排序；汇总锚定最新完整日，未结束的当日不计入。
               近 7 天少于 50 次调用的模型折叠在「低流量模型」中，不参与首页结论；最新完整日 TTFT 较前日升幅达到 20% 的模型标记为回退。
-              点击模型名称可切换下方汇总与明细。
+              点击模型行可切换下方汇总与明细。
               <span id="compare-version" class="muted">—</span>
             </p>
           </details>
         </section>
 
-        <div id="current-model" class="current-model" aria-live="polite"></div>
         <section id="model-summary" class="summary model-summary" aria-label="模型指标汇总">
           <p class="empty">加载中…</p>
         </section>
 
-        <section class="card">
+        <section class="card" id="model-trends-card">
           <div class="card-head">
-            <h2>现网模型指标统计</h2>
+            <h2>模型请求耗时、TTFT / TPOT 与 Token 曲线</h2>
             <span class="muted">按日聚合 · Asia/Shanghai</span>
           </div>
           <div id="model-trends" class="trend-grid"><p class="empty">加载中…</p></div>
-          <p class="chart-note">
-            统计此网关的模型请求（未区分测试或其他业务），耗时口径为模型请求耗时（不含端侧与网络）。
-            TTFT/TPOT 只统计 <code>stream === true</code> 的成功调用；无流式标记的样本按分桶近似单独统计 TTFT 与 TPOT；TTFT ≥ 95% 总耗时、TPOT &lt; 0.1 ms/token 视为时间戳异常并剔除。
-            P50/P95 是成功调用的请求级分位，至少需要 20 个样本；模型请求平均耗时按成功调用量加权，TPOT 按输出 Token 数减一加权；TTFT 和 TPOT 的 P50/P95 是请求级分位，基于可合并分桶近似计算（误差约 1%），每类至少 20 个样本。
-            Token 展示当日成功调用的累计值；当日未结束的数据标记为「部分日」，汇总卡不使用该日。
-            趋势图均可点击图例单独显示或隐藏曲线；模型请求失败率按所选模型统计；含未知状态的日期留空；缺失值留空，不补 0。
-          </p>
+          <details class="chart-note-details">
+            <summary>统计口径</summary>
+            <p class="chart-note">
+              统计此网关的模型请求（未区分测试或其他业务），耗时口径为模型请求耗时（不含端侧与网络）。
+              TTFT/TPOT 只统计 <code>stream === true</code> 的成功调用；无流式标记的样本按分桶近似单独统计 TTFT 与 TPOT；TTFT ≥ 95% 总耗时、TPOT &lt; 0.1 ms/token 视为时间戳异常并剔除。
+              P50/P95 是成功调用的请求级分位，至少需要 20 个样本；模型请求平均耗时按成功调用量加权，TPOT 按输出 Token 数减一加权；TTFT 和 TPOT 的 P50/P95 是请求级分位，基于可合并分桶近似计算（误差约 1%），每类至少 20 个样本。
+              Token 展示当日成功调用的累计值；当日未结束的数据标记为「部分日」，汇总卡不使用该日。
+              趋势图均可点击图例单独显示或隐藏曲线；模型请求失败率按所选模型统计；含未知状态的日期留空；缺失值留空，不补 0。
+            
+            </p>
+          </details>
         </section>
 
         <section class="card">
@@ -136,6 +131,43 @@
             </div>
           </div>
           <div id="model-stats"><p class="empty">加载中…</p></div>
+        </section>
+
+        <header class="view-section-head" id="env-section">
+          <div>
+            <p class="eyebrow">云侧 Agent</p>
+            <h2>云侧 Agent 调用指标</h2>
+            <p class="section-note">请求进入云侧 Agent 网关至响应结束的耗时、TTFT / TPOT、调用数与 Token；每次模型调用一条记录，与上方模型侧口径相互独立。</p>
+          </div>
+        </header>
+
+        <section class="card" id="env-latency-card">
+          <div id="env-latency"><p class="empty">加载中…</p></div>
+        </section>
+
+        <header class="view-section-head" id="tools-section">
+          <div>
+            <p class="eyebrow">工具</p>
+            <h2>单请求诊断</h2>
+            <p class="section-note">按 request_id 定位单个请求的分阶段耗时；只展示性能指标，不展示消息内容。</p>
+          </div>
+        </header>
+
+        <section class="card" id="request-lookup">
+          <div class="card-head">
+            <h2>按请求 ID 查询</h2>
+            <span class="muted">单请求性能诊断</span>
+          </div>
+          <form id="lookup-form" class="lookup-form">
+            <input id="lookup-id" type="text" placeholder="粘贴模型请求 ID（request_id）" autocomplete="off" spellcheck="false" required>
+            <button type="submit">查询</button>
+          </form>
+          <details class="lookup-key">
+            <summary>网关访问凭据（仅当前页面有效）</summary>
+            <input id="lookup-key" type="password" placeholder="sk-…（prod / adx-jiuwen admin key）" autocomplete="off" spellcheck="false">
+            <p class="chart-note">凭据仅保留在当前页面内，直查时发送至网关；不填时仅搜索已加载的本地快照。结果只展示性能指标，不展示消息内容。</p>
+          </details>
+          <div id="lookup-result" aria-live="polite"></div>
         </section>
 
       </section>
