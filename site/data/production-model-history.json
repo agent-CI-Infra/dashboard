@@ -1,10 +1,10 @@
 {
  "schema": "digitalmate/e2e-performance-history@1",
  "metrics_version": 6,
- "generated_at": "2026-11-06T16:47:04Z",
- "updated_at": "2026-11-06T16:47:04Z",
+ "generated_at": "2026-11-06T23:11:19Z",
+ "updated_at": "2026-11-06T23:11:19Z",
  "window_start": "2026-10-03T16:00:00+00:00",
- "window_end": "2026-11-06T16:46:54+00:00",
+ "window_end": "2026-11-06T23:11:09+00:00",
  "current_day_partial": true,
  "complete_through": "2026-11-06",
  "partial_day": "2026-11-07",
@@ -9340,16 +9340,16 @@
      "date": "2026-11-07",
      "status": "COMPLETED",
      "partial": true,
-     "query_ms": 6899,
-     "duration_sum_ms": 179380,
-     "duration_sample_count": 26,
+     "query_ms": 6798,
+     "duration_sum_ms": 278724,
+     "duration_sample_count": 41,
      "duration_p50_ms": 3224,
      "duration_p95_ms": 28263,
-     "success_count": 26,
-     "query_count": 26,
+     "success_count": 41,
+     "query_count": 41,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-06T16:26:05Z",
+     "finished_at": "2026-11-06T21:32:34Z",
      "failed_queries": 0,
      "unknown_status_count": 0,
      "blocked_queries": 0,
@@ -9361,24 +9361,40 @@
        "duration_sum_ms": 179380,
        "duration_sample_count": 26,
        "failed": 0
+      },
+      {
+       "hour": 5,
+       "calls": 15,
+       "success_count": 15,
+       "duration_sum_ms": 99344,
+       "duration_sample_count": 15,
+       "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 26,
-       "success_count": 26,
+       "call_count": 41,
+       "success_count": 41,
        "failed_count": 0,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
        "ttft_sample_count": 0,
        "ttft_sum_ms": null,
-       "ttft_estimated_avg_ms": 1683,
-       "ttft_estimated_sample_count": 17,
-       "ttft_estimated_sum_ms": 28603,
+       "ttft_estimated_avg_ms": 1670,
+       "ttft_estimated_sample_count": 30,
+       "ttft_estimated_sum_ms": 50112,
        "ttft_estimated_histogram": [
         [
+         355,
+         1
+        ],
+        [
          357,
+         1
+        ],
+        [
+         358,
          1
         ],
         [
@@ -9386,12 +9402,20 @@
          2
         ],
         [
+         362,
+         1
+        ],
+        [
          363,
+         3
+        ],
+        [
+         365,
          2
         ],
         [
          366,
-         1
+         2
         ],
         [
          367,
@@ -9402,8 +9426,12 @@
          1
         ],
         [
-         371,
+         369,
          1
+        ],
+        [
+         371,
+         2
         ],
         [
          374,
@@ -9418,6 +9446,10 @@
          1
         ],
         [
+         381,
+         1
+        ],
+        [
          382,
          1
         ],
@@ -9426,7 +9458,15 @@
          1
         ],
         [
+         392,
+         1
+        ],
+        [
          394,
+         2
+        ],
+        [
+         395,
          1
         ],
         [
@@ -9434,24 +9474,44 @@
          1
         ]
        ],
-       "ttft_filtered_count": 5,
+       "ttft_filtered_count": 6,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
        "tpot_weight_tokens": 0,
-       "tpot_estimated_avg_ms": 4.937543372657877,
-       "tpot_estimated_sample_count": 17,
-       "tpot_estimated_decode_sum_ms": 85380.0,
-       "tpot_estimated_weight_tokens": 17292,
+       "tpot_estimated_avg_ms": 4.722063554099149,
+       "tpot_estimated_sample_count": 30,
+       "tpot_estimated_decode_sum_ms": 157070.0,
+       "tpot_estimated_weight_tokens": 33263,
        "tpot_histogram": [],
        "tpot_estimated_histogram": [
+        [
+         32,
+         1
+        ],
         [
          38,
          1
         ],
         [
          44,
+         3
+        ],
+        [
+         46,
+         1
+        ],
+        [
+         49,
+         1
+        ],
+        [
+         50,
          2
+        ],
+        [
+         53,
+         1
         ],
         [
          54,
@@ -9466,11 +9526,23 @@
          1
         ],
         [
+         61,
+         1
+        ],
+        [
+         64,
+         1
+        ],
+        [
          66,
          1
         ],
         [
          67,
+         1
+        ],
+        [
+         70,
          1
         ],
         [
@@ -9482,11 +9554,19 @@
          2
         ],
         [
+         78,
+         1
+        ],
+        [
          79,
          1
         ],
         [
          81,
+         2
+        ],
+        [
+         82,
          1
         ],
         [
@@ -9506,15 +9586,15 @@
          1
         ]
        ],
-       "tpot_filtered_count": 5,
-       "duration_sum_ms": 179380,
+       "tpot_filtered_count": 6,
+       "duration_sum_ms": 278724,
        "duration_p50_ms": 3224,
        "duration_p95_ms": 28263,
-       "duration_sample_count": 26,
-       "input_tokens": 1292716,
-       "output_tokens": 29104,
-       "total_tokens": 1321820,
-       "token_sample_count": 26,
+       "duration_sample_count": 41,
+       "input_tokens": 2044542,
+       "output_tokens": 46411,
+       "total_tokens": 2090953,
+       "token_sample_count": 41,
        "token_coverage": 1.0,
        "failed_input_tokens": null,
        "failed_output_tokens": null,
@@ -9528,16 +9608,16 @@
     "date": "2026-11-07",
     "status": "COMPLETED",
     "partial": true,
-    "query_ms": 6899,
-    "duration_sum_ms": 179380,
-    "duration_sample_count": 26,
+    "query_ms": 6798,
+    "duration_sum_ms": 278724,
+    "duration_sample_count": 41,
     "duration_p50_ms": 3224,
     "duration_p95_ms": 28263,
-    "success_count": 26,
-    "query_count": 26,
+    "success_count": 41,
+    "query_count": 41,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-06T16:26:05Z",
+    "finished_at": "2026-11-06T21:32:34Z",
     "failed_queries": 0,
     "unknown_status_count": 0,
     "blocked_queries": 0,
@@ -9549,24 +9629,40 @@
       "duration_sum_ms": 179380,
       "duration_sample_count": 26,
       "failed": 0
+     },
+     {
+      "hour": 5,
+      "calls": 15,
+      "success_count": 15,
+      "duration_sum_ms": 99344,
+      "duration_sample_count": 15,
+      "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 26,
-      "success_count": 26,
+      "call_count": 41,
+      "success_count": 41,
       "failed_count": 0,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
       "ttft_sample_count": 0,
       "ttft_sum_ms": null,
-      "ttft_estimated_avg_ms": 1683,
-      "ttft_estimated_sample_count": 17,
-      "ttft_estimated_sum_ms": 28603,
+      "ttft_estimated_avg_ms": 1670,
+      "ttft_estimated_sample_count": 30,
+      "ttft_estimated_sum_ms": 50112,
       "ttft_estimated_histogram": [
        [
+        355,
+        1
+       ],
+       [
         357,
+        1
+       ],
+       [
+        358,
         1
        ],
        [
@@ -9574,12 +9670,20 @@
         2
        ],
        [
+        362,
+        1
+       ],
+       [
         363,
+        3
+       ],
+       [
+        365,
         2
        ],
        [
         366,
-        1
+        2
        ],
        [
         367,
@@ -9590,8 +9694,12 @@
         1
        ],
        [
-        371,
+        369,
         1
+       ],
+       [
+        371,
+        2
        ],
        [
         374,
@@ -9606,6 +9714,10 @@
         1
        ],
        [
+        381,
+        1
+       ],
+       [
         382,
         1
        ],
@@ -9614,7 +9726,15 @@
         1
        ],
        [
+        392,
+        1
+       ],
+       [
         394,
+        2
+       ],
+       [
+        395,
         1
        ],
        [
@@ -9622,24 +9742,44 @@
         1
        ]
       ],
-      "ttft_filtered_count": 5,
+      "ttft_filtered_count": 6,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
       "tpot_weight_tokens": 0,
-      "tpot_estimated_avg_ms": 4.937543372657877,
-      "tpot_estimated_sample_count": 17,
-      "tpot_estimated_decode_sum_ms": 85380.0,
-      "tpot_estimated_weight_tokens": 17292,
+      "tpot_estimated_avg_ms": 4.722063554099149,
+      "tpot_estimated_sample_count": 30,
+      "tpot_estimated_decode_sum_ms": 157070.0,
+      "tpot_estimated_weight_tokens": 33263,
       "tpot_histogram": [],
       "tpot_estimated_histogram": [
+       [
+        32,
+        1
+       ],
        [
         38,
         1
        ],
        [
         44,
+        3
+       ],
+       [
+        46,
+        1
+       ],
+       [
+        49,
+        1
+       ],
+       [
+        50,
         2
+       ],
+       [
+        53,
+        1
        ],
        [
         54,
@@ -9654,11 +9794,23 @@
         1
        ],
        [
+        61,
+        1
+       ],
+       [
+        64,
+        1
+       ],
+       [
         66,
         1
        ],
        [
         67,
+        1
+       ],
+       [
+        70,
         1
        ],
        [
@@ -9670,11 +9822,19 @@
         2
        ],
        [
+        78,
+        1
+       ],
+       [
         79,
         1
        ],
        [
         81,
+        2
+       ],
+       [
+        82,
         1
        ],
        [
@@ -9694,15 +9854,15 @@
         1
        ]
       ],
-      "tpot_filtered_count": 5,
-      "duration_sum_ms": 179380,
+      "tpot_filtered_count": 6,
+      "duration_sum_ms": 278724,
       "duration_p50_ms": 3224,
       "duration_p95_ms": 28263,
-      "duration_sample_count": 26,
-      "input_tokens": 1292716,
-      "output_tokens": 29104,
-      "total_tokens": 1321820,
-      "token_sample_count": 26,
+      "duration_sample_count": 41,
+      "input_tokens": 2044542,
+      "output_tokens": 46411,
+      "total_tokens": 2090953,
+      "token_sample_count": 41,
       "token_coverage": 1.0,
       "failed_input_tokens": null,
       "failed_output_tokens": null,
