@@ -750,25 +750,45 @@ function envLatencyDailySeries(rows, group, field) {
   });
 }
 
-function envLatencyTrend(doc) {
+// Daily cloud TTFT (first token) series. Cloud call scope: one record per
+// model call, timed by the cloud runtime's llm_usage metadata.
+const ENV_TTFT_SERIES = [
+  { key: 'ttft_mean', label: 'TTFT 均值', group: 'ttft', field: 'mean', style: 'env-ttft-mean' },
+  { key: 'ttft_p50', label: 'TTFT P50', group: 'ttft', field: 'p50', style: 'env-ttft-p50' },
+  { key: 'ttft_p95', label: 'TTFT P95', group: 'ttft', field: 'p95', style: 'env-ttft-p95' },
+];
+
+const ENV_TPOT_SERIES = [
+  { key: 'tpot_mean', label: 'TPOT 加权均值', group: 'tpot', field: 'mean', style: 'env-tpot-mean' },
+  { key: 'tpot_p50', label: 'TPOT P50', group: 'tpot', field: 'p50', style: 'env-tpot-p50' },
+  { key: 'tpot_p95', label: 'TPOT P95', group: 'tpot', field: 'p95', style: 'env-tpot-p95' },
+];
+
+// Shared renderer for the per-environment daily trend cards. Values are already
+// aggregated per Asia/Shanghai day; the tooltip shows the sample count used for
+// each metric so request counts and model-call counts never get mixed up.
+function envTrendChart(doc, opts) {
   const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date) : [];
   if (!rows.length) return '';
-  const series = ENV_TREND_SERIES.map((item) => ({ ...item, values: envLatencyDailySeries(rows, item.group, item.field) }));
+  const series = opts.series.map((item) => ({ ...item, values: envLatencyDailySeries(rows, item.group, item.field) }));
   const usable = series.flatMap((item) => item.values).filter((value) => value !== null);
   if (!usable.length) return '';
 
-  const { width, height } = chartSize(1000, 260, { hostId: 'env-latency' });
+  const { width, height } = chartSize(1000, opts.height || 260, { hostId: 'env-latency' });
   const pad = { left: 58, right: 18, top: 14, bottom: 30 };
   const innerWidth = width - pad.left - pad.right;
   const innerHeight = height - pad.top - pad.bottom;
   const max = niceMax(Math.max(...usable));
+  const formatAxis = opts.formatAxis || fmtAxis;
+  const formatValue = opts.formatValue || fmtDuration;
+  const gridLines = opts.gridLines || 5;
   const x = (index) => (rows.length === 1 ? pad.left + innerWidth / 2 : pad.left + (index * innerWidth) / (rows.length - 1));
   const y = (value) => pad.top + innerHeight - (Math.max(0, value) / max) * innerHeight;
 
-  const grid = Array.from({ length: 5 }, (_, index) => {
-    const fraction = index / 4;
+  const grid = Array.from({ length: gridLines }, (_, index) => {
+    const fraction = index / (gridLines - 1);
     const yy = pad.top + innerHeight - fraction * innerHeight;
-    return `<line class="grid-line" x1="${pad.left}" y1="${yy}" x2="${width - pad.right}" y2="${yy}" /><text class="axis-text" x="${pad.left - 8}" y="${yy + 3}" text-anchor="end">${esc(fmtAxis(max * fraction))}</text>`;
+    return `<line class="grid-line" x1="${pad.left}" y1="${yy}" x2="${width - pad.right}" y2="${yy}" /><text class="axis-text" x="${pad.left - 8}" y="${yy + 3}" text-anchor="end">${esc(formatAxis(max * fraction))}</text>`;
   }).join('');
 
   const linePath = (values) => {
@@ -803,9 +823,10 @@ function envLatencyTrend(doc) {
   const zoneWidth = rows.length > 1 ? innerWidth / (rows.length - 1) : innerWidth;
   const zones = rows
     .map((row, index) => {
-      const lines = [`${row.date}${row.partial ? ' · 部分日' : ''} · n=${fmtCount(row.n)}`];
+      const sample = opts.sample ? opts.sample(row) : { n: row.n };
+      const lines = [`${row.date}${row.partial ? ' · 部分日' : ''} · n=${fmtCount(sample?.n)}${sample?.note ? ` · ${sample.note}` : ''}`];
       series.forEach((item) => {
-        if (item.values[index] !== null) lines.push(`${fmtDuration(item.values[index])} · ${item.label}`);
+        if (item.values[index] !== null) lines.push(`${formatValue(item.values[index])} · ${item.label}`);
       });
       if (lines.length === 1) return '';
       const cx = x(index);
@@ -819,8 +840,8 @@ function envLatencyTrend(doc) {
     .map((item) => `<button class="legend-toggle latency-toggle" type="button" data-env-layer="${item.key}" aria-pressed="true"><i class="legend-line ${item.style}"></i><span>${item.label}</span></button>`)
     .join('');
 
-  const head = `<div class="trend-head"><h3>云端请求耗时趋势（s）</h3><div class="trend-legend">${legend}</div></div>`;
-  const svg = `<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="云端请求耗时每日均值及 P50/P95 趋势">
+  const head = `<div class="trend-head"><h3>${opts.title}</h3><div class="trend-legend">${legend}</div></div>`;
+  const svg = `<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(opts.ariaLabel)}">
     ${grid}
     <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
     ${series.map(layer).join('')}
@@ -829,73 +850,61 @@ function envLatencyTrend(doc) {
     ${zones}
   </svg>`;
 
-  return `<div class="trend-card wide env-trend">${head}${svg}<p class="chart-note">按 ${esc(doc.label || doc.env || '环境')} 的请求逐日聚合（Asia/Shanghai）。云端请求耗时指请求进入云端网关至流式响应结束（原 GateWay 口径），均值按请求数加权；P50/P95 为当日成功请求的最近排名分位；纵轴超过 60 秒时以分钟显示；* 为部分日，窗口外数据未采集。</p></div>`;
+  return `<div class="trend-card wide env-trend">${head}${svg}<p class="chart-note">${opts.note}</p></div>`;
+}
+
+function envLatencyTrend(doc) {
+  return envTrendChart(doc, {
+    title: '云端请求耗时趋势（s）',
+    ariaLabel: '云端请求耗时每日均值及 P50/P95 趋势',
+    series: ENV_TREND_SERIES,
+    note: `按 ${esc(doc.label || doc.env || '环境')} 的请求逐日聚合（Asia/Shanghai）。云端请求耗时指请求进入云端网关至流式响应结束（原 GateWay 口径），均值按请求数加权；P50/P95 为当日成功请求的最近排名分位；纵轴超过 60 秒时以分钟显示；* 为部分日，窗口外数据未采集。`,
+  });
+}
+
+function envTtftTrend(doc) {
+  return envTrendChart(doc, {
+    title: '云端 TTFT 趋势（首 Token 耗时）',
+    ariaLabel: '云端 TTFT 每日均值及 P50/P95 趋势',
+    series: ENV_TTFT_SERIES,
+    sample: (row) => ({ n: row?.ttft?.n, note: '次模型调用' }),
+    note: '云端调用口径（每次模型调用）：TTFT 为模型调用开始至首个 Token，由云端运行时计时，可能包含上游等待与网络耗时；仅统计 0 < TTFT ≤ 调用总耗时的调用；P50/P95 为调用级最近排名分位，均值按有效调用数计算；* 为部分日，缺失值留空不补 0。',
+  });
+}
+
+function envTpotTrend(doc) {
+  return envTrendChart(doc, {
+    title: '云端 TPOT 趋势（ms/token）',
+    ariaLabel: '云端 TPOT 每日加权均值及 P50/P95 趋势',
+    series: ENV_TPOT_SERIES,
+    formatAxis: (value) => (value === 0 ? '0' : value.toFixed(1)),
+    formatValue: fmtTpot,
+    sample: (row) => ({
+      n: row?.tpot?.n,
+      note: Number.isFinite(row?.tpot?.tokens) ? `${fmtCount(row.tpot.tokens)} token 权重` : '',
+    }),
+    note: '云端调用口径（每次模型调用）：TPOT = 首 Token 后至调用结束的耗时 ÷（输出 Token 数 − 1）；均值按后续输出 Token 数加权，P50/P95 为调用级最近排名分位；仅统计输出 Token > 1 且 TPOT ≥ 0.1 ms/token 的调用；* 为部分日。',
+  });
 }
 
 function envOverheadTrend(doc) {
-  const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date) : [];
-  const values = rows.map((row) => (Number.isFinite(row?.overhead?.mean) ? row.overhead.mean : null));
-  const usable = values.filter((value) => value !== null);
-  if (!usable.length) return '';
-
-  const { width, height } = chartSize(1000, 150, { hostId: 'env-latency' });
-  const pad = { left: 58, right: 18, top: 12, bottom: 28 };
-  const innerWidth = width - pad.left - pad.right;
-  const innerHeight = height - pad.top - pad.bottom;
-  const max = niceMax(Math.max(...usable));
-  const x = (index) => (rows.length === 1 ? pad.left + innerWidth / 2 : pad.left + (index * innerWidth) / (rows.length - 1));
-  const y = (value) => pad.top + innerHeight - (Math.max(0, value) / max) * innerHeight;
-
-  const grid = Array.from({ length: 3 }, (_, index) => {
-    const fraction = index / 2;
-    const yy = pad.top + innerHeight - fraction * innerHeight;
-    return `<line class="grid-line" x1="${pad.left}" y1="${yy}" x2="${width - pad.right}" y2="${yy}" /><text class="axis-text" x="${pad.left - 8}" y="${yy + 3}" text-anchor="end">${esc(fmtAxis(max * fraction))}</text>`;
-  }).join('');
-
-  let path = '';
-  let open = false;
-  values.forEach((value, index) => {
-    if (value === null) {
-      open = false;
-      return;
-    }
-    path += `${open ? 'L' : 'M'}${x(index).toFixed(1)},${y(value).toFixed(1)}`;
-    open = true;
+  return envTrendChart(doc, {
+    title: '网关开销趋势（s）',
+    ariaLabel: '网关开销每日均值趋势',
+    height: 150,
+    gridLines: 3,
+    series: [{ key: 'ov_mean', label: '网关开销均值', group: 'overhead', field: 'mean', style: 'env-ov-mean' }],
+    note: '网关开销 = 同一请求的云端请求耗时 − WorkSwarm 耗时，逐请求取差值后按日求均值；仅统计两端时间戳齐全的请求。',
   });
-  const dots = values
-    .map((value, index) => (value === null ? '' : `<circle class="trend-dot" cx="${x(index).toFixed(1)}" cy="${y(value).toFixed(1)}" r="2.6" />`))
+}
+
+function envCallDetail(doc) {
+  const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date && (row.ttft || row.tpot)) : [];
+  if (!rows.length) return '';
+  const body = rows
+    .map((row) => `<tr><td>${esc(row.date)}${row.partial ? '*' : ''}</td><td>${fmtCount(row.ttft?.n)}</td><td>${fmtDuration(row.ttft?.mean)}</td><td>${fmtDuration(row.ttft?.p50)}</td><td>${fmtDuration(row.ttft?.p95)}</td><td>${fmtCount(row.tpot?.n)}</td><td>${fmtTpot(row.tpot?.mean)}</td><td>${fmtTpot(row.tpot?.p50)}</td><td>${fmtTpot(row.tpot?.p95)}</td></tr>`)
     .join('');
-
-  const labelIndexes = rows.length <= 8
-    ? rows.map((_, index) => index)
-    : [...new Set([0, Math.floor((rows.length - 1) / 2), rows.length - 1])].filter((index) => index >= 0);
-  const xLabels = labelIndexes
-    .map((index) => `<text class="axis-text" x="${x(index)}" y="${height - 8}" text-anchor="middle">${esc(String(rows[index].date).slice(5))}${rows[index].partial ? '*' : ''}</text>`)
-    .join('');
-
-  const zoneWidth = rows.length > 1 ? innerWidth / (rows.length - 1) : innerWidth;
-  const zones = rows
-    .map((row, index) => {
-      if (values[index] === null) return '';
-      const lines = [`${row.date}${row.partial ? ' · 部分日' : ''} · n=${fmtCount(row.n)}`, `${fmtDuration(values[index])} · 网关开销均值`];
-      const cx = x(index);
-      const left = Math.max(pad.left, cx - zoneWidth / 2);
-      const right = Math.min(width - pad.right, cx + zoneWidth / 2);
-      return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right - left).toFixed(1)}" height="${innerHeight}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
-    })
-    .join('');
-
-  const head = `<div class="trend-head"><h3>网关开销趋势（s）</h3><div class="trend-legend"><button class="legend-toggle latency-toggle" type="button" data-env-layer="ov_mean" aria-pressed="true"><i class="legend-line env-ov-mean"></i><span>网关开销均值</span></button></div></div>`;
-  const svg = `<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="网关开销每日均值趋势">
-    ${grid}
-    <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
-    <g class="latency-layer env-ov-mean" data-env-series="ov_mean">${path ? `<path class="trend-series" d="${path}" />` : ''}${dots}</g>
-    ${xLabels}
-    <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
-    ${zones}
-  </svg>`;
-
-  return `<div class="trend-card wide env-trend">${head}${svg}<p class="chart-note">网关开销 = 同一请求的云端请求耗时 − WorkSwarm 耗时，逐请求取差值后按日求均值；仅统计两端时间戳齐全的请求。</p></div>`;
+  return `<details class="env-call-detail" open><summary>云端 TTFT / TPOT 每日明细</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>日期</th><th>TTFT 样本</th><th>TTFT 均值</th><th>TTFT P50</th><th>TTFT P95</th><th>TPOT 样本</th><th>TPOT 加权均值</th><th>TPOT P50</th><th>TPOT P95</th></tr></thead><tbody>${body}</tbody></table></div><p class="chart-note">云端调用口径：每次模型调用一条记录；TTFT 为模型调用开始至首个 Token，TPOT 按输出 Token 数减一加权；* 为部分日。</p></details>`;
 }
 
 function fmtToken(value) {
@@ -2796,7 +2805,7 @@ async function loadEnvLatency() {
     daily = null;
   }
   const charts = daily && daily.schema === 'digitalmate/env-request-latency-daily@1'
-    ? `${envLatencyTrend(daily)}${envOverheadTrend(daily)}`
+    ? `${envLatencyTrend(daily)}${envTtftTrend(daily)}${envTpotTrend(daily)}${envOverheadTrend(daily)}${envCallDetail(daily)}`
     : '';
   target.innerHTML = `${charts}${envLatency(doc)}`;
 }

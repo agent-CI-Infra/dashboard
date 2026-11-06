@@ -1715,3 +1715,27 @@ h1 {
 .latency-layer.env-ws-p50 .trend-dot { fill: #10b981; }
 .latency-layer.env-ws-p95 .trend-dot { fill: #065f46; }
 .latency-layer.env-ov-mean .trend-dot { fill: #ea580c; }
+
+/* Cloud TTFT / TPOT trends use the cloud-call (per model call) scope. */
+.legend-line.env-ttft-mean, .legend-line.env-tpot-mean { border-top-width: 3px; }
+.legend-line.env-ttft-mean { border-top-color: #0f766e; }
+.legend-line.env-ttft-p50 { border-top-color: #14b8a6; border-top-style: dotted; }
+.legend-line.env-ttft-p95 { border-top-color: #134e4a; border-top-style: dashed; }
+.legend-line.env-tpot-mean { border-top-color: #6d28d9; }
+.legend-line.env-tpot-p50 { border-top-color: #8b5cf6; border-top-style: dotted; }
+.legend-line.env-tpot-p95 { border-top-color: #4c1d95; border-top-style: dashed; }
+.latency-layer.env-ttft-mean .trend-series { stroke: #0f766e; stroke-width: 2.4; }
+.latency-layer.env-ttft-p50 .trend-series { stroke: #14b8a6; stroke-width: 1.8; stroke-dasharray: 2 4; }
+.latency-layer.env-ttft-p95 .trend-series { stroke: #134e4a; stroke-width: 1.8; stroke-dasharray: 7 4; }
+.latency-layer.env-tpot-mean .trend-series { stroke: #6d28d9; stroke-width: 2.4; }
+.latency-layer.env-tpot-p50 .trend-series { stroke: #8b5cf6; stroke-width: 1.8; stroke-dasharray: 2 4; }
+.latency-layer.env-tpot-p95 .trend-series { stroke: #4c1d95; stroke-width: 1.8; stroke-dasharray: 7 4; }
+.latency-layer.env-ttft-mean .trend-dot { fill: #0f766e; }
+.latency-layer.env-ttft-p50 .trend-dot { fill: #14b8a6; }
+.latency-layer.env-ttft-p95 .trend-dot { fill: #134e4a; }
+.latency-layer.env-tpot-mean .trend-dot { fill: #6d28d9; }
+.latency-layer.env-tpot-p50 .trend-dot { fill: #8b5cf6; }
+.latency-layer.env-tpot-p95 .trend-dot { fill: #4c1d95; }
+.env-call-detail { margin: 2px 0 12px; }
+.env-call-detail summary { cursor: pointer; color: var(--muted, #64748b); font-size: 13px; }
+.env-call-detail .table-wrap { margin-top: 8px; }
