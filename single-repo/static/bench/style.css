@@ -70,6 +70,23 @@ dd { margin: 0; text-align: right; overflow-wrap: anywhere; }
 .status.blocked { color: var(--blocked); background: var(--blocked-bg); }
 .status.unknown { color: var(--muted); background: var(--unknown-bg); }
 
+.block-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.block-head h2 { margin: 0; }
+.segmented { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; }
+.segmented button { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 12.5px; padding: 4px 12px; border-radius: 999px; cursor: pointer; }
+.segmented button.active { background: var(--ink); color: var(--panel); }
+.chart { width: 100%; min-height: 240px; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart .gridline { stroke: var(--line-soft); stroke-width: 1; }
+.chart .axis { stroke: var(--line); stroke-width: 1; }
+.chart .tick { fill: var(--muted); font-size: 11px; }
+.chart .series-line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.chart .series-dot { stroke: var(--panel); stroke-width: 1.5; }
+.chart .chart-empty { padding: 30px 0; text-align: center; color: var(--muted); }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; font-size: 12.5px; color: var(--muted); }
+.chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.chart-legend i { width: 18px; height: 2px; border-radius: 2px; display: inline-block; }
+
 .scroll { overflow-x: auto; }
 .grid { width: 100%; border-collapse: collapse; font-size: 13px; }
 .grid th, .grid td { padding: 8px 10px; border-bottom: 1px solid var(--line-soft); text-align: left; white-space: nowrap; }

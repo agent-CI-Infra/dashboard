@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>DigitalMate Bench</title>
-    <link rel="stylesheet" href="style.css?v=20261105.2" />
+    <link rel="stylesheet" href="style.css?v=20261106.1" />
   </head>
   <body>
     <main class="page">
@@ -19,6 +19,18 @@
         <div id="latest" class="cards" aria-live="polite"></div>
       </section>
 
+      <section class="block" aria-labelledby="trend-title">
+        <div class="block-head">
+          <h2 id="trend-title">趋势</h2>
+          <div class="segmented" role="group" aria-label="趋势指标">
+            <button type="button" data-metric="pass" class="active">通过率</button>
+            <button type="button" data-metric="latency">p50 延迟</button>
+          </div>
+        </div>
+        <div id="chart" class="chart" aria-live="polite"></div>
+        <p id="chart-note" class="muted small"></p>
+      </section>
+
       <section class="block" aria-labelledby="summary-title">
         <h2 id="summary-title">本期汇总</h2>
         <p class="muted small">最近一次 Bench / Nightly 的汇总。E2E 结果看顶部 E2E 页。</p>
@@ -27,10 +39,10 @@
 
       <section class="block" aria-labelledby="history-title">
         <h2 id="history-title">运行记录</h2>
-        <p class="muted small">每晚一次 Nightly，默认只跑一个 bench task；点击运行号查看完整日志。</p>
+        <p class="muted small">每轮 Nightly / Bench 一条记录；点击运行号查看完整日志。</p>
         <div class="scroll"><table id="history" class="grid"></table></div>
       </section>
     </main>
-    <script src="app.js?v=20261105.2"></script>
+    <script src="app.js?v=20261106.1"></script>
   </body>
 </html>

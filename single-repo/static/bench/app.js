@@ -214,6 +214,139 @@
     </tr></thead><tbody>${rows}</tbody>`
   }
 
+  // ------------------------------------------------------------ trend chart
+  // One line per benchmark, shared y-axis. Keep the labels stable even when a
+  // run only contains one profile (older nightly runs are Pi-Bench only).
+  const SERIES = [
+    { key: 'gaia', label: 'GAIA', match: /GAIA/i, color: '#4e79a7' },
+    { key: 'past', label: 'PAST-Bench', match: /PAST/i, color: '#f28e2b' },
+    { key: 'pi', label: 'Pi-Bench', match: /Pi-Bench/i, color: '#59a14f' },
+    { key: 'vita', label: 'VitaBench', match: /VitaBench/i, color: '#e15759' },
+    { key: 'vibelife', label: 'VibeLife office', match: /VibeLife/i, color: '#b07aa1' },
+  ]
+  const seriesFor = (name) => SERIES.find((item) => item.match.test(name)) || { key: name, label: name, color: '#8b949e' }
+  const scoreOf = (item) => {
+    const passAt1 = item.passAt1
+    if (passAt1 !== null && passAt1 !== undefined && passAt1 !== '' && Number.isFinite(Number(passAt1))) {
+      return Number(passAt1)
+    }
+    const match = String(item.detail || '').match(/^([0-9.]+)/)
+    return match ? Number(match[1]) : null
+  }
+  const metricValue = (item, metric) => {
+    if (!item) return null
+    if (metric === 'latency') {
+      const ms = Number(item.latencyMs && item.latencyMs.p50)
+      return Number.isFinite(ms) ? ms / 1000 : null
+    }
+    const value = scoreOf(item)
+    return Number.isFinite(value) ? value * 100 : null
+  }
+  const xLabel = (run) => {
+    const d = new Date(runTime(run))
+    if (Number.isNaN(d.getTime())) return '—'
+    return d.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })
+  }
+
+  let lastRuns = []
+  let chartMetric = 'pass'
+
+  function renderChart(runs) {
+    const target = $('#chart')
+    const note = $('#chart-note')
+    if (!target) return
+    const ordered = runs.slice().sort((a, b) => new Date(runTime(a)) - new Date(runTime(b)))
+    const points = ordered.map((run) => {
+      const bench = benchOf(run)
+      return { run, items: bench ? benchmarksOf(bench) : [] }
+    })
+    const series = SERIES.map((spec) => ({
+      ...spec,
+      values: points
+        .map((point, index) => {
+          const item = point.items.find((candidate) => seriesFor(candidate.name).key === spec.key)
+          const value = metricValue(item, chartMetric)
+          return value === null ? null : { index, value, item, run: point.run }
+        })
+        .filter(Boolean),
+    })).filter((item) => item.values.length)
+    if (!series.length) {
+      target.innerHTML = '<div class="chart-empty">还没有可画趋势的 benchmark 数据。</div>'
+      note.textContent = ''
+      return
+    }
+    const width = 1000
+    const height = 280
+    const left = 48
+    const right = 16
+    const top = 16
+    const bottom = 36
+    const plotW = width - left - right
+    const plotH = height - top - bottom
+    const maxValue = Math.max(...series.flatMap((item) => item.values.map((point) => point.value)), chartMetric === 'pass' ? 100 : 1)
+    const yMax = chartMetric === 'pass' ? 100 : Math.max(1, Math.ceil(maxValue * 1.2))
+    const xAt = (index) => (points.length === 1 ? left + plotW / 2 : left + (index * plotW) / (points.length - 1))
+    const yAt = (value) => top + plotH - (Math.max(0, value) / yMax) * plotH
+    const ticks = [0, 1, 2, 3, 4].map((index) => {
+      const value = (yMax * index) / 4
+      return { value, y: yAt(value) }
+    })
+    const labelEvery = Math.max(1, Math.ceil(points.length / 8))
+    const grid = ticks
+      .map(
+        (tick) =>
+          `<line class="gridline" x1="${left}" y1="${tick.y.toFixed(1)}" x2="${width - right}" y2="${tick.y.toFixed(1)}"></line>
+           <text class="tick" x="${left - 8}" y="${(tick.y + 3).toFixed(1)}" text-anchor="end">${chartMetric === 'pass' ? `${Math.round(tick.value)}%` : `${tick.value.toFixed(1)}s`}</text>`,
+      )
+      .join('')
+    const xAxis = points
+      .map((point, index) =>
+        index % labelEvery === 0 || index === points.length - 1
+          ? `<text class="tick" x="${xAt(index).toFixed(1)}" y="${height - 14}" text-anchor="middle">${esc(xLabel(point.run))}</text>`
+          : '',
+      )
+      .join('')
+    const lines = series
+      .map((item) => {
+        const coords = item.values.map((point) => `${xAt(point.index).toFixed(1)},${yAt(point.value).toFixed(1)}`).join(' ')
+        const path =
+          item.values.length > 1
+            ? `<polyline class="series-line" points="${coords}" stroke="${item.color}"></polyline>`
+            : ''
+        const dots = item.values
+          .map(
+            (point) =>
+              `<circle class="series-dot" cx="${xAt(point.index).toFixed(1)}" cy="${yAt(point.value).toFixed(1)}" r="3.5" fill="${item.color}">
+                <title>${esc(item.label)} · ${esc(xLabel(point.run))} · ${chartMetric === 'pass' ? `${point.value.toFixed(1)}%` : `${point.value.toFixed(2)}s`}</title>
+              </circle>`,
+          )
+          .join('')
+        return path + dots
+      })
+      .join('')
+    const legend = series
+      .map((item) => `<span><i style="background:${item.color}"></i>${esc(item.label)}</span>`)
+      .join('')
+    target.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Bench 趋势图">
+      ${grid}
+      <line class="axis" x1="${left}" y1="${top + plotH}" x2="${width - right}" y2="${top + plotH}"></line>
+      ${xAxis}
+      ${lines}
+    </svg><div class="chart-legend">${legend}</div>`
+    note.textContent =
+      chartMetric === 'pass'
+        ? '每个点是一轮运行；通过率取 pass@1，VibeLife 取加权得分。至少两轮后才会出现连线。'
+        : '每个点是一轮运行；p50 为查询发出到消息接收，单位秒。至少两轮后才会出现连线。'
+  }
+
+  document.querySelectorAll('[data-metric]').forEach((button) => {
+    button.addEventListener('click', () => {
+      chartMetric = button.dataset.metric
+      document.querySelectorAll('[data-metric]').forEach((item) => item.classList.toggle('active', item === button))
+      renderChart(lastRuns)
+    })
+  })
+
   async function main() {
     try {
       const data = normalize(await load())
@@ -223,6 +356,8 @@
         : `最近 ${runs.length} 次运行`
       renderLatest(runs)
       renderTables(runs)
+      lastRuns = runs
+      renderChart(runs)
     } catch (err) {
       const box = $('#error')
       box.hidden = false
