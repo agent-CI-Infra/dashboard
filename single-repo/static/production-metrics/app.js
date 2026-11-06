@@ -1874,6 +1874,10 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
       const previous = prior && (!row.date || addDays(prior.date, 1) === row.date) ? prior : null;
       const p50Chip = deltaChip(row?.p50_ms, previous?.p50_ms, { lowerIsBetter: true, label: '' });
       const p95Chip = deltaChip(row?.p95_ms, previous?.p95_ms, { lowerIsBetter: true, label: '' });
+      const ttftP50Chip = deltaChip(row?.ttft_estimated_p50_ms, previous?.ttft_estimated_p50_ms, { lowerIsBetter: true, label: '' });
+      const ttftP95Chip = deltaChip(row?.ttft_estimated_p95_ms, previous?.ttft_estimated_p95_ms, { lowerIsBetter: true, label: '' });
+      const tpotP50Chip = deltaChip(row?.tpot_estimated_p50_ms, previous?.tpot_estimated_p50_ms, { lowerIsBetter: true, label: '' });
+      const tpotP95Chip = deltaChip(row?.tpot_estimated_p95_ms, previous?.tpot_estimated_p95_ms, { lowerIsBetter: true, label: '' });
       const versionCell = showVersion
         ? `<td class="run-id" title="${esc([row?.run_id, row?.commit].filter(Boolean).join(' · '))}">${esc(shortVersion(row) || '—')}</td>`
         : '';
@@ -1883,10 +1887,10 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
         <td class="num">${fmtCount(row?.calls)}</td>
         <td class="num">${fmtCount(row?.success_count)}</td>
         <td class="num">${fmtPercent(row?.failure_rate)}</td>
-        <td class="num">${fmtDuration(row?.ttft_estimated_p50_ms)}</td>
-        <td class="num">${fmtDuration(row?.ttft_estimated_p95_ms)}</td>
-        <td class="num">${fmtTpot(row?.tpot_estimated_p50_ms)}</td>
-        <td class="num">${fmtTpot(row?.tpot_estimated_p95_ms)}</td>
+        <td class="num metric-column"><span class="metric-cell"><span>${fmtDuration(row?.ttft_estimated_p50_ms)}</span><span class="metric-change">${ttftP50Chip}</span></span></td>
+        <td class="num metric-column"><span class="metric-cell"><span>${fmtDuration(row?.ttft_estimated_p95_ms)}</span><span class="metric-change">${ttftP95Chip}</span></span></td>
+        <td class="num metric-column"><span class="metric-cell"><span>${fmtTpot(row?.tpot_estimated_p50_ms)}</span><span class="metric-change">${tpotP50Chip}</span></span></td>
+        <td class="num metric-column"><span class="metric-cell"><span>${fmtTpot(row?.tpot_estimated_p95_ms)}</span><span class="metric-change">${tpotP95Chip}</span></span></td>
         <td class="num metric-column"><span class="metric-cell"><span>${esc(p50RangeText(row))}</span><span class="metric-samples">（${fmtCount(row?.duration_samples)}）</span><span class="metric-change">${p50Chip}</span></span></td>
         <td class="num metric-column"><span class="metric-cell"><span>${esc(p95RangeText(row))}</span><span class="metric-samples">（${fmtCount(row?.duration_samples)}）</span><span class="metric-change">${p95Chip}</span></span></td>
         <td class="num">${fmtToken(row?.[`input_${suffix}`])}</td>
@@ -1897,7 +1901,7 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
     .reverse()
     .join('');
   return `<div class="table-wrap"><table class="history-table">
-    <thead><tr><th>${esc(label)}</th>${versionHead}<th>网关调用数</th><th>成功数</th><th title="所选模型的失败请求占全部请求的比例；未知状态时不显示">请求失败率</th><th title="流式状态未知，按请求统计的估算分位数；至少 20 个样本">TTFT P50（估算）</th><th title="流式状态未知，按请求统计的估算分位数；至少 20 个样本">TTFT P95（估算）</th><th title="流式状态未知，按请求统计的估算分位数；至少 20 个样本">TPOT P50（估算）</th><th title="流式状态未知，按请求统计的估算分位数；至少 20 个样本">TPOT P95（估算）</th><th class="metric-column">网关 P50 区间（样本）</th><th class="metric-column">网关 P95 区间（样本）</th><th title="成功调用的平均输入 Token 数">输入 Token</th><th title="成功调用的平均输出 Token 数">输出 Token</th><th title="成功调用的平均总 Token 数">总 Token</th></tr></thead>
+    <thead><tr><th>${esc(label)}</th>${versionHead}<th class="num">网关调用数</th><th class="num">成功数</th><th class="num" title="所选模型的失败请求占全部请求的比例；未知状态时不显示">请求失败率</th><th class="num metric-column" title="流式状态未知，按请求统计的估算分位数；至少 20 个样本">TTFT P50</th><th class="num metric-column" title="流式状态未知，按请求统计的估算分位数；至少 20 个样本">TTFT P95</th><th class="num metric-column" title="流式状态未知，按请求统计的估算分位数；至少 20 个样本">TPOT P50</th><th class="num metric-column" title="流式状态未知，按请求统计的估算分位数；至少 20 个样本">TPOT P95</th><th class="num metric-column" title="网关耗时分位数区间；括号内为样本数">网关 P50 区间</th><th class="num metric-column" title="网关耗时分位数区间；括号内为样本数">网关 P95 区间</th><th class="num" title="成功调用的平均输入 Token 数">输入 Token</th><th class="num" title="成功调用的平均输出 Token 数">输出 Token</th><th class="num" title="成功调用的平均总 Token 数">总 Token</th></tr></thead>
     <tbody>${body}</tbody>
   </table></div>`;
 }

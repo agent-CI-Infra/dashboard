@@ -686,6 +686,18 @@ h1 {
   font-variant-numeric: tabular-nums;
 }
 
+/* Numeric metric columns read best centered; date/version columns stay left. */
+.history-table th.num,
+.history-table td.num {
+  text-align: center;
+}
+
+/* The value+chip range columns keep their left edge at the column start. */
+.history-table th.metric-column,
+.history-table td.metric-column {
+  text-align: left;
+}
+
 .history-table .run-id {
   max-width: 220px;
   overflow: hidden;
@@ -1447,15 +1459,18 @@ h1 {
   width: 1%;
 }
 
-/* Keep the value, sample count and change together without reserving empty space. */
+/* Keep the value, sample count and change together without reserving empty space.
+   The cell spans the column so every change chip in a column lines up vertically. */
 .metric-cell {
-  display: inline-flex;
+  display: flex;
+  width: 100%;
   align-items: baseline;
   gap: 4px;
 }
 
 .metric-change {
   flex: none;
+  margin-left: auto;
 }
 
 .token-coverage {
