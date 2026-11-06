@@ -1,0 +1,112 @@
+{
+  "schema": "digitalmate/env-request-latency@1",
+  "generated_at": "2026-11-06T05:05:00Z",
+  "source": "workswarm process.log (agent container, ms precision)",
+  "definitions": {
+    "gateway": "[MessageHandler] dispatch -> [MessageHandler] Stream finished (total_chunks)",
+    "workswarm": "[E2A][in] -> run_stream_task finished",
+    "overhead": "gateway - workswarm"
+  },
+  "envs": [
+    {
+      "env": "adx-jiuwen-test-0",
+      "label": "test-0",
+      "n": 772,
+      "errors": 0,
+      "window": {
+        "start": "2026-11-02T13:26:49.282Z",
+        "end": "2026-11-06T03:57:54.317Z"
+      },
+      "gateway_ms": {
+        "mean": 24187,
+        "p50": 8030,
+        "p95": 97217
+      },
+      "workswarm_ms": {
+        "mean": 22978,
+        "p50": 7184,
+        "p95": 94974
+      },
+      "overhead_ms": {
+        "mean": 772,
+        "p50": 835,
+        "p95": 1115
+      }
+    },
+    {
+      "env": "adx-jiuwen-test-1",
+      "label": "test-1",
+      "n": 2,
+      "errors": 0,
+      "window": {
+        "start": "2026-10-31T14:06:47.868Z",
+        "end": "2026-10-31T14:06:47.984Z"
+      },
+      "gateway_ms": {
+        "mean": 1901,
+        "p50": 1861,
+        "p95": 1941
+      },
+      "workswarm_ms": {
+        "mean": 999,
+        "p50": 965,
+        "p95": 1033
+      },
+      "overhead_ms": {
+        "mean": 902,
+        "p50": 896,
+        "p95": 908
+      }
+    },
+    {
+      "env": "adx-jiuwen-test-2",
+      "label": "test-2",
+      "n": 11,
+      "errors": 0,
+      "window": {
+        "start": "2026-11-05T08:29:29.082Z",
+        "end": "2026-11-05T11:38:23.220Z"
+      },
+      "gateway_ms": {
+        "mean": 8943,
+        "p50": 8910,
+        "p95": 18253
+      },
+      "workswarm_ms": {
+        "mean": 8119,
+        "p50": 8101,
+        "p95": 17419
+      },
+      "overhead_ms": {
+        "mean": 824,
+        "p50": 820,
+        "p95": 860
+      }
+    },
+    {
+      "env": "adx-jiuwen-test-4",
+      "label": "test-4",
+      "n": 16,
+      "errors": 0,
+      "window": {
+        "start": "2026-11-04T08:00:49.451Z",
+        "end": "2026-11-05T08:54:50.171Z"
+      },
+      "gateway_ms": {
+        "mean": 42372,
+        "p50": 17064,
+        "p95": 257778
+      },
+      "workswarm_ms": {
+        "mean": 41532,
+        "p50": 16244,
+        "p95": 256942
+      },
+      "overhead_ms": {
+        "mean": 841,
+        "p50": 822,
+        "p95": 1081
+      }
+    }
+  ]
+}
