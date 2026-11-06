@@ -2397,16 +2397,7 @@ function modelCompareCard(rows, { selected = null } = {}) {
     <tbody>${list.map(renderRow).join('')}</tbody>
   </table></div>`;
   const active = rows.filter((row) => !row.lowVolume);
-  const quiet = rows.filter((row) => row.lowVolume);
-  const activeTable = active.length ? table(active) : '<p class="empty">所选范围内暂无足量调用的模型。</p>';
-  const quietTable = quiet.length
-    ? `<details class="low-volume"${quiet.some((row) => row.name === selected) ? ' open' : ''}>
-      <summary>低流量模型（近 ${RECENT_WINDOW_DAYS} 天 &lt; ${MIN_RECENT_CALLS} 次调用）· ${quiet.length} 个</summary>
-      <p class="chart-note">这些模型的调用量不足以支撑可靠的分位与失败率，仅折叠展示，不参与首页结论。</p>
-      ${table(quiet)}
-    </details>`
-    : '';
-  return activeTable + quietTable;
+  return active.length ? table(active) : '<p class="empty">所选范围内暂无足量调用的模型。</p>';
 }
 
 // The freshest point across all cases identifies the current data drop.
