@@ -85,8 +85,51 @@ function milliseconds(value) {
 
 // The manual Bench workflow publishes one Markdown table for all profiles.
 // Parse it rather than reading five different report schemas; `render_report.py`
-// is the single source of truth for the table.
-function reportEntry(file, run) {
+// is the single source of truth for the table. The per-task detail comes from
+// the sibling run.json/report.json files in the same artifact.
+const BENCH_PROFILES = [
+  { match: /GAIA/i, dir: 'gaia' },
+  { match: /PAST/i, dir: 'past-bench' },
+  { match: /Pi-Bench/i, dir: 'pi-bench' },
+  { match: /VitaBench/i, dir: 'vita-bench' },
+  { match: /VibeLife/i, dir: 'vibelife-office' },
+]
+function benchProfile(name) {
+  return BENCH_PROFILES.find((item) => item.match.test(name)) || null
+}
+function tasksFor(dir, name) {
+  const profile = benchProfile(name)
+  if (!profile) return []
+  const runFile = walk(dir).find((candidate) => candidate.endsWith(`/${profile.dir}/run.json`))
+  if (runFile) {
+    const data = readJson(runFile) || {}
+    return (data.tasks || []).map((task) => ({
+      id: task.taskId || task.id || '',
+      title: task.title || '',
+      status: task.verdict || (Number(task.passAt1) > 0 ? 'PASS' : 'FAIL'),
+      trials: Array.isArray(task.trials) ? task.trials.length : 1,
+      passes: Array.isArray(task.trials) ? task.trials.filter((trial) => trial.pass).length : Number(task.passAt1) > 0 ? 1 : 0,
+      passAt1: Number.isFinite(Number(task.passAt1)) ? Number(task.passAt1) : null,
+    }))
+  }
+  if (profile.dir === 'vibelife-office') {
+    const reportFile = walk(dir).find((candidate) => candidate.endsWith('/vibelife-office/report.json'))
+    const report = reportFile ? readJson(reportFile) : null
+    if (report) {
+      return [{
+        id: report.task || 'office_fitout_15d',
+        title: 'VibeLifeBench office_fitout_15d stage 0',
+        status: String(report.outcome || '').toLowerCase() === 'completed' ? 'PASS' : 'FAIL',
+        trials: 1,
+        passes: String(report.outcome || '').toLowerCase() === 'completed' ? 1 : 0,
+        passAt1: null,
+      }]
+    }
+  }
+  return []
+}
+
+function reportEntry(dir, file, run) {
   const lines = readFileSync(file, 'utf8').split(/\r?\n/)
   const benchmarks = []
   let inTable = false
@@ -114,6 +157,7 @@ function reportEntry(file, run) {
       passHatK: fraction(passHatK),
       detail,
       latencyMs: milliseconds(latency),
+      tasks: tasksFor(dir, name),
     })
   }
   if (!benchmarks.length) return null
@@ -205,7 +249,7 @@ function main() {
   let bench = findFirst(args.bench, 'bench-summary.json')
   if (!bench) {
     const report = findFile(args.bench, 'bench-report.md')
-    if (report) bench = reportEntry(report, run)
+    if (report) bench = reportEntry(args.bench ? path.resolve(String(args.bench)) : '', report, run)
   }
   const entry = entryFrom({ bench, run })
   if (!entry.runNumber && !entry.runId) throw new Error('no run id in artifacts or run metadata')

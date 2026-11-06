@@ -91,13 +91,27 @@
     return profile || task || '—'
   }
 
+  const normalizeTask = (task) => {
+    const passes = Number(task.passes) || 0
+    const trials = Number(task.trials) || 1
+    return {
+      id: task.id || task.taskId || '',
+      title: task.title || '',
+      status: task.status || (task.flaky ? 'FLAKY' : passes >= trials ? 'PASS' : passes > 0 ? 'FLAKY' : 'FAIL'),
+      trials,
+      passes,
+      passAt1: Number.isFinite(Number(task.passAt1)) ? Number(task.passAt1) : Number.isFinite(Number(task.passRate)) ? Number(task.passRate) : null,
+    }
+  }
   const benchmarksOf = (bench) => {
-    if (Array.isArray(bench && bench.benchmarks) && bench.benchmarks.length) return bench.benchmarks
+    if (Array.isArray(bench && bench.benchmarks) && bench.benchmarks.length) {
+      return bench.benchmarks.map((item) => ({ ...item, tasks: (item.tasks || []).map(normalizeTask) }))
+    }
     return [
       {
         name: benchmarkName(bench),
         status: bench.status,
-        tasks: taskCount(bench),
+        tasks: (bench.tasks || []).map(normalizeTask),
         trials: trialsOf(bench),
         passAt1: bench.passAt1,
         passAtK: bench.passAtK,
@@ -107,10 +121,15 @@
       },
     ]
   }
+  const latestWithData = (runs) => runs.find((run) => {
+    const bench = benchOf(run)
+    return bench && benchmarksOf(bench).length > 0
+  }) || runs[0]
   const totalOf = (benchmarks, key) => benchmarks.reduce((sum, item) => sum + (Number(item[key]) || 0), 0)
+  const totalTasks = (benchmarks) => benchmarks.reduce((sum, item) => sum + (Array.isArray(item.tasks) ? item.tasks.length : 0), 0)
 
   function renderLatest(runs) {
-    const latest = runs[0]
+    const latest = latestWithData(runs)
     if (!latest) {
       $('#latest').innerHTML = '<div class="empty">还没有 Bench 运行记录。</div>'
       return
@@ -128,8 +147,8 @@
         ['pass@1', many ? '—' : `${pct(benchmarks[0].passAt1)} · ${passedOf(bench)}/${trialsOf(bench)}`],
         ['pass@k', many ? '—' : pct(benchmarks[0].passAtK)],
       ]),
-      card('规模', `<span class="mono">${totalOf(benchmarks, 'tasks')} task</span>`, [
-        ['Tasks', String(totalOf(benchmarks, 'tasks'))],
+      card('规模', `<span class="mono">${totalTasks(benchmarks)} task</span>`, [
+        ['Tasks', String(totalTasks(benchmarks))],
         ['Trials', String(totalOf(benchmarks, 'trials'))],
         ['p50 / p95', many ? '—' : latency(bench)],
       ]),
@@ -164,11 +183,15 @@
     if (!bench) {
       return [`<tr><td class="muted">—</td><td>${statusChip('ERROR')}</td>${'<td class="muted">—</td>'.repeat(7)}<td>${runLink(run)}</td></tr>`]
     }
-    return benchmarksOf(bench).map(
-      (item) => `<tr>
-      <td>${esc(item.name)}</td>
+    return benchmarksOf(bench).flatMap((item) => {
+      const tasks = item.tasks || []
+      const toggle = tasks.length
+        ? '<button type="button" class="bench-toggle" aria-expanded="false" title="展开 task 列表">▸</button>'
+        : '<span class="toggle-spacer" aria-hidden="true"></span>'
+      const row = `<tr class="bench-row">
+      <td>${toggle}${esc(item.name)}</td>
       <td>${statusChip(item.status)}</td>
-      <td class="num">${item.tasks || 0}</td>
+      <td class="num">${tasks.length}</td>
       <td class="num">${item.trials || 0}</td>
       <td class="num">${pct(item.passAt1)}</td>
       <td class="num">${pct(item.passAtK)}</td>
@@ -176,8 +199,17 @@
       <td>${esc(item.detail || '—')}</td>
       <td class="nowrap">${latency(item)}</td>
       <td>${runLink(run)}</td>
-    </tr>`,
-    )
+    </tr>`
+      if (!tasks.length) return [row]
+      const taskRows = tasks.map((task) => `<tr>
+        <td class="mono">${esc(task.id)}</td>
+        <td>${statusChip(task.status)}</td>
+        <td class="num">${pct(task.passAt1)}</td>
+        <td class="num">${task.passes}/${task.trials}</td>
+        <td class="task-title">${esc(task.title)}</td>
+      </tr>`).join('')
+      return [row, `<tr class="task-row" hidden><td colspan="10"><table class="task-table"><thead><tr><th>task</th><th>result</th><th>pass@1</th><th>passes/trials</th><th>title</th></tr></thead><tbody>${taskRows}</tbody></table></td></tr>`]
+    })
   }
 
   function renderTables(runs) {
@@ -186,7 +218,7 @@
       summary.innerHTML = '<tbody><tr><td class="empty">暂无记录</td></tr></tbody>'
     } else {
       summary.innerHTML = `<thead><tr>${SUMMARY_HEAD.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead>
-        <tbody>${summaryRows(runs[0]).join('')}</tbody>`
+        <tbody>${summaryRows(latestWithData(runs)).join('')}</tbody>`
     }
 
     const history = $('#history')
@@ -212,6 +244,16 @@
     history.innerHTML = `<thead><tr>
       <th>时间</th><th>benchmark</th><th>result</th><th>pass@1</th><th>commit</th><th>运行</th>
     </tr></thead><tbody>${rows}</tbody>`
+    document.querySelectorAll('.bench-toggle').forEach((button) => {
+      button.addEventListener('click', () => {
+        const taskRow = button.closest('tr').nextElementSibling
+        if (!taskRow || !taskRow.classList.contains('task-row')) return
+        const open = taskRow.hidden
+        taskRow.hidden = !open
+        button.setAttribute('aria-expanded', String(open))
+        button.textContent = open ? '▾' : '▸'
+      })
+    })
   }
 
   // ------------------------------------------------------------ trend chart
