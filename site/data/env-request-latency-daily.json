@@ -10,7 +10,8 @@
   "workswarm": "[E2A][in] → run_stream_task finished",
   "overhead": "gateway − workswarm（逐请求差值取均值）",
   "ttft": "云端调用口径：模型调用开始 → 首个 Token（运行时 ttft_ms，每次模型调用一条记录）",
-  "tpot": "云端调用口径：首 Token → 调用结束，按输出 Token 数（N−1）加权（运行时 tpot_ms）"
+  "tpot": "云端调用口径：首 Token → 调用结束，按输出 Token 数（N−1）加权（运行时 tpot_ms）",
+  "failure": "失败调用 = llm_call_error 事件（如 422 预算超限、408 超时）；失败率 = 失败 ÷（成功 + 失败）"
  },
  "days": [
   {
@@ -47,7 +48,13 @@
     "mean": 5.96,
     "p50": 5.25,
     "p95": 8.48
-   }
+   },
+   "calls": {
+    "total": 101,
+    "success": 101,
+    "failed": 0
+   },
+   "failure_rate": 0.0
   },
   {
    "date": "2026-11-03",
@@ -83,7 +90,13 @@
     "mean": 5.69,
     "p50": 4.95,
     "p95": 12.19
-   }
+   },
+   "calls": {
+    "total": 342,
+    "success": 187,
+    "failed": 155
+   },
+   "failure_rate": 0.4532
   },
   {
    "date": "2026-11-04",
@@ -119,7 +132,13 @@
     "mean": 5.53,
     "p50": 4.67,
     "p95": 9.94
-   }
+   },
+   "calls": {
+    "total": 152,
+    "success": 148,
+    "failed": 4
+   },
+   "failure_rate": 0.0263
   },
   {
    "date": "2026-11-05",
@@ -155,7 +174,13 @@
     "mean": 8.25,
     "p50": 9.17,
     "p95": 94.06
-   }
+   },
+   "calls": {
+    "total": 629,
+    "success": 629,
+    "failed": 0
+   },
+   "failure_rate": 0.0
   },
   {
    "date": "2026-11-06",
@@ -191,7 +216,13 @@
     "mean": 5.84,
     "p50": 5.33,
     "p95": 69.61
-   }
+   },
+   "calls": {
+    "total": 495,
+    "success": 495,
+    "failed": 0
+   },
+   "failure_rate": 0.0
   }
  ],
  "metric_scope": {
@@ -202,6 +233,7 @@
   },
   "valid_calls": 1560,
   "ignored_noise_lines": 127,
-  "note": "TTFT/TPOT 仅取 agent_adapter 的 llm_usage 事件；另有 127 行含该关键词的工具输出文本，非 usage 记录，已排除"
+  "note": "TTFT/TPOT 仅取 agent_adapter 的 llm_usage 事件；另有 127 行含该关键词的工具输出文本，非 usage 记录，已排除",
+  "failure_note": "调用数 = 成功调用（llm_usage）+ 失败调用（llm_call_error）；失败率按已知终态调用计算"
  }
 }
