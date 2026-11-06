@@ -1725,23 +1725,23 @@ h1 {
 .env-trend + .env-trend { margin-top: 14px; }
 .env-trend { margin-bottom: 10px; }
 .legend-line.env-gw-mean, .legend-line.env-ws-mean, .legend-line.env-ov-mean { border-top-width: 3px; }
-.legend-line.env-gw-mean { border-top-color: #1d4ed8; }
-.legend-line.env-gw-p50 { border-top-color: #3b82f6; border-top-style: dotted; }
-.legend-line.env-gw-p95 { border-top-color: #1e3a8a; border-top-style: dashed; }
+.legend-line.env-gw-mean { border-top-color: var(--series-1); }
+.legend-line.env-gw-p50 { border-top-color: var(--series-2); border-top-style: dashed; }
+.legend-line.env-gw-p95 { border-top-color: var(--series-2); }
 .legend-line.env-ws-mean { border-top-color: #047857; }
 .legend-line.env-ws-p50 { border-top-color: #10b981; border-top-style: dotted; }
 .legend-line.env-ws-p95 { border-top-color: #065f46; border-top-style: dashed; }
 .legend-line.env-ov-mean { border-top-color: #ea580c; }
-.latency-layer.env-gw-mean .trend-series { stroke: #1d4ed8; stroke-width: 2.4; }
-.latency-layer.env-gw-p50 .trend-series { stroke: #3b82f6; stroke-width: 1.8; stroke-dasharray: 2 4; }
-.latency-layer.env-gw-p95 .trend-series { stroke: #1e3a8a; stroke-width: 1.8; stroke-dasharray: 7 4; }
+.latency-layer.env-gw-mean .trend-series { stroke: var(--series-1); stroke-width: 2.4; }
+.latency-layer.env-gw-p50 .trend-series { stroke: var(--series-2); stroke-width: 1.8; stroke-dasharray: 2 3; }
+.latency-layer.env-gw-p95 .trend-series { stroke: var(--series-2); stroke-width: 1.8; }
 .latency-layer.env-ws-mean .trend-series { stroke: #047857; stroke-width: 2.4; }
 .latency-layer.env-ws-p50 .trend-series { stroke: #10b981; stroke-width: 1.8; stroke-dasharray: 2 4; }
 .latency-layer.env-ws-p95 .trend-series { stroke: #065f46; stroke-width: 1.8; stroke-dasharray: 7 4; }
 .latency-layer.env-ov-mean .trend-series { stroke: #ea580c; stroke-width: 2.2; }
-.latency-layer.env-gw-mean .trend-dot { fill: #1d4ed8; }
-.latency-layer.env-gw-p50 .trend-dot { fill: #3b82f6; }
-.latency-layer.env-gw-p95 .trend-dot { fill: #1e3a8a; }
+.latency-layer.env-gw-mean .trend-dot { fill: var(--series-1); }
+.latency-layer.env-gw-p50 .trend-dot { fill: var(--series-2); }
+.latency-layer.env-gw-p95 .trend-dot { fill: var(--series-2); }
 .latency-layer.env-ws-mean .trend-dot { fill: #047857; }
 .latency-layer.env-ws-p50 .trend-dot { fill: #10b981; }
 .latency-layer.env-ws-p95 .trend-dot { fill: #065f46; }
@@ -1749,35 +1749,36 @@ h1 {
 
 /* Cloud TTFT / TPOT trends use the cloud-call (per model call) scope. */
 .legend-line.env-ttft-mean, .legend-line.env-tpot-mean { border-top-width: 3px; }
-.legend-line.env-ttft-mean { border-top-color: #0f766e; }
-.legend-line.env-ttft-p50 { border-top-color: #14b8a6; border-top-style: dotted; }
-.legend-line.env-ttft-p95 { border-top-color: #134e4a; border-top-style: dashed; }
-.legend-line.env-tpot-mean { border-top-color: #6d28d9; }
-.legend-line.env-tpot-p50 { border-top-color: #8b5cf6; border-top-style: dotted; }
-.legend-line.env-tpot-p95 { border-top-color: #4c1d95; border-top-style: dashed; }
-.latency-layer.env-ttft-mean .trend-series { stroke: #0f766e; stroke-width: 2.4; }
-.latency-layer.env-ttft-p50 .trend-series { stroke: #14b8a6; stroke-width: 1.8; stroke-dasharray: 2 4; }
-.latency-layer.env-ttft-p95 .trend-series { stroke: #134e4a; stroke-width: 1.8; stroke-dasharray: 7 4; }
-.latency-layer.env-tpot-mean .trend-series { stroke: #6d28d9; stroke-width: 2.4; }
-.latency-layer.env-tpot-p50 .trend-series { stroke: #8b5cf6; stroke-width: 1.8; stroke-dasharray: 2 4; }
-.latency-layer.env-tpot-p95 .trend-series { stroke: #4c1d95; stroke-width: 1.8; stroke-dasharray: 7 4; }
-.latency-layer.env-ttft-mean .trend-dot { fill: #0f766e; }
-.latency-layer.env-ttft-p50 .trend-dot { fill: #14b8a6; }
-.latency-layer.env-ttft-p95 .trend-dot { fill: #134e4a; }
-.latency-layer.env-tpot-mean .trend-dot { fill: #6d28d9; }
-.latency-layer.env-tpot-p50 .trend-dot { fill: #8b5cf6; }
-.latency-layer.env-tpot-p95 .trend-dot { fill: #4c1d95; }
+.legend-line.env-ttft-mean, .legend-line.env-tpot-mean { border-top-style: dotted; }
+.legend-line.env-ttft-mean { border-top-color: var(--series-3); }
+.legend-line.env-ttft-p50 { border-top-color: #2563eb; border-top-style: dotted; }
+.legend-line.env-ttft-p95 { border-top-color: #ea580c; border-top-style: dotted; }
+.legend-line.env-tpot-mean { border-top-color: var(--series-3); }
+.legend-line.env-tpot-p50 { border-top-color: #2563eb; border-top-style: dotted; }
+.legend-line.env-tpot-p95 { border-top-color: #ea580c; border-top-style: dotted; }
+.latency-layer.env-ttft-mean .trend-series { stroke: var(--series-3); stroke-width: 2; stroke-dasharray: 2 3; }
+.latency-layer.env-ttft-p50 .trend-series { stroke: #2563eb; stroke-width: 1.8; stroke-dasharray: 2 4; }
+.latency-layer.env-ttft-p95 .trend-series { stroke: #ea580c; stroke-width: 1.8; stroke-dasharray: 2 4; }
+.latency-layer.env-tpot-mean .trend-series { stroke: var(--series-3); stroke-width: 2; stroke-dasharray: 2 3; }
+.latency-layer.env-tpot-p50 .trend-series { stroke: #2563eb; stroke-width: 1.8; stroke-dasharray: 2 4; }
+.latency-layer.env-tpot-p95 .trend-series { stroke: #ea580c; stroke-width: 1.8; stroke-dasharray: 2 4; }
+.latency-layer.env-ttft-mean .trend-dot { fill: var(--series-3); }
+.latency-layer.env-ttft-p50 .trend-dot { fill: #2563eb; }
+.latency-layer.env-ttft-p95 .trend-dot { fill: #ea580c; }
+.latency-layer.env-tpot-mean .trend-dot { fill: var(--series-3); }
+.latency-layer.env-tpot-p50 .trend-dot { fill: #2563eb; }
+.latency-layer.env-tpot-p95 .trend-dot { fill: #ea580c; }
 .env-call-detail { margin: 2px 0 12px; }
 .env-call-detail summary { cursor: pointer; color: var(--muted, #64748b); font-size: 13px; }
 .env-call-detail .table-wrap { margin-top: 8px; }
 
 /* Cloud call volume and failure rate share a dual-axis card. */
-.legend-line.env-calls { border-top-color: #2563eb; border-top-width: 3px; }
-.legend-line.env-fail { border-top-color: #dc2626; border-top-style: dashed; }
-.latency-layer.env-calls .trend-series { stroke: #2563eb; stroke-width: 2.2; }
-.latency-layer.env-fail .trend-series { stroke: #dc2626; stroke-width: 2; stroke-dasharray: 6 4; }
-.latency-layer.env-calls .trend-dot { fill: #2563eb; }
-.latency-layer.env-fail .trend-dot { fill: #dc2626; }
+.legend-line.env-calls { border-top-color: var(--series-1); border-top-width: 3px; }
+.legend-line.env-fail { border-top-color: var(--series-2); border-top-style: dashed; }
+.latency-layer.env-calls .trend-series { stroke: var(--series-1); stroke-width: 2.2; }
+.latency-layer.env-fail .trend-series { stroke: var(--series-2); stroke-width: 2; stroke-dasharray: 5 4; }
+.latency-layer.env-calls .trend-dot { fill: var(--series-1); }
+.latency-layer.env-fail .trend-dot { fill: var(--series-2); }
 
 /* Emphasised keywords inside stat-card labels. */
 .stat-label strong {
