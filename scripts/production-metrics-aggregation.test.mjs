@@ -198,11 +198,12 @@ test('TPOT is unavailable if weighted evidence is missing', () => {
 test('separate TPOT chart renders estimated values and tooltip', () => {
   const c = vm.createContext({});
   vm.runInContext(`const chartSize=()=>({width:1000,height:220}); const niceMax=(v)=>v||1;
-    const fmtAxis=String; const fmtDuration=String; const fmtTpot=(v)=>v+' ms/token'; const esc=String;` +
+    const fmtAxis=String; const fmtDuration=String; const fmtTpot=(v)=>v+' ms/token'; const fmtTpotBare=(v)=>String(v); const pointLabel=()=>''; const esc=String;` +
     extract('function latencyTrendChart(points', 'function tokenTrendChart(') +
     '; globalThis.chart=tpotTrendChart;', c);
   const html = c.chart([{date:'2026-11-04',tpot_estimated_ms:2.5}], {});
-  assert.match(html, /TPOT 加权估算/);
+  assert.match(html, /模型平均 TPOT 趋势（ms\/token）/);
+  assert.match(html, /模型平均 TPOT P50 区间/);
   assert.doesNotMatch(html, /TPOT 加权（流式）|TPOT P50（流式）|TPOT P95（流式）/);
   assert.match(html, /latency-layer tpot-est/);
   assert.match(html, /TPOT 趋势（ms\/token）/);
@@ -212,7 +213,7 @@ test('separate TPOT chart renders estimated values and tooltip', () => {
 test('percentiles have one legend each and ranges are not plotted as single values', () => {
   const c = vm.createContext({});
   vm.runInContext(`const chartSize=()=>({width:1000,height:220}); const niceMax=(v)=>v||1;
-    const fmtAxis=String; const fmtDuration=String; const fmtTpot=String; const esc=String;
+    const fmtAxis=String; const fmtDuration=String; const fmtTpot=String; const pointLabel=()=>''; const esc=String;
     const p50RangeText=(r)=>r.p50_lower_ms+' – '+r.p50_ms; const p95RangeText=(r)=>r.p95_lower_ms+' – '+r.p95_ms;` +
     extract('function latencyTrendChart(points', 'function tokenTrendChart(') +
     '; globalThis.chart=latencyTrendChart;', c);
@@ -294,11 +295,11 @@ test('estimated TTFT histogram is mergeable, keeps zeros and separate from stric
 test('TTFT chart has only estimated mean and request percentiles', () => {
   const c=vm.createContext({});
   vm.runInContext(`const chartSize=()=>({width:1000,height:220}); const niceMax=(v)=>v||1;
-    const fmtAxis=String; const fmtDuration=(v)=>v+' ms'; const fmtTpot=String; const esc=String;` +
+    const fmtAxis=String; const fmtDuration=(v)=>v+' ms'; const fmtTpot=String; const pointLabel=()=>''; const esc=String;` +
     extract('function latencyTrendChart(points', 'function tokenTrendChart(') + ';globalThis.chart=ttftTrendChart;', c);
   const html=c.chart([{date:'2026-11-05',ttft_estimated_ms:2000,ttft_estimated_p50_ms:1800,ttft_estimated_p95_ms:6000}],{});
-  assert.match(html,/TTFT 趋势/); assert.match(html,/TTFT 平均估算/);
-  assert.match(html,/TTFT P50 估算/); assert.match(html,/TTFT P95 估算/);
+  assert.match(html,/模型平均 TTFT 趋势（s）/); assert.match(html,/<span>模型平均 TTFT<\/span>/);
+  assert.match(html,/模型平均 TTFT P50 区间/); assert.match(html,/模型平均 TTFT P95 区间/);
   assert.doesNotMatch(html,/TTFT（流式）/); assert.match(html,/1800 ms/);
 });
 
@@ -306,23 +307,24 @@ test('TTFT chart has only estimated mean and request percentiles', () => {
 test('gateway latency chart includes successful-call mean and honors legend toggle', () => {
   const c=vm.createContext({});
   vm.runInContext(`const chartSize=()=>({width:1000,height:220}); const niceMax=(v)=>v||1;
-    const fmtAxis=String; const fmtDuration=(v)=>v+' ms'; const fmtTpot=String; const esc=String;
+    const fmtAxis=String; const fmtDuration=(v)=>v+' ms'; const fmtTpot=String; const pointLabel=()=>''; const esc=String;
     const p50RangeText=String; const p95RangeText=String;` +
     extract('function latencyTrendChart(points', 'function tokenTrendChart(') + ';globalThis.chart=latencyTrendChart;', c);
   const data=[{date:'2026-11-05',duration_ms:8500,p50_ms:3800,p95_ms:29900}];
   const shown=c.chart(data,{}); assert.match(shown,/data-latency-layer="duration"/);
-  assert.match(shown,/8500 ms · 网关平均耗时/); assert.match(shown,/latency-layer ttft/);
-  const hidden=c.chart(data,{duration:false}); assert.doesNotMatch(hidden,/8500 ms · 网关平均耗时/);
+  assert.match(shown,/8500 ms · 模型请求平均耗时/); assert.match(shown,/latency-layer ttft/);
+  const hidden=c.chart(data,{duration:false}); assert.doesNotMatch(hidden,/8500 ms · 模型请求平均耗时/);
   assert.match(hidden,/latency-layer ttft is-hidden/);
 });
 
 
-test('statistics details show four estimated percentiles and compact token headers', () => {
+test('statistics details show mean latency columns with units in the headers', () => {
   const c=vm.createContext({});
-  vm.runInContext(`const esc=String, fmtDuration=(x)=>x == null?'—':x+'ms', fmtTpot=(x)=>x == null?'—':x+'ms/token';
-    const fmtToken=String, fmtCount=String, fmtPercent=String, deltaChip=()=>'', p50RangeText=()=>'', p95RangeText=()=>'', shortVersion=()=>'', addDays=()=>'';` +
+  vm.runInContext(`const esc=String, fmtCount=String, fmtPercent=String, deltaChip=()=>'', shortVersion=()=>'', addDays=()=>'';
+    const fmtSecondsBare=(x)=>x == null?'—':String(x/1000), fmtTpotBare=(x)=>Number.isFinite(x)?x.toFixed(2):'—', fmtInUnit=(v,d)=>v == null?'—':String(v/d);` +
     extract('function modelMetricTable(', '// The shortest stable identifier') + ';globalThis.table=modelMetricTable;', c);
-  const html=c.table([{date:'2026-11-05',ttft_estimated_p50_ms:1800,ttft_estimated_p95_ms:6000,tpot_estimated_p50_ms:4.7,tpot_estimated_p95_ms:12,total_per_request:123,token_coverage:1}],{unit:'request'});
-  for (const label of ['TTFT P50（估算）','TTFT P95（估算）','TPOT P50（估算）','TPOT P95（估算）','1800ms','6000ms','4.7ms/token','12ms/token']) assert.ok(html.includes(label),label);
-  assert.doesNotMatch(html,/>平均 TTFT|>平均 TPOT|>覆盖率|输入 \/ 成功调用/);
+  const html=c.table([{date:'2026-11-05',calls:520,failure_rate:0.038,ttft_estimated_ms:1000,tpot_estimated_ms:4.7,duration_ms:2800,input_tokens:44300000,output_tokens:970000,total_tokens:45270000}],{unit:'request'});
+  for (const label of ['>平均 TTFT（s）</th>','>平均 TPOT（ms/token）</th>','>模型请求平均耗时（s）</th>','>输入 Token（M）</th>','>总 Token（M）</th>']) assert.ok(html.includes(label),label);
+  assert.ok(html.includes('>44.3<') && !html.includes('>44.3M<'));
+  assert.doesNotMatch(html,/>TTFT P50|>TTFT P95|>TPOT P50|>TPOT P95|>成功数|覆盖率/);
 });
