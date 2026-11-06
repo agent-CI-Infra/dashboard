@@ -1867,44 +1867,37 @@ const REGRESSION_THRESHOLD = 20;
 function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'query', showVersion = false } = {}) {
   if (!Array.isArray(rows) || !rows.length) return '<p class="empty">暂无统计数据。</p>';
   const suffix = unit === 'request' ? 'per_request' : 'per_query';
-  const unitLabel = unit === 'request' ? '成功调用' : '网关调用';
   const versionHead = showVersion ? '<th>版本</th>' : '';
   const body = [...rows]
     .map((row, index) => {
       const prior = index > 0 ? rows[index - 1] : null;
       const previous = prior && (!row.date || addDays(prior.date, 1) === row.date) ? prior : null;
-      const ttftChip = deltaChip(row?.ttft_ms, previous?.ttft_ms, { lowerIsBetter: true, label: '' });
-      const tpotChip = deltaChip(row?.tpot_ms, previous?.tpot_ms, { lowerIsBetter: true, label: '' });
       const p50Chip = deltaChip(row?.p50_ms, previous?.p50_ms, { lowerIsBetter: true, label: '' });
       const p95Chip = deltaChip(row?.p95_ms, previous?.p95_ms, { lowerIsBetter: true, label: '' });
       const versionCell = showVersion
         ? `<td class="run-id" title="${esc([row?.run_id, row?.commit].filter(Boolean).join(' · '))}">${esc(shortVersion(row) || '—')}</td>`
         : '';
       const partialBadge = row?.partial ? ' <span class="badge partial" title="当日采集尚未结束">部分日</span>' : '';
-      const estimate = row?.ttft_estimated_samples
-        ? `<span class="metric-samples">估算 ${fmtDuration(row.ttft_estimated_ms)}（${fmtCount(row.ttft_estimated_samples)}）</span>`
-        : '';
-      const tpotEstimate = row?.tpot_estimated_samples
-        ? `<span class="metric-samples">估算 ${fmtTpot(row.tpot_estimated_ms)}（${fmtCount(row.tpot_estimated_samples)}）</span>`
-        : '';
       return `<tr${row?.partial ? ' class="is-partial"' : ''}>
         <td>${esc(row?.[dateKey] ?? '—')}${partialBadge}</td>${versionCell}
         <td class="num">${fmtCount(row?.calls)}</td>
         <td class="num">${fmtCount(row?.success_count)}</td>
         <td class="num">${fmtPercent(row?.failure_rate)}</td>
-        <td class="num metric-column"><span class="metric-cell"><span>${fmtDuration(row?.ttft_ms)}</span><span class="metric-samples">（${fmtCount(row?.ttft_samples)}）</span>${estimate}<span class="metric-change">${ttftChip}</span></span></td>
-        <td class="num metric-column"><span class="metric-cell"><span>${fmtTpot(row?.tpot_ms)}</span><span class="metric-samples">（${fmtCount(row?.tpot_samples)}）</span>${tpotEstimate}<span class="metric-change">${tpotChip}</span></span></td>
+        <td class="num">${fmtDuration(row?.ttft_estimated_p50_ms)}</td>
+        <td class="num">${fmtDuration(row?.ttft_estimated_p95_ms)}</td>
+        <td class="num">${fmtTpot(row?.tpot_estimated_p50_ms)}</td>
+        <td class="num">${fmtTpot(row?.tpot_estimated_p95_ms)}</td>
         <td class="num metric-column"><span class="metric-cell"><span>${esc(p50RangeText(row))}</span><span class="metric-samples">（${fmtCount(row?.duration_samples)}）</span><span class="metric-change">${p50Chip}</span></span></td>
         <td class="num metric-column"><span class="metric-cell"><span>${esc(p95RangeText(row))}</span><span class="metric-samples">（${fmtCount(row?.duration_samples)}）</span><span class="metric-change">${p95Chip}</span></span></td>
         <td class="num">${fmtToken(row?.[`input_${suffix}`])}</td>
         <td class="num">${fmtToken(row?.[`output_${suffix}`])}</td>
-        <td class="num">${fmtToken(row?.[`total_${suffix}`])}${Number.isFinite(row?.token_coverage) ? `<span class="token-coverage">覆盖率 ${fmtPercent(row.token_coverage * 100)}</span>` : ''}</td>
+        <td class="num">${fmtToken(row?.[`total_${suffix}`])}</td>
       </tr>`;
     })
     .reverse()
     .join('');
   return `<div class="table-wrap"><table class="history-table">
-    <thead><tr><th>${esc(label)}</th>${versionHead}<th>网关调用数</th><th>成功数</th><th title="所选模型的失败请求占全部请求的比例；未知状态时不显示">请求失败率</th><th class="metric-column">平均 TTFT（流式样本）</th><th class="metric-column">平均 TPOT（流式样本）</th><th class="metric-column">网关 P50 区间（样本）</th><th class="metric-column">网关 P95 区间（样本）</th><th>输入 / ${unitLabel}</th><th>输出 / ${unitLabel}</th><th>总 Token / ${unitLabel}</th></tr></thead>
+    <thead><tr><th>${esc(label)}</th>${versionHead}<th>网关调用数</th><th>成功数</th><th title="所选模型的失败请求占全部请求的比例；未知状态时不显示">请求失败率</th><th title="流式状态未知，按请求统计的估算分位数；至少 20 个样本">TTFT P50（估算）</th><th title="流式状态未知，按请求统计的估算分位数；至少 20 个样本">TTFT P95（估算）</th><th title="流式状态未知，按请求统计的估算分位数；至少 20 个样本">TPOT P50（估算）</th><th title="流式状态未知，按请求统计的估算分位数；至少 20 个样本">TPOT P95（估算）</th><th class="metric-column">网关 P50 区间（样本）</th><th class="metric-column">网关 P95 区间（样本）</th><th title="成功调用的平均输入 Token 数">输入 Token</th><th title="成功调用的平均输出 Token 数">输出 Token</th><th title="成功调用的平均总 Token 数">总 Token</th></tr></thead>
     <tbody>${body}</tbody>
   </table></div>`;
 }

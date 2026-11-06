@@ -315,3 +315,14 @@ test('gateway latency chart includes successful-call mean and honors legend togg
   const hidden=c.chart(data,{duration:false}); assert.doesNotMatch(hidden,/8500 ms · 网关平均耗时/);
   assert.match(hidden,/latency-layer ttft is-hidden/);
 });
+
+
+test('statistics details show four estimated percentiles and compact token headers', () => {
+  const c=vm.createContext({});
+  vm.runInContext(`const esc=String, fmtDuration=(x)=>x == null?'—':x+'ms', fmtTpot=(x)=>x == null?'—':x+'ms/token';
+    const fmtToken=String, fmtCount=String, fmtPercent=String, deltaChip=()=>'', p50RangeText=()=>'', p95RangeText=()=>'', shortVersion=()=>'', addDays=()=>'';` +
+    extract('function modelMetricTable(', '// The shortest stable identifier') + ';globalThis.table=modelMetricTable;', c);
+  const html=c.table([{date:'2026-11-05',ttft_estimated_p50_ms:1800,ttft_estimated_p95_ms:6000,tpot_estimated_p50_ms:4.7,tpot_estimated_p95_ms:12,total_per_request:123,token_coverage:1}],{unit:'request'});
+  for (const label of ['TTFT P50（估算）','TTFT P95（估算）','TPOT P50（估算）','TPOT P95（估算）','1800ms','6000ms','4.7ms/token','12ms/token']) assert.ok(html.includes(label),label);
+  assert.doesNotMatch(html,/>平均 TTFT|>平均 TPOT|>覆盖率|输入 \/ 成功调用/);
+});
