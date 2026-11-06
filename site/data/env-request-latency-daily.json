@@ -1,6 +1,6 @@
 {
  "schema": "digitalmate/env-request-latency-daily@1",
- "generated_at": "2026-11-06T08:50:00Z",
+ "generated_at": "2026-11-06T16:02:41Z",
  "env": "adx-jiuwen-test-0",
  "label": "test-0",
  "unit": "ms",
@@ -15,6 +15,53 @@
   "tokens": "成功调用的 Token 累计：llm_usage 记录 usage_metadata 的 input_tokens / output_tokens 求和"
  },
  "days": [
+  {
+   "date": "2026-10-31",
+   "partial": true,
+   "n": 65,
+   "gateway": {
+    "n": 64,
+    "mean": 23426.1,
+    "p50": 11726.0,
+    "p95": 104668.0
+   },
+   "workswarm": {
+    "n": 24,
+    "mean": 19772.8,
+    "p50": 12398.0,
+    "p95": 74728.0
+   },
+   "overhead": {
+    "n": 24,
+    "mean": 802.9,
+    "p50": 823.0,
+    "p95": 851.0
+   },
+   "ttft": {
+    "n": 88,
+    "mean": 4874.14,
+    "p50": 4546.33,
+    "p95": 8136.38
+   },
+   "tpot": {
+    "n": 88,
+    "tokens": 53651,
+    "mean": 14.89,
+    "p50": 20.24,
+    "p95": 28.21
+   },
+   "tokens": {
+    "input": 3857131,
+    "output": 53739,
+    "total": 3910870
+   },
+   "calls": {
+    "total": 88,
+    "success": 88,
+    "failed": 0
+   },
+   "failure_rate": 0.0
+  },
   {
    "date": "2026-11-02",
    "partial": true,
@@ -39,7 +86,7 @@
    },
    "ttft": {
     "n": 101,
-    "mean": 3684.5,
+    "mean": 3684.52,
     "p50": 2946.39,
     "p95": 7999.65
    },
@@ -47,8 +94,8 @@
     "n": 101,
     "tokens": 80115,
     "mean": 5.96,
-    "p50": 5.25,
-    "p95": 8.48
+    "p50": 5.63,
+    "p95": 9.74
    },
    "tokens": {
     "input": 4284810,
@@ -159,46 +206,46 @@
   {
    "date": "2026-11-05",
    "partial": false,
-   "n": 431,
+   "n": 433,
    "gateway": {
-    "n": 431,
-    "mean": 16763.1,
-    "p50": 7257.0,
+    "n": 433,
+    "mean": 16845.9,
+    "p50": 7263.0,
     "p95": 63985.0
    },
    "workswarm": {
-    "n": 431,
-    "mean": 15853.5,
-    "p50": 6417.0,
+    "n": 433,
+    "mean": 15936.6,
+    "p50": 6423.0,
     "p95": 62666.0
    },
    "overhead": {
-    "n": 431,
-    "mean": 909.6,
+    "n": 433,
+    "mean": 909.3,
     "p50": 839.0,
     "p95": 1467.0
    },
    "ttft": {
-    "n": 629,
-    "mean": 3872.9,
-    "p50": 2628.63,
-    "p95": 7323.1
+    "n": 638,
+    "mean": 3862.11,
+    "p50": 2631.19,
+    "p95": 7261.43
    },
    "tpot": {
-    "n": 626,
-    "tokens": 287903,
-    "mean": 8.25,
-    "p50": 9.17,
-    "p95": 94.06
+    "n": 638,
+    "tokens": 292603,
+    "mean": 8.22,
+    "p50": 6.99,
+    "p95": 14.42
    },
    "tokens": {
-    "input": 22648202,
-    "output": 288753,
-    "total": 22936955
+    "input": 22990613,
+    "output": 293241,
+    "total": 23283854
    },
    "calls": {
-    "total": 629,
-    "success": 629,
+    "total": 638,
+    "success": 638,
     "failed": 0
    },
    "failure_rate": 0.0
@@ -206,46 +253,46 @@
   {
    "date": "2026-11-06",
    "partial": true,
-   "n": 191,
+   "n": 241,
    "gateway": {
-    "n": 191,
-    "mean": 29782.7,
-    "p50": 7595.0,
+    "n": 241,
+    "mean": 33844.8,
+    "p50": 9162.0,
     "p95": 164779.0
    },
    "workswarm": {
-    "n": 189,
-    "mean": 27435.6,
-    "p50": 6703.0,
-    "p95": 166841.0
+    "n": 236,
+    "mean": 32106.5,
+    "p50": 8214.0,
+    "p95": 143783.0
    },
    "overhead": {
-    "n": 189,
-    "mean": 629.1,
+    "n": 236,
+    "mean": 642.3,
     "p50": 839.0,
-    "p95": 899.0
+    "p95": 893.0
    },
    "ttft": {
-    "n": 495,
-    "mean": 3601.9,
-    "p50": 3014.24,
-    "p95": 6939.48
+    "n": 701,
+    "mean": 3555.09,
+    "p50": 3005.14,
+    "p95": 6492.96
    },
    "tpot": {
-    "n": 492,
-    "tokens": 411525,
-    "mean": 5.84,
-    "p50": 5.33,
-    "p95": 69.61
+    "n": 701,
+    "tokens": 592609,
+    "mean": 5.94,
+    "p50": 5.23,
+    "p95": 11.34
    },
    "tokens": {
-    "input": 27514888,
-    "output": 412333,
-    "total": 27927221
+    "input": 37304886,
+    "output": 593310,
+    "total": 37898196
    },
    "calls": {
-    "total": 495,
-    "success": 495,
+    "total": 701,
+    "success": 701,
     "failed": 0
    },
    "failure_rate": 0.0
@@ -257,9 +304,9 @@
   "models": {
    "deepseek-v4.1-flash-1017": 1560
   },
-  "valid_calls": 1560,
-  "ignored_noise_lines": 127,
-  "note": "TTFT/TPOT 仅取 agent_adapter 的 llm_usage 事件；另有 127 行含该关键词的工具输出文本，非 usage 记录，已排除",
+  "valid_calls": 1863,
+  "ignored_noise_lines": 883,
+  "note": "TTFT/TPOT 仅取 agent_adapter 的 llm_usage 事件；另有 883 行含该关键词的工具输出文本，非 usage 记录，已排除",
   "failure_note": "调用数 = 成功调用（llm_usage）+ 失败调用（llm_call_error）；失败率按已知终态调用计算"
  }
 }
