@@ -1,0 +1,23 @@
+name: Collect after dashboard changes
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['site/**', '.sync/**']
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch collection on main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          COLLECTION_REQUEST_ID: push-${{ github.sha }}
+        # The collector's OIDC trust accepts workflow_dispatch, not push.
+        run: gh workflow run collect.yml --repo "$GH_REPO" --ref main --raw-field "request_id=$COLLECTION_REQUEST_ID"

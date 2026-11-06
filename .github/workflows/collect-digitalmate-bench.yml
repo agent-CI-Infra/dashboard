@@ -1,0 +1,127 @@
+name: Collect DigitalMate bench
+
+# Copies the Bench summary from the latest DigitalMate Nightly into
+# site/data/bench.json on the imported `digitalmate` branch, then redeploys the
+# board. The Bench tab reads that file; it is not part of snapshot.json. E2E
+# results stay on the board's E2E tab and are collected separately.
+#
+# Requires DIGITALMATE_TOKEN (fine-grained PAT on openJiuwen-ai/DigitalMate)
+# with Actions: read. Without the secret the job is a no-op.
+on:
+  schedule:
+    # Nightly starts at 18:00 UTC and takes 1-2h. Poll every two hours and only
+    # publish when the run id or the summaries changed.
+    - cron: '30 */2 * * *'
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Nightly run id (empty = latest completed scheduled Nightly)'
+        type: string
+        default: ''
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: collect-digitalmate-bench
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Check source token
+        id: token
+        env:
+          TOKEN: ${{ secrets.DIGITALMATE_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo 'skip=true' >> "$GITHUB_OUTPUT"
+            echo '::warning::DIGITALMATE_TOKEN is not configured; skipping DigitalMate bench collection.'
+          else
+            echo 'skip=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch the latest Nightly artifacts
+        id: fetch
+        if: steps.token.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.DIGITALMATE_TOKEN }}
+          INPUT_RUN_ID: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+          repo=openJiuwen-ai/DigitalMate
+          id="$INPUT_RUN_ID"
+          if [ -z "$id" ]; then
+            id=$(gh api "repos/$repo/actions/workflows/nightly.yml/runs?event=schedule&branch=main&status=completed&per_page=1" \
+              --jq '.workflow_runs[0].id // empty')
+          fi
+          if [ -z "$id" ]; then
+            echo '::notice::No completed scheduled Nightly run yet.'
+            echo 'skip=true' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          gh api "repos/$repo/actions/runs/$id" \
+            --jq '{id,html_url,conclusion,status,created_at,head_sha,event}' > /tmp/nightly-run.json
+          gh api "repos/$repo/actions/runs/$id/artifacts?per_page=100" > /tmp/nightly-artifacts.json
+          bench_name=$(jq -r '[.artifacts[] | select(.name == "bench-results" or (.name | startswith("bench-"))) | .name] | first // empty' /tmp/nightly-artifacts.json)
+          rm -rf /tmp/bench
+          if [ -n "$bench_name" ]; then
+            gh run download "$id" -R "$repo" -n "$bench_name" -D /tmp/bench
+          else
+            echo '::notice::Nightly run has no bench artifact (Bench likely skipped); not recording an empty run.'
+            echo 'skip=true' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "run_id=$id" >> "$GITHUB_OUTPUT"
+
+      - name: Merge summaries
+        if: steps.fetch.outputs.skip == 'false'
+        run: |
+          set -euo pipefail
+          git fetch origin digitalmate:refs/remotes/origin/digitalmate
+          if git cat-file -e origin/digitalmate:site/data/bench.json 2>/dev/null; then
+            git show origin/digitalmate:site/data/bench.json > /tmp/previous-bench.json
+          fi
+          node scripts/merge-bench-summary.mjs \
+            --bench /tmp/bench --run /tmp/nightly-run.json \
+            --previous /tmp/previous-bench.json --out /tmp/bench.json
+
+      - name: Update digitalmate branch
+        id: update
+        if: steps.fetch.outputs.skip == 'false'
+        run: |
+          set -euo pipefail
+          git fetch origin digitalmate:refs/remotes/origin/digitalmate
+          git checkout -B digitalmate origin/digitalmate
+          if git cat-file -e HEAD:site/data/bench.json 2>/dev/null; then
+            if node -e "const fs=require('fs');const a=JSON.parse(fs.readFileSync('site/data/bench.json'));const b=JSON.parse(fs.readFileSync('/tmp/bench.json'));delete a.updatedAt;delete b.updatedAt;process.exit(JSON.stringify(a)===JSON.stringify(b)?0:1)"; then
+              echo 'changed=false' >> "$GITHUB_OUTPUT"
+              echo 'bench data unchanged'
+              exit 0
+            fi
+          fi
+          mkdir -p site/data
+          cp /tmp/bench.json site/data/bench.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site/data/bench.json
+          git commit -m 'chore(digitalmate): update bench results'
+          git pull --rebase origin digitalmate
+          git push origin HEAD:digitalmate
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+
+      - name: Deploy dashboard
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main

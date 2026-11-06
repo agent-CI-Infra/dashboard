@@ -1,0 +1,68 @@
+name: Collect dashboard data
+run-name: Collect dashboard (${{ inputs.request_id || github.event_name }})
+on:
+  # The bot dispatches collection when an Issue or PR is opened, reopened or closed, and every
+  # eight hours otherwise. This daily run only covers a bot that has stopped dispatching.
+  schedule:
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+    inputs:
+      source_repository:
+        description: Source repository; must match this dashboard's configured source
+        type: string
+        required: false
+      request_id:
+        description: Bot refresh identifier
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: collect-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate source and destination
+        id: context
+        env:
+          SOURCE_REPOSITORY: ${{ inputs.source_repository }}
+          COLLECTION_REQUEST_ID: ${{ inputs.request_id }}
+        run: python3 collection_context.py
+      - name: Exchange OIDC credentials and collect
+        env:
+          SOURCE_REPOSITORY: ${{ steps.context.outputs.source }}
+          COLLECTION_REQUEST_ID: ${{ inputs.request_id }}
+          SDBOT_TOKEN_BROKER_URL: ${{ vars.SDBOT_TOKEN_BROKER_URL }}
+          SDBOT_TOKEN_AUDIENCE: ${{ vars.SDBOT_TOKEN_AUDIENCE }}
+        run: python3 collect_with_oidc.py
+      # Scoped App tokens are revoked after collection. The App commit triggers pages.yml.
+      # New E2E HTML reports never enter git: they stay here as an Actions artifact
+      # until their source artifacts expire, and pages.yml attaches them.
+      - name: Measure E2E report retention
+        id: records
+        run: python3 run_records.py retention .tmp/e2e-html >> "$GITHUB_OUTPUT"
+      - name: Keep new E2E HTML reports
+        if: steps.records.outputs.days
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-html
+          path: .tmp/e2e-html
+          retention-days: ${{ steps.records.outputs.days }}
+          if-no-files-found: error
+          include-hidden-files: true

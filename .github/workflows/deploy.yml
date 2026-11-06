@@ -1,0 +1,108 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Refresh data and redeploy every hour.
+    - cron: '0 * * * *'
+  workflow_run:
+    workflows: ["Collect board data"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion != 'cancelled'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Refresh community data
+        # Re-collect before building so the deployed site reflects the latest
+        # GitHub data. The collector degrades gracefully: on failure it keeps
+        # the previously published values instead of overwriting them.
+        env:
+          # Read-only token for the private monitored repos (reuses the existing
+          # PRIVATE_SOURCE_TOKEN secret; unset => public repos only).
+          MONITOR_TOKEN: ${{ secrets.PRIVATE_SOURCE_TOKEN }}
+          # Monitored repos default to the keys of config/internal-contributors.json.
+          # Set a repository variable only to override that list.
+          MONITOR_REPOS: ${{ vars.MONITOR_REPOS }}
+          MONITOR_MAX_LIST_PAGES: '40'
+          MONITOR_BOTS: ${{ vars.MONITOR_BOTS }}
+        run: npm run collect
+
+      - name: Refresh gate data
+        # Pulls gate data for the monitored repositories: board summaries
+        # (ci-gates/board-summary@1), the legacy status-board snapshot, and
+        # run-level history, then derives per-branch / per-category aggregates.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run collect:gate
+
+      - name: Build static site
+        # Relative base (./) keeps assets and ./data/*.json working both for
+        # project pages (/<repo>/) and for a <user>.github.io root site.
+        env:
+          VITE_BASE: './'
+        run: npm run build
+
+      - name: Assemble repository boards
+        # Each board branch stores only data; the public site is assembled
+        # from all board/* branches after the Vite build.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/assemble-boards.mjs
+
+      - name: Verify boards publish only data
+        # Private boards use the same public Pages site, so a board branch may
+        # publish only site/data/ plus the static board assets. board-config.json,
+        # .sync/ and any source file must never reach the artifact.
+        run: |
+          set -euo pipefail
+          [ -d dist/boards ] || exit 0
+          if find dist/boards -type f \( -name 'board-config.json' -o -path '*/.sync/*' -o -name '*.py' -o -name '*.env' -o -name '*.pem' \) -print -quit | grep -q .; then
+            echo "::error::board output contains files that are not public board data"
+            exit 1
+          fi
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

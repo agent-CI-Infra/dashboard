@@ -1,0 +1,51 @@
+import path from 'path'
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
+import { playwright } from '@vitest/browser-playwright'
+import { configDefaults } from 'vitest/config'
+
+// https://vite.dev/config/
+export default defineConfig({
+  // Relative base keeps asset/data URLs portable across GitHub Pages
+  // project subpaths (e.g. /<repo>/) and user/organization sites (/).
+  // Override with VITE_BASE=/<repo>/ when a fixed subpath is preferred.
+  base: process.env.VITE_BASE ?? './',
+  plugins: [
+    tanstackRouter({
+      target: 'react',
+      autoCodeSplitting: true,
+    }),
+    react(),
+    tailwindcss(),
+  ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+  test: {
+    silent: 'passed-only',
+    unstubEnvs: true,
+    // scripts/** contains Node's built-in test runner suites (collector
+    // adapters); Vitest's browser runner must not pick them up.
+    exclude: [...configDefaults.exclude, 'scripts/**', 'single-repo/**'],
+    browser: {
+      enabled: true,
+      provider: playwright(),
+      instances: [{ browser: 'chromium' }],
+    },
+    coverage: {
+      // include: ['src/**/*.{js,jsx,ts,tsx}'], // Uncomment to expand the report to all src/**/* so untested modules appear as 0% coverage.
+      exclude: [
+        'src/components/ui/**',
+        'src/assets/**',
+        'src/tanstack-table.d.ts',
+        'src/routeTree.gen.ts',
+        'src/test-utils/**',
+        'src/routes/**',
+      ],
+    },
+  },
+})

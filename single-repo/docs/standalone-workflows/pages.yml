@@ -1,0 +1,60 @@
+name: Deploy dashboard Pages
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+  workflow_run:
+    workflows: ["Collect dashboard data (PAT)"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+      - name: Check snapshot
+        id: snapshot
+        run: |
+          if [ -s site/index.html ] && [ -s site/data/snapshot.json ]; then
+            echo ready=true >> "$GITHUB_OUTPUT"
+          else
+            echo ready=false >> "$GITHUB_OUTPUT"
+            echo "No site snapshot yet; run Setup dashboard and Collect dashboard data first."
+          fi
+      # Unexpired E2E HTML reports come from the collect runs that fetched them;
+      # anything unavailable falls back to its GitHub artifact link.
+      - name: Attach E2E HTML reports
+        if: steps.snapshot.outputs.ready == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 run_records.py attach site
+      - uses: actions/configure-pages@v5
+        if: steps.snapshot.outputs.ready == 'true'
+      - uses: actions/upload-pages-artifact@v4
+        if: steps.snapshot.outputs.ready == 'true'
+        with:
+          path: site
+      - uses: actions/deploy-pages@v4
+        if: steps.snapshot.outputs.ready == 'true'
+        id: deployment

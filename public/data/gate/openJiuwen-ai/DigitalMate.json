@@ -1,0 +1,115 @@
+{
+  "id": "digitalmate",
+  "name": "DigitalMate",
+  "owner": "openJiuwen-ai",
+  "defaultBranch": "main",
+  "url": "https://agent-ci-infra.github.io/dashboard/boards/openJiuwen-ai/digitalmate/",
+  "generatedAt": "2026-10-31T03:18:55.503Z",
+  "sourceUrl": "https://agent-ci-infra.github.io/dashboard/boards/openJiuwen-ai/digitalmate/data/snapshot.json",
+  "windowDays": 30,
+  "level": "C1",
+  "stage": "enforced",
+  "caseSummary": {
+    "total": 0,
+    "ready": 0,
+    "todo": 0,
+    "skipped": 0,
+    "executed": 0,
+    "passed": 0,
+    "notRun": 0
+  },
+  "branchData": [
+    {
+      "name": "main",
+      "gateStatus": "passed",
+      "coverage": null,
+      "stats": [
+        {
+          "category": "ready",
+          "daily": [
+            {
+              "date": "2026-10-30",
+              "pass": 9,
+              "fail": 0,
+              "ignored": 5,
+              "retries": 0,
+              "durations": [
+                279,
+                154,
+                512,
+                209,
+                157,
+                119,
+                577,
+                246,
+                744,
+                146,
+                251,
+                198,
+                302,
+                146
+              ]
+            },
+            {
+              "date": "2026-10-31",
+              "pass": 13,
+              "fail": 0,
+              "ignored": 2,
+              "retries": 0,
+              "durations": [
+                390,
+                197,
+                153,
+                244,
+                361,
+                180,
+                226,
+                220,
+                150,
+                157,
+                276,
+                1089,
+                655,
+                251,
+                198
+              ]
+            }
+          ],
+          "link": "https://agent-ci-infra.github.io/dashboard/boards/openJiuwen-ai/digitalmate/#ci",
+          "latest": {
+            "verdict": "pass",
+            "event": "push",
+            "runId": 41087955112,
+            "runAt": "2026-10-30T16:13:49Z",
+            "runUrl": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/41087955112",
+            "sha": "db299fa598566469bc9ab229dd3e2398e0cec2c2",
+            "results": [
+              {
+                "name": "bash scripts/ci/node-tests.sh",
+                "status": "pass",
+                "exitCode": 0,
+                "durationMs": 25704
+              }
+            ]
+          }
+        },
+        {
+          "category": "daily",
+          "daily": [
+            {
+              "date": "2026-10-31",
+              "pass": 0,
+              "fail": 0,
+              "ignored": 1,
+              "retries": 0,
+              "durations": [
+                4752
+              ]
+            }
+          ],
+          "link": "https://agent-ci-infra.github.io/dashboard/boards/openJiuwen-ai/digitalmate/#ci"
+        }
+      ]
+    }
+  ]
+}

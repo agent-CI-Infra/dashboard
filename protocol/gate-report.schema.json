@@ -1,0 +1,335 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-ci-infra.github.io/ci-gates/schema/gate-report.schema.json",
+  "title": "ci-gates gate report",
+  "description": "Per-lane gate verdict emitted by ci-gates. v1.1 adds onboarding, case statistics, observe/waiver and run metadata for dashboards. All v1.1 fields are optional and backward compatible.",
+  "type": "object",
+  "required": [
+    "schema",
+    "repo",
+    "sha",
+    "event",
+    "lane",
+    "level",
+    "verdict",
+    "results"
+  ],
+  "properties": {
+    "schema": {
+      "const": "ci-gates/gate-report@1"
+    },
+    "gates": {
+      "type": "string",
+      "description": "Public gates repository version, e.g. v1.4.0."
+    },
+    "gatesVersion": {
+      "type": "string"
+    },
+    "repo": {
+      "type": "string",
+      "pattern": "^[^/\\s]+/[^/\\s]+$",
+      "description": "owner/name of the consuming repository."
+    },
+    "sha": {
+      "type": "string",
+      "minLength": 7
+    },
+    "event": {
+      "type": "string",
+      "minLength": 1,
+      "description": "GitHub event that produced this report. merge_group / push / schedule / release are trusted; pull_request events are provisional."
+    },
+    "lane": {
+      "$ref": "#/$defs/lane"
+    },
+    "level": {
+      "$ref": "#/$defs/level"
+    },
+    "preset": {
+      "type": "string",
+      "description": "Resolved preset (result of preset=auto detection)."
+    },
+    "verdict": {
+      "$ref": "#/$defs/verdict"
+    },
+    "onboarding": {
+      "$ref": "#/$defs/onboarding"
+    },
+    "cases": {
+      "$ref": "#/$defs/reportCases"
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/result"
+      }
+    },
+    "observe": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/observe"
+      }
+    },
+    "waivers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/waiver"
+      }
+    },
+    "run": {
+      "$ref": "#/$defs/run"
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "lane": {
+      "enum": [
+        "build",
+        "pr-ready",
+        "pr-merge",
+        "daily",
+        "release"
+      ]
+    },
+    "level": {
+      "enum": [
+        "C0",
+        "C1",
+        "C2",
+        "C3",
+        "C4"
+      ]
+    },
+    "verdict": {
+      "enum": [
+        "pass",
+        "fail",
+        "not_applicable",
+        "waived",
+        "observe_fail",
+        "error"
+      ]
+    },
+    "gateStatus": {
+      "enum": [
+        "pass",
+        "fail",
+        "not_run",
+        "not_applicable",
+        "waived",
+        "observe_fail",
+        "error"
+      ]
+    },
+    "stage": {
+      "enum": [
+        "discovered",
+        "gates-running",
+        "cases-pending",
+        "observing",
+        "enforced",
+        "failing"
+      ]
+    },
+    "trust": {
+      "enum": [
+        "trusted",
+        "provisional",
+        "unknown"
+      ]
+    },
+    "onboarding": {
+      "type": "object",
+      "properties": {
+        "stage": {
+          "$ref": "#/$defs/stage"
+        },
+        "since": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "observeUntil": {
+          "type": "string",
+          "format": "date"
+        },
+        "catalog": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "catalogStats": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ready": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "todo": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skipped": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": true
+    },
+    "caseLayer": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "planned": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "executed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "notRun": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "todo": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": true
+    },
+    "reportCases": {
+      "type": "object",
+      "properties": {
+        "catalog": {
+          "$ref": "#/$defs/catalogStats"
+        },
+        "layers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/caseLayer"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "id",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "$ref": "#/$defs/gateStatus"
+        },
+        "enforcement": {
+          "enum": [
+            "enforce",
+            "observe",
+            "advisory"
+          ]
+        },
+        "durationMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "reason": {
+          "type": "string"
+        },
+        "metrics": {
+          "type": "object"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "observe": {
+      "type": "object",
+      "required": [
+        "gate",
+        "until"
+      ],
+      "properties": {
+        "gate": {
+          "type": "string"
+        },
+        "until": {
+          "type": "string",
+          "format": "date"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "waiver": {
+      "type": "object",
+      "required": [
+        "gate",
+        "until"
+      ],
+      "properties": {
+        "gate": {
+          "type": "string"
+        },
+        "until": {
+          "type": "string",
+          "format": "date"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "issue": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "run": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

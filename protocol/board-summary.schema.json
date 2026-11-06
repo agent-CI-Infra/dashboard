@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-ci-infra.github.io/ci-gates/schema/board-summary.schema.json",
+  "title": "ci-gates board summary",
+  "description": "Public, whitelisted summary published by a per-repository board. The public dashboard consumes only this file: no case titles, file paths, logs or credentials. See docs/ci-gates-dashboard-integration.md §4.4.",
+  "type": "object",
+  "required": [
+    "schema",
+    "repo",
+    "owner",
+    "name",
+    "defaultBranch",
+    "generatedAt",
+    "windowDays",
+    "level",
+    "stage",
+    "lanes"
+  ],
+  "properties": {
+    "schema": { "const": "ci-gates/board-summary@1" },
+    "repo": {
+      "type": "string",
+      "pattern": "^[^/\\s]+/[^/\\s]+$"
+    },
+    "owner": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "defaultBranch": { "type": "string", "minLength": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "windowDays": { "type": "integer", "minimum": 1, "maximum": 90 },
+    "level": { "$ref": "#/$defs/level" },
+    "preset": { "type": "string" },
+    "gatesVersion": { "type": "string" },
+    "stage": { "$ref": "#/$defs/stage" },
+    "boardUrl": { "type": "string", "format": "uri" },
+    "coverage": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "openWaivers": { "type": "integer", "minimum": 0 },
+    "observeUntil": { "type": "string", "format": "date" },
+    "caseSummary": { "$ref": "#/$defs/caseSummary" },
+    "lanes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/lane" }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "level": {
+      "enum": ["C0", "C1", "C2", "C3", "C4"]
+    },
+    "stage": {
+      "enum": [
+        "discovered",
+        "gates-running",
+        "cases-pending",
+        "observing",
+        "enforced",
+        "failing"
+      ]
+    },
+    "laneId": {
+      "enum": ["build", "pr-ready", "pr-merge", "daily", "release"]
+    },
+    "verdict": {
+      "enum": [
+        "pass",
+        "fail",
+        "not_run",
+        "not_applicable",
+        "waived",
+        "observe_fail",
+        "error"
+      ]
+    },
+    "trust": {
+      "enum": ["trusted", "provisional", "unknown"]
+    },
+    "caseSummary": {
+      "type": "object",
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "ready": { "type": "integer", "minimum": 0 },
+        "todo": { "type": "integer", "minimum": 0 },
+        "skipped": { "type": "integer", "minimum": 0 },
+        "executed": { "type": "integer", "minimum": 0 },
+        "passed": { "type": "integer", "minimum": 0 },
+        "notRun": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "dayBucket": {
+      "type": "object",
+      "required": ["date"],
+      "properties": {
+        "date": { "type": "string", "format": "date" },
+        "pass": { "type": "integer", "minimum": 0 },
+        "fail": { "type": "integer", "minimum": 0 },
+        "ignored": { "type": "integer", "minimum": 0 },
+        "retries": { "type": "integer", "minimum": 0 },
+        "durations": {
+          "type": "array",
+          "items": { "type": "number", "minimum": 0 }
+        }
+      },
+      "additionalProperties": true
+    },
+    "lane": {
+      "type": "object",
+      "required": ["id", "verdict"],
+      "properties": {
+        "id": { "$ref": "#/$defs/laneId" },
+        "verdict": { "$ref": "#/$defs/verdict" },
+        "trust": { "$ref": "#/$defs/trust" },
+        "reason": { "type": "string" },
+        "passRate": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "runs": { "type": "integer", "minimum": 0 },
+        "avgDurationSec": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "lastRunAt": { "type": "string", "format": "date-time" },
+        "lastRunUrl": { "type": "string", "format": "uri" },
+        "lastRunId": { "type": "integer", "minimum": 1 },
+        "lastEvent": { "type": "string" },
+        "lastSha": { "type": "string" },
+        "cases": { "$ref": "#/$defs/caseSummary" },
+        "history": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/dayBucket" }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

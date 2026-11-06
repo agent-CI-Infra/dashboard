@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-ci-infra.github.io/ci-gates/schema/case-catalog.schema.json",
+  "title": "ci-gates case catalog",
+  "description": "The single source of truth for which test cases must exist, grouped by gate lane and test layer. YAML files validate against this JSON schema after parsing.",
+  "type": "object",
+  "required": ["schema", "version", "cases"],
+  "properties": {
+    "schema": { "const": "ci-gates/case-catalog@1" },
+    "version": { "const": 1 },
+    "cases": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/case" }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "lane": {
+      "enum": ["build", "pr-ready", "pr-merge", "daily", "release"]
+    },
+    "layer": {
+      "type": "string",
+      "pattern": "^L[0-5](-L[0-5])?$"
+    },
+    "status": {
+      "enum": ["ready", "todo", "skipped"]
+    },
+    "source": {
+      "enum": ["detected", "detected-unverified", "generated", "manual"]
+    },
+    "case": {
+      "type": "object",
+      "required": ["id", "lane", "layer", "title", "status"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+          "minLength": 1,
+          "description": "Stable, globally unique, dot-separated. Renaming after release counts as a weakening."
+        },
+        "lane": { "$ref": "#/$defs/lane" },
+        "layer": { "$ref": "#/$defs/layer" },
+        "title": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/status" },
+        "file": { "type": "string" },
+        "runner": {
+          "type": "string",
+          "description": "Framework locator, e.g. classname::name, file::test_func, TestXxx."
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "owner": { "type": "string" },
+        "source": { "$ref": "#/$defs/source" },
+        "until": {
+          "type": "string",
+          "format": "date",
+          "description": "Required when status=skipped; max 90 days out."
+        },
+        "reason": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "skipped" } },
+            "required": ["status"]
+          },
+          "then": { "required": ["until", "reason"] }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "ready" } },
+            "required": ["status"]
+          },
+          "then": { "required": ["file", "owner"] }
+        }
+      ]
+    }
+  }
+}

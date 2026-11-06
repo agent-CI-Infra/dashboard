@@ -1,0 +1,54 @@
+name: 'CI Gates onboarding'
+description: Request help connecting a repository to CI Gates
+title: '[Gate onboarding]: '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Read the [template guide](https://github.com/agent-CI-Infra/CI-workflow/blob/main/README.md) first. It covers copying the workflow, configuring lanes and registering cases.
+
+  - type: input
+    id: repo
+    attributes:
+      label: Repository
+      description: The repository you want to connect, as owner/name.
+      placeholder: acme/web
+    validations:
+      required: true
+
+  - type: dropdown
+    id: stack
+    attributes:
+      label: Primary stack
+      options:
+        - Node / TypeScript
+        - Python
+        - Go
+        - Java / Kotlin
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: lanes
+    attributes:
+      label: Gate commands
+      description: What should build / pr-ready / pr-merge / daily / release run?
+      placeholder: |
+        build: npm run build
+        pr-ready: npm run lint && npm test
+        pr-merge: npm run build
+        daily: npm test
+        release: npm run build
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I copied the CI-workflow template into the repository.
+        - label: I can add @case markers to tests.
+        - label: I want the hosted single-repo board (no extra board repository).
+        - label: I understand the source repository must be public for the hosted board.

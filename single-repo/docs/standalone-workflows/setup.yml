@@ -1,0 +1,67 @@
+name: Setup dashboard
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_repository:
+        description: Source repository to display, owner/repository
+        required: true
+        type: string
+      config_json:
+        description: Optional JSON configuration (workflows, branch_lines, review_sla_days, stale_days, label)
+        required: false
+        type: string
+      reset:
+        description: Remove collected data for the previous source
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: setup-dashboard
+  cancel-in-progress: false
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Write board-config.json
+        env:
+          SOURCE_REPOSITORY: ${{ inputs.source_repository }}
+          CONFIG_JSON: ${{ inputs.config_json }}
+          RESET: ${{ inputs.reset }}
+        run: |
+          args=(--source "$SOURCE_REPOSITORY" --board "$GITHUB_REPOSITORY")
+          if [ -n "$CONFIG_JSON" ]; then
+            args+=(--json "$CONFIG_JSON")
+          fi
+          if [ "$RESET" = "true" ]; then
+            args+=(--reset)
+          fi
+          python3 setup.py "${args[@]}"
+      - name: Commit configuration
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo "dashboard configuration is unchanged"
+          else
+            git commit -m "chore: configure dashboard for ${{ inputs.source_repository }}"
+            git push origin main
+          fi
+      - name: Start initial collection
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run "Collect dashboard data (PAT)" --ref main

@@ -1,0 +1,52 @@
+{
+  "schema": "ci-gates/gate-report@1",
+  "gates": "v1.4.0",
+  "gatesVersion": "v1.4.0",
+  "repo": "acme/web",
+  "sha": "3f9c2a1b7d4e5f60718293a4b5c6d7e8f9012345",
+  "event": "merge_group",
+  "lane": "build",
+  "level": "C1",
+  "preset": "node-web",
+  "verdict": "pass",
+  "onboarding": {
+    "stage": "cases-pending",
+    "since": "2026-10-20T08:00:00Z",
+    "observeUntil": "2026-11-03",
+    "catalog": "test/cases/catalog.yaml"
+  },
+  "cases": {
+    "catalog": { "total": 20, "ready": 8, "todo": 12, "skipped": 0 },
+    "layers": [
+      { "name": "L1", "planned": 8, "executed": 8, "passed": 7, "notRun": 1, "todo": 0 },
+      { "name": "L3", "planned": 4, "executed": 0, "passed": 0, "notRun": 0, "todo": 4 }
+    ]
+  },
+  "results": [
+    {
+      "id": "test",
+      "status": "pass",
+      "durationMs": 182340,
+      "metrics": { "cases": 8, "failed": 1, "notRun": 1 }
+    },
+    {
+      "id": "coverage.patch",
+      "status": "observe_fail",
+      "enforcement": "observe",
+      "metrics": { "linesPct": 62.5, "threshold": 80 },
+      "evidence": ["coverage/lcov.info"]
+    },
+    {
+      "id": "e2e-core",
+      "status": "not_applicable",
+      "reason": "no core cases in catalog"
+    }
+  ],
+  "observe": [{ "gate": "coverage.patch", "until": "2026-11-03" }],
+  "waivers": [],
+  "run": {
+    "id": 18273645,
+    "attempt": 1,
+    "url": "https://github.com/acme/web/actions/runs/18273645"
+  }
+}

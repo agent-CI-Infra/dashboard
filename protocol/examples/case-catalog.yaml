@@ -1,0 +1,40 @@
+schema: ci-gates/case-catalog@1
+version: 1
+cases:
+  - id: auth.login.success
+    lane: build
+    layer: L1
+    title: 正确凭证可以登录
+    status: ready
+    file: test/unit/auth.test.ts
+    runner: 'auth.test.ts::login succeeds'
+    tags: [unit, fast]
+    owner: '@alice'
+    source: detected
+
+  - id: checkout.core.flow
+    lane: build
+    layer: L3
+    title: 结账主流程（核心子集）
+    status: todo
+    file: test/e2e/checkout.spec.ts
+    tags: ['@core']
+    source: generated
+
+  - id: staging.smoke.login
+    lane: pr-merge
+    layer: L4
+    title: staging 登录冒烟
+    status: todo
+    file: test/env/smoke.spec.ts
+    source: generated
+
+  - id: legacy.oauth.callback
+    lane: daily
+    layer: L3
+    title: 旧版 OAuth 回调回归
+    status: skipped
+    until: '2026-11-15'
+    reason: 旧版入口下个版本下线，暂不补
+    owner: '@bob'
+    source: manual
