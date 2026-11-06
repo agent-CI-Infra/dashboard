@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/test-matrix@1",
- "generatedAt": "2026-11-05T23:51:41.903Z",
+ "generatedAt": "2026-11-06T07:27:03.428Z",
  "source": {
   "repository": "openJiuwen-ai/DigitalMate",
-  "main": "8ac6c574",
+  "main": "b0175c05",
   "refs": [
    {
     "label": "test/st-complete-coverage",
@@ -33,11 +33,12 @@
   "createdAt": "2026-11-05T23:27:53Z",
   "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/42129498976",
   "jobs": {
-   "Benchmark GAIA (component, nightly)": "in_progress",
+   "Benchmark GAIA (component, nightly)": "success",
    "Update cloud DigitalMate (latest main)": "success",
-   "Benchmark VibeLifeBench stage 0 (nightly)": "queued",
+   "Benchmark VibeLifeBench stage 0 (nightly)": "success",
    "DigitalMate ST (Windows)": "skipped",
-   "E2E (real device)": "queued"
+   "E2E (real device)": "failure",
+   "Nightly report": "success"
   }
  },
  "statusLabels": {
@@ -80,14 +81,14 @@
  "summary": {
   "layers": {
    "UT": {
-    "cases": 175,
-    "tests": 2285,
+    "cases": 176,
+    "tests": 2290,
     "byStatus": {
-     "ci_lane": 175
+     "ci_lane": 176
     },
     "bySuite": {},
     "byImpl": {
-     "main": 175
+     "main": 176
     }
    },
    "UT-Server": {
@@ -831,6 +832,27 @@
    "note": "",
    "tests": 3,
    "layer": "UT",
+   "id": "chat-artifact-images.test.mjs",
+   "title": "chat",
+   "module": "chat",
+   "file": "tests/unit/chat-artifact-images.test.mjs",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "ut.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 3,
+   "layer": "UT",
    "id": "chat-attachment-integration.test.mjs",
    "title": "chat",
    "module": "chat",
@@ -850,7 +872,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 14,
+   "tests": 15,
    "layer": "UT",
    "id": "ci-gate.test.mjs",
    "title": "ci",
@@ -1102,7 +1124,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 19,
+   "tests": 20,
    "layer": "UT",
    "id": "cloud-markdown-links.test.mjs",
    "title": "cloud",
@@ -10265,7 +10287,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-ATTACH-01",
@@ -10290,11 +10312,11 @@
    "prs": [],
    "evidence": null,
    "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/247",
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-BACK-01",
-   "title": "系统返回：先关闭子页，根页面退后台并保留对话与草稿",
+   "title": "系统返回：关闭子页面并保留未发送草稿",
    "module": "BACK",
    "mode": "single-turn",
    "file": "tests/e2e/workflow/cases/DM-WF-BACK-01.workflow.json",
@@ -10302,8 +10324,8 @@
    "status": "no_result",
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 23,
-   "scoreCriteria": 3
+   "steps": 28,
+   "scoreCriteria": 2
   },
   {
    "priority": "P2",
@@ -10329,7 +10351,7 @@
    "status": "pass_recheck_blocked",
    "progress": "已有 PASS；当前版复核 BLOCKED",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 22,
+   "steps": 28,
    "scoreCriteria": 2
   },
   {
@@ -10342,7 +10364,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-BACKGROUND-01",
@@ -10367,7 +10389,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-BACKGROUND-02",
@@ -10392,7 +10414,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-CHAT-01",
@@ -10404,8 +10426,8 @@
    "status": "no_result",
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 10,
-   "scoreCriteria": 4
+   "steps": 13,
+   "scoreCriteria": 1
   },
   {
    "priority": "P0",
@@ -10417,7 +10439,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-CHAT-02",
@@ -10429,8 +10451,8 @@
    "status": "no_result",
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 10,
-   "scoreCriteria": 4
+   "steps": 14,
+   "scoreCriteria": 1
   },
   {
    "priority": "P0",
@@ -10442,7 +10464,7 @@
    "prs": [],
    "evidence": null,
    "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/235",
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-CHROME-01",
@@ -10467,7 +10489,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-COLDSTART-01",
@@ -10492,7 +10514,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-FILE-01",
@@ -10504,8 +10526,8 @@
    "status": "no_result",
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 16,
-   "scoreCriteria": 5
+   "steps": 21,
+   "scoreCriteria": 1
   },
   {
    "priority": "P1",
@@ -10517,7 +10539,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-FILE-02",
@@ -10542,7 +10564,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-FILE-03",
@@ -10594,7 +10616,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-FILEDELETE-01",
@@ -10619,7 +10641,7 @@
    "prs": [],
    "evidence": null,
    "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/227",
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-MATH-01",
@@ -10644,7 +10666,7 @@
    "prs": [],
    "evidence": null,
    "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/147",
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-MEMORY-01",
@@ -10656,8 +10678,8 @@
    "status": "no_result",
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 26,
-   "scoreCriteria": 5
+   "steps": 35,
+   "scoreCriteria": 1
   },
   {
    "priority": "P1",
@@ -10669,7 +10691,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-NETWORK-01",
@@ -10694,7 +10716,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-PERM-01",
@@ -10719,7 +10741,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-PRIVACY-01",
@@ -10758,7 +10780,7 @@
    "status": "pass_recorded",
    "progress": "已有 PASS；当前版复核待完成",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 17,
+   "steps": 21,
    "scoreCriteria": 2
   },
   {
@@ -10771,7 +10793,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-QUOTE-01",
@@ -10810,7 +10832,7 @@
    "status": "pass_recorded",
    "progress": "已有 PASS；当前版复核待完成",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 14,
+   "steps": 21,
    "scoreCriteria": 2
   },
   {
@@ -10823,7 +10845,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-REMINDER-01",
@@ -10848,7 +10870,7 @@
    "prs": [],
    "evidence": null,
    "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/147",
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-RESET-01",
@@ -10873,7 +10895,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-SILENCE-01",
@@ -10898,7 +10920,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-SKL-01",
@@ -10923,7 +10945,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-SKL-02",
@@ -10963,7 +10985,7 @@
    "progress": "已有 PASS；当前版复核待完成",
    "lane": "nightly.yml · E2E (real device)",
    "steps": 18,
-   "scoreCriteria": 2
+   "scoreCriteria": 1
   },
   {
    "priority": "P2",
@@ -10975,7 +10997,7 @@
    "prs": [],
    "evidence": null,
    "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/147",
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-STRUCTURED-01",
@@ -11000,7 +11022,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-SWITCH-01",
@@ -11025,7 +11047,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-TIMEOUT-01",
@@ -11050,7 +11072,7 @@
    "prs": [],
    "evidence": null,
    "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/147",
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-TOPIC-01",
@@ -11062,8 +11084,8 @@
    "status": "no_result",
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 24,
-   "scoreCriteria": 5
+   "steps": 34,
+   "scoreCriteria": 1
   },
   {
    "priority": "P0",
@@ -11075,7 +11097,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-TRAVEL-01",
@@ -11087,8 +11109,8 @@
    "status": "no_result",
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 18,
-   "scoreCriteria": 6
+   "steps": 23,
+   "scoreCriteria": 1
   },
   {
    "priority": "P2",
@@ -11100,7 +11122,7 @@
    "prs": [],
    "evidence": null,
    "issue": null,
-   "note": "最近一次定时 nightly 的 E2E 作业：queued",
+   "note": "最近一次定时 nightly 的 E2E 作业：failure",
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-UPGRADE-01",
