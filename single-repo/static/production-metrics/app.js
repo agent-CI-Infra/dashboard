@@ -735,6 +735,172 @@ function envLatency(doc) {
   return `<p class="chart-note">数据源 ${esc(doc.source || '—')} · 更新 ${esc(doc.generated_at || '—')}${windowNote}。GateWay 为 ${esc(defs.gateway || '请求进入网关至流式响应结束')}；WorkSwarm 为 ${esc(defs.workswarm || 'AgentServer 收到输入至 run_stream_task 结束')}；网关开销为两者之差。P50/P95 为最近排名分位。</p><div class="table-wrap"><table class="history-table"><thead><tr><th>环境</th><th>请求数</th><th>GateWay 均值</th><th>GateWay P50</th><th>GateWay P95</th><th>WorkSwarm 均值</th><th>WorkSwarm P50</th><th>WorkSwarm P95</th><th>网关开销均值</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
+// Daily GateWay / WorkSwarm latency series for one environment. The same
+// request-level spans as the table above, grouped by Asia/Shanghai day.
+const ENV_TREND_SERIES = [
+  { key: 'gw_mean', label: 'GateWay 均值', group: 'gateway', field: 'mean', style: 'env-gw-mean' },
+  { key: 'gw_p50', label: 'GateWay P50', group: 'gateway', field: 'p50', style: 'env-gw-p50' },
+  { key: 'gw_p95', label: 'GateWay P95', group: 'gateway', field: 'p95', style: 'env-gw-p95' },
+  { key: 'ws_mean', label: 'WorkSwarm 均值', group: 'workswarm', field: 'mean', style: 'env-ws-mean' },
+  { key: 'ws_p50', label: 'WorkSwarm P50', group: 'workswarm', field: 'p50', style: 'env-ws-p50' },
+  { key: 'ws_p95', label: 'WorkSwarm P95', group: 'workswarm', field: 'p95', style: 'env-ws-p95' },
+];
+
+function envLatencyDailySeries(rows, group, field) {
+  return rows.map((row) => {
+    const value = row?.[group]?.[field];
+    return Number.isFinite(value) ? value : null;
+  });
+}
+
+function envLatencyTrend(doc) {
+  const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date) : [];
+  if (!rows.length) return '';
+  const series = ENV_TREND_SERIES.map((item) => ({ ...item, values: envLatencyDailySeries(rows, item.group, item.field) }));
+  const usable = series.flatMap((item) => item.values).filter((value) => value !== null);
+  if (!usable.length) return '';
+
+  const { width, height } = chartSize(1000, 260, { hostId: 'env-latency' });
+  const pad = { left: 58, right: 18, top: 14, bottom: 30 };
+  const innerWidth = width - pad.left - pad.right;
+  const innerHeight = height - pad.top - pad.bottom;
+  const max = niceMax(Math.max(...usable));
+  const x = (index) => (rows.length === 1 ? pad.left + innerWidth / 2 : pad.left + (index * innerWidth) / (rows.length - 1));
+  const y = (value) => pad.top + innerHeight - (Math.max(0, value) / max) * innerHeight;
+
+  const grid = Array.from({ length: 5 }, (_, index) => {
+    const fraction = index / 4;
+    const yy = pad.top + innerHeight - fraction * innerHeight;
+    return `<line class="grid-line" x1="${pad.left}" y1="${yy}" x2="${width - pad.right}" y2="${yy}" /><text class="axis-text" x="${pad.left - 8}" y="${yy + 3}" text-anchor="end">${esc(fmtAxis(max * fraction))}</text>`;
+  }).join('');
+
+  const linePath = (values) => {
+    let path = '';
+    let open = false;
+    values.forEach((value, index) => {
+      if (value === null) {
+        open = false;
+        return;
+      }
+      path += `${open ? 'L' : 'M'}${x(index).toFixed(1)},${y(value).toFixed(1)}`;
+      open = true;
+    });
+    return path;
+  };
+
+  const layer = (item) => {
+    const path = linePath(item.values);
+    const dots = item.values
+      .map((value, index) => (value === null ? '' : `<circle class="trend-dot" cx="${x(index).toFixed(1)}" cy="${y(value).toFixed(1)}" r="2.6" />`))
+      .join('');
+    return `<g class="latency-layer ${item.style}" data-env-series="${item.key}">${path ? `<path class="trend-series" d="${path}" />` : ''}${dots}</g>`;
+  };
+
+  const labelIndexes = rows.length <= 8
+    ? rows.map((_, index) => index)
+    : [...new Set([0, Math.floor((rows.length - 1) / 2), rows.length - 1])].filter((index) => index >= 0);
+  const xLabels = labelIndexes
+    .map((index) => `<text class="axis-text" x="${x(index)}" y="${height - 8}" text-anchor="middle">${esc(String(rows[index].date).slice(5))}${rows[index].partial ? '*' : ''}</text>`)
+    .join('');
+
+  const zoneWidth = rows.length > 1 ? innerWidth / (rows.length - 1) : innerWidth;
+  const zones = rows
+    .map((row, index) => {
+      const lines = [`${row.date}${row.partial ? ' · 部分日' : ''} · n=${fmtCount(row.n)}`];
+      series.forEach((item) => {
+        if (item.values[index] !== null) lines.push(`${fmtDuration(item.values[index])} · ${item.label}`);
+      });
+      if (lines.length === 1) return '';
+      const cx = x(index);
+      const left = Math.max(pad.left, cx - zoneWidth / 2);
+      const right = Math.min(width - pad.right, cx + zoneWidth / 2);
+      return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right - left).toFixed(1)}" height="${innerHeight}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
+    })
+    .join('');
+
+  const legend = series
+    .map((item) => `<button class="legend-toggle latency-toggle" type="button" data-env-layer="${item.key}" aria-pressed="true"><i class="legend-line ${item.style}"></i><span>${item.label}</span></button>`)
+    .join('');
+
+  const head = `<div class="trend-head"><h3>GateWay / WorkSwarm 请求耗时趋势（s）</h3><div class="trend-legend">${legend}</div></div>`;
+  const svg = `<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="GateWay 与 WorkSwarm 每日请求耗时均值及 P50/P95 趋势">
+    ${grid}
+    <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
+    ${series.map(layer).join('')}
+    ${xLabels}
+    <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
+    ${zones}
+  </svg>`;
+
+  return `<div class="trend-card wide env-trend">${head}${svg}<p class="chart-note">按 ${esc(doc.label || doc.env || '环境')} 的请求逐日聚合（Asia/Shanghai），均值按请求数加权；P50/P95 为当日成功请求的最近排名分位；纵轴超过 60 秒时以分钟显示；* 为部分日，窗口外数据未采集。</p></div>`;
+}
+
+function envOverheadTrend(doc) {
+  const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date) : [];
+  const values = rows.map((row) => (Number.isFinite(row?.overhead?.mean) ? row.overhead.mean : null));
+  const usable = values.filter((value) => value !== null);
+  if (!usable.length) return '';
+
+  const { width, height } = chartSize(1000, 150, { hostId: 'env-latency' });
+  const pad = { left: 58, right: 18, top: 12, bottom: 28 };
+  const innerWidth = width - pad.left - pad.right;
+  const innerHeight = height - pad.top - pad.bottom;
+  const max = niceMax(Math.max(...usable));
+  const x = (index) => (rows.length === 1 ? pad.left + innerWidth / 2 : pad.left + (index * innerWidth) / (rows.length - 1));
+  const y = (value) => pad.top + innerHeight - (Math.max(0, value) / max) * innerHeight;
+
+  const grid = Array.from({ length: 3 }, (_, index) => {
+    const fraction = index / 2;
+    const yy = pad.top + innerHeight - fraction * innerHeight;
+    return `<line class="grid-line" x1="${pad.left}" y1="${yy}" x2="${width - pad.right}" y2="${yy}" /><text class="axis-text" x="${pad.left - 8}" y="${yy + 3}" text-anchor="end">${esc(fmtAxis(max * fraction))}</text>`;
+  }).join('');
+
+  let path = '';
+  let open = false;
+  values.forEach((value, index) => {
+    if (value === null) {
+      open = false;
+      return;
+    }
+    path += `${open ? 'L' : 'M'}${x(index).toFixed(1)},${y(value).toFixed(1)}`;
+    open = true;
+  });
+  const dots = values
+    .map((value, index) => (value === null ? '' : `<circle class="trend-dot" cx="${x(index).toFixed(1)}" cy="${y(value).toFixed(1)}" r="2.6" />`))
+    .join('');
+
+  const labelIndexes = rows.length <= 8
+    ? rows.map((_, index) => index)
+    : [...new Set([0, Math.floor((rows.length - 1) / 2), rows.length - 1])].filter((index) => index >= 0);
+  const xLabels = labelIndexes
+    .map((index) => `<text class="axis-text" x="${x(index)}" y="${height - 8}" text-anchor="middle">${esc(String(rows[index].date).slice(5))}${rows[index].partial ? '*' : ''}</text>`)
+    .join('');
+
+  const zoneWidth = rows.length > 1 ? innerWidth / (rows.length - 1) : innerWidth;
+  const zones = rows
+    .map((row, index) => {
+      if (values[index] === null) return '';
+      const lines = [`${row.date}${row.partial ? ' · 部分日' : ''} · n=${fmtCount(row.n)}`, `${fmtDuration(values[index])} · 网关开销均值`];
+      const cx = x(index);
+      const left = Math.max(pad.left, cx - zoneWidth / 2);
+      const right = Math.min(width - pad.right, cx + zoneWidth / 2);
+      return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right - left).toFixed(1)}" height="${innerHeight}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
+    })
+    .join('');
+
+  const head = `<div class="trend-head"><h3>网关开销趋势（s）</h3><div class="trend-legend"><button class="legend-toggle latency-toggle" type="button" data-env-layer="ov_mean" aria-pressed="true"><i class="legend-line env-ov-mean"></i><span>网关开销均值</span></button></div></div>`;
+  const svg = `<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="网关开销每日均值趋势">
+    ${grid}
+    <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
+    <g class="latency-layer env-ov-mean" data-env-series="ov_mean">${path ? `<path class="trend-series" d="${path}" />` : ''}${dots}</g>
+    ${xLabels}
+    <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
+    ${zones}
+  </svg>`;
+
+  return `<div class="trend-card wide env-trend">${head}${svg}<p class="chart-note">网关开销 = 同一请求的 GateWay 耗时 − WorkSwarm 耗时，逐请求取差值后按日求均值；仅统计两端时间戳齐全的请求。</p></div>`;
+}
+
 function fmtToken(value) {
   if (!Number.isFinite(value) || value < 0) return '—';
   fmtToken.formatter ??= new Intl.NumberFormat('zh-CN', { maximumFractionDigits: 1 });
@@ -2617,13 +2783,25 @@ async function loadProductionMetrics() {
 async function loadEnvLatency() {
   const target = $('env-latency');
   if (!target) return;
+  let doc = null;
   try {
     const response = await fetch('../data/env-request-latency.json', { cache: 'no-store' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    target.innerHTML = envLatency(await response.json());
+    doc = await response.json();
   } catch {
-    target.innerHTML = envLatency(null);
+    doc = null;
   }
+  let daily = null;
+  try {
+    const response = await fetch('../data/env-request-latency-daily.json', { cache: 'no-store' });
+    if (response.ok) daily = await response.json();
+  } catch {
+    daily = null;
+  }
+  const charts = daily && daily.schema === 'digitalmate/env-request-latency-daily@1'
+    ? `${envLatencyTrend(daily)}${envOverheadTrend(daily)}`
+    : '';
+  target.innerHTML = `${charts}${envLatency(doc)}`;
 }
 
 function requireCurrentMetricsVersion(history) {
@@ -2721,6 +2899,18 @@ $('model-trends').addEventListener('click', (event) => {
   renderTrends();
   const next = document.querySelector(`#model-trends [data-trend-layer="${key}"]`);
   if (next) next.focus();
+});
+
+$('env-latency').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-env-layer]');
+  if (!button) return;
+  const key = button.dataset.envLayer;
+  const hide = button.getAttribute('aria-pressed') === 'true';
+  button.setAttribute('aria-pressed', String(!hide));
+  button.classList.toggle('off', hide);
+  document.querySelectorAll(`#env-latency [data-env-series="${key}"]`).forEach((node) => {
+    node.classList.toggle('is-hidden', hide);
+  });
 });
 
 // One hover readout for every chart: a crosshair snaps to the nearest date and

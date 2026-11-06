@@ -1689,3 +1689,29 @@ h1 {
 .latency-layer.tpot-p50 .trend-dot, .latency-layer.tpot-est-p50 .trend-dot { fill: #2563eb; }
 .latency-layer.tpot-p95 .trend-dot, .latency-layer.tpot-est-p95 .trend-dot { fill: #ea580c; }
 .latency-layer.tpot-est-p50 .trend-series, .latency-layer.tpot-est-p95 .trend-series { stroke-dasharray: 2 4; }
+
+/* Per-environment daily GateWay / WorkSwarm latency trends. */
+.env-trend + .env-trend { margin-top: 14px; }
+.env-trend { margin-bottom: 10px; }
+.legend-line.env-gw-mean, .legend-line.env-ws-mean, .legend-line.env-ov-mean { border-top-width: 3px; }
+.legend-line.env-gw-mean { border-top-color: #1d4ed8; }
+.legend-line.env-gw-p50 { border-top-color: #3b82f6; border-top-style: dotted; }
+.legend-line.env-gw-p95 { border-top-color: #1e3a8a; border-top-style: dashed; }
+.legend-line.env-ws-mean { border-top-color: #047857; }
+.legend-line.env-ws-p50 { border-top-color: #10b981; border-top-style: dotted; }
+.legend-line.env-ws-p95 { border-top-color: #065f46; border-top-style: dashed; }
+.legend-line.env-ov-mean { border-top-color: #ea580c; }
+.latency-layer.env-gw-mean .trend-series { stroke: #1d4ed8; stroke-width: 2.4; }
+.latency-layer.env-gw-p50 .trend-series { stroke: #3b82f6; stroke-width: 1.8; stroke-dasharray: 2 4; }
+.latency-layer.env-gw-p95 .trend-series { stroke: #1e3a8a; stroke-width: 1.8; stroke-dasharray: 7 4; }
+.latency-layer.env-ws-mean .trend-series { stroke: #047857; stroke-width: 2.4; }
+.latency-layer.env-ws-p50 .trend-series { stroke: #10b981; stroke-width: 1.8; stroke-dasharray: 2 4; }
+.latency-layer.env-ws-p95 .trend-series { stroke: #065f46; stroke-width: 1.8; stroke-dasharray: 7 4; }
+.latency-layer.env-ov-mean .trend-series { stroke: #ea580c; stroke-width: 2.2; }
+.latency-layer.env-gw-mean .trend-dot { fill: #1d4ed8; }
+.latency-layer.env-gw-p50 .trend-dot { fill: #3b82f6; }
+.latency-layer.env-gw-p95 .trend-dot { fill: #1e3a8a; }
+.latency-layer.env-ws-mean .trend-dot { fill: #047857; }
+.latency-layer.env-ws-p50 .trend-dot { fill: #10b981; }
+.latency-layer.env-ws-p95 .trend-dot { fill: #065f46; }
+.latency-layer.env-ov-mean .trend-dot { fill: #ea580c; }
