@@ -753,6 +753,14 @@ function fmtTpotBare(value) {
   return Number.isFinite(value) && value >= 0 ? value.toFixed(2) : '—';
 }
 
+// Bare number expressed in a fixed unit (k/M/B); the unit itself is shown in
+// the column header or card label, never repeated per cell.
+function fmtInUnit(value, div = 1) {
+  if (!Number.isFinite(value) || value < 0) return '—';
+  const quotient = value / div;
+  return trimNumberZeros(quotient.toFixed(quotient >= 100 ? 1 : 2));
+}
+
 // Per-point value with a day-over-day direction glyph, drawn beside each dot.
 // Latency-family charts color the glyph by "lower is better"; volume charts
 // keep it neutral so growth never reads as an alarm. Skipped entirely when the
@@ -1876,6 +1884,16 @@ const REGRESSION_THRESHOLD = 20;
 function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'query', showVersion = false } = {}) {
   if (!Array.isArray(rows) || !rows.length) return '<p class="empty">暂无统计数据。</p>';
   const versionHead = showVersion ? '<th>版本</th>' : '';
+  // One unit per Token column, picked from the column maximum so every cell in
+  // that column stays a bare number and the header carries the unit.
+  const tokenUnit = (field) => {
+    const max = Math.max(...rows.map((row) => (Number.isFinite(row?.[field]) ? row[field] : 0)), 0);
+    return max >= 1e9 ? [1e9, 'B'] : max >= 1e6 ? [1e6, 'M'] : max >= 1e3 ? [1e3, 'k'] : [1, ''];
+  };
+  const [inputDiv, inputUnit] = tokenUnit('input_tokens');
+  const [outputDiv, outputUnit] = tokenUnit('output_tokens');
+  const [totalDiv, totalUnit] = tokenUnit('total_tokens');
+  const unitSuffix = (suffix) => (suffix ? `（${suffix}）` : '');
   const body = [...rows]
     .map((row, index) => {
       const prior = index > 0 ? rows[index - 1] : null;
@@ -1891,18 +1909,18 @@ function modelMetricTable(rows, { label = '日期', dateKey = 'date', unit = 'qu
         <td>${esc(row?.[dateKey] ?? '—')}${partialBadge}</td>${versionCell}
         <td class="num">${fmtCount(row?.calls)}</td>
         <td class="num">${fmtPercent(row?.failure_rate)}</td>
-        <td class="num metric-column"><span class="metric-cell"><span>${fmtDuration(row?.ttft_estimated_ms)}</span><span class="metric-change">${ttftChip}</span></span></td>
-        <td class="num metric-column"><span class="metric-cell"><span>${fmtTpot(row?.tpot_estimated_ms)}</span><span class="metric-change">${tpotChip}</span></span></td>
-        <td class="num metric-column"><span class="metric-cell"><span>${fmtDuration(row?.duration_ms)}</span><span class="metric-change">${durationChip}</span></span></td>
-        <td class="num">${fmtTokenCompact(row?.input_tokens)}</td>
-        <td class="num">${fmtTokenCompact(row?.output_tokens)}</td>
-        <td class="num">${fmtTokenCompact(row?.total_tokens)}</td>
+        <td class="num metric-column"><span class="metric-cell"><span>${fmtSecondsBare(row?.ttft_estimated_ms)}</span><span class="metric-change">${ttftChip}</span></span></td>
+        <td class="num metric-column"><span class="metric-cell"><span>${fmtTpotBare(row?.tpot_estimated_ms)}</span><span class="metric-change">${tpotChip}</span></span></td>
+        <td class="num metric-column"><span class="metric-cell"><span>${fmtSecondsBare(row?.duration_ms)}</span><span class="metric-change">${durationChip}</span></span></td>
+        <td class="num">${fmtInUnit(row?.input_tokens, inputDiv)}</td>
+        <td class="num">${fmtInUnit(row?.output_tokens, outputDiv)}</td>
+        <td class="num">${fmtInUnit(row?.total_tokens, totalDiv)}</td>
       </tr>`;
     })
     .reverse()
     .join('');
   return `<div class="table-wrap"><table class="history-table metric-table">
-    <thead><tr><th>${esc(label)}</th>${versionHead}<th class="num">模型请求数</th><th class="num" title="所选模型的失败请求占全部请求的比例；未知状态时不显示">模型请求失败率</th><th class="num metric-column" title="全部请求的 TTFT 均值（分桶近似）">平均 TTFT</th><th class="num metric-column" title="全部请求的 TPOT 均值（按输出 Token 数减一加权）">平均 TPOT</th><th class="num metric-column" title="按成功调用量加权，不含端侧与网络">模型请求平均耗时</th><th class="num" title="当日成功调用的输入 Token 累计数">输入 Token</th><th class="num" title="当日成功调用的输出 Token 累计数">输出 Token</th><th class="num" title="当日成功调用的总 Token 累计数">总 Token</th></tr></thead>
+    <thead><tr><th>${esc(label)}</th>${versionHead}<th class="num">模型请求数</th><th class="num" title="所选模型的失败请求占全部请求的比例；未知状态时不显示">模型请求失败率</th><th class="num metric-column" title="全部请求的 TTFT 均值（分桶近似）">平均 TTFT（s）</th><th class="num metric-column" title="全部请求的 TPOT 均值（按输出 Token 数减一加权）">平均 TPOT（ms/token）</th><th class="num metric-column" title="按成功调用量加权，不含端侧与网络">模型请求平均耗时（s）</th><th class="num" title="当日成功调用的输入 Token 累计数">输入 Token${unitSuffix(inputUnit)}</th><th class="num" title="当日成功调用的输出 Token 累计数">输出 Token${unitSuffix(outputUnit)}</th><th class="num" title="当日成功调用的总 Token 累计数">总 Token${unitSuffix(totalUnit)}</th></tr></thead>
     <tbody>${body}</tbody>
   </table></div>`;
 }
