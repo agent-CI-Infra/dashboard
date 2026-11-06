@@ -922,7 +922,13 @@ function envSummary(doc) {
   const seconds = (value) => fmtSecondsBare(value);
   const rate = Number.isFinite(anchor.failure_rate) ? fmtPercent(anchor.failure_rate * 100) : '—';
   const failureTone = Number.isFinite(anchor.failure_rate) && anchor.failure_rate > 0 ? 'failed' : 'ok';
-  return `<section class="summary env-summary" aria-label="云侧 Agent 指标">
+  const tokenValues = [anchor.tokens?.input, anchor.tokens?.output, anchor.tokens?.total];
+  const tokenMax = Math.max(...tokenValues.map((value) => (Number.isFinite(value) ? value : 0)));
+  const [tokenDiv, tokenUnit] = tokenMax >= 1e9 ? [1e9, 'B'] : tokenMax >= 1e6 ? [1e6, 'M'] : tokenMax >= 1e3 ? [1e3, 'k'] : [1, ''];
+  const tokenBare = (value) => (Number.isFinite(value) && value >= 0
+    ? trimNumberZeros((value / tokenDiv).toFixed(value / tokenDiv >= 100 ? 1 : 2))
+    : '—');
+  return `<section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>调用数</strong> / <strong>请求失败率</strong></div>
       <div class="stat-value combo">${fmtCount(anchor.calls?.total)} / <span class="${failureTone}">${rate}</span></div>
@@ -942,6 +948,11 @@ function envSummary(doc) {
       <div class="stat-label">云侧 Agent<strong>TPOT</strong> 平均 / P50 / P95（ms/token）</div>
       <div class="stat-value combo">${fmtTpotBare(anchor.tpot?.mean)} / ${fmtTpotBare(anchor.tpot?.p50)} / ${fmtTpotBare(anchor.tpot?.p95)}</div>
       <div class="stat-hint">${fmtCount(anchor.tpot?.n)} 次调用 · ${fmtCount(anchor.tpot?.tokens)} token 加权</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">云侧 Agent输入 / 输出 / 总 Token${tokenUnit ? `（${tokenUnit}）` : ''}</div>
+      <div class="stat-value combo">${tokenBare(anchor.tokens?.input)} / ${tokenBare(anchor.tokens?.output)} / ${tokenBare(anchor.tokens?.total)}</div>
+      <div class="stat-hint">成功调用 ${fmtCount(anchor.calls?.success)} 次 · llm_usage 累计</div>
     </div>
   </section>`;
 }
