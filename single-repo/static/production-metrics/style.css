@@ -970,7 +970,8 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 14px;
+  gap: 10px 16px;
+  margin-top: 12px;
 }
 
 .compare-item {
@@ -980,9 +981,10 @@ h1 {
 }
 
 .compare-item.is-selected {
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: 8px;
   outline: 1px solid var(--line);
+  background: var(--panel-2, rgba(148, 163, 184, 0.08));
 }
 
 .perf-strip {
@@ -1579,22 +1581,51 @@ h1 {
 
 /* The time range applies to both the comparison and model details. */
 .comparison-head {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
+  gap: 10px 16px;
 }
+.comparison-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  min-width: 0;
+}
+.comparison-title h2 { margin: 0; }
 .comparison-controls {
   display: flex;
-  flex: 1 1 550px;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px 12px;
-}
-.comparison-updated {
   margin-left: auto;
 }
+.comparison-updated {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.comparison-note {
+  margin-top: 12px;
+  border-top: 1px dashed var(--line);
+  padding-top: 8px;
+}
+.comparison-note > summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+}
+.comparison-note > summary:hover { color: var(--ink); }
+.comparison-note p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
 @media (max-width: 700px) {
-  .comparison-controls { flex-basis: 100%; }
-  .comparison-updated { margin-left: 0; }
+  .comparison-controls { margin-left: 0; }
+  .comparison-updated { white-space: normal; }
 }
 
 .lookup-form {
@@ -1739,3 +1770,17 @@ h1 {
 .env-call-detail { margin: 2px 0 12px; }
 .env-call-detail summary { cursor: pointer; color: var(--muted, #64748b); font-size: 13px; }
 .env-call-detail .table-wrap { margin-top: 8px; }
+
+/* Cloud call volume and failure rate share a dual-axis card. */
+.legend-line.env-calls { border-top-color: #2563eb; border-top-width: 3px; }
+.legend-line.env-fail { border-top-color: #dc2626; border-top-style: dashed; }
+.latency-layer.env-calls .trend-series { stroke: #2563eb; stroke-width: 2.2; }
+.latency-layer.env-fail .trend-series { stroke: #dc2626; stroke-width: 2; stroke-dasharray: 6 4; }
+.latency-layer.env-calls .trend-dot { fill: #2563eb; }
+.latency-layer.env-fail .trend-dot { fill: #dc2626; }
+
+/* Emphasised keywords inside stat-card labels. */
+.stat-label strong {
+  color: var(--ink);
+  font-weight: 700;
+}

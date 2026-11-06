@@ -96,6 +96,15 @@ function fmtAxis(ms) {
   return `${Math.round(ms)}ms`;
 }
 
+// Environment charts plot elapsed time in seconds only, so a long request
+// reads as 154s rather than switching to minutes mid-axis.
+function fmtAxisSeconds(ms) {
+  if (!Number.isFinite(ms) || ms <= 0) return '0s';
+  const seconds = ms / 1000;
+  if (seconds >= 100) return `${Math.round(seconds)}s`;
+  return `${Number(seconds.toFixed(1))}s`;
+}
+
 function fmtDateTime(iso) {
   if (!iso) return '—';
   const date = new Date(iso);
@@ -738,9 +747,9 @@ function envLatency(doc) {
 // Daily cloud request latency series for one environment. The Gateway span
 // (the cloud end-to-end request path) grouped by Asia/Shanghai day.
 const ENV_TREND_SERIES = [
-  { key: 'gw_mean', label: '云端请求耗时均值', group: 'gateway', field: 'mean', style: 'env-gw-mean' },
-  { key: 'gw_p50', label: '云端请求耗时 P50', group: 'gateway', field: 'p50', style: 'env-gw-p50' },
-  { key: 'gw_p95', label: '云端请求耗时 P95', group: 'gateway', field: 'p95', style: 'env-gw-p95' },
+  { key: 'gw_mean', label: '云侧 Agent 请求耗时均值', group: 'gateway', field: 'mean', style: 'env-gw-mean' },
+  { key: 'gw_p50', label: '云侧 Agent 请求耗时 P50', group: 'gateway', field: 'p50', style: 'env-gw-p50' },
+  { key: 'gw_p95', label: '云侧 Agent 请求耗时 P95', group: 'gateway', field: 'p95', style: 'env-gw-p95' },
 ];
 
 function envLatencyDailySeries(rows, group, field) {
@@ -754,13 +763,13 @@ function envLatencyDailySeries(rows, group, field) {
 // model call, timed by the cloud runtime's llm_usage metadata.
 const ENV_TTFT_SERIES = [
   { key: 'ttft_mean', label: 'TTFT 均值', group: 'ttft', field: 'mean', style: 'env-ttft-mean' },
-  { key: 'ttft_p50', label: 'TTFT P50', group: 'ttft', field: 'p50', style: 'env-ttft-p50' },
+  { key: 'ttft_p50', label: 'TTFT P50', group: 'ttft', field: 'p50', style: 'env-ttft-p50', below: true },
   { key: 'ttft_p95', label: 'TTFT P95', group: 'ttft', field: 'p95', style: 'env-ttft-p95' },
 ];
 
 const ENV_TPOT_SERIES = [
   { key: 'tpot_mean', label: 'TPOT 加权均值', group: 'tpot', field: 'mean', style: 'env-tpot-mean' },
-  { key: 'tpot_p50', label: 'TPOT P50', group: 'tpot', field: 'p50', style: 'env-tpot-p50' },
+  { key: 'tpot_p50', label: 'TPOT P50', group: 'tpot', field: 'p50', style: 'env-tpot-p50', below: true },
   { key: 'tpot_p95', label: 'TPOT P95', group: 'tpot', field: 'p95', style: 'env-tpot-p95' },
 ];
 
@@ -775,7 +784,7 @@ function envTrendChart(doc, opts) {
   if (!usable.length) return '';
 
   const { width, height } = chartSize(1000, opts.height || 260, { hostId: 'env-latency' });
-  const pad = { left: 58, right: 18, top: 14, bottom: 30 };
+  const pad = { left: 58, right: 18, top: 14, bottom: 40 };
   const innerWidth = width - pad.left - pad.right;
   const innerHeight = height - pad.top - pad.bottom;
   const max = niceMax(Math.max(...usable));
@@ -805,10 +814,18 @@ function envTrendChart(doc, opts) {
     return path;
   };
 
+  const dense = rows.length > 16;
   const layer = (item) => {
     const path = linePath(item.values);
     const dots = item.values
-      .map((value, index) => (value === null ? '' : `<circle class="trend-dot" cx="${x(index).toFixed(1)}" cy="${y(value).toFixed(1)}" r="2.6" />`))
+      .map((value, index) => {
+        if (value === null) return '';
+        const labelX = Math.min(Math.max(x(index), pad.left + 18), width - pad.right - 18);
+        const label = opts.pointLabels === false || dense
+          ? ''
+          : pointLabel(labelX, y(value), value, item.values[index - 1], { format: opts.labelFormat || formatValue, lowerIsBetter: true, below: !!item.below });
+        return `<circle class="trend-dot" cx="${x(index).toFixed(1)}" cy="${y(value).toFixed(1)}" r="2.6" />${label}`;
+      })
       .join('');
     return `<g class="latency-layer ${item.style}" data-env-series="${item.key}">${path ? `<path class="trend-series" d="${path}" />` : ''}${dots}</g>`;
   };
@@ -855,36 +872,140 @@ function envTrendChart(doc, opts) {
 
 function envLatencyTrend(doc) {
   return envTrendChart(doc, {
-    title: '云端请求耗时趋势（s）',
-    ariaLabel: '云端请求耗时每日均值及 P50/P95 趋势',
+    title: '云侧 Agent 请求耗时（s）',
+    ariaLabel: '云侧 Agent 请求耗时每日均值及 P50/P95',
     series: ENV_TREND_SERIES,
-    note: `按 ${esc(doc.label || doc.env || '环境')} 的请求逐日聚合（Asia/Shanghai）。云端请求耗时指请求进入云端网关至流式响应结束（原 GateWay 口径），均值按请求数加权；P50/P95 为当日成功请求的最近排名分位；纵轴超过 60 秒时以分钟显示；* 为部分日，窗口外数据未采集。`,
+    height: 300,
+    formatAxis: fmtAxisSeconds,
+    labelFormat: fmtAxisSeconds,
+    note: `按 ${esc(doc.label || doc.env || '环境')} 的请求逐日聚合（Asia/Shanghai）。云侧 Agent 请求耗时指请求进入云侧网关至流式响应结束（原 GateWay 口径），均值按请求数加权；P50/P95 为当日成功请求的最近排名分位；纵轴为秒；* 为部分日，窗口外数据未采集。`,
   });
 }
 
 function envTtftTrend(doc) {
   return envTrendChart(doc, {
-    title: '云端 TTFT 趋势（首 Token 耗时）',
-    ariaLabel: '云端 TTFT 每日均值及 P50/P95 趋势',
+    title: '云侧 Agent TTFT（首 Token 耗时）',
+    ariaLabel: '云侧 Agent TTFT 每日均值及 P50/P95',
     series: ENV_TTFT_SERIES,
+    height: 300,
+    formatAxis: fmtAxisSeconds,
+    labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.ttft?.n, note: '次模型调用' }),
-    note: '云端调用口径（每次模型调用）：TTFT 为模型调用开始至首个 Token，由云端运行时计时，可能包含上游等待与网络耗时；仅统计 0 < TTFT ≤ 调用总耗时的调用；P50/P95 为调用级最近排名分位，均值按有效调用数计算；* 为部分日，缺失值留空不补 0。',
+    note: '云侧 Agent 调用口径（每次模型调用）：TTFT 为模型调用开始至首个 Token，由云侧 Agent 运行时计时，可能包含上游等待与网络耗时；仅统计 0 < TTFT ≤ 调用总耗时的调用；P50/P95 为调用级最近排名分位，均值按有效调用数计算；* 为部分日，缺失值留空不补 0。',
   });
 }
 
 function envTpotTrend(doc) {
   return envTrendChart(doc, {
-    title: '云端 TPOT 趋势（ms/token）',
-    ariaLabel: '云端 TPOT 每日加权均值及 P50/P95 趋势',
+    title: '云侧 Agent TPOT（ms/token）',
+    ariaLabel: '云侧 Agent TPOT 每日加权均值及 P50/P95',
     series: ENV_TPOT_SERIES,
-    formatAxis: (value) => (value === 0 ? '0' : value.toFixed(1)),
-    formatValue: fmtTpot,
+    height: 300,
+    formatAxis: (value) => (value === 0 ? '0' : Number(value.toFixed(1))),
+    formatValue: (value) => `${value.toFixed(2)}`,
+    labelFormat: (value) => `${value.toFixed(2)}`,
     sample: (row) => ({
       n: row?.tpot?.n,
       note: Number.isFinite(row?.tpot?.tokens) ? `${fmtCount(row.tpot.tokens)} token 权重` : '',
     }),
-    note: '云端调用口径（每次模型调用）：TPOT = 首 Token 后至调用结束的耗时 ÷（输出 Token 数 − 1）；均值按后续输出 Token 数加权，P50/P95 为调用级最近排名分位；仅统计输出 Token > 1 且 TPOT ≥ 0.1 ms/token 的调用；* 为部分日。',
+    note: '云侧 Agent 调用口径（每次模型调用）：TPOT = 首 Token 后至调用结束的耗时 ÷（输出 Token 数 − 1）；均值按后续输出 Token 数加权，P50/P95 为调用级最近排名分位；仅统计输出 Token > 1 且 TPOT ≥ 0.1 ms/token 的调用；* 为部分日。',
   });
+}
+
+// Cloud call volume and failure rate share one card: counts on the left axis,
+// the failure percentage on the right. Failed calls come from llm_call_error
+// events (budget exceeded, timeouts), successful ones from llm_usage records.
+function envCallTrend(doc) {
+  const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date) : [];
+  if (!rows.length) return '';
+  const calls = rows.map((row) => (Number.isFinite(row?.calls?.total) ? row.calls.total : null));
+  const rates = rows.map((row) => (Number.isFinite(row?.failure_rate) ? row.failure_rate * 100 : null));
+  if (!calls.some((value) => value !== null) && !rates.some((value) => value !== null)) return '';
+
+  const { width, height } = chartSize(1000, 230, { hostId: 'env-latency' });
+  const pad = { left: 58, right: 56, top: 16, bottom: 40 };
+  const innerWidth = width - pad.left - pad.right;
+  const innerHeight = height - pad.top - pad.bottom;
+  const callMax = niceMax(Math.max(1, ...calls.filter((value) => value !== null)));
+  const rateMax = 100;
+  const x = (index) => (rows.length === 1 ? pad.left + innerWidth / 2 : pad.left + (index * innerWidth) / (rows.length - 1));
+  const yCall = (value) => pad.top + innerHeight - (Math.max(0, value) / callMax) * innerHeight;
+  const yRate = (value) => pad.top + innerHeight - (Math.max(0, value) / rateMax) * innerHeight;
+
+  const grid = Array.from({ length: 5 }, (_, index) => {
+    const fraction = index / 4;
+    const yy = pad.top + innerHeight - fraction * innerHeight;
+    return `<line class="grid-line" x1="${pad.left}" y1="${yy}" x2="${width - pad.right}" y2="${yy}" /><text class="axis-text" x="${pad.left - 8}" y="${yy + 3}" text-anchor="end">${esc(fmtCount(Math.round(callMax * fraction)))}</text><text class="axis-text" x="${width - pad.right + 8}" y="${yy + 3}" text-anchor="start">${Math.round(rateMax * fraction)}%</text>`;
+  }).join('');
+
+  const linePath = (values, scale) => {
+    let path = '';
+    let open = false;
+    values.forEach((value, index) => {
+      if (value === null) {
+        open = false;
+        return;
+      }
+      path += `${open ? 'L' : 'M'}${x(index).toFixed(1)},${scale(value).toFixed(1)}`;
+      open = true;
+    });
+    return path;
+  };
+
+  const marks = (values, scale, format, opts = {}) => values
+    .map((value, index) => {
+      if (value === null) return '';
+      const labelX = Math.min(Math.max(x(index), pad.left + 18), width - pad.right - 18);
+      const label = pointLabel(labelX, scale(value), value, values[index - 1], {
+        format,
+        lowerIsBetter: !!opts.lowerIsBetter,
+        below: !!opts.below,
+        dense: rows.length > 16,
+      });
+      return `<circle class="trend-dot" cx="${x(index).toFixed(1)}" cy="${scale(value).toFixed(1)}" r="2.8" />${label}`;
+    })
+    .join('');
+
+  const labelIndexes = rows.length <= 8
+    ? rows.map((_, index) => index)
+    : [...new Set([0, Math.floor((rows.length - 1) / 2), rows.length - 1])].filter((index) => index >= 0);
+  const xLabels = labelIndexes
+    .map((index) => `<text class="axis-text" x="${x(index)}" y="${height - 8}" text-anchor="middle">${esc(String(rows[index].date).slice(5))}${rows[index].partial ? '*' : ''}</text>`)
+    .join('');
+
+  const zoneWidth = rows.length > 1 ? innerWidth / (rows.length - 1) : innerWidth;
+  const zones = rows
+    .map((row, index) => {
+      const lines = [`${row.date}${row.partial ? ' · 部分日' : ''}`];
+      if (row.calls) {
+        lines.push(`调用 ${fmtCount(row.calls.total)} · 成功 ${fmtCount(row.calls.success)} / 失败 ${fmtCount(row.calls.failed)}`);
+      }
+      if (Number.isFinite(row.failure_rate)) lines.push(`失败率 ${(row.failure_rate * 100).toFixed(1)}%`);
+      if (lines.length === 1) return '';
+      const cx = x(index);
+      const left = Math.max(pad.left, cx - zoneWidth / 2);
+      const right = Math.min(width - pad.right, cx + zoneWidth / 2);
+      return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right - left).toFixed(1)}" height="${innerHeight}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
+    })
+    .join('');
+
+  const legend = [
+    ['env_calls', '调用数', 'env-calls'],
+    ['env_fail', '请求失败率', 'env-fail'],
+  ]
+    .map(([key, label, style]) => `<button class="legend-toggle latency-toggle" type="button" data-env-layer="${key}" aria-pressed="true"><i class="legend-line ${style}"></i><span>${label}</span></button>`)
+    .join('');
+
+  const head = `<div class="trend-head"><h3>云侧 Agent 调用数与请求失败率</h3><div class="trend-legend">${legend}</div></div>`;
+  return `<div class="trend-card wide env-trend">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="云侧 Agent 每日调用数与请求失败率">
+    ${grid}
+    <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
+    <g class="latency-layer env-calls" data-env-series="env_calls">${linePath(calls, yCall) ? `<path class="trend-series" d="${linePath(calls, yCall)}" />` : ''}${marks(calls, yCall, fmtCount)}</g>
+    <g class="latency-layer env-fail" data-env-series="env_fail">${linePath(rates, yRate) ? `<path class="trend-series" d="${linePath(rates, yRate)}" />` : ''}${marks(rates, yRate, (value) => `${value.toFixed(1)}%`, { lowerIsBetter: true, below: true })}</g>
+    ${xLabels}
+    <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
+    ${zones}
+  </svg><p class="chart-note">调用数 = 成功调用（llm_usage）+ 失败调用（llm_call_error），左轴为调用次数，右轴为失败率；失败率 = 失败 ÷（成功 + 失败），仅统计已知终态的调用；失败主要为 422 预算超限与 408 超时；* 为部分日。</p></div>`;
 }
 
 function envCallDetail(doc) {
@@ -893,7 +1014,7 @@ function envCallDetail(doc) {
   const body = rows
     .map((row) => `<tr><td>${esc(row.date)}${row.partial ? '*' : ''}</td><td>${fmtCount(row.ttft?.n)}</td><td>${fmtDuration(row.ttft?.mean)}</td><td>${fmtDuration(row.ttft?.p50)}</td><td>${fmtDuration(row.ttft?.p95)}</td><td>${fmtCount(row.tpot?.n)}</td><td>${fmtTpot(row.tpot?.mean)}</td><td>${fmtTpot(row.tpot?.p50)}</td><td>${fmtTpot(row.tpot?.p95)}</td></tr>`)
     .join('');
-  return `<details class="env-call-detail" open><summary>云端 TTFT / TPOT 每日明细</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>日期</th><th>TTFT 样本</th><th>TTFT 均值</th><th>TTFT P50</th><th>TTFT P95</th><th>TPOT 样本</th><th>TPOT 加权均值</th><th>TPOT P50</th><th>TPOT P95</th></tr></thead><tbody>${body}</tbody></table></div><p class="chart-note">云端调用口径：每次模型调用一条记录；TTFT 为模型调用开始至首个 Token，TPOT 按输出 Token 数减一加权；* 为部分日。</p></details>`;
+  return `<details class="env-call-detail" open><summary>云侧 Agent TTFT / TPOT 每日明细</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>日期</th><th>TTFT 样本</th><th>TTFT 均值</th><th>TTFT P50</th><th>TTFT P95</th><th>TPOT 样本</th><th>TPOT 加权均值</th><th>TPOT P50</th><th>TPOT P95</th></tr></thead><tbody>${body}</tbody></table></div><p class="chart-note">云侧 Agent 调用口径：每次模型调用一条记录；TTFT 为模型调用开始至首个 Token，TPOT 按输出 Token 数减一加权；* 为部分日。</p></details>`;
 }
 
 function fmtToken(value) {
@@ -1822,7 +1943,7 @@ function ttftTrendChart(points, visibility = {}) {
   ];
   const visible = key => visibility[key] !== false;
   const legend = defs.map(([key, label, , style]) => `<button class="legend-toggle latency-toggle${visible(key) ? '' : ' off'}" type="button" data-latency-layer="${key}" aria-pressed="${visible(key)}"><i class="legend-line ${style}"></i><span>${label}</span></button>`).join('');
-  const head = `<div class="trend-head"><h3>模型平均 TTFT 趋势（s）</h3><div class="trend-legend">${legend}</div></div>`;
+  const head = `<div class="trend-head"><h3>模型平均 TTFT（s）</h3><div class="trend-legend">${legend}</div></div>`;
   const values = defs.flatMap(([, , field]) => rows.map(row => row[field]).filter(v => Number.isFinite(v) && v >= 0));
   if (!values.length) return `<div class="trend-card wide">${head}<p class="empty">暂无 TTFT 数据</p></div>`;
   const {width, height} = chartSize(1000, 220);
@@ -1864,7 +1985,7 @@ function tpotTrendChart(points, visibility = {}) {
   ];
   const visible = key => visibility[key] !== false;
   const legend = defs.map(([key, label, , style]) => `<button class="legend-toggle latency-toggle${visible(key) ? '' : ' off'}" type="button" data-latency-layer="${key}" aria-pressed="${visible(key)}"><i class="legend-line ${style}"></i><span>${label}</span></button>`).join('');
-  const head = `<div class="trend-head"><h3>模型平均 TPOT 趋势（ms/token）</h3><div class="trend-legend">${legend}</div></div>`;
+  const head = `<div class="trend-head"><h3>模型平均 TPOT（ms/token）</h3><div class="trend-legend">${legend}</div></div>`;
   const values = defs.flatMap(([, , field]) => rows.map(row => row[field]).filter(v => Number.isFinite(v) && v >= 0));
   if (!values.length) return `<div class="trend-card wide">${head}<p class="empty">暂无 TPOT 数据</p></div>`;
   const {width, height} = chartSize(1000, 220);
@@ -2041,22 +2162,22 @@ function modelSummary(days, model, { unit = 'query', failure = null, anchor = nu
   const failureTone = failure ? (failure.failed ? 'failed' : 'ok') : '';
   return `
     <div class="stat-card">
-      <div class="stat-label">模型请求数 / 模型请求失败率</div>
+      <div class="stat-label">模型侧<strong>请求数</strong> / <strong>请求失败率</strong></div>
       <div class="stat-value combo">${fmtCount(latest.calls)} / <span class="${failureTone}">${failure ? fmtPercent(failure.failure_rate) : '—'}</span></div>
       <div class="stat-hint">成功 ${fmtCount(latest.success_count)} / 失败 ${failure ? fmtCount(failure.failed) : '—（含未知状态或无数据）'}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">模型请求平均耗时 / P50 区间 / P95 区间（s）</div>
+      <div class="stat-label">模型侧<strong>请求耗时</strong>平均 / P50 / P95（s）</div>
       <div class="stat-value combo">${fmtSecondsBare(latest.duration_ms)} / ${esc(fmtSecondsRangeBare(latest, 'p50'))} / ${esc(fmtSecondsRangeBare(latest, 'p95'))}</div>
       <div class="stat-hint">不含端侧与网络 · ${fmtCount(latest.duration_samples)} 个成功样本</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">模型平均 TTFT / P50 区间 / P95 区间（s）</div>
+      <div class="stat-label">模型侧<strong>TTFT</strong> 平均 / P50 / P95（s）</div>
       <div class="stat-value combo">${fmtSecondsBare(latest.ttft_estimated_ms)} / ${fmtSecondsBare(latest.ttft_estimated_p50_ms)} / ${fmtSecondsBare(latest.ttft_estimated_p95_ms)}</div>
       <div class="stat-hint">${fmtCount(latest.ttft_estimated_samples)} 个样本 · 分桶近似 · 至少 20 个样本</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">模型平均 TPOT / P50 区间 / P95 区间（ms/token）</div>
+      <div class="stat-label">模型侧<strong>TPOT</strong> 平均 / P50 / P95（ms/token）</div>
       <div class="stat-value combo">${fmtTpotBare(latest.tpot_estimated_ms)} / ${tpotBare('p50')} / ${tpotBare('p95')}</div>
       <div class="stat-hint">Token 加权 · ${fmtCount(latest.tpot_estimated_samples)} 个样本 · 规则过滤 ${fmtCount(latest.tpot_filtered_count)} 个</div>
     </div>
@@ -2794,9 +2915,11 @@ async function loadEnvLatency() {
     daily = null;
   }
   const charts = daily && daily.schema === 'digitalmate/env-request-latency-daily@1'
-    ? `${envLatencyTrend(daily)}${envTtftTrend(daily)}${envTpotTrend(daily)}${envCallDetail(daily)}`
+    ? `${envLatencyTrend(daily)}${envTtftTrend(daily)}${envTpotTrend(daily)}${envCallTrend(daily)}${envCallDetail(daily)}`
     : '';
-  target.innerHTML = `${charts}${envLatency(doc)}`;
+  // The per-environment GateWay / WorkSwarm table is parked for now; the daily
+  // charts carry the same measurements in a more readable form.
+  target.innerHTML = charts;
 }
 
 function requireCurrentMetricsVersion(history) {
