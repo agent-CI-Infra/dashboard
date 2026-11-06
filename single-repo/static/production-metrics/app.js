@@ -735,15 +735,12 @@ function envLatency(doc) {
   return `<p class="chart-note">数据源 ${esc(doc.source || '—')} · 更新 ${esc(doc.generated_at || '—')}${windowNote}。GateWay 为 ${esc(defs.gateway || '请求进入网关至流式响应结束')}；WorkSwarm 为 ${esc(defs.workswarm || 'AgentServer 收到输入至 run_stream_task 结束')}；网关开销为两者之差。P50/P95 为最近排名分位。</p><div class="table-wrap"><table class="history-table"><thead><tr><th>环境</th><th>请求数</th><th>GateWay 均值</th><th>GateWay P50</th><th>GateWay P95</th><th>WorkSwarm 均值</th><th>WorkSwarm P50</th><th>WorkSwarm P95</th><th>网关开销均值</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
-// Daily GateWay / WorkSwarm latency series for one environment. The same
-// request-level spans as the table above, grouped by Asia/Shanghai day.
+// Daily cloud request latency series for one environment. The Gateway span
+// (the cloud end-to-end request path) grouped by Asia/Shanghai day.
 const ENV_TREND_SERIES = [
-  { key: 'gw_mean', label: 'GateWay 均值', group: 'gateway', field: 'mean', style: 'env-gw-mean' },
-  { key: 'gw_p50', label: 'GateWay P50', group: 'gateway', field: 'p50', style: 'env-gw-p50' },
-  { key: 'gw_p95', label: 'GateWay P95', group: 'gateway', field: 'p95', style: 'env-gw-p95' },
-  { key: 'ws_mean', label: 'WorkSwarm 均值', group: 'workswarm', field: 'mean', style: 'env-ws-mean' },
-  { key: 'ws_p50', label: 'WorkSwarm P50', group: 'workswarm', field: 'p50', style: 'env-ws-p50' },
-  { key: 'ws_p95', label: 'WorkSwarm P95', group: 'workswarm', field: 'p95', style: 'env-ws-p95' },
+  { key: 'gw_mean', label: '云端请求耗时均值', group: 'gateway', field: 'mean', style: 'env-gw-mean' },
+  { key: 'gw_p50', label: '云端请求耗时 P50', group: 'gateway', field: 'p50', style: 'env-gw-p50' },
+  { key: 'gw_p95', label: '云端请求耗时 P95', group: 'gateway', field: 'p95', style: 'env-gw-p95' },
 ];
 
 function envLatencyDailySeries(rows, group, field) {
@@ -822,8 +819,8 @@ function envLatencyTrend(doc) {
     .map((item) => `<button class="legend-toggle latency-toggle" type="button" data-env-layer="${item.key}" aria-pressed="true"><i class="legend-line ${item.style}"></i><span>${item.label}</span></button>`)
     .join('');
 
-  const head = `<div class="trend-head"><h3>GateWay / WorkSwarm 请求耗时趋势（s）</h3><div class="trend-legend">${legend}</div></div>`;
-  const svg = `<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="GateWay 与 WorkSwarm 每日请求耗时均值及 P50/P95 趋势">
+  const head = `<div class="trend-head"><h3>云端请求耗时趋势（s）</h3><div class="trend-legend">${legend}</div></div>`;
+  const svg = `<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="云端请求耗时每日均值及 P50/P95 趋势">
     ${grid}
     <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
     ${series.map(layer).join('')}
@@ -832,7 +829,7 @@ function envLatencyTrend(doc) {
     ${zones}
   </svg>`;
 
-  return `<div class="trend-card wide env-trend">${head}${svg}<p class="chart-note">按 ${esc(doc.label || doc.env || '环境')} 的请求逐日聚合（Asia/Shanghai），均值按请求数加权；P50/P95 为当日成功请求的最近排名分位；纵轴超过 60 秒时以分钟显示；* 为部分日，窗口外数据未采集。</p></div>`;
+  return `<div class="trend-card wide env-trend">${head}${svg}<p class="chart-note">按 ${esc(doc.label || doc.env || '环境')} 的请求逐日聚合（Asia/Shanghai）。云端请求耗时指请求进入云端网关至流式响应结束（原 GateWay 口径），均值按请求数加权；P50/P95 为当日成功请求的最近排名分位；纵轴超过 60 秒时以分钟显示；* 为部分日，窗口外数据未采集。</p></div>`;
 }
 
 function envOverheadTrend(doc) {
@@ -898,7 +895,7 @@ function envOverheadTrend(doc) {
     ${zones}
   </svg>`;
 
-  return `<div class="trend-card wide env-trend">${head}${svg}<p class="chart-note">网关开销 = 同一请求的 GateWay 耗时 − WorkSwarm 耗时，逐请求取差值后按日求均值；仅统计两端时间戳齐全的请求。</p></div>`;
+  return `<div class="trend-card wide env-trend">${head}${svg}<p class="chart-note">网关开销 = 同一请求的云端请求耗时 − WorkSwarm 耗时，逐请求取差值后按日求均值；仅统计两端时间戳齐全的请求。</p></div>`;
 }
 
 function fmtToken(value) {
