@@ -977,12 +977,18 @@ h1 {
   display: none;
 }
 
-/* One card per metric family; auto-fit keeps the last row from leaving a
-   gap when the count is not a multiple of the column count. */
+/* One card per metric family, three per row: five tiles fill two rows on
+   both the model and cloud side, matching the chart grid below. */
 .model-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .model-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* Combined "a / b / c" values need a smaller face than single values. */
