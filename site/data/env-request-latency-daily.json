@@ -1,14 +1,16 @@
 {
  "schema": "digitalmate/env-request-latency-daily@1",
- "generated_at": "2026-11-06T07:29:35Z",
+ "generated_at": "2026-11-06T08:50:00Z",
  "env": "adx-jiuwen-test-0",
  "label": "test-0",
  "unit": "ms",
- "source": "workswarm process.log（agent 容器，毫秒精度），按 Asia/Shanghai 自然日聚合",
+ "source": "workswarm process.log（agent 容器，毫秒精度；请求耗时取 [MessageHandler] 跨度，TTFT/TPOT 取云端运行时 llm_usage 记录），按 Asia/Shanghai 自然日聚合",
  "definitions": {
   "gateway": "[MessageHandler] dispatch → [MessageHandler] Stream 正常完成（total_chunks）",
   "workswarm": "[E2A][in] → run_stream_task finished",
-  "overhead": "gateway − workswarm（逐请求差值取均值）"
+  "overhead": "gateway − workswarm（逐请求差值取均值）",
+  "ttft": "云端调用口径：模型调用开始 → 首个 Token（运行时 ttft_ms，每次模型调用一条记录）",
+  "tpot": "云端调用口径：首 Token → 调用结束，按输出 Token 数（N−1）加权（运行时 tpot_ms）"
  },
  "days": [
   {
@@ -32,6 +34,19 @@
     "mean": 780.0,
     "p50": 823.0,
     "p95": 846.0
+   },
+   "ttft": {
+    "n": 101,
+    "mean": 3684.5,
+    "p50": 2946.39,
+    "p95": 7999.65
+   },
+   "tpot": {
+    "n": 101,
+    "tokens": 80115,
+    "mean": 5.96,
+    "p50": 5.25,
+    "p95": 8.48
    }
   },
   {
@@ -55,6 +70,19 @@
     "mean": 656.5,
     "p50": 820.0,
     "p95": 853.0
+   },
+   "ttft": {
+    "n": 187,
+    "mean": 3445.2,
+    "p50": 2856.43,
+    "p95": 5372.4
+   },
+   "tpot": {
+    "n": 187,
+    "tokens": 141278,
+    "mean": 5.69,
+    "p50": 4.95,
+    "p95": 12.19
    }
   },
   {
@@ -78,6 +106,19 @@
     "mean": 229.9,
     "p50": 813.0,
     "p95": 844.0
+   },
+   "ttft": {
+    "n": 148,
+    "mean": 6738.3,
+    "p50": 3541.3,
+    "p95": 17285.69
+   },
+   "tpot": {
+    "n": 148,
+    "tokens": 105373,
+    "mean": 5.53,
+    "p50": 4.67,
+    "p95": 9.94
    }
   },
   {
@@ -101,6 +142,19 @@
     "mean": 909.6,
     "p50": 839.0,
     "p95": 1467.0
+   },
+   "ttft": {
+    "n": 629,
+    "mean": 3872.9,
+    "p50": 2628.63,
+    "p95": 7323.1
+   },
+   "tpot": {
+    "n": 626,
+    "tokens": 287903,
+    "mean": 8.25,
+    "p50": 9.17,
+    "p95": 94.06
    }
   },
   {
@@ -124,7 +178,30 @@
     "mean": 629.1,
     "p50": 839.0,
     "p95": 899.0
+   },
+   "ttft": {
+    "n": 495,
+    "mean": 3601.9,
+    "p50": 3014.24,
+    "p95": 6939.48
+   },
+   "tpot": {
+    "n": 492,
+    "tokens": 411525,
+    "mean": 5.84,
+    "p50": 5.33,
+    "p95": 69.61
    }
   }
- ]
+ ],
+ "metric_scope": {
+  "request_latency": "每次云端请求（request_id 维度）",
+  "ttft_tpot": "每次云端模型调用（一次请求可含多次模型调用）",
+  "models": {
+   "deepseek-v4.1-flash-1017": 1560
+  },
+  "valid_calls": 1560,
+  "ignored_noise_lines": 127,
+  "note": "TTFT/TPOT 仅取 agent_adapter 的 llm_usage 事件；另有 127 行含该关键词的工具输出文本，非 usage 记录，已排除"
+ }
 }
