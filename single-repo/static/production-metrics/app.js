@@ -887,17 +887,6 @@ function envTpotTrend(doc) {
   });
 }
 
-function envOverheadTrend(doc) {
-  return envTrendChart(doc, {
-    title: '网关开销趋势（s）',
-    ariaLabel: '网关开销每日均值趋势',
-    height: 150,
-    gridLines: 3,
-    series: [{ key: 'ov_mean', label: '网关开销均值', group: 'overhead', field: 'mean', style: 'env-ov-mean' }],
-    note: '网关开销 = 同一请求的云端请求耗时 − WorkSwarm 耗时，逐请求取差值后按日求均值；仅统计两端时间戳齐全的请求。',
-  });
-}
-
 function envCallDetail(doc) {
   const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date && (row.ttft || row.tpot)) : [];
   if (!rows.length) return '';
@@ -2805,7 +2794,7 @@ async function loadEnvLatency() {
     daily = null;
   }
   const charts = daily && daily.schema === 'digitalmate/env-request-latency-daily@1'
-    ? `${envLatencyTrend(daily)}${envTtftTrend(daily)}${envTpotTrend(daily)}${envOverheadTrend(daily)}${envCallDetail(daily)}`
+    ? `${envLatencyTrend(daily)}${envTtftTrend(daily)}${envTpotTrend(daily)}${envCallDetail(daily)}`
     : '';
   target.innerHTML = `${charts}${envLatency(doc)}`;
 }
