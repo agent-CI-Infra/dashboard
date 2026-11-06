@@ -1357,7 +1357,7 @@
     }
     const selected = history.cases[STATE.perfCase] || cases[0];
     const latest = selected.latest || {};
-    const points = (Array.isArray(selected.points) ? selected.points : []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)));
+    const points = (Array.isArray(selected.points) ? selected.points : []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)) || ((Date.parse(a.finished_at) || 0) - (Date.parse(b.finished_at) || 0)));
     const statuses = cases.map((c) => c.latest?.status);
     const completed = statuses.filter((s) => String(s).toUpperCase() === 'COMPLETED').length;
     const blocked = statuses.filter((s) => String(s).toUpperCase() === 'BLOCKED').length;
@@ -1367,7 +1367,7 @@
     const values = points.map((p) => p.query_ms).filter((v) => v != null).sort((a, b) => a - b);
     const median = values.length ? (values.length % 2 ? values[(values.length - 1) / 2] : Math.round((values[values.length / 2 - 1] + values[values.length / 2]) / 2)) : null;
     const [selectedLabel, selectedTone] = perfStatus(latest.status);
-    const activeDays = new Set(points.map((p) => p.date)).size;
+    const activeRuns = points.length;
     const queryCount = latest.query_count ?? (Array.isArray(latest.queries) ? latest.queries.length : 0);
     const title = selected.title || latest.title || selected.id;
     const caseButtons = cases.map((c) => {
@@ -1376,7 +1376,7 @@
     }).join('');
     const updated = history.updated_at ? shortDateTime(history.updated_at) : '—';
     return `<div class="perf-section" data-perf-section>
-      ${sectionHead('Nightly 用例性能', `真机 / 模拟器 nightly · 每用例每天一个查询耗时点 · 从发出 query 到收到最后一条消息 · 同日重跑取最新 · 数据 ${esc(updated)}`)}
+      ${sectionHead('Nightly 用例性能', `真机 / 模拟器 nightly · 每用例每轮一个查询耗时点 · 从发出 query 到收到最后一条消息 · 同日重跑保留 · 数据 ${esc(updated)}`)}
       ${tiles([
         { label: '用例', value: n(cases.length), sub: `最新一轮 ${n(completed)} 通过` },
         { label: '最新通过', value: `${n(completed)}<small>/ ${n(cases.length)}</small>`, sub: `${Math.round((completed / cases.length) * 100)}%`, tone: completed === cases.length ? 'good' : '' },
@@ -1391,12 +1391,12 @@
             <div><span>本轮平均查询</span><strong>${perfMs(latest.query_ms)}</strong></div>
             <div><span>历史中位数</span><strong>${perfMs(median)}</strong></div>
             <div><span>查询次数</span><strong>${n(queryCount)}</strong></div>
-            <div><span>记录天数</span><strong>${n(activeDays)}</strong></div>
+            <div><span>记录轮次</span><strong>${n(activeRuns)}</strong></div>
           </div>
           <div class="card perf-card"><h3>最近一次 Profiling · 查询耗时 <span class="sub">${n(queryCount)} 次查询 · 以最后一条消息到达计 · E2E ${perfMs(latest.duration_ms)}</span></h3>${perfQueries(latest)}</div>
           <div class="card perf-card"><h3>Orbit 云端 trace <span class="sub">model 耗时 · TTFT · TPOT · 上下文 tokens · 阶段</span></h3>${perfCloud(latest)}</div>
-          <div class="card perf-card"><h3>每日平均查询耗时 <span class="sub">一天一个点 · 从 query 到消息接收 · Asia/Shanghai</span></h3>${perfChart(points)}<p class="perf-note">当前 ${n(activeDays)} 个执行日；每点为当轮 query 平均耗时，仅 profiling，不含 E2E 步骤等待；缺失日期不补 0。</p></div>
-          <details class="card perf-card perf-history"><summary>执行历史 <span class="sub">${n(points.length)} 天</span></summary>${perfHistoryTable(points)}</details>
+          <div class="card perf-card"><h3>每轮平均查询耗时 <span class="sub">每轮一个点 · 从 query 到消息接收 · Asia/Shanghai</span></h3>${perfChart(points)}<p class="perf-note">当前 ${n(activeRuns)} 轮运行；每点为当轮 query 平均耗时，仅 profiling，不含 E2E 步骤等待；缺失值不补 0。</p></div>
+          <details class="card perf-card perf-history"><summary>执行历史 <span class="sub">${n(points.length)} 次</span></summary>${perfHistoryTable(points)}</details>
         </div>
       </div>
     </div>`;
