@@ -1598,3 +1598,13 @@ h1 {
 @media (max-width: 600px) {
   .lookup-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Request-level TPOT percentiles; dotted lines indicate unknown stream state. */
+.legend-line.tpot-p50, .legend-line.tpot-est-p50 { border-color: #2563eb; }
+.legend-line.tpot-p95, .legend-line.tpot-est-p95 { border-color: #ea580c; }
+.legend-line.tpot-est-p50, .legend-line.tpot-est-p95 { border-top-style: dotted; }
+.latency-layer.tpot-p50 .trend-series, .latency-layer.tpot-est-p50 .trend-series { stroke: #2563eb; }
+.latency-layer.tpot-p95 .trend-series, .latency-layer.tpot-est-p95 .trend-series { stroke: #ea580c; }
+.latency-layer.tpot-p50 .trend-dot, .latency-layer.tpot-est-p50 .trend-dot { fill: #2563eb; }
+.latency-layer.tpot-p95 .trend-dot, .latency-layer.tpot-est-p95 .trend-dot { fill: #ea580c; }
+.latency-layer.tpot-est-p50 .trend-series, .latency-layer.tpot-est-p95 .trend-series { stroke-dasharray: 2 4; }

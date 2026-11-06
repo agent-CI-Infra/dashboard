@@ -57,7 +57,7 @@ from pathlib import Path
 
 BASE = 'https://onlineswarm.openjiuwen.com:31474'
 SCHEMA = 'digitalmate/e2e-performance-history@1'
-METRICS_VERSION = 5
+METRICS_VERSION = 6
 RUN_ID = 'prod-adx-jiuwen'
 P50_MIN_SAMPLES = 20
 P95_MIN_SAMPLES = 20
@@ -109,6 +109,15 @@ def mean(values):
 def percentile_nearest_rank(values, percentile):
     ordered = sorted(values)
     return ordered[min(len(ordered) - 1, max(0, math.ceil(percentile * len(ordered)) - 1))]
+
+
+def metric_histogram(values):
+    """Mergeable 2%-wide logarithmic buckets; -1001 represents exact zero."""
+    counts = {}
+    for value in values:
+        index = math.floor(math.log(value) / math.log(1.02)) if value > 0 else -1001
+        counts[index] = counts.get(index, 0) + 1
+    return sorted(counts.items())
 
 
 def status_of(row):
@@ -391,6 +400,7 @@ def aggregate_point(day_rows, date, physical, partial_day=None):
         'ttft_estimated_avg_ms': rounded(mean(ttft_estimated)) if ttft_estimated else None,
         'ttft_estimated_sample_count': len(ttft_estimated),
         'ttft_estimated_sum_ms': rounded(sum(ttft_estimated)) if ttft_estimated else None,
+        'ttft_estimated_histogram': metric_histogram(ttft_estimated),
         'ttft_filtered_count': ttft_filtered,
         'tpot_avg_ms': sum(item[0] for item in tpot_strict) / sum(item[1] for item in tpot_strict) if tpot_strict else None,
         'tpot_sample_count': len(tpot_strict),
@@ -400,6 +410,8 @@ def aggregate_point(day_rows, date, physical, partial_day=None):
         'tpot_estimated_sample_count': len(tpot_estimated),
         'tpot_estimated_decode_sum_ms': sum(item[0] for item in tpot_estimated) if tpot_estimated else None,
         'tpot_estimated_weight_tokens': sum(item[1] for item in tpot_estimated),
+        'tpot_histogram': metric_histogram(duration / tokens for duration, tokens in tpot_strict),
+        'tpot_estimated_histogram': metric_histogram(duration / tokens for duration, tokens in tpot_estimated),
         'tpot_filtered_count': tpot_filtered,
         # The sum lets the dashboard weight this model-day against every other
         # model-day without ever averaging daily means.

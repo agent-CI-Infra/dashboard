@@ -875,6 +875,8 @@ function newMetricAccumulator() {
     ttft_samples: 0,
     ttft_est_sum: 0,
     ttft_est_samples: 0,
+    ttft_est_histogram: new Map(),
+    ttft_est_histogram_complete: true,
     ttft_filtered: 0,
     tpot_sum: 0,
     tpot_samples: 0,
@@ -884,6 +886,10 @@ function newMetricAccumulator() {
     tpot_est_samples: 0,
     tpot_est_weight: 0,
     tpot_est_complete: true,
+    tpot_histogram: new Map(),
+    tpot_histogram_complete: true,
+    tpot_est_histogram: new Map(),
+    tpot_est_histogram_complete: true,
     tpot_filtered: 0,
     p50_min: null,
     p50_max: null,
@@ -938,10 +944,17 @@ function mergeMetricRow(acc, row) {
       acc[`${key}_samples`] += samples;
     }
   }
+  if (positive(row?.ttft_estimated_samples)) {
+    mergeMetricHistogram(acc.ttft_est_histogram, row.ttft_estimated_histogram,
+      row.ttft_estimated_samples) || (acc.ttft_est_histogram_complete = false);
+  }
   for (const [key, field] of [['tpot', 'tpot'], ['tpot_est', 'tpot_estimated']]) {
     const samples = positive(row?.[`${field}_samples`]);
     if (!samples) continue;
     acc[`${key}_samples`] += samples;
+    if (!mergeMetricHistogram(acc[`${key}_histogram`], row?.[`${field}_histogram`], samples)) {
+      acc[`${key}_histogram_complete`] = false;
+    }
     const duration = row?.[`${field}_decode_sum_ms`];
     const weight = row?.[`${field}_weight_tokens`];
     if (Number.isFinite(duration) && duration >= 0 && Number.isSafeInteger(weight) && weight > 0) {
@@ -980,6 +993,29 @@ function mergeMetricRow(acc, row) {
   }
 }
 
+function mergeMetricHistogram(bins, histogram, samples) {
+  const valid = Array.isArray(histogram) && histogram.every((bucket) =>
+    Array.isArray(bucket) && bucket.length === 2 && Number.isSafeInteger(bucket[0]) &&
+    bucket[0] >= -1001 && bucket[0] <= 1000 && Number.isSafeInteger(bucket[1]) && bucket[1] > 0) &&
+    histogram.reduce((sum, bucket) => sum + bucket[1], 0) === samples;
+  if (!valid) return false;
+  for (const [index, count] of histogram) bins.set(index, (bins.get(index) || 0) + count);
+  return true;
+}
+
+// Each bucket covers [1.02^i, 1.02^(i+1)); its midpoint approximates the
+// request-level nearest-rank percentile to within 1%. Buckets merge across days.
+function tpotPercentile(histogram, samples, complete, percentile) {
+  if (!complete || samples < 20) return null;
+  const target = Math.ceil(samples * percentile);
+  let count = 0;
+  for (const [index, n] of [...histogram.entries()].sort((a, b) => a[0] - b[0])) {
+    count += n;
+    if (count >= target) return index === -1001 ? 0 : 1.02 ** (index + 0.5);
+  }
+  return null;
+}
+
 function finalizeMetricAccumulator(acc) {
   const result = {
     calls: acc.calls,
@@ -991,6 +1027,9 @@ function finalizeMetricAccumulator(acc) {
     ttft_samples: acc.ttft_samples,
     ttft_estimated_ms: acc.ttft_est_samples > 0 ? acc.ttft_est_sum / acc.ttft_est_samples : null,
     ttft_estimated_samples: acc.ttft_est_samples,
+    ttft_estimated_histogram: acc.ttft_est_histogram_complete ? [...acc.ttft_est_histogram.entries()] : null,
+    ttft_estimated_p50_ms: tpotPercentile(acc.ttft_est_histogram, acc.ttft_est_samples, acc.ttft_est_histogram_complete, 0.5),
+    ttft_estimated_p95_ms: tpotPercentile(acc.ttft_est_histogram, acc.ttft_est_samples, acc.ttft_est_histogram_complete, 0.95),
     ttft_filtered_count: acc.ttft_filtered,
     tpot_ms: acc.tpot_complete && acc.tpot_weight > 0 ? acc.tpot_sum / acc.tpot_weight : null,
     tpot_samples: acc.tpot_samples,
@@ -1000,6 +1039,12 @@ function finalizeMetricAccumulator(acc) {
     tpot_estimated_samples: acc.tpot_est_samples,
     tpot_estimated_decode_sum_ms: acc.tpot_est_complete && acc.tpot_est_weight > 0 ? acc.tpot_est_sum : null,
     tpot_estimated_weight_tokens: acc.tpot_est_weight,
+    tpot_histogram: acc.tpot_histogram_complete ? [...acc.tpot_histogram.entries()] : null,
+    tpot_estimated_histogram: acc.tpot_est_histogram_complete ? [...acc.tpot_est_histogram.entries()] : null,
+    tpot_p50_ms: tpotPercentile(acc.tpot_histogram, acc.tpot_samples, acc.tpot_histogram_complete, 0.5),
+    tpot_p95_ms: tpotPercentile(acc.tpot_histogram, acc.tpot_samples, acc.tpot_histogram_complete, 0.95),
+    tpot_estimated_p50_ms: tpotPercentile(acc.tpot_est_histogram, acc.tpot_est_samples, acc.tpot_est_histogram_complete, 0.5),
+    tpot_estimated_p95_ms: tpotPercentile(acc.tpot_est_histogram, acc.tpot_est_samples, acc.tpot_est_histogram_complete, 0.95),
     tpot_filtered_count: acc.tpot_filtered,
     p50_lower_ms: acc.p50_complete ? acc.p50_min : null,
     p50_ms: acc.p50_complete ? acc.p50_max : null,
@@ -1054,6 +1099,7 @@ function benchmarkRowToMetric(row, point = null) {
     ttft_estimated_ms: metric(row?.ttft_estimated_avg_ms),
     ttft_estimated_samples: positive(row?.ttft_estimated_sample_count),
     ttft_estimated_sum_ms: metric(row?.ttft_estimated_sum_ms),
+    ttft_estimated_histogram: row?.ttft_estimated_histogram,
     ttft_filtered_count: positive(row?.ttft_filtered_count),
     tpot_ms: metric(row?.tpot_avg_ms),
     tpot_samples: positive(row?.tpot_sample_count),
@@ -1063,6 +1109,8 @@ function benchmarkRowToMetric(row, point = null) {
     tpot_estimated_samples: positive(row?.tpot_estimated_sample_count),
     tpot_estimated_decode_sum_ms: metric(row?.tpot_estimated_decode_sum_ms),
     tpot_estimated_weight_tokens: positive(row?.tpot_estimated_weight_tokens),
+    tpot_histogram: row?.tpot_histogram,
+    tpot_estimated_histogram: row?.tpot_estimated_histogram,
     tpot_filtered_count: positive(row?.tpot_filtered_count),
     p50_ms: metric(row?.duration_p50_ms ?? point?.duration_p50_ms),
     p95_ms: metric(row?.duration_p95_ms ?? point?.duration_p95_ms),
@@ -1372,16 +1420,11 @@ function p95RangeText(row) {
 }
 
 // TTFT and P95 are both milliseconds on the left axis. TPOT joins the same
-// card on a secondary right axis (ms/token) so every latency curve lives in
-// one place and each can be toggled from the legend.
+// TTFT and gateway latency percentiles share a time axis.
 function latencyTrendChart(points, visibility = {}) {
   const rows = Array.isArray(points) ? points : [];
   const isVisible = (key) => visibility?.[key] !== false;
   const series = (key) => rows.map((row) => (Number.isFinite(row?.[key]) ? row[key] : null));
-  const ttft = series('ttft_ms');
-  const ttftEstimate = series('ttft_estimated_ms');
-  const tpot = series('tpot_ms');
-  const tpotEstimate = series('tpot_estimated_ms');
   const upper = series('p95_ms');
   const lower = rows.map((row) => {
     if (!Number.isFinite(row?.p95_ms)) return null;
@@ -1396,16 +1439,10 @@ function latencyTrendChart(points, visibility = {}) {
   // Plot a single point only when its bounds agree; the tooltip keeps the range.
   const p50 = p50Upper.map((value, index) => value !== null && value === p50Lower[index] ? value : null);
   const p95 = upper.map((value, index) => value !== null && value === lower[index] ? value : null);
-  const leftUsable = [...ttft, ...ttftEstimate, ...p50Upper, ...upper].filter((value) => value !== null);
-  const tpotUsable = [...tpot, ...tpotEstimate].filter((value) => value !== null);
-  const hasTpot = tpotUsable.length > 0;
-  const usable = [...leftUsable, ...tpotUsable];
+  const leftUsable = [...p50Upper, ...upper].filter((value) => value !== null);
+  const usable = leftUsable;
 
   const legend = [
-    { key: 'ttft', label: 'TTFT（流式）', style: 'ttft' },
-    { key: 'ttft_est', label: 'TTFT 估算（流式未知）', style: 'ttft-est' },
-    { key: 'tpot', label: 'TPOT（流式）', style: 'tpot' },
-    { key: 'tpot_est', label: 'TPOT 估算（流式未知）', style: 'tpot-est' },
     { key: 'p50', label: 'P50', style: 'p50' },
     { key: 'p95', label: 'P95', style: 'p95' },
   ]
@@ -1416,19 +1453,17 @@ function latencyTrendChart(points, visibility = {}) {
       </button>`;
     })
     .join('');
-  const head = `<div class="trend-head"><h3>网关延迟（TTFT · TPOT · P50 / P95）</h3><div class="trend-legend">${legend}</div></div>`;
+  const head = `<div class="trend-head"><h3>网关耗时（P50 / P95）</h3><div class="trend-legend">${legend}</div></div>`;
   if (!usable.length) return `<div class="trend-card wide">${head}<p class="empty">暂无数据</p></div>`;
 
   const { width, height } = chartSize(1000, 220);
-  const pad = { left: 58, right: hasTpot ? 66 : 18, top: 14, bottom: 30 };
+  const pad = { left: 58, right: 18, top: 14, bottom: 30 };
   const innerWidth = width - pad.left - pad.right;
   const innerHeight = height - pad.top - pad.bottom;
   const max = niceMax(leftUsable.length ? Math.max(...leftUsable) : 1);
-  const rightMax = niceMax(hasTpot ? Math.max(...tpotUsable) : 1);
   const x = (index) =>
     rows.length === 1 ? pad.left + innerWidth / 2 : pad.left + (index * innerWidth) / (rows.length - 1);
   const y = (value) => pad.top + innerHeight - (Math.max(0, value) / max) * innerHeight;
-  const yRight = (value) => pad.top + innerHeight - (Math.max(0, value) / rightMax) * innerHeight;
   const ticks = 4;
 
   const grid = Array.from({ length: ticks + 1 }, (_, index) => {
@@ -1437,12 +1472,7 @@ function latencyTrendChart(points, visibility = {}) {
     const leftLabel = leftUsable.length
       ? `<text class="axis-text" x="${pad.left - 8}" y="${yy + 3}" text-anchor="end">${esc(fmtAxis(max * fraction))}</text>`
       : '';
-    const rightLabel = hasTpot
-      ? `<text class="axis-text axis-right" x="${width - pad.right + 8}" y="${yy + 3}">${esc(
-          `${Math.round(rightMax * fraction * 10) / 10}`,
-        )}</text>`
-      : '';
-    return `<line class="grid-line" x1="${pad.left}" y1="${yy}" x2="${width - pad.right}" y2="${yy}" />${leftLabel}${rightLabel}`;
+    return `<line class="grid-line" x1="${pad.left}" y1="${yy}" x2="${width - pad.right}" y2="${yy}" />${leftLabel}`;
   }).join('');
 
   const linePath = (values, scale = y) => {
@@ -1488,10 +1518,6 @@ function latencyTrendChart(points, visibility = {}) {
   const zones = rows
     .map((row, index) => {
       const lines = [String(row?.date || '') + (row?.partial ? ' · 部分日' : '')];
-      if (isVisible('ttft') && ttft[index] !== null) lines.push(`${fmtDuration(ttft[index])} · TTFT（流式）`);
-      if (isVisible('ttft_est') && ttftEstimate[index] !== null) lines.push(`${fmtDuration(ttftEstimate[index])} · TTFT 估算（流式未知）`);
-      if (isVisible('tpot') && tpot[index] !== null) lines.push(`${fmtTpot(tpot[index])} · TPOT（流式）`);
-      if (isVisible('tpot_est') && tpotEstimate[index] !== null) lines.push(`${fmtTpot(tpotEstimate[index])} · TPOT 估算（流式未知）`);
       if (isVisible('p50') && p50Upper[index] !== null) lines.push(`${p50RangeText(row)} · P50`);
       if (isVisible('p95') && upper[index] !== null) lines.push(`${p95RangeText(row)} · P95`);
       if (lines.length === 1) return '';
@@ -1502,19 +1528,97 @@ function latencyTrendChart(points, visibility = {}) {
     })
     .join('');
 
-  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="流式 TTFT、TPOT 与请求级 P50 / P95 趋势">
+  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="网关耗时 P50 / P95 趋势">
     ${grid}
     <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
-    ${layer('ttft', ttft, 'ttft')}
-    ${layer('ttft_est', ttftEstimate, 'ttft-est', true)}
-    ${hasTpot ? layer('tpot', tpot, 'tpot', true, yRight) : ''}
-    ${hasTpot ? layer('tpot_est', tpotEstimate, 'tpot-est', true, yRight) : ''}
     ${layer('p50', p50, 'p50-upper')}
     ${layer('p95', p95, 'p95-upper')}
     ${xLabels}
     <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
     ${zones}
-  </svg><p class="chart-note">TTFT 和 TPOT 的流式主曲线只统计 <code>stream === true</code> 的成功调用；流式状态未知的样本单独显示为估算，不并入主均值。TPOT 按输出 Token 数减一加权，即首个响应之后的总耗时除以对应 Token 总数。P50/P95 为成功调用的请求级分位，至少 20 个样本；多个来源仅有区间时在悬浮提示中显示，不绘制单值。TTFT、P50、P95 共用左侧毫秒轴，TPOT 使用右侧 ms/token 轴。</p></div>`;
+  </svg><p class="chart-note">P50/P95 为成功调用的请求级分位，至少 20 个样本；多个来源仅有区间时在悬浮提示中显示，不绘制单值。网关耗时使用毫秒轴。</p></div>`;
+}
+
+function ttftTrendChart(points, visibility = {}) {
+  const rows = Array.isArray(points) ? points : [];
+  const defs = [
+    ['ttft_est', 'TTFT 平均估算', 'ttft_estimated_ms', 'tpot-est'],
+    ['ttft_est_p50', 'TTFT P50 估算', 'ttft_estimated_p50_ms', 'tpot-est-p50'],
+    ['ttft_est_p95', 'TTFT P95 估算', 'ttft_estimated_p95_ms', 'tpot-est-p95'],
+  ];
+  const visible = key => visibility[key] !== false;
+  const legend = defs.map(([key, label, , style]) => `<button class="legend-toggle latency-toggle${visible(key) ? '' : ' off'}" type="button" data-latency-layer="${key}" aria-pressed="${visible(key)}"><i class="legend-line ${style}"></i><span>${label}</span></button>`).join('');
+  const head = `<div class="trend-head"><h3>TTFT 趋势</h3><div class="trend-legend">${legend}</div></div>`;
+  const values = defs.flatMap(([, , field]) => rows.map(row => row[field]).filter(v => Number.isFinite(v) && v >= 0));
+  if (!values.length) return `<div class="trend-card wide">${head}<p class="empty">暂无 TTFT 数据</p></div>`;
+  const {width, height} = chartSize(1000, 220);
+  const pad = {left:58, right:18, top:14, bottom:30};
+  const iw = width - pad.left - pad.right, ih = height - pad.top - pad.bottom;
+  const max = niceMax(Math.max(...values));
+  const x = index => rows.length === 1 ? pad.left + iw / 2 : pad.left + index * iw / (rows.length - 1);
+  const y = value => pad.top + ih - value / max * ih;
+  const grid = Array.from({length:5}, (_, i) => { const yy = pad.top + ih - i * ih / 4;
+    return `<line class="grid-line" x1="${pad.left}" y1="${yy}" x2="${width-pad.right}" y2="${yy}" /><text class="axis-text" x="${pad.left-8}" y="${yy+3}" text-anchor="end">${esc(fmtAxis(max*i/4))}</text>`; }).join('');
+  const layers = defs.map(([key, , field, style]) => {
+    let path = '', open = false;
+    const dots = rows.map((row, i) => { const value = row[field];
+      if (!Number.isFinite(value) || value < 0) { open = false; return ''; }
+      path += `${open ? 'L' : 'M'}${x(i).toFixed(1)},${y(value).toFixed(1)}`; open = true;
+      return `<circle class="trend-dot" cx="${x(i).toFixed(1)}" cy="${y(value).toFixed(1)}" r="3" />`;
+    }).join('');
+    return `<g class="latency-layer ${style}${visible(key) ? '' : ' is-hidden'}">${path ? `<path class="trend-series" d="${path}" />` : ''}${dots}</g>`;
+  }).join('');
+  const labels = [...new Set([0, rows.length - 1, Math.floor((rows.length-1)/2)])].filter(i => i >= 0 && i < rows.length).sort((a,b)=>a-b).map(i => `<text class="axis-text" x="${x(i)}" y="${height-8}" text-anchor="middle">${esc(String(rows[i]?.date || '').slice(5))}</text>`).join('');
+  const zoneWidth = rows.length > 1 ? iw / (rows.length-1) : iw;
+  const zones = rows.map((row,i) => {
+    const lines = [String(row.date || '') + (row.partial ? ' · 部分日' : '')];
+    for (const [key,label,field] of defs) if (visible(key) && Number.isFinite(row[field])) lines.push(`${fmtDuration(row[field])} · ${label}`);
+    if (lines.length === 1) return '';
+    const cx=x(i), left=Math.max(pad.left,cx-zoneWidth/2), right=Math.min(width-pad.right,cx+zoneWidth/2);
+    return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right-left).toFixed(1)}" height="${ih}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
+  }).join('');
+  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="TTFT 估算均值与请求级 P50 P95 趋势">${grid}<line class="axis-line" x1="${pad.left}" y1="${pad.top+ih}" x2="${width-pad.right}" y2="${pad.top+ih}" />${layers}${labels}<line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top+ih}" hidden />${zones}</svg><p class="chart-note">均值按请求数加权；P50/P95 为请求级分位（分桶近似，每类至少 20 个样本）。仅展示流式状态未知的估算数据。</p></div>`;
+}
+
+function tpotTrendChart(points, visibility = {}) {
+  const rows = Array.isArray(points) ? points : [];
+  const defs = [
+    ['tpot_est', 'TPOT 加权估算', 'tpot_estimated_ms', 'tpot-est'],
+    ['tpot_est_p50', 'TPOT P50 估算', 'tpot_estimated_p50_ms', 'tpot-est-p50'],
+    ['tpot_est_p95', 'TPOT P95 估算', 'tpot_estimated_p95_ms', 'tpot-est-p95'],
+  ];
+  const visible = key => visibility[key] !== false;
+  const legend = defs.map(([key, label, , style]) => `<button class="legend-toggle latency-toggle${visible(key) ? '' : ' off'}" type="button" data-latency-layer="${key}" aria-pressed="${visible(key)}"><i class="legend-line ${style}"></i><span>${label}</span></button>`).join('');
+  const head = `<div class="trend-head"><h3>TPOT 趋势（ms/token）</h3><div class="trend-legend">${legend}</div></div>`;
+  const values = defs.flatMap(([, , field]) => rows.map(row => row[field]).filter(v => Number.isFinite(v) && v >= 0));
+  if (!values.length) return `<div class="trend-card wide">${head}<p class="empty">暂无 TPOT 数据</p></div>`;
+  const {width, height} = chartSize(1000, 220);
+  const pad = {left:58, right:18, top:14, bottom:30};
+  const iw = width - pad.left - pad.right, ih = height - pad.top - pad.bottom;
+  const max = niceMax(Math.max(...values));
+  const x = index => rows.length === 1 ? pad.left + iw / 2 : pad.left + index * iw / (rows.length - 1);
+  const y = value => pad.top + ih - value / max * ih;
+  const grid = Array.from({length:5}, (_, i) => { const yy = pad.top + ih - i * ih / 4;
+    return `<line class="grid-line" x1="${pad.left}" y1="${yy}" x2="${width-pad.right}" y2="${yy}" /><text class="axis-text" x="${pad.left-8}" y="${yy+3}" text-anchor="end">${esc(String(Math.round(max*i/4*10)/10))}</text>`; }).join('');
+  const layers = defs.map(([key, , field, style]) => {
+    let path = '', open = false;
+    const dots = rows.map((row, i) => { const value = row[field];
+      if (!Number.isFinite(value) || value < 0) { open = false; return ''; }
+      path += `${open ? 'L' : 'M'}${x(i).toFixed(1)},${y(value).toFixed(1)}`; open = true;
+      return `<circle class="trend-dot" cx="${x(i).toFixed(1)}" cy="${y(value).toFixed(1)}" r="3" />`;
+    }).join('');
+    return `<g class="latency-layer ${style}${visible(key) ? '' : ' is-hidden'}">${path ? `<path class="trend-series" d="${path}" />` : ''}${dots}</g>`;
+  }).join('');
+  const labels = [...new Set([0, rows.length - 1, Math.floor((rows.length-1)/2)])].filter(i => i >= 0 && i < rows.length).sort((a,b)=>a-b).map(i => `<text class="axis-text" x="${x(i)}" y="${height-8}" text-anchor="middle">${esc(String(rows[i]?.date || '').slice(5))}</text>`).join('');
+  const zoneWidth = rows.length > 1 ? iw / (rows.length-1) : iw;
+  const zones = rows.map((row,i) => {
+    const lines = [String(row.date || '') + (row.partial ? ' · 部分日' : '')];
+    for (const [key,label,field] of defs) if (visible(key) && Number.isFinite(row[field])) lines.push(`${fmtTpot(row[field])} · ${label}`);
+    if (lines.length === 1) return '';
+    const cx=x(i), left=Math.max(pad.left,cx-zoneWidth/2), right=Math.min(width-pad.right,cx+zoneWidth/2);
+    return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right-left).toFixed(1)}" height="${ih}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
+  }).join('');
+  return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="TPOT 加权均值与请求级 P50 P95 趋势">${grid}<line class="axis-line" x1="${pad.left}" y1="${pad.top+ih}" x2="${width-pad.right}" y2="${pad.top+ih}" />${layers}${labels}<line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top+ih}" hidden />${zones}</svg><p class="chart-note">均值按输出 Token 数减一加权；P50/P95 为请求级分位（分桶近似，每类至少 20 个样本）。仅展示流式状态未知的估算数据。</p></div>`;
 }
 
 function tokenTrendChart(points, visibility = {}, unit = 'query') {
@@ -1638,6 +1742,8 @@ function tokenTrendChart(points, visibility = {}, unit = 'query') {
 function modelTrends(days, tokenVisibility = {}, latencyVisibility = {}, { tokenUnit = 'query', failures = [], volumeVisibility = {} } = {}) {
   return volumeTrendChart(days, failures, volumeVisibility)
     + latencyTrendChart(days, latencyVisibility)
+    + ttftTrendChart(days, latencyVisibility)
+    + tpotTrendChart(days, latencyVisibility)
     + tokenTrendChart(days, tokenVisibility, tokenUnit);
 }
 
@@ -1667,8 +1773,21 @@ function modelSummary(days, model, { unit = 'query', failure = null, anchor = nu
   const tpotEstimateCard = `<div class="stat-card">
       <div class="stat-label">TPOT 估算（覆盖率 ${esc(tpotEstimateCoverage)}）</div>
       <div class="stat-value">${fmtTpot(latest.tpot_estimated_ms)}</div>
-      <div class="stat-hint">Token 加权 · 流式状态未知 · ${fmtCount(latest.tpot_estimated_samples)} 个样本 · 不并入主均值</div>
+      <div class="stat-hint">Token 加权 · 流式状态未知 · ${fmtCount(latest.tpot_estimated_samples)} 个样本 · 不并入主均值 · 规则过滤 ${fmtCount(latest.tpot_filtered_count)} 个</div>
     </div>`;
+  const tpotPercentileCard = (label, key) => {
+    const confirmed = latest[`tpot_${key}_ms`];
+    const estimate = latest[`tpot_estimated_${key}_ms`];
+    const useEstimate = !Number.isFinite(confirmed) && Number.isFinite(estimate);
+    const hint = useEstimate
+      ? `流式状态未知 · ${fmtCount(latest.tpot_estimated_samples)} 个样本 · 已确认流式样本不足`
+      : `流式 ${fmtCount(latest.tpot_samples)} 个样本 · 估算 ${fmtTpot(estimate)}（${fmtCount(latest.tpot_estimated_samples)} 个样本）`;
+    return `<div class="stat-card">
+      <div class="stat-label">TPOT ${label}（${useEstimate ? '估算' : '流式'} · 请求级）</div>
+      <div class="stat-value">${fmtTpot(useEstimate ? estimate : confirmed)}</div>
+      <div class="stat-hint">${hint}<br>分桶近似 · 每类至少 20 个样本</div>
+    </div>`;
+  };
   return `
     <div class="stat-card">
       <div class="stat-label">最新完整日</div>
@@ -1701,12 +1820,19 @@ function modelSummary(days, model, { unit = 'query', failure = null, anchor = nu
       <div class="stat-hint">${latest.ttft_samples ? `${fmtCount(latest.ttft_samples)} 个已确认流式成功样本` : '无已确认流式成功调用'}</div>
     </div>
     ${estimateCard}
+    ${['p50', 'p95'].map((key) => `<div class="stat-card">
+      <div class="stat-label">TTFT ${key.toUpperCase()}（估算 · 请求级）</div>
+      <div class="stat-value">${fmtDuration(latest[`ttft_estimated_${key}_ms`])}</div>
+      <div class="stat-hint">流式状态未知 · ${fmtCount(latest.ttft_estimated_samples)} 个样本 · 分桶近似 · 至少 20 个样本</div>
+    </div>`).join('')}
     <div class="stat-card">
       <div class="stat-label">平均 TPOT（流式）</div>
       <div class="stat-value">${fmtTpot(latest.tpot_ms)}</div>
       <div class="stat-hint">${hint(`Token 加权 · ${fmtCount(latest.tpot_samples)} 个已确认流式样本`, deltaChip(latest.tpot_ms, previous?.tpot_ms, { lowerIsBetter: true }))}</div>
     </div>
     ${tpotEstimateCard}
+    ${tpotPercentileCard("P50", "p50")}
+    ${tpotPercentileCard("P95", "p95")}
     <div class="stat-card">
       <div class="stat-label">输入 Token / ${unitLabel}</div>
       <div class="stat-value">${fmtToken(latest[`input_${suffix}`])}</div>
@@ -2447,7 +2573,7 @@ async function loadProductionMetrics() {
 }
 
 function requireCurrentMetricsVersion(history) {
-  if (!Number.isInteger(history?.metrics_version) || history.metrics_version < 5) {
+  if (!Number.isInteger(history?.metrics_version) || history.metrics_version < 6) {
     throw new Error('数据口径版本过旧，请等待采集任务完成历史数据重建');
   }
 }

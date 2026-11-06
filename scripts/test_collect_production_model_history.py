@@ -107,6 +107,18 @@ class CollectionTests(unittest.TestCase):
         self.assertAlmostEqual(metrics['tpot_estimated_avg_ms'], 3000 / 110)
         self.assertEqual(metrics['tpot_estimated_weight_tokens'], 110)
 
+    def test_tpot_histogram_preserves_request_counts_and_extremes(self):
+        samples = [(1000, 250)] * 19 + [(10000, 10)]
+        histogram = collector.metric_histogram(duration / tokens for duration, tokens in samples)
+        self.assertEqual(sum(count for _, count in histogram), 20)
+        self.assertEqual(sorted(count for _, count in histogram), [1, 19])
+        self.assertLess(abs(1.02 ** (histogram[0][0] + 0.5) / 4 - 1), 0.01)
+
+    def test_ttft_estimate_histogram_includes_zero(self):
+        hist = collector.metric_histogram([0, 1000, 1000])
+        self.assertEqual(hist[0], (-1001, 1))
+        self.assertEqual(sum(count for _, count in hist), 3)
+
     def test_unknown_status_cannot_be_counted_as_passed(self):
         point = collector.aggregate_point([{'status': 'unknown'}], '2026-11-03', 'model')
         self.assertEqual(point['status'], 'UNKNOWN')
