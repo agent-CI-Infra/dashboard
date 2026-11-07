@@ -6,13 +6,13 @@ const source = readFileSync(new URL('../single-repo/static/production-metrics/ap
 const extract=(start,end)=>{const a=source.indexOf(start),b=source.indexOf(end,a);if(a<0||b<0)throw Error('missing function');return source.slice(a,b);};
 const context=vm.createContext({});
 vm.runInContext(`const MIN_RECENT_CALLS=50; const RECENT_WINDOW_DAYS=7; const esc=(s)=>String(s).replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;'); const fmtCount=(v)=>String(v); const fmtDuration=()=> '—'; const fmtSecondsBare=()=> '—'; const fmtTpot=()=> '—'; const fmtTpotBare=()=> '—'; const fmtInUnit=()=> '—'; const fmtToken=()=> '—'; const fmtPercent=()=> '—'; const modelDisplayName=(n)=>String(n); const p50RangeText=()=> '—'; const p95RangeText=()=> '—'; const deltaChip=()=>''; const regressionFindings=()=>[];`+extract('function modelCompareCard(', '// The freshest point')+'; globalThis.card=modelCompareCard;',context);
-test('model selection is a button with an accessible selected state and no-data row',()=>{
+test('model selection is a chip with an accessible selected state and a no-data marker',()=>{
  const html=context.card([{name:'<model>',hasData:false,totals:{calls:0},latest:null,previous:null}],{selected:'<model>'});
  assert.match(html, /aria-pressed="true"/);
  assert.match(html, /&lt;model>/);
 });
 
-test('low-volume models stay out of the comparison table', () => {
+test('low-volume models stay out of the comparison list', () => {
  const active={name:'busy',hasData:true,totals:{calls:900},latest:null,previous:null,lowVolume:false,recentCalls:900};
  const quiet={name:'one-call',hasData:true,totals:{calls:1},latest:null,previous:null,lowVolume:true,recentCalls:1};
  const html=context.card([active,quiet],{selected:'busy'});

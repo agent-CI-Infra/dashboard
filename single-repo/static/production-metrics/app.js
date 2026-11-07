@@ -2364,40 +2364,27 @@ function modelComparison(history, rangeDays = 0) {
     || a.name.localeCompare(b.name));
 }
 
-// The comparison is a compact table: one row per model, range-wide totals in
-// the columns, and the row doubles as the switcher for the drill-down below.
+// The comparison is a switcher, not a second copy of the drill-down: it lists
+// the models present in the selected range and points the detail below at one
+// of them, so the same numbers are not repeated twice on the page.
 function modelCompareCard(rows, { selected = null } = {}) {
   if (!Array.isArray(rows) || !rows.length) return '<p class="empty">暂无模型数据。</p>';
-  const tokenMax = Math.max(...rows.map((row) => (Number.isFinite(row?.totals?.total_tokens) ? row.totals.total_tokens : 0)), 0);
-  const [tokenDiv, tokenSuffix] = tokenMax >= 1e9 ? [1e9, 'B'] : tokenMax >= 1e6 ? [1e6, 'M'] : tokenMax >= 1e3 ? [1e3, 'k'] : [1, ''];
   // Stripping the provider prefix can make two distinct models read alike; in
-  // that case keep the raw name so the rows stay tellable apart.
+  // that case keep the raw name so the chips stay tellable apart.
   const displayCounts = new Map();
   for (const row of rows) {
     const label = modelDisplayName(row.name);
     displayCounts.set(label, (displayCounts.get(label) || 0) + 1);
   }
   const labelFor = (row) => (displayCounts.get(modelDisplayName(row.name)) > 1 ? row.name : modelDisplayName(row.name));
-  const renderRow = (row) => {
-    const regressing = regressionFindings(row.latest, row.previous).length > 0;
-    const totals = row.totals || {};
-    return `<tr class="${row.name === selected ? 'is-selected' : ''}" data-select-model="${esc(row.name)}"${row.name === selected ? ' aria-current="true"' : ''}>
-      <td class="compare-name"><button type="button" class="compare-model-button" data-select-model="${esc(row.name)}" aria-pressed="${row.name === selected}">${esc(labelFor(row))}</button>${regressing ? ' <span class="badge failed">回退</span>' : ''}${row.lowVolume ? ' <span class="badge low">低流量</span>' : ''}</td>
-      <td class="num">${row.hasData ? fmtCount(totals.calls) : '—'}</td>
-      <td class="num">${fmtPercent(row.failure_rate)}</td>
-      <td class="num">${fmtSecondsBare(totals.duration_ms)}</td>
-      <td class="num">${fmtSecondsBare(totals.p95_ms)}</td>
-      <td class="num">${fmtSecondsBare(totals.ttft_estimated_ms)}</td>
-      <td class="num">${fmtTpotBare(totals.tpot_estimated_ms)}</td>
-      <td class="num">${fmtInUnit(totals.total_tokens, tokenDiv)}</td>
-    </tr>`;
-  };
-  const table = (list) => `<div class="table-wrap compare-wrap"><table class="history-table compare-table">
-    <thead><tr><th scope="col">模型</th><th scope="col" class="num">请求数</th><th scope="col" class="num" title="失败请求占全部已知终态请求的比例">失败率</th><th scope="col" class="num" title="按成功调用量加权，不含端侧与网络">平均耗时（s）</th><th scope="col" class="num">P95（s）</th><th scope="col" class="num" title="分桶近似">TTFT（s）</th><th scope="col" class="num" title="按输出 Token 数减一加权">TPOT（ms/token）</th><th scope="col" class="num" title="所选范围内成功调用的总 Token 累计">总 Token${tokenSuffix ? `（${tokenSuffix}）` : ''}</th></tr></thead>
-    <tbody>${list.map(renderRow).join('')}</tbody>
-  </table></div>`;
   const active = rows.filter((row) => !row.lowVolume);
-  return active.length ? table(active) : '<p class="empty">所选范围内暂无足量调用的模型。</p>';
+  if (!active.length) return '<p class="empty">所选范围内暂无足量调用的模型。</p>';
+  const chips = active.map((row) => {
+    const isSelected = row.name === selected;
+    const classes = ['model-chip', isSelected ? 'is-selected' : '', row.hasData ? '' : 'is-idle'].filter(Boolean).join(' ');
+    return `<button type="button" class="${classes}" data-select-model="${esc(row.name)}" aria-pressed="${isSelected}"${row.hasData ? '' : ' title="所选范围内无数据"'}>${esc(labelFor(row))}</button>`;
+  });
+  return `<div class="compare-models" role="group" aria-label="模型选择">${chips.join('')}</div>`;
 }
 
 // The freshest point across all cases identifies the current data drop.
