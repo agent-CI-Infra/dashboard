@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/test-matrix@1",
- "generatedAt": "2026-11-06T23:33:33.748Z",
+ "generatedAt": "2026-11-07T06:39:07.609Z",
  "source": {
   "repository": "openJiuwen-ai/DigitalMate",
-  "main": "e48edbf8",
+  "main": "34f30d96",
   "refs": [
    {
     "label": "test/st-complete-coverage",
@@ -33,8 +33,11 @@
   "createdAt": "2026-11-06T22:53:27Z",
   "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/42308031888",
   "jobs": {
-   "Update HK DigitalMate (latest main)": "in_progress",
-   "DigitalMate ST (Windows)": "skipped"
+   "Update HK DigitalMate (latest main)": "cancelled",
+   "DigitalMate ST (Windows)": "skipped",
+   "Nightly report": "success",
+   "Bench (full)": "skipped",
+   "E2E (${{ (inputs.e2e_case || 'all') }})": "skipped"
   }
  },
  "statusLabels": {
@@ -77,14 +80,14 @@
  "summary": {
   "layers": {
    "UT": {
-    "cases": 188,
-    "tests": 2396,
+    "cases": 189,
+    "tests": 2401,
     "byStatus": {
-     "ci_lane": 188
+     "ci_lane": 189
     },
     "bySuite": {},
     "byImpl": {
-     "main": 188
+     "main": 189
     }
    },
    "UT-Server": {
@@ -3892,12 +3895,33 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 10,
+   "tests": 12,
    "layer": "UT",
    "id": "startup-presentation.test.mjs",
    "title": "startup",
    "module": "startup",
    "file": "tests/unit/startup-presentation.test.mjs",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "ut.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 3,
+   "layer": "UT",
+   "id": "startup-splash-playback.test.mjs",
+   "title": "startup",
+   "module": "startup",
+   "file": "tests/unit/startup-splash-playback.test.mjs",
    "impl": "main",
    "status": "ci_lane",
    "lane": "ut.yml"
