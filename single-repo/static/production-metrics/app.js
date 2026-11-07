@@ -987,8 +987,20 @@ function envCallTrend(doc) {
 function envCallDetail(doc) {
   const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date && (row.ttft || row.tpot)) : [];
   if (!rows.length) return '';
+  // Same day-over-day chip as the model-side stats table, so the two detail
+  // tables read the same way.
+  const cell = (value, previous, format) => {
+    const chip = deltaChip(value, previous, { lowerIsBetter: true, label: '' });
+    return `<td class="num metric-column"><span class="metric-cell"><span>${format(value)}</span><span class="metric-change">${chip}</span></span></td>`;
+  };
   const body = rows
-    .map((row) => `<tr><td>${esc(row.date)}${row.partial ? '*' : ''}</td><td>${fmtCount(row.ttft?.n)}</td><td>${fmtDuration(row.ttft?.mean)}</td><td>${fmtDuration(row.ttft?.p50)}</td><td>${fmtDuration(row.ttft?.p95)}</td><td>${fmtCount(row.tpot?.n)}</td><td>${fmtTpot(row.tpot?.mean)}</td><td>${fmtTpot(row.tpot?.p50)}</td><td>${fmtTpot(row.tpot?.p95)}</td></tr>`)
+    .map((row, index) => {
+      // Compare with the calendar day before, not merely the previous row: a
+      // gap in the log must not turn a multi-day change into a daily one.
+      const prior = index > 0 ? rows[index - 1] : null;
+      const previous = prior && addDays(prior.date, 1) === row.date ? prior : null;
+      return `<tr><td>${esc(row.date)}${row.partial ? '*' : ''}</td><td>${fmtCount(row.ttft?.n)}</td>${cell(row.ttft?.mean, previous?.ttft?.mean, fmtDuration)}${cell(row.ttft?.p50, previous?.ttft?.p50, fmtDuration)}${cell(row.ttft?.p95, previous?.ttft?.p95, fmtDuration)}<td>${fmtCount(row.tpot?.n)}</td>${cell(row.tpot?.mean, previous?.tpot?.mean, fmtTpot)}${cell(row.tpot?.p50, previous?.tpot?.p50, fmtTpot)}${cell(row.tpot?.p95, previous?.tpot?.p95, fmtTpot)}</tr>`;
+    })
     .join('');
   return `<details class="env-call-detail" open><summary>云侧 Agent TTFT / TPOT 每日明细</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>日期</th><th>TTFT 样本</th><th>TTFT 均值</th><th>TTFT P50</th><th>TTFT P95</th><th>TPOT 样本</th><th>TPOT 加权均值</th><th>TPOT P50</th><th>TPOT P95</th></tr></thead><tbody>${body}</tbody></table></div><p class="chart-note">云侧 Agent 调用口径：每次模型调用一条记录；TTFT 为模型调用开始至首个 Token，TPOT 按输出 Token 数减一加权；* 为部分日。</p></details>`;
 }
