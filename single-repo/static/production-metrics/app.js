@@ -1001,6 +1001,9 @@ function envCallDetail(doc) {
       const previous = prior && addDays(prior.date, 1) === row.date ? prior : null;
       return `<tr><td>${esc(row.date)}${row.partial ? '*' : ''}</td><td>${fmtCount(row.ttft?.n)}</td>${cell(row.ttft?.mean, previous?.ttft?.mean, fmtDuration)}${cell(row.ttft?.p50, previous?.ttft?.p50, fmtDuration)}${cell(row.ttft?.p95, previous?.ttft?.p95, fmtDuration)}<td>${fmtCount(row.tpot?.n)}</td>${cell(row.tpot?.mean, previous?.tpot?.mean, fmtTpot)}${cell(row.tpot?.p50, previous?.tpot?.p50, fmtTpot)}${cell(row.tpot?.p95, previous?.tpot?.p95, fmtTpot)}</tr>`;
     })
+    // Newest first, like the model-side stats table; the chips were computed
+    // against the previous calendar day before the rows were flipped.
+    .reverse()
     .join('');
   return `<details class="env-call-detail" open><summary>云侧 Agent TTFT / TPOT 每日明细</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>日期</th><th>TTFT 样本</th><th>TTFT 均值</th><th>TTFT P50</th><th>TTFT P95</th><th>TPOT 样本</th><th>TPOT 加权均值</th><th>TPOT P50</th><th>TPOT P95</th></tr></thead><tbody>${body}</tbody></table></div><p class="chart-note">云侧 Agent 调用口径：每次模型调用一条记录；TTFT 为模型调用开始至首个 Token，TPOT 按输出 Token 数减一加权；* 为部分日。</p></details>`;
 }
@@ -2391,6 +2394,9 @@ function modelCompareCard(rows, { selected = null } = {}) {
   const labelFor = (row) => (displayCounts.get(modelDisplayName(row.name)) > 1 ? row.name : modelDisplayName(row.name));
   const active = rows.filter((row) => !row.lowVolume);
   if (!active.length) return '<p class="empty">所选范围内暂无足量调用的模型。</p>';
+  // A single model is already named by the "当前：…" badge in the card head;
+  // repeating it as a one-item list below would add a row without a choice.
+  if (active.length < 2) return '';
   const chips = active.map((row) => {
     const isSelected = row.name === selected;
     const classes = ['model-chip', isSelected ? 'is-selected' : '', row.hasData ? '' : 'is-idle'].filter(Boolean).join(' ');
