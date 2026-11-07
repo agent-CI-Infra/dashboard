@@ -1,10 +1,10 @@
 {
  "schema": "digitalmate/e2e-performance-history@1",
  "metrics_version": 6,
- "generated_at": "2026-11-06T23:11:19Z",
- "updated_at": "2026-11-06T23:11:19Z",
+ "generated_at": "2026-11-07T06:00:18Z",
+ "updated_at": "2026-11-07T06:00:18Z",
  "window_start": "2026-10-03T16:00:00+00:00",
- "window_end": "2026-11-06T23:11:09+00:00",
+ "window_end": "2026-11-07T06:00:07+00:00",
  "current_day_partial": true,
  "complete_through": "2026-11-06",
  "partial_day": "2026-11-07",
@@ -9340,17 +9340,17 @@
      "date": "2026-11-07",
      "status": "COMPLETED",
      "partial": true,
-     "query_ms": 6798,
-     "duration_sum_ms": 278724,
-     "duration_sample_count": 41,
-     "duration_p50_ms": 3224,
-     "duration_p95_ms": 28263,
-     "success_count": 41,
-     "query_count": 41,
+     "query_ms": 4985,
+     "duration_sum_ms": 1979021,
+     "duration_sample_count": 397,
+     "duration_p50_ms": 2830,
+     "duration_p95_ms": 17398,
+     "success_count": 397,
+     "query_count": 400,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-06T21:32:34Z",
-     "failed_queries": 0,
+     "finished_at": "2026-11-07T05:22:39Z",
+     "failed_queries": 3,
      "unknown_status_count": 0,
      "blocked_queries": 0,
      "hours": [
@@ -9369,212 +9369,548 @@
        "duration_sum_ms": 99344,
        "duration_sample_count": 15,
        "failed": 0
+      },
+      {
+       "hour": 9,
+       "calls": 34,
+       "success_count": 34,
+       "duration_sum_ms": 201162,
+       "duration_sample_count": 34,
+       "failed": 0
+      },
+      {
+       "hour": 10,
+       "calls": 272,
+       "success_count": 269,
+       "duration_sum_ms": 1215233,
+       "duration_sample_count": 269,
+       "failed": 3
+      },
+      {
+       "hour": 11,
+       "calls": 20,
+       "success_count": 20,
+       "duration_sum_ms": 159380,
+       "duration_sample_count": 20,
+       "failed": 0
+      },
+      {
+       "hour": 12,
+       "calls": 18,
+       "success_count": 18,
+       "duration_sum_ms": 71539,
+       "duration_sample_count": 18,
+       "failed": 0
+      },
+      {
+       "hour": 13,
+       "calls": 15,
+       "success_count": 15,
+       "duration_sum_ms": 52983,
+       "duration_sample_count": 15,
+       "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 41,
-       "success_count": 41,
-       "failed_count": 0,
+       "call_count": 400,
+       "success_count": 397,
+       "failed_count": 3,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
        "ttft_sample_count": 0,
        "ttft_sum_ms": null,
-       "ttft_estimated_avg_ms": 1670,
-       "ttft_estimated_sample_count": 30,
-       "ttft_estimated_sum_ms": 50112,
+       "ttft_estimated_avg_ms": 1693,
+       "ttft_estimated_sample_count": 217,
+       "ttft_estimated_sum_ms": 367305,
        "ttft_estimated_histogram": [
         [
-         355,
+         336,
          1
+        ],
+        [
+         338,
+         4
+        ],
+        [
+         339,
+         1
+        ],
+        [
+         340,
+         1
+        ],
+        [
+         341,
+         1
+        ],
+        [
+         342,
+         1
+        ],
+        [
+         343,
+         2
+        ],
+        [
+         344,
+         1
+        ],
+        [
+         345,
+         1
+        ],
+        [
+         346,
+         1
+        ],
+        [
+         347,
+         1
+        ],
+        [
+         348,
+         1
+        ],
+        [
+         349,
+         2
+        ],
+        [
+         350,
+         4
+        ],
+        [
+         352,
+         1
+        ],
+        [
+         353,
+         5
+        ],
+        [
+         354,
+         4
+        ],
+        [
+         355,
+         2
         ],
         [
          357,
-         1
+         4
         ],
         [
          358,
-         1
+         5
+        ],
+        [
+         359,
+         6
         ],
         [
          360,
-         2
+         4
+        ],
+        [
+         361,
+         1
         ],
         [
          362,
-         1
+         4
         ],
         [
          363,
-         3
+         6
+        ],
+        [
+         364,
+         7
         ],
         [
          365,
-         2
+         7
         ],
         [
          366,
-         2
+         8
         ],
         [
          367,
-         1
+         14
         ],
         [
          368,
-         1
+         5
         ],
         [
          369,
-         1
+         4
+        ],
+        [
+         370,
+         4
         ],
         [
          371,
-         2
+         9
+        ],
+        [
+         372,
+         3
+        ],
+        [
+         373,
+         12
         ],
         [
          374,
+         5
+        ],
+        [
+         375,
+         3
+        ],
+        [
+         376,
          2
         ],
         [
          377,
-         1
+         3
+        ],
+        [
+         378,
+         4
         ],
         [
          379,
-         1
+         6
+        ],
+        [
+         380,
+         4
         ],
         [
          381,
-         1
+         7
         ],
         [
          382,
+         5
+        ],
+        [
+         383,
+         3
+        ],
+        [
+         384,
          1
         ],
         [
          385,
+         3
+        ],
+        [
+         386,
+         3
+        ],
+        [
+         388,
+         1
+        ],
+        [
+         389,
+         1
+        ],
+        [
+         390,
+         4
+        ],
+        [
+         391,
          1
         ],
         [
          392,
-         1
+         3
+        ],
+        [
+         393,
+         3
         ],
         [
          394,
-         2
+         3
         ],
         [
          395,
          1
         ],
         [
-         403,
+         396,
          1
+        ],
+        [
+         397,
+         1
+        ],
+        [
+         398,
+         1
+        ],
+        [
+         399,
+         1
+        ],
+        [
+         400,
+         1
+        ],
+        [
+         403,
+         2
+        ],
+        [
+         407,
+         1
+        ],
+        [
+         409,
+         1
+        ],
+        [
+         422,
+         1
+        ],
+        [
+         429,
+         1
+        ],
+        [
+         444,
+         1
+        ],
+        [
+         446,
+         2
         ]
        ],
-       "ttft_filtered_count": 6,
+       "ttft_filtered_count": 93,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
        "tpot_weight_tokens": 0,
-       "tpot_estimated_avg_ms": 4.722063554099149,
-       "tpot_estimated_sample_count": 30,
-       "tpot_estimated_decode_sum_ms": 157070.0,
-       "tpot_estimated_weight_tokens": 33263,
+       "tpot_estimated_avg_ms": 4.3276221543074005,
+       "tpot_estimated_sample_count": 217,
+       "tpot_estimated_decode_sum_ms": 819881.0,
+       "tpot_estimated_weight_tokens": 189453,
        "tpot_histogram": [],
        "tpot_estimated_histogram": [
+        [
+         23,
+         1
+        ],
         [
          32,
          1
         ],
         [
+         37,
+         1
+        ],
+        [
          38,
+         2
+        ],
+        [
+         41,
+         1
+        ],
+        [
+         42,
+         1
+        ],
+        [
+         43,
          1
         ],
         [
          44,
-         3
+         4
         ],
         [
          46,
-         1
+         2
+        ],
+        [
+         47,
+         2
+        ],
+        [
+         48,
+         4
         ],
         [
          49,
-         1
+         3
         ],
         [
          50,
          2
         ],
         [
-         53,
+         51,
+         3
+        ],
+        [
+         52,
          1
+        ],
+        [
+         53,
+         3
         ],
         [
          54,
-         1
+         7
         ],
         [
-         57,
-         1
-        ],
-        [
-         58,
-         1
-        ],
-        [
-         61,
-         1
-        ],
-        [
-         64,
-         1
-        ],
-        [
-         66,
-         1
-        ],
-        [
-         67,
-         1
-        ],
-        [
-         70,
-         1
-        ],
-        [
-         75,
-         1
-        ],
-        [
-         76,
+         55,
          2
         ],
         [
+         56,
+         4
+        ],
+        [
+         57,
+         2
+        ],
+        [
+         58,
+         6
+        ],
+        [
+         59,
+         8
+        ],
+        [
+         60,
+         4
+        ],
+        [
+         61,
+         3
+        ],
+        [
+         62,
+         7
+        ],
+        [
+         63,
+         5
+        ],
+        [
+         64,
+         7
+        ],
+        [
+         65,
+         4
+        ],
+        [
+         66,
+         5
+        ],
+        [
+         67,
+         5
+        ],
+        [
+         68,
+         9
+        ],
+        [
+         69,
+         5
+        ],
+        [
+         70,
+         9
+        ],
+        [
+         71,
+         12
+        ],
+        [
+         72,
+         7
+        ],
+        [
+         73,
+         4
+        ],
+        [
+         74,
+         6
+        ],
+        [
+         75,
+         4
+        ],
+        [
+         76,
+         12
+        ],
+        [
+         77,
+         3
+        ],
+        [
          78,
-         1
+         6
         ],
         [
          79,
+         6
+        ],
+        [
+         80,
          1
         ],
         [
          81,
-         2
+         8
         ],
         [
          82,
-         1
+         4
         ],
         [
          83,
-         1
+         4
         ],
         [
          84,
+         1
+        ],
+        [
+         85,
+         2
+        ],
+        [
+         86,
+         4
+        ],
+        [
+         87,
+         2
+        ],
+        [
+         88,
          1
         ],
         [
@@ -9582,24 +9918,40 @@
          1
         ],
         [
+         92,
+         1
+        ],
+        [
          96,
+         1
+        ],
+        [
+         97,
+         1
+        ],
+        [
+         101,
+         1
+        ],
+        [
+         114,
          1
         ]
        ],
-       "tpot_filtered_count": 6,
-       "duration_sum_ms": 278724,
-       "duration_p50_ms": 3224,
-       "duration_p95_ms": 28263,
-       "duration_sample_count": 41,
-       "input_tokens": 2044542,
-       "output_tokens": 46411,
-       "total_tokens": 2090953,
-       "token_sample_count": 41,
+       "tpot_filtered_count": 93,
+       "duration_sum_ms": 1979021,
+       "duration_p50_ms": 2830,
+       "duration_p95_ms": 17398,
+       "duration_sample_count": 397,
+       "input_tokens": 14344891,
+       "output_tokens": 333614,
+       "total_tokens": 14678505,
+       "token_sample_count": 397,
        "token_coverage": 1.0,
-       "failed_input_tokens": null,
-       "failed_output_tokens": null,
-       "failed_total_tokens": null,
-       "failed_token_sample_count": 0
+       "failed_input_tokens": 154089,
+       "failed_output_tokens": 0,
+       "failed_total_tokens": 154089,
+       "failed_token_sample_count": 3
       }
      ]
     }
@@ -9608,17 +9960,17 @@
     "date": "2026-11-07",
     "status": "COMPLETED",
     "partial": true,
-    "query_ms": 6798,
-    "duration_sum_ms": 278724,
-    "duration_sample_count": 41,
-    "duration_p50_ms": 3224,
-    "duration_p95_ms": 28263,
-    "success_count": 41,
-    "query_count": 41,
+    "query_ms": 4985,
+    "duration_sum_ms": 1979021,
+    "duration_sample_count": 397,
+    "duration_p50_ms": 2830,
+    "duration_p95_ms": 17398,
+    "success_count": 397,
+    "query_count": 400,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-06T21:32:34Z",
-    "failed_queries": 0,
+    "finished_at": "2026-11-07T05:22:39Z",
+    "failed_queries": 3,
     "unknown_status_count": 0,
     "blocked_queries": 0,
     "hours": [
@@ -9637,212 +9989,548 @@
       "duration_sum_ms": 99344,
       "duration_sample_count": 15,
       "failed": 0
+     },
+     {
+      "hour": 9,
+      "calls": 34,
+      "success_count": 34,
+      "duration_sum_ms": 201162,
+      "duration_sample_count": 34,
+      "failed": 0
+     },
+     {
+      "hour": 10,
+      "calls": 272,
+      "success_count": 269,
+      "duration_sum_ms": 1215233,
+      "duration_sample_count": 269,
+      "failed": 3
+     },
+     {
+      "hour": 11,
+      "calls": 20,
+      "success_count": 20,
+      "duration_sum_ms": 159380,
+      "duration_sample_count": 20,
+      "failed": 0
+     },
+     {
+      "hour": 12,
+      "calls": 18,
+      "success_count": 18,
+      "duration_sum_ms": 71539,
+      "duration_sample_count": 18,
+      "failed": 0
+     },
+     {
+      "hour": 13,
+      "calls": 15,
+      "success_count": 15,
+      "duration_sum_ms": 52983,
+      "duration_sample_count": 15,
+      "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 41,
-      "success_count": 41,
-      "failed_count": 0,
+      "call_count": 400,
+      "success_count": 397,
+      "failed_count": 3,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
       "ttft_sample_count": 0,
       "ttft_sum_ms": null,
-      "ttft_estimated_avg_ms": 1670,
-      "ttft_estimated_sample_count": 30,
-      "ttft_estimated_sum_ms": 50112,
+      "ttft_estimated_avg_ms": 1693,
+      "ttft_estimated_sample_count": 217,
+      "ttft_estimated_sum_ms": 367305,
       "ttft_estimated_histogram": [
        [
-        355,
+        336,
         1
+       ],
+       [
+        338,
+        4
+       ],
+       [
+        339,
+        1
+       ],
+       [
+        340,
+        1
+       ],
+       [
+        341,
+        1
+       ],
+       [
+        342,
+        1
+       ],
+       [
+        343,
+        2
+       ],
+       [
+        344,
+        1
+       ],
+       [
+        345,
+        1
+       ],
+       [
+        346,
+        1
+       ],
+       [
+        347,
+        1
+       ],
+       [
+        348,
+        1
+       ],
+       [
+        349,
+        2
+       ],
+       [
+        350,
+        4
+       ],
+       [
+        352,
+        1
+       ],
+       [
+        353,
+        5
+       ],
+       [
+        354,
+        4
+       ],
+       [
+        355,
+        2
        ],
        [
         357,
-        1
+        4
        ],
        [
         358,
-        1
+        5
+       ],
+       [
+        359,
+        6
        ],
        [
         360,
-        2
+        4
+       ],
+       [
+        361,
+        1
        ],
        [
         362,
-        1
+        4
        ],
        [
         363,
-        3
+        6
+       ],
+       [
+        364,
+        7
        ],
        [
         365,
-        2
+        7
        ],
        [
         366,
-        2
+        8
        ],
        [
         367,
-        1
+        14
        ],
        [
         368,
-        1
+        5
        ],
        [
         369,
-        1
+        4
+       ],
+       [
+        370,
+        4
        ],
        [
         371,
-        2
+        9
+       ],
+       [
+        372,
+        3
+       ],
+       [
+        373,
+        12
        ],
        [
         374,
+        5
+       ],
+       [
+        375,
+        3
+       ],
+       [
+        376,
         2
        ],
        [
         377,
-        1
+        3
+       ],
+       [
+        378,
+        4
        ],
        [
         379,
-        1
+        6
+       ],
+       [
+        380,
+        4
        ],
        [
         381,
-        1
+        7
        ],
        [
         382,
+        5
+       ],
+       [
+        383,
+        3
+       ],
+       [
+        384,
         1
        ],
        [
         385,
+        3
+       ],
+       [
+        386,
+        3
+       ],
+       [
+        388,
+        1
+       ],
+       [
+        389,
+        1
+       ],
+       [
+        390,
+        4
+       ],
+       [
+        391,
         1
        ],
        [
         392,
-        1
+        3
+       ],
+       [
+        393,
+        3
        ],
        [
         394,
-        2
+        3
        ],
        [
         395,
         1
        ],
        [
-        403,
+        396,
         1
+       ],
+       [
+        397,
+        1
+       ],
+       [
+        398,
+        1
+       ],
+       [
+        399,
+        1
+       ],
+       [
+        400,
+        1
+       ],
+       [
+        403,
+        2
+       ],
+       [
+        407,
+        1
+       ],
+       [
+        409,
+        1
+       ],
+       [
+        422,
+        1
+       ],
+       [
+        429,
+        1
+       ],
+       [
+        444,
+        1
+       ],
+       [
+        446,
+        2
        ]
       ],
-      "ttft_filtered_count": 6,
+      "ttft_filtered_count": 93,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
       "tpot_weight_tokens": 0,
-      "tpot_estimated_avg_ms": 4.722063554099149,
-      "tpot_estimated_sample_count": 30,
-      "tpot_estimated_decode_sum_ms": 157070.0,
-      "tpot_estimated_weight_tokens": 33263,
+      "tpot_estimated_avg_ms": 4.3276221543074005,
+      "tpot_estimated_sample_count": 217,
+      "tpot_estimated_decode_sum_ms": 819881.0,
+      "tpot_estimated_weight_tokens": 189453,
       "tpot_histogram": [],
       "tpot_estimated_histogram": [
+       [
+        23,
+        1
+       ],
        [
         32,
         1
        ],
        [
+        37,
+        1
+       ],
+       [
         38,
+        2
+       ],
+       [
+        41,
+        1
+       ],
+       [
+        42,
+        1
+       ],
+       [
+        43,
         1
        ],
        [
         44,
-        3
+        4
        ],
        [
         46,
-        1
+        2
+       ],
+       [
+        47,
+        2
+       ],
+       [
+        48,
+        4
        ],
        [
         49,
-        1
+        3
        ],
        [
         50,
         2
        ],
        [
-        53,
+        51,
+        3
+       ],
+       [
+        52,
         1
+       ],
+       [
+        53,
+        3
        ],
        [
         54,
-        1
+        7
        ],
        [
-        57,
-        1
-       ],
-       [
-        58,
-        1
-       ],
-       [
-        61,
-        1
-       ],
-       [
-        64,
-        1
-       ],
-       [
-        66,
-        1
-       ],
-       [
-        67,
-        1
-       ],
-       [
-        70,
-        1
-       ],
-       [
-        75,
-        1
-       ],
-       [
-        76,
+        55,
         2
        ],
        [
+        56,
+        4
+       ],
+       [
+        57,
+        2
+       ],
+       [
+        58,
+        6
+       ],
+       [
+        59,
+        8
+       ],
+       [
+        60,
+        4
+       ],
+       [
+        61,
+        3
+       ],
+       [
+        62,
+        7
+       ],
+       [
+        63,
+        5
+       ],
+       [
+        64,
+        7
+       ],
+       [
+        65,
+        4
+       ],
+       [
+        66,
+        5
+       ],
+       [
+        67,
+        5
+       ],
+       [
+        68,
+        9
+       ],
+       [
+        69,
+        5
+       ],
+       [
+        70,
+        9
+       ],
+       [
+        71,
+        12
+       ],
+       [
+        72,
+        7
+       ],
+       [
+        73,
+        4
+       ],
+       [
+        74,
+        6
+       ],
+       [
+        75,
+        4
+       ],
+       [
+        76,
+        12
+       ],
+       [
+        77,
+        3
+       ],
+       [
         78,
-        1
+        6
        ],
        [
         79,
+        6
+       ],
+       [
+        80,
         1
        ],
        [
         81,
-        2
+        8
        ],
        [
         82,
-        1
+        4
        ],
        [
         83,
-        1
+        4
        ],
        [
         84,
+        1
+       ],
+       [
+        85,
+        2
+       ],
+       [
+        86,
+        4
+       ],
+       [
+        87,
+        2
+       ],
+       [
+        88,
         1
        ],
        [
@@ -9850,24 +10538,40 @@
         1
        ],
        [
+        92,
+        1
+       ],
+       [
         96,
+        1
+       ],
+       [
+        97,
+        1
+       ],
+       [
+        101,
+        1
+       ],
+       [
+        114,
         1
        ]
       ],
-      "tpot_filtered_count": 6,
-      "duration_sum_ms": 278724,
-      "duration_p50_ms": 3224,
-      "duration_p95_ms": 28263,
-      "duration_sample_count": 41,
-      "input_tokens": 2044542,
-      "output_tokens": 46411,
-      "total_tokens": 2090953,
-      "token_sample_count": 41,
+      "tpot_filtered_count": 93,
+      "duration_sum_ms": 1979021,
+      "duration_p50_ms": 2830,
+      "duration_p95_ms": 17398,
+      "duration_sample_count": 397,
+      "input_tokens": 14344891,
+      "output_tokens": 333614,
+      "total_tokens": 14678505,
+      "token_sample_count": 397,
       "token_coverage": 1.0,
-      "failed_input_tokens": null,
-      "failed_output_tokens": null,
-      "failed_total_tokens": null,
-      "failed_token_sample_count": 0
+      "failed_input_tokens": 154089,
+      "failed_output_tokens": 0,
+      "failed_total_tokens": 154089,
+      "failed_token_sample_count": 3
      }
     ]
    }
