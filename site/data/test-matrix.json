@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/test-matrix@1",
- "generatedAt": "2026-11-07T06:39:07.609Z",
+ "generatedAt": "2026-11-07T13:36:22.646Z",
  "source": {
   "repository": "openJiuwen-ai/DigitalMate",
-  "main": "34f30d96",
+  "main": "3aed1067",
   "refs": [
    {
     "label": "test/st-complete-coverage",
@@ -81,7 +81,7 @@
   "layers": {
    "UT": {
     "cases": 189,
-    "tests": 2401,
+    "tests": 2431,
     "byStatus": {
      "ci_lane": 189
     },
@@ -91,14 +91,14 @@
     }
    },
    "UT-Server": {
-    "cases": 241,
-    "tests": 4021,
+    "cases": 245,
+    "tests": 4079,
     "byStatus": {
-     "ci_lane": 241
+     "ci_lane": 245
     },
     "bySuite": {},
     "byImpl": {
-     "main": 241
+     "main": 245
     }
    },
    "REG": {
@@ -1858,7 +1858,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 67,
+   "tests": 83,
    "layer": "UT",
    "id": "digitalmate-adapter.test.mjs",
    "title": "digitalmate",
@@ -2740,7 +2740,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 10,
+   "tests": 24,
    "layer": "UT",
    "id": "digitalmate-stream-presentation.test.mjs",
    "title": "digitalmate",
@@ -4777,7 +4777,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 30,
+   "tests": 36,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_engine_attachments.py",
    "title": "test_engine_attachments",
@@ -6919,7 +6919,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 50,
+   "tests": 52,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_engine_service.py",
    "title": "test_engine_service",
@@ -8074,6 +8074,27 @@
    "evidence": null,
    "issue": null,
    "note": "",
+   "tests": 5,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_push_delivery.py",
+   "title": "test_push_delivery",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_push_delivery.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
    "tests": 2,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_pytest_failure_reporting.py",
@@ -8179,7 +8200,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 19,
+   "tests": 36,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_reply_stream.py",
    "title": "test_reply_stream",
@@ -8389,7 +8410,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 11,
+   "tests": 14,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_search_policy.py",
    "title": "test_search_policy",
@@ -8494,12 +8515,75 @@
    "evidence": null,
    "issue": null,
    "note": "",
+   "tests": 3,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_session_proximity_legacy_identity.py",
+   "title": "test_session_proximity_legacy_identity",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_session_proximity_legacy_identity.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 3,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_session_proximity_legacy_identity_consumer.py",
+   "title": "test_session_proximity_legacy_identity_consumer",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_session_proximity_legacy_identity_consumer.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
    "tests": 6,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_session_proximity_models.py",
    "title": "test_session_proximity_models",
    "module": "services/agent_bridge",
    "file": "harness/personal-agent/services/agent_bridge/tests/test_session_proximity_models.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 9,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_session_proximity_rejected_existing.py",
+   "title": "test_session_proximity_rejected_existing",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_session_proximity_rejected_existing.py",
    "impl": "main",
    "status": "ci_lane",
    "lane": "server-regression.yml"
@@ -8704,7 +8788,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 4,
+   "tests": 5,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_source_links.py",
    "title": "test_source_links",
@@ -9103,7 +9187,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 42,
+   "tests": 43,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_workswarm_adapter.py",
    "title": "test_workswarm_adapter",
@@ -9166,7 +9250,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 10,
+   "tests": 18,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_workswarm_flow.py",
    "title": "test_workswarm_flow",
@@ -10798,7 +10882,7 @@
    "tests": null,
    "layer": "E2E",
    "id": "DM-WF-ATTACH-01",
-   "title": "上传中切会话和身份不串绑附件",
+   "title": "上传附件时阻止切换会话",
    "module": "ATTACH",
    "mode": "multi-turn",
    "file": "tests/e2e/workflow/cases/DM-WF-ATTACH-01.workflow.json",
@@ -10806,7 +10890,7 @@
    "status": "no_result",
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 42,
+   "steps": 30,
    "scoreCriteria": 1
   },
   {
@@ -11083,7 +11167,7 @@
    "status": "no_result",
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 44,
+   "steps": 42,
    "scoreCriteria": 1
   },
   {
@@ -11135,7 +11219,7 @@
    "status": "pass_recorded",
    "progress": "已有 PASS；当前版复核待完成",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 25,
+   "steps": 29,
    "scoreCriteria": 1
   },
   {
@@ -11160,7 +11244,7 @@
    "status": "no_result",
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 49,
+   "steps": 43,
    "scoreCriteria": 1
   },
   {
@@ -11389,7 +11473,7 @@
    "status": "no_result",
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 35,
+   "steps": 27,
    "scoreCriteria": 2
   },
   {
