@@ -1,10 +1,10 @@
 {
  "schema": "digitalmate/e2e-performance-history@1",
  "metrics_version": 6,
- "generated_at": "2026-11-07T19:26:48Z",
- "updated_at": "2026-11-07T19:26:48Z",
+ "generated_at": "2026-11-08T00:39:14Z",
+ "updated_at": "2026-11-08T00:39:14Z",
  "window_start": "2026-10-04T16:00:00+00:00",
- "window_end": "2026-11-07T19:26:41+00:00",
+ "window_end": "2026-11-08T00:39:09+00:00",
  "current_day_partial": true,
  "complete_through": "2026-11-07",
  "partial_day": "2026-11-08",
@@ -10159,16 +10159,16 @@
      "date": "2026-11-08",
      "status": "COMPLETED",
      "partial": true,
-     "query_ms": 2224,
-     "duration_sum_ms": 40039,
-     "duration_sample_count": 18,
-     "duration_p50_ms": null,
-     "duration_p95_ms": null,
-     "success_count": 18,
-     "query_count": 18,
+     "query_ms": 5541,
+     "duration_sum_ms": 387852,
+     "duration_sample_count": 70,
+     "duration_p50_ms": 2642,
+     "duration_p95_ms": 22666,
+     "success_count": 70,
+     "query_count": 70,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-07T19:22:44Z",
+     "finished_at": "2026-11-08T00:17:42Z",
      "failed_queries": 0,
      "unknown_status_count": 0,
      "blocked_queries": 0,
@@ -10196,45 +10196,185 @@
        "duration_sum_ms": 11451,
        "duration_sample_count": 6,
        "failed": 0
+      },
+      {
+       "hour": 7,
+       "calls": 43,
+       "success_count": 43,
+       "duration_sum_ms": 291982,
+       "duration_sample_count": 43,
+       "failed": 0
+      },
+      {
+       "hour": 8,
+       "calls": 9,
+       "success_count": 9,
+       "duration_sum_ms": 55831,
+       "duration_sample_count": 9,
+       "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 18,
-       "success_count": 18,
+       "call_count": 70,
+       "success_count": 70,
        "failed_count": 0,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
        "ttft_sample_count": 0,
        "ttft_sum_ms": null,
-       "ttft_estimated_avg_ms": 1433,
-       "ttft_estimated_sample_count": 3,
-       "ttft_estimated_sum_ms": 4298,
+       "ttft_estimated_avg_ms": 2277,
+       "ttft_estimated_sample_count": 23,
+       "ttft_estimated_sum_ms": 52377,
        "ttft_estimated_histogram": [
+        [
+         333,
+         1
+        ],
+        [
+         345,
+         1
+        ],
+        [
+         349,
+         1
+        ],
+        [
+         362,
+         1
+        ],
         [
          363,
          1
         ],
         [
+         364,
+         1
+        ],
+        [
+         365,
+         1
+        ],
+        [
+         367,
+         1
+        ],
+        [
          368,
+         3
+        ],
+        [
+         375,
+         1
+        ],
+        [
+         378,
+         1
+        ],
+        [
+         379,
+         1
+        ],
+        [
+         383,
+         1
+        ],
+        [
+         385,
          2
+        ],
+        [
+         398,
+         1
+        ],
+        [
+         411,
+         1
+        ],
+        [
+         414,
+         2
+        ],
+        [
+         433,
+         1
+        ],
+        [
+         454,
+         1
         ]
        ],
-       "ttft_filtered_count": 6,
+       "ttft_filtered_count": 22,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
        "tpot_weight_tokens": 0,
-       "tpot_estimated_avg_ms": 5.347912524850894,
-       "tpot_estimated_sample_count": 3,
-       "tpot_estimated_decode_sum_ms": 2690.0,
-       "tpot_estimated_weight_tokens": 503,
+       "tpot_estimated_avg_ms": 4.302699974766591,
+       "tpot_estimated_sample_count": 23,
+       "tpot_estimated_decode_sum_ms": 85258.0,
+       "tpot_estimated_weight_tokens": 19815,
        "tpot_histogram": [],
        "tpot_estimated_histogram": [
         [
-         81,
+         41,
          1
+        ],
+        [
+         49,
+         2
+        ],
+        [
+         53,
+         1
+        ],
+        [
+         63,
+         2
+        ],
+        [
+         64,
+         1
+        ],
+        [
+         68,
+         1
+        ],
+        [
+         72,
+         1
+        ],
+        [
+         73,
+         2
+        ],
+        [
+         75,
+         1
+        ],
+        [
+         76,
+         1
+        ],
+        [
+         77,
+         1
+        ],
+        [
+         78,
+         1
+        ],
+        [
+         79,
+         1
+        ],
+        [
+         81,
+         3
+        ],
+        [
+         82,
+         2
         ],
         [
          85,
@@ -10245,15 +10385,15 @@
          1
         ]
        ],
-       "tpot_filtered_count": 6,
-       "duration_sum_ms": 40039,
-       "duration_p50_ms": null,
-       "duration_p95_ms": null,
-       "duration_sample_count": 18,
-       "input_tokens": 188765,
-       "output_tokens": 3168,
-       "total_tokens": 191933,
-       "token_sample_count": 18,
+       "tpot_filtered_count": 22,
+       "duration_sum_ms": 387852,
+       "duration_p50_ms": 2642,
+       "duration_p95_ms": 22666,
+       "duration_sample_count": 70,
+       "input_tokens": 1898784,
+       "output_tokens": 62218,
+       "total_tokens": 1961002,
+       "token_sample_count": 70,
        "token_coverage": 1.0,
        "failed_input_tokens": null,
        "failed_output_tokens": null,
@@ -10267,16 +10407,16 @@
     "date": "2026-11-08",
     "status": "COMPLETED",
     "partial": true,
-    "query_ms": 2224,
-    "duration_sum_ms": 40039,
-    "duration_sample_count": 18,
-    "duration_p50_ms": null,
-    "duration_p95_ms": null,
-    "success_count": 18,
-    "query_count": 18,
+    "query_ms": 5541,
+    "duration_sum_ms": 387852,
+    "duration_sample_count": 70,
+    "duration_p50_ms": 2642,
+    "duration_p95_ms": 22666,
+    "success_count": 70,
+    "query_count": 70,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-07T19:22:44Z",
+    "finished_at": "2026-11-08T00:17:42Z",
     "failed_queries": 0,
     "unknown_status_count": 0,
     "blocked_queries": 0,
@@ -10304,45 +10444,185 @@
       "duration_sum_ms": 11451,
       "duration_sample_count": 6,
       "failed": 0
+     },
+     {
+      "hour": 7,
+      "calls": 43,
+      "success_count": 43,
+      "duration_sum_ms": 291982,
+      "duration_sample_count": 43,
+      "failed": 0
+     },
+     {
+      "hour": 8,
+      "calls": 9,
+      "success_count": 9,
+      "duration_sum_ms": 55831,
+      "duration_sample_count": 9,
+      "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 18,
-      "success_count": 18,
+      "call_count": 70,
+      "success_count": 70,
       "failed_count": 0,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
       "ttft_sample_count": 0,
       "ttft_sum_ms": null,
-      "ttft_estimated_avg_ms": 1433,
-      "ttft_estimated_sample_count": 3,
-      "ttft_estimated_sum_ms": 4298,
+      "ttft_estimated_avg_ms": 2277,
+      "ttft_estimated_sample_count": 23,
+      "ttft_estimated_sum_ms": 52377,
       "ttft_estimated_histogram": [
+       [
+        333,
+        1
+       ],
+       [
+        345,
+        1
+       ],
+       [
+        349,
+        1
+       ],
+       [
+        362,
+        1
+       ],
        [
         363,
         1
        ],
        [
+        364,
+        1
+       ],
+       [
+        365,
+        1
+       ],
+       [
+        367,
+        1
+       ],
+       [
         368,
+        3
+       ],
+       [
+        375,
+        1
+       ],
+       [
+        378,
+        1
+       ],
+       [
+        379,
+        1
+       ],
+       [
+        383,
+        1
+       ],
+       [
+        385,
         2
+       ],
+       [
+        398,
+        1
+       ],
+       [
+        411,
+        1
+       ],
+       [
+        414,
+        2
+       ],
+       [
+        433,
+        1
+       ],
+       [
+        454,
+        1
        ]
       ],
-      "ttft_filtered_count": 6,
+      "ttft_filtered_count": 22,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
       "tpot_weight_tokens": 0,
-      "tpot_estimated_avg_ms": 5.347912524850894,
-      "tpot_estimated_sample_count": 3,
-      "tpot_estimated_decode_sum_ms": 2690.0,
-      "tpot_estimated_weight_tokens": 503,
+      "tpot_estimated_avg_ms": 4.302699974766591,
+      "tpot_estimated_sample_count": 23,
+      "tpot_estimated_decode_sum_ms": 85258.0,
+      "tpot_estimated_weight_tokens": 19815,
       "tpot_histogram": [],
       "tpot_estimated_histogram": [
        [
-        81,
+        41,
         1
+       ],
+       [
+        49,
+        2
+       ],
+       [
+        53,
+        1
+       ],
+       [
+        63,
+        2
+       ],
+       [
+        64,
+        1
+       ],
+       [
+        68,
+        1
+       ],
+       [
+        72,
+        1
+       ],
+       [
+        73,
+        2
+       ],
+       [
+        75,
+        1
+       ],
+       [
+        76,
+        1
+       ],
+       [
+        77,
+        1
+       ],
+       [
+        78,
+        1
+       ],
+       [
+        79,
+        1
+       ],
+       [
+        81,
+        3
+       ],
+       [
+        82,
+        2
        ],
        [
         85,
@@ -10353,15 +10633,15 @@
         1
        ]
       ],
-      "tpot_filtered_count": 6,
-      "duration_sum_ms": 40039,
-      "duration_p50_ms": null,
-      "duration_p95_ms": null,
-      "duration_sample_count": 18,
-      "input_tokens": 188765,
-      "output_tokens": 3168,
-      "total_tokens": 191933,
-      "token_sample_count": 18,
+      "tpot_filtered_count": 22,
+      "duration_sum_ms": 387852,
+      "duration_p50_ms": 2642,
+      "duration_p95_ms": 22666,
+      "duration_sample_count": 70,
+      "input_tokens": 1898784,
+      "output_tokens": 62218,
+      "total_tokens": 1961002,
+      "token_sample_count": 70,
       "token_coverage": 1.0,
       "failed_input_tokens": null,
       "failed_output_tokens": null,
