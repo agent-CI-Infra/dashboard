@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/test-matrix@1",
- "generatedAt": "2026-11-07T19:40:14.314Z",
+ "generatedAt": "2026-11-08T00:56:01.368Z",
  "source": {
   "repository": "openJiuwen-ai/DigitalMate",
-  "main": "9f80a50b",
+  "main": "fd026523",
   "refs": [
    {
     "label": "test/st-complete-coverage",
@@ -30,14 +30,14 @@
   "e2e": 27
  },
  "nightly": {
-  "createdAt": "2026-11-06T22:53:27Z",
-  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/42308031888",
+  "createdAt": "2026-11-07T21:37:57Z",
+  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/42416777933",
   "jobs": {
-   "Update HK DigitalMate (latest main)": "cancelled",
+   "Update HK DigitalMate (latest main)": "failure",
    "DigitalMate ST (Windows)": "skipped",
    "Nightly report": "success",
-   "Bench (full)": "skipped",
-   "E2E (${{ (inputs.e2e_case || 'all') }})": "skipped"
+   "E2E (${{ (inputs.e2e_case || 'all') }})": "skipped",
+   "Bench (full)": "skipped"
   }
  },
  "statusLabels": {
@@ -91,14 +91,14 @@
     }
    },
    "UT-Server": {
-    "cases": 245,
-    "tests": 4079,
+    "cases": 249,
+    "tests": 4118,
     "byStatus": {
-     "ci_lane": 245
+     "ci_lane": 249
     },
     "bySuite": {},
     "byImpl": {
-     "main": 245
+     "main": 249
     }
    },
    "REG": {
@@ -8200,7 +8200,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 36,
+   "tests": 37,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_reply_stream.py",
    "title": "test_reply_stream",
@@ -8473,6 +8473,48 @@
    "evidence": null,
    "issue": null,
    "note": "",
+   "tests": 8,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_session_permission_settlement.py",
+   "title": "test_session_permission_settlement",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_session_permission_settlement.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 11,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_session_proximity_a01_consumer.py",
+   "title": "test_session_proximity_a01_consumer",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_session_proximity_a01_consumer.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
    "tests": 34,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_session_proximity_acceptance.py",
@@ -8559,6 +8601,27 @@
    "note": "",
    "tests": 6,
    "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_session_proximity_legacy_receipts.py",
+   "title": "test_session_proximity_legacy_receipts",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_session_proximity_legacy_receipts.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 6,
+   "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_session_proximity_models.py",
    "title": "test_session_proximity_models",
    "module": "services/agent_bridge",
@@ -8626,6 +8689,27 @@
    "title": "test_session_proximity_runtime_flow",
    "module": "services/agent_bridge",
    "file": "harness/personal-agent/services/agent_bridge/tests/test_session_proximity_runtime_flow.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 10,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_session_proximity_submission_row_port.py",
+   "title": "test_session_proximity_submission_row_port",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_session_proximity_submission_row_port.py",
    "impl": "main",
    "status": "ci_lane",
    "lane": "server-regression.yml"
@@ -9334,7 +9418,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 12,
+   "tests": 15,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_workswarm_unload.py",
    "title": "test_workswarm_unload",
