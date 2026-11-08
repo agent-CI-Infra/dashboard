@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/test-matrix@1",
- "generatedAt": "2026-11-08T00:56:01.368Z",
+ "generatedAt": "2026-11-08T22:31:56.134Z",
  "source": {
   "repository": "openJiuwen-ai/DigitalMate",
-  "main": "fd026523",
+  "main": "4a79b732",
   "refs": [
    {
     "label": "test/st-complete-coverage",
@@ -30,14 +30,14 @@
   "e2e": 27
  },
  "nightly": {
-  "createdAt": "2026-11-07T21:37:57Z",
-  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/42416777933",
+  "createdAt": "2026-11-08T21:51:29Z",
+  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/42527279739",
   "jobs": {
    "Update HK DigitalMate (latest main)": "failure",
    "DigitalMate ST (Windows)": "skipped",
    "Nightly report": "success",
-   "E2E (${{ (inputs.e2e_case || 'all') }})": "skipped",
-   "Bench (full)": "skipped"
+   "Bench (full)": "skipped",
+   "E2E (${{ (inputs.e2e_case || 'all') }})": "skipped"
   }
  },
  "statusLabels": {
@@ -81,7 +81,7 @@
   "layers": {
    "UT": {
     "cases": 189,
-    "tests": 2432,
+    "tests": 2441,
     "byStatus": {
      "ci_lane": 189
     },
@@ -91,14 +91,14 @@
     }
    },
    "UT-Server": {
-    "cases": 249,
-    "tests": 4118,
+    "cases": 254,
+    "tests": 4222,
     "byStatus": {
-     "ci_lane": 249
+     "ci_lane": 254
     },
     "bySuite": {},
     "byImpl": {
-     "main": 249
+     "main": 254
     }
    },
    "REG": {
@@ -2404,7 +2404,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 70,
+   "tests": 71,
    "layer": "UT",
    "id": "digitalmate-notifications.test.mjs",
    "title": "digitalmate",
@@ -2572,7 +2572,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 11,
+   "tests": 16,
    "layer": "UT",
    "id": "digitalmate-session-proximity.test.mjs",
    "title": "digitalmate",
@@ -2908,7 +2908,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 4,
+   "tests": 5,
    "layer": "UT",
    "id": "digitalmate-topic-async.test.mjs",
    "title": "digitalmate",
@@ -4147,7 +4147,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 0,
+   "tests": 2,
    "layer": "UT",
    "id": "waterfall-renderer-interaction.test.mjs",
    "title": "waterfall",
@@ -7486,6 +7486,27 @@
    "evidence": null,
    "issue": null,
    "note": "",
+   "tests": 23,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_engine_workspace_aggregate_admission.py",
+   "title": "test_engine_workspace_aggregate_admission",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_engine_workspace_aggregate_admission.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
    "tests": 5,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_entry_point.py",
@@ -8536,7 +8557,70 @@
    "evidence": null,
    "issue": null,
    "note": "",
+   "tests": 19,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_session_proximity_admission_consumer.py",
+   "title": "test_session_proximity_admission_consumer",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_session_proximity_admission_consumer.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 27,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_session_proximity_admission_port.py",
+   "title": "test_session_proximity_admission_port",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_session_proximity_admission_port.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
    "tests": 14,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_session_proximity_aggregate_consumer.py",
+   "title": "test_session_proximity_aggregate_consumer",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_session_proximity_aggregate_consumer.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 21,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_session_proximity_integration.py",
    "title": "test_session_proximity_integration",
@@ -8584,6 +8668,27 @@
    "title": "test_session_proximity_legacy_identity_consumer",
    "module": "services/agent_bridge",
    "file": "harness/personal-agent/services/agent_bridge/tests/test_session_proximity_legacy_identity_consumer.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 5,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_session_proximity_legacy_payload_bytes.py",
+   "title": "test_session_proximity_legacy_payload_bytes",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_session_proximity_legacy_payload_bytes.py",
    "impl": "main",
    "status": "ci_lane",
    "lane": "server-regression.yml"
@@ -8683,7 +8788,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 6,
+   "tests": 17,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_session_proximity_runtime_flow.py",
    "title": "test_session_proximity_runtime_flow",
@@ -8725,7 +8830,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 10,
+   "tests": 8,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_session_proximity_upgrade.py",
    "title": "test_session_proximity_upgrade",
