@@ -1,6 +1,6 @@
 {
  "schema": "digitalmate/env-request-latency-daily@1",
- "generated_at": "2026-11-07T19:44:12Z",
+ "generated_at": "2026-11-08T01:01:13Z",
  "env": "adx-jiuwen-test-0",
  "label": "test-0",
  "unit": "ms",
@@ -347,46 +347,46 @@
   {
    "date": "2026-11-08",
    "partial": true,
-   "n": 60,
+   "n": 69,
    "gateway": {
-    "n": 60,
-    "mean": 80899.7,
-    "p50": 41729.0,
+    "n": 69,
+    "mean": 74398.6,
+    "p50": 41051.0,
     "p95": 302717.0
    },
    "workswarm": {
-    "n": 53,
-    "mean": 69517.8,
-    "p50": 40225.0,
+    "n": 61,
+    "mean": 64863.1,
+    "p50": 37864.0,
     "p95": 229871.0
    },
    "overhead": {
-    "n": 53,
-    "mean": 794.3,
+    "n": 61,
+    "mean": 680.9,
     "p50": 832.0,
     "p95": 867.0
    },
    "ttft": {
-    "n": 383,
-    "mean": 3235.63,
-    "p50": 2811.72,
-    "p95": 5999.6
+    "n": 408,
+    "mean": 3264.11,
+    "p50": 2816.47,
+    "p95": 6455.21
    },
    "tpot": {
-    "n": 383,
-    "tokens": 421900,
-    "mean": 5.76,
-    "p50": 5.41,
+    "n": 408,
+    "tokens": 448218,
+    "mean": 5.73,
+    "p50": 5.36,
     "p95": 8.6
    },
    "tokens": {
-    "input": 22082266,
-    "output": 422283,
-    "total": 22504549
+    "input": 23932612,
+    "output": 448626,
+    "total": 24381238
    },
    "calls": {
-    "total": 383,
-    "success": 383,
+    "total": 408,
+    "success": 408,
     "failed": 0
    },
    "failure_rate": 0.0
@@ -398,9 +398,9 @@
   "models": {
    "deepseek-v4.1-flash-1017": 1560
   },
-  "valid_calls": 2346,
-  "ignored_noise_lines": 965,
-  "note": "TTFT/TPOT 仅取 agent_adapter 的 llm_usage 事件；另有 965 行含该关键词的工具输出文本，非 usage 记录，已排除",
+  "valid_calls": 2371,
+  "ignored_noise_lines": 974,
+  "note": "TTFT/TPOT 仅取 agent_adapter 的 llm_usage 事件；另有 974 行含该关键词的工具输出文本，非 usage 记录，已排除",
   "failure_note": "调用数 = 成功调用（llm_usage）+ 失败调用（llm_call_error）；失败率按已知终态调用计算"
  }
 }
