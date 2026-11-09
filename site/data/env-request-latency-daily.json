@@ -1,6 +1,6 @@
 {
  "schema": "digitalmate/env-request-latency-daily@1",
- "generated_at": "2026-11-09T01:34:24Z",
+ "generated_at": "2026-11-09T06:15:34Z",
  "env": "adx-jiuwen-test-0",
  "label": "test-0",
  "unit": "ms",
@@ -12,7 +12,11 @@
   "ttft": "云端调用口径：模型调用开始 → 首个 Token（运行时 ttft_ms，每次模型调用一条记录）",
   "tpot": "云端调用口径：首 Token → 调用结束，按输出 Token 数（N−1）加权（运行时 tpot_ms）",
   "failure": "失败调用 = llm_call_error 事件（如 422 预算超限、408 超时）；失败率 = 失败 ÷（成功 + 失败）",
-  "tokens": "成功调用的 Token 累计：llm_usage 记录 usage_metadata 的 input_tokens / output_tokens 求和"
+  "tokens": "成功调用的 Token 累计：llm_usage 记录 usage_metadata 的 input_tokens / output_tokens 求和",
+  "first_token": "请求口径：网关受理 → 首个携带文本的 chunk（chat.delta / chat.reasoning）",
+  "answer_first": "请求口径：网关受理 → 首个答案文本 chunk（chat.delta）",
+  "react": "请求口径：首个文本 chunk → 首个答案文本 chunk（思考与工具阶段）",
+  "tool": "工具口径：chat.tool_call → chat.tool_result（服务端适配器记录，含下发、执行与结果返回；不含端侧）"
  },
  "days": [
   {
@@ -50,6 +54,22 @@
     "p50": 20.24,
     "p95": 28.21
    },
+   "first_token": {
+    "n": 19,
+    "mean": 8235.4,
+    "p50": 7811.0,
+    "p95": 12321.0
+   },
+   "answer_first": {
+    "n": 0
+   },
+   "react": {
+    "n": 0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
    "tokens": {
     "input": 3857131,
     "output": 53739,
@@ -97,6 +117,22 @@
     "p50": 5.63,
     "p95": 9.74
    },
+   "first_token": {
+    "n": 26,
+    "mean": 6217.1,
+    "p50": 5591.0,
+    "p95": 8575.0
+   },
+   "answer_first": {
+    "n": 0
+   },
+   "react": {
+    "n": 0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
    "tokens": {
     "input": 4284810,
     "output": 80216,
@@ -238,6 +274,28 @@
     "p50": 6.99,
     "p95": 14.42
    },
+   "first_token": {
+    "n": 422,
+    "mean": 6050.2,
+    "p50": 5485.0,
+    "p95": 8878.0
+   },
+   "answer_first": {
+    "n": 158,
+    "mean": 5524.6,
+    "p50": 4834.0,
+    "p95": 8403.0
+   },
+   "react": {
+    "n": 158,
+    "mean": 5.2,
+    "p50": 0.0,
+    "p95": 0.0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
    "tokens": {
     "input": 22990613,
     "output": 293241,
@@ -285,6 +343,28 @@
     "p50": 5.23,
     "p95": 11.34
    },
+   "first_token": {
+    "n": 231,
+    "mean": 5880.6,
+    "p50": 5563.0,
+    "p95": 8730.0
+   },
+   "answer_first": {
+    "n": 44,
+    "mean": 4941.9,
+    "p50": 4607.0,
+    "p95": 6152.0
+   },
+   "react": {
+    "n": 44,
+    "mean": 0.0,
+    "p50": 0.0,
+    "p95": 0.0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
    "tokens": {
     "input": 37304886,
     "output": 593310,
@@ -332,6 +412,22 @@
     "p50": 5.12,
     "p95": 8.47
    },
+   "first_token": {
+    "n": 21,
+    "mean": 6006.0,
+    "p50": 5831.0,
+    "p95": 7699.0
+   },
+   "answer_first": {
+    "n": 0
+   },
+   "react": {
+    "n": 0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
    "tokens": {
     "input": 4487390,
     "output": 58762,
@@ -347,46 +443,62 @@
   {
    "date": "2026-11-08",
    "partial": true,
-   "n": 89,
+   "n": 132,
    "gateway": {
-    "n": 89,
-    "mean": 61132.3,
-    "p50": 31049.0,
-    "p95": 194184.0
+    "n": 130,
+    "mean": 77053.1,
+    "p50": 38801.0,
+    "p95": 285415.0
    },
    "workswarm": {
-    "n": 78,
-    "mean": 52992.7,
-    "p50": 27409.0,
-    "p95": 177432.0
+    "n": 112,
+    "mean": 71313.6,
+    "p50": 35858.0,
+    "p95": 270178.0
    },
    "overhead": {
-    "n": 78,
-    "mean": 729.8,
+    "n": 112,
+    "mean": 635.7,
     "p50": 832.0,
-    "p95": 865.0
+    "p95": 864.0
    },
    "ttft": {
-    "n": 452,
-    "mean": 3242.51,
-    "p50": 2778.92,
-    "p95": 6002.24
+    "n": 957,
+    "mean": 3573.37,
+    "p50": 2944.92,
+    "p95": 7153.29
    },
    "tpot": {
-    "n": 452,
-    "tokens": 489729,
-    "mean": 5.6,
-    "p50": 5.32,
-    "p95": 8.6
+    "n": 957,
+    "tokens": 877355,
+    "mean": 5.05,
+    "p50": 4.85,
+    "p95": 8.15
    },
+   "first_token": {
+    "n": 111,
+    "mean": 5111.1,
+    "p50": 4696.0,
+    "p95": 7752.0
+   },
+   "answer_first": {
+    "n": 0
+   },
+   "react": {
+    "n": 0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
    "tokens": {
-    "input": 24848195,
-    "output": 490181,
-    "total": 25338376
+    "input": 61158124,
+    "output": 878312,
+    "total": 62036436
    },
    "calls": {
-    "total": 452,
-    "success": 452,
+    "total": 957,
+    "success": 957,
     "failed": 0
    },
    "failure_rate": 0.0
@@ -398,9 +510,9 @@
   "models": {
    "deepseek-v4.1-flash-1017": 1560
   },
-  "valid_calls": 2415,
-  "ignored_noise_lines": 204,
-  "note": "TTFT/TPOT 仅取 agent_adapter 的 llm_usage 事件；另有 204 行含该关键词的工具输出文本，非 usage 记录，已排除",
+  "valid_calls": 2920,
+  "ignored_noise_lines": 1033,
+  "note": "TTFT/TPOT 仅取 agent_adapter 的 llm_usage 事件；另有 1033 行含该关键词的工具输出文本，非 usage 记录，已排除",
   "failure_note": "调用数 = 成功调用（llm_usage）+ 失败调用（llm_call_error）；失败率按已知终态调用计算"
  }
 }
