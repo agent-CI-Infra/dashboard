@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/e2e-performance-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updated_at": "2026-11-08T18:15:02.025Z",
+  "updated_at": "2026-11-09T09:28:07.198Z",
   "cases": {
     "DM-WF-CHROME-01": {
       "id": "DM-WF-CHROME-01",
@@ -4923,7 +4923,7 @@
     },
     "DM-WF-ATTACH-01": {
       "id": "DM-WF-ATTACH-01",
-      "title": "上传中切会话和身份不串绑附件",
+      "title": "上传附件时阻止切换会话",
       "mode": "multi-turn",
       "points": [
         {
@@ -4965,16 +4965,26 @@
           "run_id": "nightly-42504489179-1",
           "commit": "a84d496da135ec43a9aa1734c584d790ec7db87b",
           "finished_at": "2026-11-08T17:25:29.553Z"
+        },
+        {
+          "date": "2026-11-09",
+          "status": "BLOCKED",
+          "query_ms": null,
+          "query_count": 0,
+          "duration_ms": 0,
+          "run_id": "nightly-42593386906-1",
+          "commit": "a0dfb6ee5973e98907749aca3cff3a53fa4cc1fb",
+          "finished_at": "2026-11-09T09:28:06.207Z"
         }
       ],
       "latest": {
         "id": "DM-WF-ATTACH-01",
-        "title": "上传中切会话和身份不串绑附件",
+        "title": "上传附件时阻止切换会话",
         "mode": "multi-turn",
         "status": "BLOCKED",
-        "failure": "Live test controls unavailable: cloud.inject, account.switch, device.config; no business actions were attempted",
-        "started_at": "2026-11-08T17:25:29.553Z",
-        "finished_at": "2026-11-08T17:25:29.553Z",
+        "failure": "[SETUP_FAIL] Live control adapter initialization failed; credentials and local adapter errors were not published",
+        "started_at": "2026-11-09T09:28:06.207Z",
+        "finished_at": "2026-11-09T09:28:06.207Z",
         "duration_ms": 0,
         "query_count": 0,
         "query_ms": null,
@@ -5007,16 +5017,16 @@
             "id": "S-setup",
             "action": "environment",
             "status": "failed",
-            "started_at": "2026-11-08T17:25:29.553Z",
+            "started_at": "2026-11-09T09:28:06.207Z",
             "duration_ms": 0,
-            "detail": "Live test controls unavailable: cloud.inject, account.switch, device.config; no business actions were attempted"
+            "detail": "[SETUP_FAIL] Live control adapter initialization failed; credentials and local adapter errors were not published"
           }
         ],
         "screenshots": 0,
         "profiling_files": 0,
-        "run_id": "nightly-42504489179-1",
-        "commit": "a84d496da135ec43a9aa1734c584d790ec7db87b",
-        "generated_at": "2026-11-08T18:15:02.025Z"
+        "run_id": "nightly-42593386906-1",
+        "commit": "a0dfb6ee5973e98907749aca3cff3a53fa4cc1fb",
+        "generated_at": "2026-11-09T09:28:07.198Z"
       }
     },
     "DM-WF-BACK-02": {
