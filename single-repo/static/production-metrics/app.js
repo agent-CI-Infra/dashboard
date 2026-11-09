@@ -947,15 +947,19 @@ function envSummary(doc) {
   const tokenBare = (value) => (Number.isFinite(value) && value >= 0
     ? trimNumberZeros((value / tokenDiv).toFixed(value / tokenDiv >= 100 ? 1 : 2))
     : '—');
-  // These metrics arrive with newer collector versions or the adapter that
-  // records tool timing; a day without samples must not show an all-dash tile.
-  const requestTile = (key, label, hint) => (Number.isFinite(anchor[key]?.n) && anchor[key].n > 0
-    ? `<div class="stat-card">
+  // The four request-scope tiles always stay on the board, in the same order
+  // and with the same wording, whatever the anchor day happens to hold. A day
+  // without samples shows "—" and a zero count instead of dropping the card,
+  // so a collection gap is visible as a gap rather than as a missing metric.
+  const requestTile = (key, label, hint) => {
+    const sampleCount = Number.isFinite(anchor[key]?.n) ? anchor[key].n : 0;
+    const count = sampleCount > 0 ? `${fmtCount(sampleCount)} 个请求` : '0 个请求 · 当日无样本';
+    return `<div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>${label}</strong> 平均 / P50 / P95（s）</div>
       <div class="stat-value combo">${seconds(anchor[key]?.mean)} / ${seconds(anchor[key]?.p50)} / ${seconds(anchor[key]?.p95)}</div>
-      <div class="stat-hint">${fmtCount(anchor[key]?.n)} 个请求 · ${hint}</div>
-    </div>`
-    : '');
+      <div class="stat-hint">${count} · ${hint}</div>
+    </div>`;
+  };
   const firstTile = requestTile('first_token', '首吐字', '网关受理 → 首个文本 chunk');
   const answerTile = requestTile('answer_first', '答案首吐字', '网关受理 → 首个答案 chunk');
   const reactTile = requestTile('react', 'ReAct 阶段', '首个文本 chunk → 答案首吐字 · 思考 + 工具');
@@ -1096,13 +1100,15 @@ function envCallTrend(doc) {
 function envCallDetail(doc) {
   const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date && (row.ttft || row.tpot || row.first_token || row.answer_first || row.react || row.tool)) : [];
   if (!rows.length) return '';
-  // Same rule as the summary tiles: a column group appears only when some row
-  // has samples for it, so a board fed by an older collector or an environment
-  // without the adapter keeps its table narrow instead of showing dash columns.
+  // The request-scope groups follow the document schema, like the summary
+  // tiles: a collector that writes these fields gets its columns on every row,
+  // and a row without samples reads as a zero count with dashes. Tool timing is
+  // written by the product adapter, so it appears once a sample exists.
+  const hasField = (key) => rows.some((row) => row[key] && typeof row[key] === 'object');
   const hasSamples = (key) => rows.some((row) => Number.isFinite(row[key]?.n) && row[key].n > 0);
-  const hasFirst = hasSamples('first_token');
-  const hasAnswer = hasSamples('answer_first');
-  const hasReact = hasSamples('react');
+  const hasFirst = hasField('first_token');
+  const hasAnswer = hasField('answer_first');
+  const hasReact = hasField('react');
   const hasTool = hasSamples('tool');
   // Same day-over-day chip as the model-side stats table, so the two detail
   // tables read the same way.
