@@ -68,7 +68,8 @@
               <span id="model-range" class="muted">—</span>
             </div>
             <div id="model-controls" class="comparison-controls">
-              <div class="range-picker" role="group" aria-label="时间范围（影响模型对比及下方明细）">
+              <div class="range-picker" role="group" aria-label="时间范围（影响模型对比及下方汇总、曲线与明细）">
+                <button class="range-btn" type="button" data-range="1" aria-pressed="false">当天</button>
                 <button class="range-btn" type="button" data-range="7" aria-pressed="false">近 7 天</button>
                 <button class="range-btn" type="button" data-range="30" aria-pressed="false">近 30 天</button>
                 <button class="range-btn active" type="button" data-range="0" aria-pressed="true">全部</button>
@@ -81,7 +82,7 @@
             <summary>统计口径</summary>
             <p>
               所选时间范围内列出全部有足量调用的模型，按调用数排序；近 7 天少于 50 次调用的模型不在此列出。
-              汇总锚定最新完整日，未结束的当日不计入。点击模型可切换下方汇总、曲线与明细。
+              汇总、曲线与明细按所选时间范围统计，未结束的当日不计入汇总。点击模型可切换下方汇总、曲线与明细。
               <span id="compare-version" class="muted">—</span>
             </p>
           </details>
@@ -103,7 +104,7 @@
               统计此网关的模型请求（未区分测试或其他业务），耗时口径为模型请求耗时（不含端侧与网络）。
               TTFT/TPOT 只统计 <code>stream === true</code> 的成功调用；无流式标记的样本按分桶近似单独统计 TTFT 与 TPOT；TTFT ≥ 95% 总耗时、TPOT &lt; 0.1 ms/token 视为时间戳异常并剔除。
               P50/P95 是成功调用的请求级分位，至少需要 20 个样本；模型请求平均耗时按成功调用量加权，TPOT 按输出 Token 数减一加权；TTFT 和 TPOT 的 P50/P95 是请求级分位，基于可合并分桶近似计算（误差约 1%），每类至少 20 个样本。
-              Token 展示当日成功调用的累计值；当日未结束的数据标记为「部分日」，汇总卡不使用该日。
+              Token 汇总卡展示所选时间范围内成功调用的累计值；当日未结束的数据标记为「部分日」，不计入汇总。
               趋势图均可点击图例单独显示或隐藏曲线；模型请求失败率按所选模型统计；含未知状态的日期留空；缺失值留空，不补 0。
             
             </p>
