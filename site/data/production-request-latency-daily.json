@@ -1,0 +1,669 @@
+{
+ "schema": "digitalmate/env-request-latency-daily@1",
+ "generated_at": "2026-11-09T16:34:43Z",
+ "env": "adx-jiuwen",
+ "label": "production",
+ "unit": "ms",
+ "source": "现网 adx-jiuwen 命名空间 52 个沙箱 digitalmate-w-*/workswarm/process.log（console pod 只读挂载，毫秒精度），按看板 cloud-request-log-aggregate.py 同一规则解析，按 Asia/Shanghai 自然日聚合",
+ "window": {
+  "start": "2026-10-26",
+  "end": "2026-11-10",
+  "days": 15
+ },
+ "definitions": {
+  "gateway": "[MessageHandler] dispatch → [MessageHandler] Stream 正常完成（total_chunks）",
+  "workswarm": "[E2A][in] → run_stream_task finished",
+  "overhead": "gateway − workswarm（逐请求差值取均值）",
+  "ttft": "云端调用口径：模型调用开始 → 首个 Token（运行时 ttft_ms，每次模型调用一条记录）",
+  "tpot": "云端调用口径：首 Token → 调用结束，按输出 Token 数（N−1）加权（运行时 tpot_ms）",
+  "failure": "失败调用 = llm_call_error 事件",
+  "tokens": "成功调用 llm_usage 的 input_tokens / output_tokens 求和",
+  "first_token": "请求口径：网关受理 → 首个携带文本的 chunk（chat.delta / chat.reasoning）",
+  "answer_first": "请求口径：网关受理 → 首个答案文本 chunk（chat.delta）",
+  "react": "请求口径：首个文本 chunk → 首个答案文本 chunk",
+  "tool": "工具口径：chat.tool_call → chat.tool_result（现网无 tool-calls-*.jsonl，该项为空）"
+ },
+ "days": [
+  {
+   "date": "2026-11-01",
+   "partial": true,
+   "n": 147,
+   "gateway": {
+    "n": 146,
+    "mean": 287332.7,
+    "p50": 15956,
+    "p95": 87244
+   },
+   "workswarm": {
+    "n": 135,
+    "mean": 26786.3,
+    "p50": 15161,
+    "p95": 86205
+   },
+   "overhead": {
+    "n": 135,
+    "mean": 807.5,
+    "p50": 828,
+    "p95": 877
+   },
+   "ttft": {
+    "n": 509,
+    "mean": 1808.09,
+    "p50": 1613.15,
+    "p95": 2779.81
+   },
+   "tpot": {
+    "n": 509,
+    "tokens": 462703,
+    "mean": 4.22,
+    "p50": 4.16,
+    "p95": 5.82
+   },
+   "first_token": {
+    "n": 135,
+    "mean": 4271.5,
+    "p50": 3591,
+    "p95": 7690
+   },
+   "answer_first": {
+    "n": 0
+   },
+   "react": {
+    "n": 0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
+   "tokens": {
+    "input": 25744944,
+    "output": 463212,
+    "total": 26208156
+   },
+   "calls": {
+    "total": 509,
+    "success": 509,
+    "failed": 0
+   },
+   "failure_rate": 0
+  },
+  {
+   "date": "2026-11-02",
+   "partial": false,
+   "n": 101,
+   "gateway": {
+    "n": 101,
+    "mean": 44738.7,
+    "p50": 22791,
+    "p95": 146473
+   },
+   "workswarm": {
+    "n": 95,
+    "mean": 45163.3,
+    "p50": 21030,
+    "p95": 148244
+   },
+   "overhead": {
+    "n": 95,
+    "mean": 769.1,
+    "p50": 832,
+    "p95": 867
+   },
+   "ttft": {
+    "n": 419,
+    "mean": 2303.75,
+    "p50": 1873.01,
+    "p95": 4004.53
+   },
+   "tpot": {
+    "n": 419,
+    "tokens": 399241,
+    "mean": 5.03,
+    "p50": 4.85,
+    "p95": 8.16
+   },
+   "first_token": {
+    "n": 93,
+    "mean": 4816.4,
+    "p50": 3793,
+    "p95": 8082
+   },
+   "answer_first": {
+    "n": 0
+   },
+   "react": {
+    "n": 0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
+   "tokens": {
+    "input": 24976444,
+    "output": 399660,
+    "total": 25376104
+   },
+   "calls": {
+    "total": 419,
+    "success": 419,
+    "failed": 0
+   },
+   "failure_rate": 0
+  },
+  {
+   "date": "2026-11-03",
+   "partial": false,
+   "n": 17,
+   "gateway": {
+    "n": 17,
+    "mean": 86894.3,
+    "p50": 41576,
+    "p95": 202146
+   },
+   "workswarm": {
+    "n": 17,
+    "mean": 86158.5,
+    "p50": 40747,
+    "p95": 201323
+   },
+   "overhead": {
+    "n": 17,
+    "mean": 735.8,
+    "p50": 832,
+    "p95": 863
+   },
+   "ttft": {
+    "n": 113,
+    "mean": 3289.47,
+    "p50": 1720.66,
+    "p95": 9258.79
+   },
+   "tpot": {
+    "n": 113,
+    "tokens": 123045,
+    "mean": 3.84,
+    "p50": 3.83,
+    "p95": 5.66
+   },
+   "first_token": {
+    "n": 16,
+    "mean": 4440.1,
+    "p50": 3891,
+    "p95": 7749
+   },
+   "answer_first": {
+    "n": 0
+   },
+   "react": {
+    "n": 0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
+   "tokens": {
+    "input": 6300351,
+    "output": 123158,
+    "total": 6423509
+   },
+   "calls": {
+    "total": 113,
+    "success": 113,
+    "failed": 0
+   },
+   "failure_rate": 0
+  },
+  {
+   "date": "2026-11-04",
+   "partial": true,
+   "n": 104,
+   "gateway": {
+    "n": 102,
+    "mean": 37941.7,
+    "p50": 19697,
+    "p95": 121223
+   },
+   "workswarm": {
+    "n": 96,
+    "mean": 37388,
+    "p50": 19143,
+    "p95": 120379
+   },
+   "overhead": {
+    "n": 96,
+    "mean": 801.3,
+    "p50": 833,
+    "p95": 904
+   },
+   "ttft": {
+    "n": 345,
+    "mean": 2340.79,
+    "p50": 1855.4,
+    "p95": 4503.13
+   },
+   "tpot": {
+    "n": 345,
+    "tokens": 388158,
+    "mean": 5.56,
+    "p50": 4.97,
+    "p95": 9.24
+   },
+   "first_token": {
+    "n": 94,
+    "mean": 5061.6,
+    "p50": 3952,
+    "p95": 8088
+   },
+   "answer_first": {
+    "n": 0
+   },
+   "react": {
+    "n": 0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
+   "tokens": {
+    "input": 19976818,
+    "output": 388503,
+    "total": 20365321
+   },
+   "calls": {
+    "total": 345,
+    "success": 345,
+    "failed": 0
+   },
+   "failure_rate": 0
+  },
+  {
+   "date": "2026-11-05",
+   "partial": true,
+   "n": 154,
+   "gateway": {
+    "n": 153,
+    "mean": 105134.8,
+    "p50": 15769,
+    "p95": 147016
+   },
+   "workswarm": {
+    "n": 137,
+    "mean": 104188.7,
+    "p50": 14684,
+    "p95": 145053
+   },
+   "overhead": {
+    "n": 137,
+    "mean": 704.2,
+    "p50": 831,
+    "p95": 876
+   },
+   "ttft": {
+    "n": 735,
+    "mean": 2533.7,
+    "p50": 1973.17,
+    "p95": 5306.96
+   },
+   "tpot": {
+    "n": 735,
+    "tokens": 719759,
+    "mean": 5.54,
+    "p50": 4.75,
+    "p95": 12.48
+   },
+   "first_token": {
+    "n": 136,
+    "mean": 4743.7,
+    "p50": 3992,
+    "p95": 8051
+   },
+   "answer_first": {
+    "n": 0
+   },
+   "react": {
+    "n": 0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
+   "tokens": {
+    "input": 52325539,
+    "output": 720494,
+    "total": 53046033
+   },
+   "calls": {
+    "total": 735,
+    "success": 735,
+    "failed": 0
+   },
+   "failure_rate": 0
+  },
+  {
+   "date": "2026-11-06",
+   "partial": true,
+   "n": 85,
+   "gateway": {
+    "n": 85,
+    "mean": 47622.3,
+    "p50": 22637,
+    "p95": 136384
+   },
+   "workswarm": {
+    "n": 81,
+    "mean": 47036.7,
+    "p50": 21374,
+    "p95": 135543
+   },
+   "overhead": {
+    "n": 81,
+    "mean": 709.8,
+    "p50": 842,
+    "p95": 878
+   },
+   "ttft": {
+    "n": 324,
+    "mean": 2096.08,
+    "p50": 1668.88,
+    "p95": 3554.52
+   },
+   "tpot": {
+    "n": 324,
+    "tokens": 362663,
+    "mean": 5.52,
+    "p50": 5.04,
+    "p95": 9.9
+   },
+   "first_token": {
+    "n": 81,
+    "mean": 4746.2,
+    "p50": 3926,
+    "p95": 8105
+   },
+   "answer_first": {
+    "n": 0
+   },
+   "react": {
+    "n": 0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
+   "tokens": {
+    "input": 16895070,
+    "output": 362987,
+    "total": 17258057
+   },
+   "calls": {
+    "total": 324,
+    "success": 324,
+    "failed": 0
+   },
+   "failure_rate": 0
+  },
+  {
+   "date": "2026-11-07",
+   "partial": true,
+   "n": 94,
+   "gateway": {
+    "n": 93,
+    "mean": 30776,
+    "p50": 18627,
+    "p95": 83200
+   },
+   "workswarm": {
+    "n": 87,
+    "mean": 30348.9,
+    "p50": 18064,
+    "p95": 95223
+   },
+   "overhead": {
+    "n": 87,
+    "mean": 729.6,
+    "p50": 842,
+    "p95": 873
+   },
+   "ttft": {
+    "n": 412,
+    "mean": 1816.97,
+    "p50": 1600.84,
+    "p95": 2996.16
+   },
+   "tpot": {
+    "n": 412,
+    "tokens": 338910,
+    "mean": 4.39,
+    "p50": 4.18,
+    "p95": 6.73
+   },
+   "first_token": {
+    "n": 86,
+    "mean": 3922.6,
+    "p50": 3591,
+    "p95": 6059
+   },
+   "answer_first": {
+    "n": 0
+   },
+   "react": {
+    "n": 0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
+   "tokens": {
+    "input": 21427002,
+    "output": 339322,
+    "total": 21766324
+   },
+   "calls": {
+    "total": 412,
+    "success": 412,
+    "failed": 0
+   },
+   "failure_rate": 0
+  },
+  {
+   "date": "2026-11-08",
+   "partial": true,
+   "n": 122,
+   "gateway": {
+    "n": 122,
+    "mean": 41653.4,
+    "p50": 23981,
+    "p95": 121866
+   },
+   "workswarm": {
+    "n": 117,
+    "mean": 40781.3,
+    "p50": 23142,
+    "p95": 121046
+   },
+   "overhead": {
+    "n": 117,
+    "mean": 828.7,
+    "p50": 844,
+    "p95": 1036
+   },
+   "ttft": {
+    "n": 598,
+    "mean": 2428.29,
+    "p50": 1671.07,
+    "p95": 5570.21
+   },
+   "tpot": {
+    "n": 598,
+    "tokens": 492481,
+    "mean": 5.05,
+    "p50": 4.71,
+    "p95": 7.84
+   },
+   "first_token": {
+    "n": 115,
+    "mean": 4458.5,
+    "p50": 3748,
+    "p95": 7515
+   },
+   "answer_first": {
+    "n": 0
+   },
+   "react": {
+    "n": 0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
+   "tokens": {
+    "input": 33008657,
+    "output": 493079,
+    "total": 33501736
+   },
+   "calls": {
+    "total": 598,
+    "success": 598,
+    "failed": 0
+   },
+   "failure_rate": 0
+  },
+  {
+   "date": "2026-11-09",
+   "partial": true,
+   "n": 99,
+   "gateway": {
+    "n": 98,
+    "mean": 90498.7,
+    "p50": 44813,
+    "p95": 357605
+   },
+   "workswarm": {
+    "n": 92,
+    "mean": 91582,
+    "p50": 46443,
+    "p95": 356752
+   },
+   "overhead": {
+    "n": 92,
+    "mean": 664.3,
+    "p50": 843,
+    "p95": 905
+   },
+   "ttft": {
+    "n": 858,
+    "mean": 3089.01,
+    "p50": 2060.8,
+    "p95": 7431.6
+   },
+   "tpot": {
+    "n": 858,
+    "tokens": 808591,
+    "mean": 5.15,
+    "p50": 4.62,
+    "p95": 9.03
+   },
+   "first_token": {
+    "n": 87,
+    "mean": 4705.5,
+    "p50": 3900,
+    "p95": 8895
+   },
+   "answer_first": {
+    "n": 0
+   },
+   "react": {
+    "n": 0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
+   "tokens": {
+    "input": 66730057,
+    "output": 809449,
+    "total": 67539506
+   },
+   "calls": {
+    "total": 858,
+    "success": 858,
+    "failed": 0
+   },
+   "failure_rate": 0
+  },
+  {
+   "date": "2026-11-10",
+   "partial": true,
+   "n": 6,
+   "gateway": {
+    "n": 6,
+    "mean": 43999,
+    "p50": 49433,
+    "p95": 57173
+   },
+   "workswarm": {
+    "n": 6,
+    "mean": 43157.7,
+    "p50": 48592,
+    "p95": 56329
+   },
+   "overhead": {
+    "n": 6,
+    "mean": 841.3,
+    "p50": 842,
+    "p95": 861
+   },
+   "ttft": {
+    "n": 23,
+    "mean": 3871.96,
+    "p50": 2447.45,
+    "p95": 11868.33
+   },
+   "tpot": {
+    "n": 23,
+    "tokens": 20888,
+    "mean": 5.56,
+    "p50": 5.75,
+    "p95": 7.45
+   },
+   "first_token": {
+    "n": 6,
+    "mean": 5920,
+    "p50": 6151,
+    "p95": 7516
+   },
+   "answer_first": {
+    "n": 0
+   },
+   "react": {
+    "n": 0
+   },
+   "tool": {
+    "n": 0
+   },
+   "tool_failed": 0,
+   "tokens": {
+    "input": 1660505,
+    "output": 20911,
+    "total": 1681416
+   },
+   "calls": {
+    "total": 23,
+    "success": 23,
+    "failed": 0
+   },
+   "failure_rate": 0
+  }
+ ],
+ "metric_scope": {
+  "request_latency": "每次云端请求（request_id 维度）",
+  "ttft_tpot": "每次云端模型调用（一次请求可含多次模型调用）",
+  "models": {
+   "deepseek-v4.1-flash-1017": 4336
+  },
+  "valid_calls": 4336,
+  "ignored_noise_lines": 947,
+  "environments": 52,
+  "note": "TTFT/TPOT 仅取 agent_adapter 的 llm_usage 事件；现网 process.log 最早仅回溯到 2026-11-01，10-26..10-31 无数据"
+ }
+}
