@@ -3117,11 +3117,15 @@ async function loadEnvLatency() {
     doc = null;
   }
   let daily = null;
-  try {
-    const response = await fetch('../data/env-request-latency-daily.json', { cache: 'no-store' });
-    if (response.ok) daily = await response.json();
-  } catch {
-    daily = null;
+  // Production boards publish their own cloud aggregate; fall back to the
+  // shared single-environment file so boards without one still render.
+  for (const name of ['production-request-latency-daily.json', 'env-request-latency-daily.json']) {
+    try {
+      const response = await fetch(`../data/${name}`, { cache: 'no-store' });
+      if (response.ok) { daily = await response.json(); break; }
+    } catch {
+      daily = null;
+    }
   }
   const charts = daily && daily.schema === 'digitalmate/env-request-latency-daily@1'
     ? `${envSummary(daily)}${envCallTrend(daily)}${envLatencyTrend(daily)}${envFirstTokenTrend(daily)}${envAnswerFirstTrend(daily)}${envReactTrend(daily)}${envToolTrend(daily)}${envTtftTrend(daily)}${envTpotTrend(daily)}${envCallDetail(daily)}`
