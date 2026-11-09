@@ -2732,6 +2732,9 @@ function renderTrends() {
 }
 
 function renderModels() {
+  // The range control lives on this view and scopes the cloud-side section too,
+  // so refresh it here: every range / hash change re-renders both halves.
+  if (state.envDaily) renderEnv();
   hideChartHover();
   const history = state.history;
   if (!history) return;
@@ -3127,12 +3130,31 @@ async function loadEnvLatency() {
       daily = null;
     }
   }
-  const charts = daily && daily.schema === 'digitalmate/env-request-latency-daily@1'
-    ? `${envSummary(daily)}${envCallTrend(daily)}${envLatencyTrend(daily)}${envFirstTokenTrend(daily)}${envAnswerFirstTrend(daily)}${envReactTrend(daily)}${envToolTrend(daily)}${envTtftTrend(daily)}${envTpotTrend(daily)}${envCallDetail(daily)}`
-    : '';
+  state.envDaily = daily && daily.schema === 'digitalmate/env-request-latency-daily@1' ? daily : null;
   // The per-environment GateWay / WorkSwarm table is parked for now; the daily
   // charts carry the same measurements in a more readable form.
-  target.innerHTML = charts;
+  renderEnv();
+}
+
+// The cloud-side section answers to the same range control as the model side:
+// the tiles pick their anchor day and every chart is drawn from the rows of the
+// selected trailing window, so both halves of the page describe one period.
+function renderEnv() {
+  const target = $('env-latency');
+  if (!target) return;
+  const daily = state.envDaily;
+  if (!daily) {
+    target.innerHTML = '';
+    return;
+  }
+  const all = Array.isArray(daily.days) ? daily.days.filter((row) => row && row.date) : [];
+  // The model side ends its window on the last complete day, so a half-collected
+  // current day never anchors a chart. Do the same here: keep every earlier day
+  // (including a first day whose log starts mid-day) and drop the partial tail.
+  const through = [...all].reverse().find((row) => !row.partial)?.date;
+  const capped = through ? all.filter((row) => row.date <= through) : all;
+  const scoped = { ...daily, days: inRange(capped, state.rangeDays) };
+  target.innerHTML = `${envSummary(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTtftTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
   refineCharts(target);
 }
 
