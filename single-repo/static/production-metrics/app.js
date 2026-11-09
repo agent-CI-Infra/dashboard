@@ -854,7 +854,7 @@ function envFirstTokenTrend(doc) {
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.first_token?.n, note: '个请求' }),
-    note: '云侧 Agent 请求口径（每个请求一条记录）：首吐字时间 = 网关受理请求 → 首个携带文本的流式 chunk（chat.delta / chat.reasoning），舍去仅状态、工具事件的 chunk；含路由、Agent 唤醒与调用模型前的全部耗时。网关日志只记录每次请求的前 3 个 chunk，若前 3 个都不是文本 chunk 则该请求不计入，样本数会小于请求数；P50/P95 为请求级最近排名分位；* 为部分日，缺失值留空不补 0。',
+    note: '云侧 Agent 请求口径（每个请求一条记录）：首吐字时间 = 网关受理请求 → 首个携带文本的流式 chunk（chat.delta / chat.reasoning），舍去仅状态、工具事件的 chunk；含路由、Agent 唤醒与调用模型前的全部耗时。网关日志记录每条流的开头 chunk 和每种事件类型的第一个 chunk（旧版本网关只记录前 3 个），日志里没有文本 chunk 的请求不计入，样本数会小于请求数；P50/P95 为请求级最近排名分位；* 为部分日，缺失值留空不补 0。',
   });
 }
 
@@ -867,7 +867,7 @@ function envAnswerFirstTrend(doc) {
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.answer_first?.n, note: '个请求' }),
-    note: '云侧 Agent 请求口径（每个请求一条记录）：答案首吐字时间 = 网关受理请求 → 首个答案文本 chunk（chat.delta），不把状态、思考（chat.reasoning）与工具事件的 chunk 算作答案。它总是 ≥ 首吐字时间，两者之差即下方 ReAct 阶段。网关日志只记录每次请求的前 3 个 chunk，若前 3 个里没有答案文本则该请求不计入，样本数会小于请求数；P50/P95 为请求级最近排名分位；* 为部分日，缺失值留空不补 0。',
+    note: '云侧 Agent 请求口径（每个请求一条记录）：答案首吐字时间 = 网关受理请求 → 首个答案文本 chunk（chat.delta），不把状态、思考（chat.reasoning）与工具事件的 chunk 算作答案。它总是 ≥ 首吐字时间，两者之差即下方 ReAct 阶段。网关日志记录每条流的开头 chunk 和每种事件类型的第一个 chunk（旧版本网关只记录前 3 个），日志里没有答案文本 chunk 的请求不计入，样本数会小于请求数；P50/P95 为请求级最近排名分位；* 为部分日，缺失值留空不补 0。',
   });
 }
 
@@ -880,7 +880,7 @@ function envReactTrend(doc) {
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.react?.n, note: '个请求' }),
-    note: '云侧 Agent 请求口径（每个请求一条记录）：ReAct 阶段 = 首个文本 chunk（开始思考）→ 首个答案文本 chunk，即 Agent 在给出答案前的思考与工具调用耗时，不含网关受理、路由与 Agent 唤醒；回复一开始就是答案时记为 0。它不按模型调用计时，与下方模型调用 TTFT 的样本口径不同。网关日志只记录每次请求的前 3 个 chunk，两个端点都出现才计入；P50/P95 为请求级最近排名分位；* 为部分日，缺失值留空不补 0。',
+    note: '云侧 Agent 请求口径（每个请求一条记录）：ReAct 阶段 = 首个文本 chunk（开始思考）→ 首个答案文本 chunk，即 Agent 在给出答案前的思考与工具调用耗时，不含网关受理、路由与 Agent 唤醒；回复一开始就是答案时记为 0。它不按模型调用计时，与下方模型调用 TTFT 的样本口径不同。网关日志记录每条流的开头 chunk 和每种事件类型的第一个 chunk（旧版本网关只记录前 3 个），两个端点都出现才计入；P50/P95 为请求级最近排名分位；* 为部分日，缺失值留空不补 0。',
   });
 }
 

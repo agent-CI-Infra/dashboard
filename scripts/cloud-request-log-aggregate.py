@@ -37,8 +37,10 @@ if _until:
     UNTIL = datetime.datetime.fromisoformat(_until.replace("Z", "+00:00")).timestamp()
 
 REQ = re.compile(r"request_id=")
-# The gateway logs the first three chunks of every stream with their event type,
-# which is where the cloud side's first visible token shows up.
+# The gateway logs the head of every stream and the first chunk of every event
+# type, which is where the cloud side's first visible token and first answer
+# text show up. Logs written before that change only carry the first three
+# chunks, so a stream whose answer starts later contributes no answer sample.
 CHUNK = re.compile(r"\[MessageHandler\] process_stream chunk #(\d+): request_id=\S+ event_type=(\S*)")
 # Event types that carry text the user can see; the first one of these marks the
 # cloud side's first token (chat.reasoning is the model's visible thinking).

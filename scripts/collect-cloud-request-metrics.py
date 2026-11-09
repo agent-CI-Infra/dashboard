@@ -295,15 +295,14 @@ def pool(results):
             "overhead": stats(rec["overhead"], 1),
             "ttft": stats(rec["ttft"], 2),
             "tpot": weighted_stats(rec["tpot"]),
-            # Gateway dispatch -> first chunk carrying visible text. Fewer
-            # samples than "n": the gateway only logs the first three chunks,
-            # so a reply that opens with more than three non-text chunks cannot
-            # be measured.
+            # Gateway dispatch -> first chunk carrying visible text. The gateway
+            # logs the head of the stream and the first chunk of every event
+            # type; logs written before that change only carry the first three
+            # chunks, so older days can have fewer samples than "n".
             "first_token": stats(rec["first_token"], 1),
             # Request scope, but two different end markers: answer_first stops
             # at the first answer-text chunk (chat.delta), react covers only the
             # thinking/tool phase between the first text chunk and that answer.
-            # Both inherit first_token's coverage limit.
             "answer_first": stats(rec["answer_first"], 1),
             "react": stats(rec["react"], 1),
             # One sample per finished tool call, timed by the product adapter.
