@@ -1,15 +1,15 @@
 {
  "schema": "digitalmate/e2e-performance-history@1",
  "metrics_version": 6,
- "generated_at": "2026-11-09T01:31:41Z",
- "updated_at": "2026-11-09T01:31:41Z",
+ "generated_at": "2026-11-09T06:35:10Z",
+ "updated_at": "2026-11-09T06:35:10Z",
  "window_start": "2026-10-05T16:00:00+00:00",
- "window_end": "2026-11-09T01:31:22+00:00",
+ "window_end": "2026-11-09T06:34:38+00:00",
  "current_day_partial": true,
  "complete_through": "2026-11-08",
  "partial_day": "2026-11-09",
  "source_scope": "gateway-all-requests",
- "excluded_missing_model": 0,
+ "excluded_missing_model": 4,
  "device": {
   "model": "现网网关 prod / adx-jiuwen",
   "kind": "gateway"
@@ -11331,19 +11331,19 @@
     },
     {
      "date": "2026-11-09",
-     "status": "FAILED",
+     "status": "COMPLETED",
      "partial": true,
-     "query_ms": 8575,
-     "duration_sum_ms": 4767614,
-     "duration_sample_count": 556,
+     "query_ms": 8947,
+     "duration_sum_ms": 15048160,
+     "duration_sample_count": 1682,
      "duration_p50_ms": 8420,
-     "duration_p95_ms": 17767,
-     "success_count": 556,
-     "query_count": 1609,
+     "duration_p95_ms": 17900,
+     "success_count": 1682,
+     "query_count": 3272,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-09T01:31:10Z",
-     "failed_queries": 1053,
+     "finished_at": "2026-11-09T06:34:41Z",
+     "failed_queries": 1590,
      "unknown_status_count": 0,
      "blocked_queries": 0,
      "hours": [
@@ -11421,30 +11421,90 @@
       },
       {
        "hour": 9,
-       "calls": 59,
-       "success_count": 1,
-       "duration_sum_ms": 1544,
-       "duration_sample_count": 1,
-       "failed": 58
+       "calls": 118,
+       "success_count": 12,
+       "duration_sum_ms": 95240,
+       "duration_sample_count": 12,
+       "failed": 106
+      },
+      {
+       "hour": 10,
+       "calls": 465,
+       "success_count": 360,
+       "duration_sum_ms": 2972292,
+       "duration_sample_count": 360,
+       "failed": 105
+      },
+      {
+       "hour": 11,
+       "calls": 237,
+       "success_count": 132,
+       "duration_sum_ms": 1517409,
+       "duration_sample_count": 132,
+       "failed": 105
+      },
+      {
+       "hour": 12,
+       "calls": 342,
+       "success_count": 232,
+       "duration_sum_ms": 1850566,
+       "duration_sample_count": 232,
+       "failed": 110
+      },
+      {
+       "hour": 13,
+       "calls": 337,
+       "success_count": 227,
+       "duration_sum_ms": 2222521,
+       "duration_sample_count": 227,
+       "failed": 110
+      },
+      {
+       "hour": 14,
+       "calls": 223,
+       "success_count": 164,
+       "duration_sum_ms": 1624062,
+       "duration_sample_count": 164,
+       "failed": 59
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 1609,
-       "success_count": 556,
-       "failed_count": 1053,
+       "call_count": 3272,
+       "success_count": 1682,
+       "failed_count": 1590,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
        "ttft_sample_count": 0,
        "ttft_sum_ms": null,
-       "ttft_estimated_avg_ms": 1844,
-       "ttft_estimated_sample_count": 141,
-       "ttft_estimated_sum_ms": 259997,
+       "ttft_estimated_avg_ms": 1891,
+       "ttft_estimated_sample_count": 390,
+       "ttft_estimated_sum_ms": 737396,
        "ttft_estimated_histogram": [
+        [
+         316,
+         1
+        ],
+        [
+         320,
+         1
+        ],
+        [
+         324,
+         1
+        ],
+        [
+         328,
+         1
+        ],
         [
          332,
          2
+        ],
+        [
+         333,
+         1
         ],
         [
          334,
@@ -11460,6 +11520,10 @@
         ],
         [
          337,
+         2
+        ],
+        [
+         338,
          1
         ],
         [
@@ -11468,99 +11532,111 @@
         ],
         [
          340,
-         4
-        ],
-        [
-         341,
-         1
-        ],
-        [
-         344,
-         4
-        ],
-        [
-         345,
-         3
-        ],
-        [
-         346,
-         2
-        ],
-        [
-         347,
-         3
-        ],
-        [
-         348,
-         2
-        ],
-        [
-         349,
-         1
-        ],
-        [
-         350,
-         3
-        ],
-        [
-         351,
-         3
-        ],
-        [
-         352,
-         1
-        ],
-        [
-         354,
-         2
-        ],
-        [
-         355,
-         2
-        ],
-        [
-         356,
-         7
-        ],
-        [
-         357,
          6
         ],
         [
-         358,
+         341,
          4
         ],
         [
-         359,
-         1
+         342,
+         4
         ],
         [
-         360,
+         343,
+         5
+        ],
+        [
+         344,
+         8
+        ],
+        [
+         345,
+         5
+        ],
+        [
+         346,
+         6
+        ],
+        [
+         347,
+         7
+        ],
+        [
+         348,
+         6
+        ],
+        [
+         349,
+         4
+        ],
+        [
+         350,
+         5
+        ],
+        [
+         351,
+         9
+        ],
+        [
+         352,
+         8
+        ],
+        [
+         353,
+         7
+        ],
+        [
+         354,
+         7
+        ],
+        [
+         355,
          3
         ],
         [
+         356,
+         10
+        ],
+        [
+         357,
+         10
+        ],
+        [
+         358,
+         9
+        ],
+        [
+         359,
+         8
+        ],
+        [
+         360,
+         7
+        ],
+        [
          361,
-         2
+         5
         ],
         [
          362,
-         1
+         8
         ],
         [
          363,
-         4
+         7
         ],
         [
          364,
-         2
+         5
         ],
         [
          365,
-         1
+         7
         ],
         [
          366,
-         2
+         5
         ],
         [
          367,
@@ -11568,71 +11644,75 @@
         ],
         [
          368,
-         2
+         7
         ],
         [
          369,
-         3
+         7
         ],
         [
          370,
-         2
+         6
         ],
         [
          371,
-         1
+         7
         ],
         [
          372,
-         3
+         9
         ],
         [
          373,
-         2
+         5
         ],
         [
          374,
-         1
+         5
         ],
         [
          375,
-         2
-        ],
-        [
-         376,
          4
         ],
         [
+         376,
+         10
+        ],
+        [
          377,
-         1
+         5
+        ],
+        [
+         378,
+         4
         ],
         [
          379,
-         1
+         8
         ],
         [
          380,
-         3
+         4
         ],
         [
          381,
-         1
+         7
         ],
         [
          382,
-         2
+         5
         ],
         [
          383,
-         3
+         8
         ],
         [
          384,
-         2
+         5
         ],
         [
          385,
-         2
+         5
         ],
         [
          386,
@@ -11640,39 +11720,87 @@
         ],
         [
          387,
-         1
+         2
         ],
         [
          388,
-         1
+         4
         ],
         [
          389,
-         2
+         4
         ],
         [
          390,
-         2
+         5
+        ],
+        [
+         391,
+         1
         ],
         [
          394,
          1
         ],
         [
+         395,
+         3
+        ],
+        [
+         396,
+         3
+        ],
+        [
          397,
+         5
+        ],
+        [
+         398,
          1
         ],
         [
-         405,
+         400,
          1
+        ],
+        [
+         401,
+         1
+        ],
+        [
+         402,
+         2
+        ],
+        [
+         403,
+         1
+        ],
+        [
+         404,
+         2
+        ],
+        [
+         405,
+         2
         ],
         [
          406,
          3
         ],
         [
+         407,
+         1
+        ],
+        [
          408,
          2
+        ],
+        [
+         409,
+         1
+        ],
+        [
+         410,
+         1
         ],
         [
          411,
@@ -11680,10 +11808,26 @@
         ],
         [
          412,
+         3
+        ],
+        [
+         413,
+         1
+        ],
+        [
+         414,
          1
         ],
         [
          415,
+         2
+        ],
+        [
+         417,
+         2
+        ],
+        [
+         419,
          1
         ],
         [
@@ -11691,8 +11835,16 @@
          2
         ],
         [
+         422,
+         1
+        ],
+        [
+         423,
+         1
+        ],
+        [
          424,
-         2
+         3
         ],
         [
          425,
@@ -11700,7 +11852,7 @@
         ],
         [
          429,
-         1
+         2
         ],
         [
          430,
@@ -11712,6 +11864,14 @@
         ],
         [
          433,
+         2
+        ],
+        [
+         434,
+         1
+        ],
+        [
+         436,
          1
         ],
         [
@@ -11719,200 +11879,264 @@
          2
         ],
         [
+         441,
+         1
+        ],
+        [
+         444,
+         1
+        ],
+        [
+         445,
+         1
+        ],
+        [
+         450,
+         1
+        ],
+        [
          452,
+         1
+        ],
+        [
+         453,
+         1
+        ],
+        [
+         463,
+         1
+        ],
+        [
+         468,
+         1
+        ],
+        [
+         471,
          1
         ]
        ],
-       "ttft_filtered_count": 208,
+       "ttft_filtered_count": 643,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
        "tpot_weight_tokens": 0,
-       "tpot_estimated_avg_ms": 4.729977236453073,
-       "tpot_estimated_sample_count": 141,
-       "tpot_estimated_decode_sum_ms": 542325.0,
-       "tpot_estimated_weight_tokens": 114657,
+       "tpot_estimated_avg_ms": 5.133336424714562,
+       "tpot_estimated_sample_count": 390,
+       "tpot_estimated_decode_sum_ms": 1992638.0,
+       "tpot_estimated_weight_tokens": 388176,
        "tpot_histogram": [],
        "tpot_estimated_histogram": [
         [
+         24,
+         1
+        ],
+        [
          28,
          1
+        ],
+        [
+         35,
+         1
+        ],
+        [
+         36,
+         2
         ],
         [
          37,
          1
         ],
         [
+         40,
+         2
+        ],
+        [
          41,
-         1
+         2
         ],
         [
          43,
          1
         ],
         [
+         44,
+         2
+        ],
+        [
          46,
-         1
+         5
         ],
         [
          47,
-         1
+         3
+        ],
+        [
+         48,
+         3
         ],
         [
          49,
          1
         ],
         [
+         50,
+         1
+        ],
+        [
          52,
-         4
+         7
         ],
         [
          53,
-         1
+         2
+        ],
+        [
+         54,
+         4
         ],
         [
          55,
-         2
+         4
         ],
         [
          56,
-         2
+         4
         ],
         [
          57,
-         1
+         5
         ],
         [
          58,
-         3
+         4
         ],
         [
          59,
-         5
-        ],
-        [
-         60,
-         1
-        ],
-        [
-         61,
-         2
-        ],
-        [
-         62,
-         1
-        ],
-        [
-         63,
-         3
-        ],
-        [
-         64,
-         5
-        ],
-        [
-         65,
-         3
-        ],
-        [
-         66,
-         3
-        ],
-        [
-         67,
-         2
-        ],
-        [
-         68,
-         4
-        ],
-        [
-         69,
-         3
-        ],
-        [
-         70,
-         3
-        ],
-        [
-         71,
-         4
-        ],
-        [
-         72,
-         4
-        ],
-        [
-         73,
-         10
-        ],
-        [
-         74,
-         2
-        ],
-        [
-         75,
-         4
-        ],
-        [
-         76,
-         3
-        ],
-        [
-         77,
-         5
-        ],
-        [
-         78,
-         1
-        ],
-        [
-         79,
-         3
-        ],
-        [
-         80,
-         4
-        ],
-        [
-         81,
-         5
-        ],
-        [
-         82,
          6
         ],
         [
-         83,
-         2
+         60,
+         10
         ],
         [
-         84,
-         2
+         61,
+         10
         ],
         [
-         85,
+         62,
          3
         ],
         [
+         63,
+         6
+        ],
+        [
+         64,
+         7
+        ],
+        [
+         65,
+         9
+        ],
+        [
+         66,
+         6
+        ],
+        [
+         67,
+         5
+        ],
+        [
+         68,
+         9
+        ],
+        [
+         69,
+         13
+        ],
+        [
+         70,
+         5
+        ],
+        [
+         71,
+         8
+        ],
+        [
+         72,
+         9
+        ],
+        [
+         73,
+         19
+        ],
+        [
+         74,
+         7
+        ],
+        [
+         75,
+         11
+        ],
+        [
+         76,
+         8
+        ],
+        [
+         77,
+         11
+        ],
+        [
+         78,
+         9
+        ],
+        [
+         79,
+         7
+        ],
+        [
+         80,
+         10
+        ],
+        [
+         81,
+         11
+        ],
+        [
+         82,
+         12
+        ],
+        [
+         83,
+         4
+        ],
+        [
+         84,
+         7
+        ],
+        [
+         85,
+         9
+        ],
+        [
          86,
-         2
+         8
         ],
         [
          87,
-         4
+         9
         ],
         [
          88,
-         4
+         9
         ],
         [
          89,
-         2
+         9
         ],
         [
          90,
-         1
+         5
         ],
         [
          91,
@@ -11920,30 +12144,50 @@
         ],
         [
          92,
-         3
+         5
         ],
         [
          93,
-         1
+         2
         ],
         [
          94,
-         3
+         5
         ],
         [
          95,
-         1
+         6
+        ],
+        [
+         96,
+         2
+        ],
+        [
+         97,
+         2
         ],
         [
          98,
-         1
+         5
+        ],
+        [
+         99,
+         3
+        ],
+        [
+         100,
+         2
         ],
         [
          102,
-         1
+         2
         ],
         [
          103,
+         4
+        ],
+        [
+         104,
          1
         ],
         [
@@ -11951,47 +12195,99 @@
          1
         ],
         [
+         106,
+         1
+        ],
+        [
+         107,
+         1
+        ],
+        [
+         108,
+         2
+        ],
+        [
          109,
+         2
+        ],
+        [
+         110,
+         2
+        ],
+        [
+         112,
+         2
+        ],
+        [
+         113,
+         3
+        ],
+        [
+         115,
+         1
+        ],
+        [
+         117,
          1
         ],
         [
          121,
+         2
+        ],
+        [
+         129,
+         1
+        ],
+        [
+         132,
+         1
+        ],
+        [
+         137,
+         1
+        ],
+        [
+         141,
+         1
+        ],
+        [
+         165,
          1
         ]
        ],
-       "tpot_filtered_count": 208,
-       "duration_sum_ms": 4767614,
+       "tpot_filtered_count": 643,
+       "duration_sum_ms": 15048160,
        "duration_p50_ms": 8420,
-       "duration_p95_ms": 17767,
-       "duration_sample_count": 556,
-       "input_tokens": 17862696,
-       "output_tokens": 647272,
-       "total_tokens": 18509968,
-       "token_sample_count": 556,
+       "duration_p95_ms": 17900,
+       "duration_sample_count": 1682,
+       "input_tokens": 52000213,
+       "output_tokens": 2085447,
+       "total_tokens": 54085660,
+       "token_sample_count": 1682,
        "token_coverage": 1.0,
-       "failed_input_tokens": 3056859,
+       "failed_input_tokens": 4615770,
        "failed_output_tokens": 0,
-       "failed_total_tokens": 3056859,
-       "failed_token_sample_count": 1053
+       "failed_total_tokens": 4615770,
+       "failed_token_sample_count": 1590
       }
      ]
     }
    ],
    "latest": {
     "date": "2026-11-09",
-    "status": "FAILED",
+    "status": "COMPLETED",
     "partial": true,
-    "query_ms": 8575,
-    "duration_sum_ms": 4767614,
-    "duration_sample_count": 556,
+    "query_ms": 8947,
+    "duration_sum_ms": 15048160,
+    "duration_sample_count": 1682,
     "duration_p50_ms": 8420,
-    "duration_p95_ms": 17767,
-    "success_count": 556,
-    "query_count": 1609,
+    "duration_p95_ms": 17900,
+    "success_count": 1682,
+    "query_count": 3272,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-09T01:31:10Z",
-    "failed_queries": 1053,
+    "finished_at": "2026-11-09T06:34:41Z",
+    "failed_queries": 1590,
     "unknown_status_count": 0,
     "blocked_queries": 0,
     "hours": [
@@ -12069,30 +12365,90 @@
      },
      {
       "hour": 9,
-      "calls": 59,
-      "success_count": 1,
-      "duration_sum_ms": 1544,
-      "duration_sample_count": 1,
-      "failed": 58
+      "calls": 118,
+      "success_count": 12,
+      "duration_sum_ms": 95240,
+      "duration_sample_count": 12,
+      "failed": 106
+     },
+     {
+      "hour": 10,
+      "calls": 465,
+      "success_count": 360,
+      "duration_sum_ms": 2972292,
+      "duration_sample_count": 360,
+      "failed": 105
+     },
+     {
+      "hour": 11,
+      "calls": 237,
+      "success_count": 132,
+      "duration_sum_ms": 1517409,
+      "duration_sample_count": 132,
+      "failed": 105
+     },
+     {
+      "hour": 12,
+      "calls": 342,
+      "success_count": 232,
+      "duration_sum_ms": 1850566,
+      "duration_sample_count": 232,
+      "failed": 110
+     },
+     {
+      "hour": 13,
+      "calls": 337,
+      "success_count": 227,
+      "duration_sum_ms": 2222521,
+      "duration_sample_count": 227,
+      "failed": 110
+     },
+     {
+      "hour": 14,
+      "calls": 223,
+      "success_count": 164,
+      "duration_sum_ms": 1624062,
+      "duration_sample_count": 164,
+      "failed": 59
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 1609,
-      "success_count": 556,
-      "failed_count": 1053,
+      "call_count": 3272,
+      "success_count": 1682,
+      "failed_count": 1590,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
       "ttft_sample_count": 0,
       "ttft_sum_ms": null,
-      "ttft_estimated_avg_ms": 1844,
-      "ttft_estimated_sample_count": 141,
-      "ttft_estimated_sum_ms": 259997,
+      "ttft_estimated_avg_ms": 1891,
+      "ttft_estimated_sample_count": 390,
+      "ttft_estimated_sum_ms": 737396,
       "ttft_estimated_histogram": [
+       [
+        316,
+        1
+       ],
+       [
+        320,
+        1
+       ],
+       [
+        324,
+        1
+       ],
+       [
+        328,
+        1
+       ],
        [
         332,
         2
+       ],
+       [
+        333,
+        1
        ],
        [
         334,
@@ -12108,6 +12464,10 @@
        ],
        [
         337,
+        2
+       ],
+       [
+        338,
         1
        ],
        [
@@ -12116,99 +12476,111 @@
        ],
        [
         340,
-        4
-       ],
-       [
-        341,
-        1
-       ],
-       [
-        344,
-        4
-       ],
-       [
-        345,
-        3
-       ],
-       [
-        346,
-        2
-       ],
-       [
-        347,
-        3
-       ],
-       [
-        348,
-        2
-       ],
-       [
-        349,
-        1
-       ],
-       [
-        350,
-        3
-       ],
-       [
-        351,
-        3
-       ],
-       [
-        352,
-        1
-       ],
-       [
-        354,
-        2
-       ],
-       [
-        355,
-        2
-       ],
-       [
-        356,
-        7
-       ],
-       [
-        357,
         6
        ],
        [
-        358,
+        341,
         4
        ],
        [
-        359,
-        1
+        342,
+        4
        ],
        [
-        360,
+        343,
+        5
+       ],
+       [
+        344,
+        8
+       ],
+       [
+        345,
+        5
+       ],
+       [
+        346,
+        6
+       ],
+       [
+        347,
+        7
+       ],
+       [
+        348,
+        6
+       ],
+       [
+        349,
+        4
+       ],
+       [
+        350,
+        5
+       ],
+       [
+        351,
+        9
+       ],
+       [
+        352,
+        8
+       ],
+       [
+        353,
+        7
+       ],
+       [
+        354,
+        7
+       ],
+       [
+        355,
         3
        ],
        [
+        356,
+        10
+       ],
+       [
+        357,
+        10
+       ],
+       [
+        358,
+        9
+       ],
+       [
+        359,
+        8
+       ],
+       [
+        360,
+        7
+       ],
+       [
         361,
-        2
+        5
        ],
        [
         362,
-        1
+        8
        ],
        [
         363,
-        4
+        7
        ],
        [
         364,
-        2
+        5
        ],
        [
         365,
-        1
+        7
        ],
        [
         366,
-        2
+        5
        ],
        [
         367,
@@ -12216,71 +12588,75 @@
        ],
        [
         368,
-        2
+        7
        ],
        [
         369,
-        3
+        7
        ],
        [
         370,
-        2
+        6
        ],
        [
         371,
-        1
+        7
        ],
        [
         372,
-        3
+        9
        ],
        [
         373,
-        2
+        5
        ],
        [
         374,
-        1
+        5
        ],
        [
         375,
-        2
-       ],
-       [
-        376,
         4
        ],
        [
+        376,
+        10
+       ],
+       [
         377,
-        1
+        5
+       ],
+       [
+        378,
+        4
        ],
        [
         379,
-        1
+        8
        ],
        [
         380,
-        3
+        4
        ],
        [
         381,
-        1
+        7
        ],
        [
         382,
-        2
+        5
        ],
        [
         383,
-        3
+        8
        ],
        [
         384,
-        2
+        5
        ],
        [
         385,
-        2
+        5
        ],
        [
         386,
@@ -12288,39 +12664,87 @@
        ],
        [
         387,
-        1
+        2
        ],
        [
         388,
-        1
+        4
        ],
        [
         389,
-        2
+        4
        ],
        [
         390,
-        2
+        5
+       ],
+       [
+        391,
+        1
        ],
        [
         394,
         1
        ],
        [
+        395,
+        3
+       ],
+       [
+        396,
+        3
+       ],
+       [
         397,
+        5
+       ],
+       [
+        398,
         1
        ],
        [
-        405,
+        400,
         1
+       ],
+       [
+        401,
+        1
+       ],
+       [
+        402,
+        2
+       ],
+       [
+        403,
+        1
+       ],
+       [
+        404,
+        2
+       ],
+       [
+        405,
+        2
        ],
        [
         406,
         3
        ],
        [
+        407,
+        1
+       ],
+       [
         408,
         2
+       ],
+       [
+        409,
+        1
+       ],
+       [
+        410,
+        1
        ],
        [
         411,
@@ -12328,10 +12752,26 @@
        ],
        [
         412,
+        3
+       ],
+       [
+        413,
+        1
+       ],
+       [
+        414,
         1
        ],
        [
         415,
+        2
+       ],
+       [
+        417,
+        2
+       ],
+       [
+        419,
         1
        ],
        [
@@ -12339,8 +12779,16 @@
         2
        ],
        [
+        422,
+        1
+       ],
+       [
+        423,
+        1
+       ],
+       [
         424,
-        2
+        3
        ],
        [
         425,
@@ -12348,7 +12796,7 @@
        ],
        [
         429,
-        1
+        2
        ],
        [
         430,
@@ -12360,6 +12808,14 @@
        ],
        [
         433,
+        2
+       ],
+       [
+        434,
+        1
+       ],
+       [
+        436,
         1
        ],
        [
@@ -12367,200 +12823,264 @@
         2
        ],
        [
+        441,
+        1
+       ],
+       [
+        444,
+        1
+       ],
+       [
+        445,
+        1
+       ],
+       [
+        450,
+        1
+       ],
+       [
         452,
+        1
+       ],
+       [
+        453,
+        1
+       ],
+       [
+        463,
+        1
+       ],
+       [
+        468,
+        1
+       ],
+       [
+        471,
         1
        ]
       ],
-      "ttft_filtered_count": 208,
+      "ttft_filtered_count": 643,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
       "tpot_weight_tokens": 0,
-      "tpot_estimated_avg_ms": 4.729977236453073,
-      "tpot_estimated_sample_count": 141,
-      "tpot_estimated_decode_sum_ms": 542325.0,
-      "tpot_estimated_weight_tokens": 114657,
+      "tpot_estimated_avg_ms": 5.133336424714562,
+      "tpot_estimated_sample_count": 390,
+      "tpot_estimated_decode_sum_ms": 1992638.0,
+      "tpot_estimated_weight_tokens": 388176,
       "tpot_histogram": [],
       "tpot_estimated_histogram": [
        [
+        24,
+        1
+       ],
+       [
         28,
         1
+       ],
+       [
+        35,
+        1
+       ],
+       [
+        36,
+        2
        ],
        [
         37,
         1
        ],
        [
+        40,
+        2
+       ],
+       [
         41,
-        1
+        2
        ],
        [
         43,
         1
        ],
        [
+        44,
+        2
+       ],
+       [
         46,
-        1
+        5
        ],
        [
         47,
-        1
+        3
+       ],
+       [
+        48,
+        3
        ],
        [
         49,
         1
        ],
        [
+        50,
+        1
+       ],
+       [
         52,
-        4
+        7
        ],
        [
         53,
-        1
+        2
+       ],
+       [
+        54,
+        4
        ],
        [
         55,
-        2
+        4
        ],
        [
         56,
-        2
+        4
        ],
        [
         57,
-        1
+        5
        ],
        [
         58,
-        3
+        4
        ],
        [
         59,
-        5
-       ],
-       [
-        60,
-        1
-       ],
-       [
-        61,
-        2
-       ],
-       [
-        62,
-        1
-       ],
-       [
-        63,
-        3
-       ],
-       [
-        64,
-        5
-       ],
-       [
-        65,
-        3
-       ],
-       [
-        66,
-        3
-       ],
-       [
-        67,
-        2
-       ],
-       [
-        68,
-        4
-       ],
-       [
-        69,
-        3
-       ],
-       [
-        70,
-        3
-       ],
-       [
-        71,
-        4
-       ],
-       [
-        72,
-        4
-       ],
-       [
-        73,
-        10
-       ],
-       [
-        74,
-        2
-       ],
-       [
-        75,
-        4
-       ],
-       [
-        76,
-        3
-       ],
-       [
-        77,
-        5
-       ],
-       [
-        78,
-        1
-       ],
-       [
-        79,
-        3
-       ],
-       [
-        80,
-        4
-       ],
-       [
-        81,
-        5
-       ],
-       [
-        82,
         6
        ],
        [
-        83,
-        2
+        60,
+        10
        ],
        [
-        84,
-        2
+        61,
+        10
        ],
        [
-        85,
+        62,
         3
        ],
        [
+        63,
+        6
+       ],
+       [
+        64,
+        7
+       ],
+       [
+        65,
+        9
+       ],
+       [
+        66,
+        6
+       ],
+       [
+        67,
+        5
+       ],
+       [
+        68,
+        9
+       ],
+       [
+        69,
+        13
+       ],
+       [
+        70,
+        5
+       ],
+       [
+        71,
+        8
+       ],
+       [
+        72,
+        9
+       ],
+       [
+        73,
+        19
+       ],
+       [
+        74,
+        7
+       ],
+       [
+        75,
+        11
+       ],
+       [
+        76,
+        8
+       ],
+       [
+        77,
+        11
+       ],
+       [
+        78,
+        9
+       ],
+       [
+        79,
+        7
+       ],
+       [
+        80,
+        10
+       ],
+       [
+        81,
+        11
+       ],
+       [
+        82,
+        12
+       ],
+       [
+        83,
+        4
+       ],
+       [
+        84,
+        7
+       ],
+       [
+        85,
+        9
+       ],
+       [
         86,
-        2
+        8
        ],
        [
         87,
-        4
+        9
        ],
        [
         88,
-        4
+        9
        ],
        [
         89,
-        2
+        9
        ],
        [
         90,
-        1
+        5
        ],
        [
         91,
@@ -12568,30 +13088,50 @@
        ],
        [
         92,
-        3
+        5
        ],
        [
         93,
-        1
+        2
        ],
        [
         94,
-        3
+        5
        ],
        [
         95,
-        1
+        6
+       ],
+       [
+        96,
+        2
+       ],
+       [
+        97,
+        2
        ],
        [
         98,
-        1
+        5
+       ],
+       [
+        99,
+        3
+       ],
+       [
+        100,
+        2
        ],
        [
         102,
-        1
+        2
        ],
        [
         103,
+        4
+       ],
+       [
+        104,
         1
        ],
        [
@@ -12599,28 +13139,80 @@
         1
        ],
        [
+        106,
+        1
+       ],
+       [
+        107,
+        1
+       ],
+       [
+        108,
+        2
+       ],
+       [
         109,
+        2
+       ],
+       [
+        110,
+        2
+       ],
+       [
+        112,
+        2
+       ],
+       [
+        113,
+        3
+       ],
+       [
+        115,
+        1
+       ],
+       [
+        117,
         1
        ],
        [
         121,
+        2
+       ],
+       [
+        129,
+        1
+       ],
+       [
+        132,
+        1
+       ],
+       [
+        137,
+        1
+       ],
+       [
+        141,
+        1
+       ],
+       [
+        165,
         1
        ]
       ],
-      "tpot_filtered_count": 208,
-      "duration_sum_ms": 4767614,
+      "tpot_filtered_count": 643,
+      "duration_sum_ms": 15048160,
       "duration_p50_ms": 8420,
-      "duration_p95_ms": 17767,
-      "duration_sample_count": 556,
-      "input_tokens": 17862696,
-      "output_tokens": 647272,
-      "total_tokens": 18509968,
-      "token_sample_count": 556,
+      "duration_p95_ms": 17900,
+      "duration_sample_count": 1682,
+      "input_tokens": 52000213,
+      "output_tokens": 2085447,
+      "total_tokens": 54085660,
+      "token_sample_count": 1682,
       "token_coverage": 1.0,
-      "failed_input_tokens": 3056859,
+      "failed_input_tokens": 4615770,
       "failed_output_tokens": 0,
-      "failed_total_tokens": 3056859,
-      "failed_token_sample_count": 1053
+      "failed_total_tokens": 4615770,
+      "failed_token_sample_count": 1590
      }
     ]
    }
