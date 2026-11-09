@@ -1309,6 +1309,20 @@ function failureSeries(history, dates, model) {
   });
 }
 
+// A range-wide rate is only shown when every day in the window has a usable
+// ratio; one day with unknown statuses would make the whole span misleading.
+function failureTotals(rows) {
+  const list = Array.isArray(rows) ? rows : [];
+  let failed = 0;
+  let queries = 0;
+  for (const row of list) {
+    if (!Number.isFinite(row?.failure_rate)) return null;
+    failed += row.failed;
+    queries += row.queries;
+  }
+  return queries > 0 ? { failed, queries, failure_rate: (failed / queries) * 100 } : null;
+}
+
 function fmtPercent(value) {
   return Number.isFinite(value) ? `${value.toFixed(1)}%` : '—';
 }
@@ -1741,6 +1755,15 @@ function inRange(days, rangeDays, endDate = null) {
   const end = endDate || rows[rows.length - 1].date;
   const start = addDays(end, -(span - 1));
   return rows.filter((row) => row.date >= start && row.date <= end);
+}
+
+// A single-day window reads better without repeating the same date.
+function spanLabel(rows) {
+  const list = Array.isArray(rows) ? rows : [];
+  if (!list.length) return '暂无数据';
+  const first = list[0].date;
+  const last = list[list.length - 1].date;
+  return first === last ? `${first} · 1 天` : `${first} 至 ${last} · ${list.length} 天`;
 }
 
 function latestModelDate(history) {
@@ -2312,17 +2335,24 @@ function modelTrends(days, tokenVisibility = {}, latencyVisibility = {}, { token
     + tokenTrendChart(days, tokenVisibility, tokenUnit);
 }
 
-function modelSummary(days, model, { unit = 'query', failure = null, anchor = null } = {}) {
-  const latest = days.find((day) => day.date === anchor);
-  if (!latest) return '<p class="empty">该模型在最新完整日暂无数据。</p>';
+// The cards summarize the selected time range: one day for 当天, the trailing
+// 7/30 days, or the whole history. Daily rows merge through the same weighted
+// accumulator as the weekly table, so means stay sample-weighted and tokens sum
+// instead of averaging daily means.
+function modelSummary(days, model, { failure = null } = {}) {
+  const rows = Array.isArray(days) ? days : [];
+  if (!rows.length) return '<p class="empty">该模型在所选时间范围内暂无数据。</p>';
+  const accumulator = newMetricAccumulator();
+  for (const row of rows) mergeMetricRow(accumulator, row);
+  const totals = finalizeMetricAccumulator(accumulator);
   // One block per metric family: members share a card, values joined by "/";
   // the unit lives in the label so values stay bare numbers.
   const tpotBare = (key) => {
-    const confirmed = latest[`tpot_${key}_ms`];
-    const estimate = latest[`tpot_estimated_${key}_ms`];
+    const confirmed = totals[`tpot_${key}_ms`];
+    const estimate = totals[`tpot_estimated_${key}_ms`];
     return fmtTpotBare(Number.isFinite(confirmed) ? confirmed : estimate);
   };
-  const tokenValues = [latest.input_tokens, latest.output_tokens, latest.total_tokens];
+  const tokenValues = [totals.input_tokens, totals.output_tokens, totals.total_tokens];
   const tokenMax = Math.max(...tokenValues.map((value) => (Number.isFinite(value) ? value : 0)));
   const [tokenDiv, tokenUnit] = tokenMax >= 1e9 ? [1e9, 'B'] : tokenMax >= 1e6 ? [1e6, 'M'] : tokenMax >= 1e3 ? [1e3, 'k'] : [1, ''];
   const tokenBare = (value) => (Number.isFinite(value) && value >= 0
@@ -2332,28 +2362,28 @@ function modelSummary(days, model, { unit = 'query', failure = null, anchor = nu
   return `
     <div class="stat-card">
       <div class="stat-label">模型侧<strong>请求数</strong> / <strong>请求失败率</strong></div>
-      <div class="stat-value combo">${fmtCount(latest.calls)} / <span class="${failureTone}">${failure ? fmtPercent(failure.failure_rate) : '—'}</span></div>
-      <div class="stat-hint">成功 ${fmtCount(latest.success_count)} / 失败 ${failure ? fmtCount(failure.failed) : '—（含未知状态或无数据）'}</div>
+      <div class="stat-value combo">${fmtCount(totals.calls)} / <span class="${failureTone}">${failure ? fmtPercent(failure.failure_rate) : '—'}</span></div>
+      <div class="stat-hint">成功 ${fmtCount(totals.success_count)} / 失败 ${failure ? fmtCount(failure.failed) : '—（含未知状态或无数据）'}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">模型侧<strong>请求耗时</strong>平均 / P50 / P95（s）</div>
-      <div class="stat-value combo">${fmtSecondsBare(latest.duration_ms)} / ${esc(fmtSecondsRangeBare(latest, 'p50'))} / ${esc(fmtSecondsRangeBare(latest, 'p95'))}</div>
-      <div class="stat-hint">不含端侧与网络 · ${fmtCount(latest.duration_samples)} 个成功样本</div>
+      <div class="stat-value combo">${fmtSecondsBare(totals.duration_ms)} / ${esc(fmtSecondsRangeBare(totals, 'p50'))} / ${esc(fmtSecondsRangeBare(totals, 'p95'))}</div>
+      <div class="stat-hint">不含端侧与网络 · ${fmtCount(totals.duration_samples)} 个成功样本</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">模型侧<strong>TTFT</strong> 平均 / P50 / P95（s）</div>
-      <div class="stat-value combo">${fmtSecondsBare(latest.ttft_estimated_ms)} / ${fmtSecondsBare(latest.ttft_estimated_p50_ms)} / ${fmtSecondsBare(latest.ttft_estimated_p95_ms)}</div>
-      <div class="stat-hint">${fmtCount(latest.ttft_estimated_samples)} 个样本 · 分桶近似 · 至少 20 个样本</div>
+      <div class="stat-value combo">${fmtSecondsBare(totals.ttft_estimated_ms)} / ${fmtSecondsBare(totals.ttft_estimated_p50_ms)} / ${fmtSecondsBare(totals.ttft_estimated_p95_ms)}</div>
+      <div class="stat-hint">${fmtCount(totals.ttft_estimated_samples)} 个样本 · 分桶近似 · 至少 20 个样本</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">模型侧<strong>TPOT</strong> 平均 / P50 / P95（ms/token）</div>
-      <div class="stat-value combo">${fmtTpotBare(latest.tpot_estimated_ms)} / ${tpotBare('p50')} / ${tpotBare('p95')}</div>
-      <div class="stat-hint">Token 加权 · ${fmtCount(latest.tpot_estimated_samples)} 个样本 · 规则过滤 ${fmtCount(latest.tpot_filtered_count)} 个</div>
+      <div class="stat-value combo">${fmtTpotBare(totals.tpot_estimated_ms)} / ${tpotBare('p50')} / ${tpotBare('p95')}</div>
+      <div class="stat-hint">Token 加权 · ${fmtCount(totals.tpot_estimated_samples)} 个样本 · 规则过滤 ${fmtCount(totals.tpot_filtered_count)} 个</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">模型侧输入 / 输出 / 总 Token${tokenUnit ? `（${tokenUnit}）` : ''}</div>
-      <div class="stat-value combo">${tokenBare(latest.input_tokens)} / ${tokenBare(latest.output_tokens)} / ${tokenBare(latest.total_tokens)}</div>
-      <div class="stat-hint">成功调用 ${fmtCount(latest.success_count)} 次</div>
+      <div class="stat-value combo">${tokenBare(totals.input_tokens)} / ${tokenBare(totals.output_tokens)} / ${tokenBare(totals.total_tokens)}</div>
+      <div class="stat-hint">成功调用 ${fmtCount(totals.success_count)} 次</div>
     </div>
   `;
 }
@@ -2759,12 +2789,11 @@ function renderModels() {
   const failures = failureSeries(history, complete, state.model);
   const dailyRates = new Map(failureSeries(history, days, state.model).map((row) => [row.date, row.failure_rate]));
   const weeklyRates = weeklyFailureRates(failures);
-  const latestFailure = anchor
-    ? failures.find((row) => row.date === anchor && Number.isFinite(row.failure_rate)) || null
-    : null;
-  const span = days.length
-    ? `${days[0].date} 至 ${days[days.length - 1].date} · ${days.length} 天`
-    : '暂无数据';
+  const rangeFailure = failureTotals(failures);
+  const span = spanLabel(days);
+  // The comparison card names the summary window: the partial current day
+  // still appears in the chart and table but never in a headline total.
+  const scopeSpan = complete.length ? spanLabel(complete) : span;
   if (insights) {
     // A low-volume model cannot raise a reliable regression claim either.
     insights.innerHTML = !isLowVolumeModel(state.model, recentCalls) && complete.some((row) => row.date === anchor)
@@ -2775,7 +2804,7 @@ function renderModels() {
     compare.innerHTML = modelCompareCard(modelComparison(history, state.rangeDays), { selected: state.model });
   }
   if (compareVersion) compareVersion.textContent = versionLine(history);
-  if (summary) summary.innerHTML = modelSummary(complete, state.model, { unit: state.tokenUnit, failure: latestFailure, anchor });
+  if (summary) summary.innerHTML = modelSummary(complete, state.model, { failure: rangeFailure });
   if (trends) {
     const trendFailures = failureSeries(history, days, state.model);
     trends.innerHTML = modelTrends(days, state.tokenVisibility, state.latencyVisibility, {
@@ -2794,7 +2823,7 @@ function renderModels() {
   if (range) {
     range.textContent = state.granularity === 'weekly' ? `周一至周日 · ${span}` : span;
   }
-  if (scope) scope.textContent = span;
+  if (scope) scope.textContent = scopeSpan;
   syncRangeButtons(false);
   // Keep the URL shareable: model, range and granularity round-trip through
   // the hash so a version manager can paste a link straight into an issue.
