@@ -40,6 +40,20 @@ ANSI = re.compile(r"\x1b\[[0-9;?]*[A-Za-z]|\x1b\][^\x07]*\x07")
 AGGREGATOR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cloud-request-log-aggregate.py")
 
 
+class AdxError(RuntimeError):
+    """A failed ADX API call.
+
+    Raised as a normal exception rather than SystemExit: several environments
+    are collected per run, and one unreachable environment (e.g. a deleted
+    generation whose terminal can no longer be opened) must not abort the
+    others.
+    """
+
+    def __init__(self, status, path, detail=""):
+        super().__init__(f"ADX API HTTP {status} {path}: {detail}".rstrip(": "))
+        self.status = status
+
+
 def call(path, method="GET", payload=None, timeout=60):
     headers = {"authorization": "Bearer " + TOKEN}
     body = None
@@ -52,7 +66,7 @@ def call(path, method="GET", payload=None, timeout=60):
             return json.loads(response.read().decode())
     except urllib.error.HTTPError as error:
         detail = error.read().decode("utf-8", "replace")[:300]
-        raise SystemExit(f"ADX API HTTP {error.code} {path}: {detail}")
+        raise AdxError(error.code, path, detail) from None
 
 
 def bindings():
@@ -126,7 +140,7 @@ class Terminal:
                 call(f"/api/terminals/{self.id}", "POST", {"type": "input", "data": payload, "seq": self.seq})
                 time.sleep(1.2)
                 return
-            except SystemExit as error:
+            except AdxError as error:
                 message = str(error)
                 if attempt == 4:
                     raise
@@ -140,7 +154,7 @@ class Terminal:
                 time.sleep(8 + attempt * 6)
                 try:
                     self._read()
-                except SystemExit:
+                except AdxError:
                     self._open()
                     self.settle(2.0)
 
@@ -319,6 +333,12 @@ def collect(until=""):
     results = []
     items = bindings()
     for index, item in enumerate(items, 1):
+        # A binding can outlive its environment (deleted generation); the
+        # console refuses a terminal on it, so there is nothing left to read.
+        state = (item.get("environments") or {}).get("current") or {}
+        if str(state.get("status") or "") == "not_found":
+            print(f"environment {index}/{len(items)} skipped: {state.get('environment_id')} no longer exists", file=sys.stderr)
+            continue
         try:
             results.append(collect_environment(item, script, until))
             if os.environ.get("ADX_DEBUG"):
