@@ -1,6 +1,526 @@
 {
-  "generatedAt": "2026-11-08T19:18:47.874Z",
+  "generatedAt": "2026-11-09T23:40:53.727Z",
   "items": [
+    {
+      "number": 2752,
+      "title": "workflow: a queued card never starts when the run in front of it fails",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T09:36:02Z",
+      "closedAt": null,
+      "waitingHours": 14.081035277777778,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2752"
+    },
+    {
+      "number": 2751,
+      "title": "tree: one reorganization job that never settles blocks every later one",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T09:07:36Z",
+      "closedAt": null,
+      "waitingHours": 14.554924166666666,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "agent-ready",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2751"
+    },
+    {
+      "number": 2750,
+      "title": "workflow: a Stop whose release always fails is retried for ever and keeps its lane slot",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T09:07:35Z",
+      "closedAt": null,
+      "waitingHours": 14.555201944444445,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "agent-ready",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2750"
+    },
+    {
+      "number": 2749,
+      "title": "probe",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T09:07:10Z",
+      "closedAt": "2026-11-09T09:08:11Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "bug"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2749"
+    },
+    {
+      "number": 2748,
+      "title": "workflow: an unbounded host call holds the serial tail, so no step deadline can ever fire",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T09:06:28Z",
+      "closedAt": null,
+      "waitingHours": 14.573813055555556,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "agent-ready",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2748"
+    },
+    {
+      "number": 2746,
+      "title": "Eight workflow/tree defences have no test: a mutation audit (13 of 31 mutations survived)",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T07:13:17Z",
+      "closedAt": "2026-11-09T07:48:52Z",
+      "waitingHours": null,
+      "comments": 5,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2746"
+    },
+    {
+      "number": 2742,
+      "title": "host: every completed turn should carry its own outcome, not leave workflow steps parsing prose",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T06:52:24Z",
+      "closedAt": null,
+      "waitingHours": 16.8082575,
+      "comments": 2,
+      "labels": [
+        "bug",
+        "agent-ready",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2742"
+    },
+    {
+      "number": 2741,
+      "title": "workflow: a step the host stopped before it answered still reads as done",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T06:51:20Z",
+      "closedAt": "2026-11-09T08:07:28Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2741"
+    },
+    {
+      "number": 2740,
+      "title": "host: the /api fence's decision is flattened to `=== 403`, so any other refusal answers 200",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T06:44:22Z",
+      "closedAt": "2026-11-09T08:15:33Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "area:security"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2740"
+    },
+    {
+      "number": 2739,
+      "title": "A memory review answer with a topic memory cannot use discards every change beside it",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T06:43:32Z",
+      "closedAt": "2026-11-09T08:04:17Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2739"
+    },
+    {
+      "number": 2736,
+      "title": "A store entry that is not a workflow throws out of load() instead of answering store-unreadable",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T05:02:23Z",
+      "closedAt": "2026-11-09T05:39:54Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2736"
+    },
+    {
+      "number": 2735,
+      "title": "A parked card leaves the queue when its start is refused and never runs again",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T05:02:22Z",
+      "closedAt": "2026-11-09T05:39:53Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2735"
+    },
+    {
+      "number": 2734,
+      "title": "Pause and Resume are lost when they arrive while a step dispatch is in flight",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T05:02:21Z",
+      "closedAt": "2026-11-09T05:39:53Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2734"
+    },
+    {
+      "number": 2733,
+      "title": "The core suite step has no tests/skipped guard, and reports 100% coverage when nothing ran",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T04:10:35Z",
+      "closedAt": null,
+      "waitingHours": 19.505201944444444,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation",
+        "area:security"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2733"
+    },
+    {
+      "number": 2732,
+      "title": "The plugins \"none skipped\" step passes a suite that ran zero tests",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T04:10:32Z",
+      "closedAt": null,
+      "waitingHours": 19.506035277777777,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation",
+        "area:security"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2732"
+    },
+    {
+      "number": 2731,
+      "title": "policy/gates.json lists test.yml but not the composite action that actually runs the suite",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T04:10:29Z",
+      "closedAt": null,
+      "waitingHours": 19.506868611111113,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation",
+        "area:security"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2731"
+    },
+    {
+      "number": 2730,
+      "title": "home-lock.test.js removes its home before the host is disposed, and the fix cannot be generated without git",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "open",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T03:55:11Z",
+      "closedAt": null,
+      "waitingHours": 19.76186861111111,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "needs-human",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2730"
+    },
+    {
+      "number": 2726,
+      "title": "core/test leaves temp dirs behind: home-lock removes its home before the host is disposed, seven files never remove theirs",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T02:36:36Z",
+      "closedAt": "2026-11-09T04:03:16Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2726"
+    },
+    {
+      "number": 2725,
+      "title": "npm test in core/ starts 191 test processes on a 192-core box and nothing bounds a stuck child",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T02:36:35Z",
+      "closedAt": "2026-11-09T03:36:55Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2725"
+    },
+    {
+      "number": 2724,
+      "title": "decisions.jsonl.tmp is one fixed name for every writer, and a read-only window writes the log too",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T02:36:34Z",
+      "closedAt": "2026-11-09T03:15:45Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2724"
+    },
+    {
+      "number": 2722,
+      "title": "test: the coverage run has no --test-timeout, so one stuck test costs the whole 25-minute job",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-09T01:58:50Z",
+      "closedAt": "2026-11-09T02:22:43Z",
+      "waitingHours": null,
+      "comments": 3,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2722"
+    },
+    {
+      "number": 2717,
+      "title": "social: a torn settings/identity file reads as \"nothing saved\" and is overwritten with no copy kept",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-08T23:07:45Z",
+      "closedAt": "2026-11-09T01:57:49Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "area:social"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2717"
+    },
+    {
+      "number": 2716,
+      "title": "core: an empty or half-written team file is diagnosed as \"saved by a newer FlyBot; update FlyBot\"",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-08T23:07:43Z",
+      "closedAt": "2026-11-09T01:43:31Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2716"
+    },
+    {
+      "number": 2715,
+      "title": "core: `exchanges: null` in the team file loads clean and writable, then every `save()` throws",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-08T23:07:41Z",
+      "closedAt": "2026-11-09T00:41:39Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2715"
+    },
+    {
+      "number": 2714,
+      "title": "core: one room record without `members` makes `load()` reject for the life of the process",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-08T23:07:40Z",
+      "closedAt": "2026-11-08T23:58:01Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2714"
+    },
+    {
+      "number": 2711,
+      "title": "Two chat-index writers past the same mark duplicate every line, and the read-only window writes the index",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-08T22:03:45Z",
+      "closedAt": "2026-11-09T02:25:55Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2711"
+    },
+    {
+      "number": 2710,
+      "title": "An anchor printed before a part split later resolves to another part and reports exact",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-08T22:03:44Z",
+      "closedAt": "2026-11-08T22:32:41Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2710"
+    },
+    {
+      "number": 2706,
+      "title": "A timeline trace that started behind another writer never retries the lock, and flush() reports success while dropping spans",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-08T19:23:21Z",
+      "closedAt": "2026-11-08T21:39:58Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2706"
+    },
+    {
+      "number": 2705,
+      "title": "inflight.json is truncated before it is written, so a crash drops every turn it was meant to resume",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-08T19:23:20Z",
+      "closedAt": "2026-11-08T21:06:37Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2705"
+    },
+    {
+      "number": 2704,
+      "title": "A workflow window that takes over writes its stale copy over the dead window's records, and never reaps its run",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "closed",
+      "isPullRequest": false,
+      "createdAt": "2026-11-08T19:23:19Z",
+      "closedAt": "2026-11-08T19:52:02Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "bug",
+        "area:automation"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/issues/2704"
+    },
     {
       "number": 2702,
       "title": "Three tests decide their own result: a python3 dependency, a fixed temp path, and a silent skip that reports a pass",
@@ -160,11 +680,11 @@
       "isPullRequest": false,
       "createdAt": "2026-11-08T10:05:46Z",
       "closedAt": null,
-      "waitingHours": 9.217187222222222,
+      "waitingHours": 37.585479722222225,
       "comments": 2,
       "labels": [
         "bug",
-        "agent-working",
+        "agent-pr",
         "area:automation",
         "urgent"
       ],
@@ -264,7 +784,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-08T05:51:28Z",
       "closedAt": null,
-      "waitingHours": 13.455520555555555,
+      "waitingHours": 41.823813055555554,
       "comments": 2,
       "labels": [
         "bug",
@@ -1216,8 +1736,8 @@
       "isPullRequest": false,
       "createdAt": "2026-11-05T14:32:47Z",
       "closedAt": null,
-      "waitingHours": 76.76690944444445,
-      "comments": 2,
+      "waitingHours": 105.13520194444445,
+      "comments": 3,
       "labels": [
         "bug",
         "agent-pr",
@@ -1573,7 +2093,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-05T01:22:36Z",
       "closedAt": null,
-      "waitingHours": 89.93663166666667,
+      "waitingHours": 118.30492416666667,
       "comments": 16,
       "labels": [
         "bug",
@@ -1815,7 +2335,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T17:50:17Z",
       "closedAt": null,
-      "waitingHours": 97.47524277777778,
+      "waitingHours": 125.84353527777778,
       "comments": 2,
       "labels": [
         "needs-human"
@@ -1862,7 +2382,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T17:41:51Z",
       "closedAt": null,
-      "waitingHours": 97.61579833333333,
+      "waitingHours": 125.98409083333334,
       "comments": 2,
       "labels": [
         "needs-human"
@@ -1950,7 +2470,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T17:31:48Z",
       "closedAt": null,
-      "waitingHours": 97.78329833333333,
+      "waitingHours": 126.15159083333333,
       "comments": 1,
       "labels": [
         "needs-human"
@@ -2102,7 +2622,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T14:16:35Z",
       "closedAt": null,
-      "waitingHours": 101.03690944444445,
+      "waitingHours": 129.40520194444446,
       "comments": 9,
       "labels": [
         "bug",
@@ -2201,7 +2721,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T12:21:37Z",
       "closedAt": null,
-      "waitingHours": 102.95302055555555,
+      "waitingHours": 131.32131305555555,
       "comments": 2,
       "labels": [
         "bug",
@@ -2319,7 +2839,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T09:38:48Z",
       "closedAt": null,
-      "waitingHours": 105.66663166666666,
+      "waitingHours": 134.03492416666666,
       "comments": 2,
       "labels": [
         "bug",
@@ -2337,7 +2857,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T09:30:58Z",
       "closedAt": null,
-      "waitingHours": 105.79718722222222,
+      "waitingHours": 134.16547972222222,
       "comments": 2,
       "labels": [
         "bug",
@@ -2355,7 +2875,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T09:20:40Z",
       "closedAt": null,
-      "waitingHours": 105.96885388888889,
+      "waitingHours": 134.3371463888889,
       "comments": 3,
       "labels": [
         "bug",
@@ -2387,7 +2907,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T06:42:59Z",
       "closedAt": null,
-      "waitingHours": 108.59690944444445,
+      "waitingHours": 136.96520194444443,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -2493,7 +3013,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T03:31:23Z",
       "closedAt": null,
-      "waitingHours": 111.79024277777778,
+      "waitingHours": 140.1585352777778,
       "comments": 2,
       "labels": [
         "bug",
@@ -2511,7 +3031,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T03:27:53Z",
       "closedAt": null,
-      "waitingHours": 111.84857611111111,
+      "waitingHours": 140.21686861111112,
       "comments": 2,
       "labels": [
         "bug",
@@ -2543,7 +3063,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T03:01:15Z",
       "closedAt": null,
-      "waitingHours": 112.292465,
+      "waitingHours": 140.6607575,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -2575,7 +3095,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T02:36:07Z",
       "closedAt": null,
-      "waitingHours": 112.7113538888889,
+      "waitingHours": 141.07964638888888,
       "comments": 2,
       "labels": [
         "bug",
@@ -2593,7 +3113,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T02:35:34Z",
       "closedAt": null,
-      "waitingHours": 112.72052055555555,
+      "waitingHours": 141.08881305555556,
       "comments": 2,
       "labels": [
         "bug",
@@ -2611,7 +3131,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T02:35:10Z",
       "closedAt": null,
-      "waitingHours": 112.72718722222223,
+      "waitingHours": 141.09547972222222,
       "comments": 2,
       "labels": [
         "bug",
@@ -2629,7 +3149,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T02:34:44Z",
       "closedAt": null,
-      "waitingHours": 112.73440944444444,
+      "waitingHours": 141.10270194444445,
       "comments": 2,
       "labels": [
         "bug",
@@ -2647,7 +3167,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T02:14:35Z",
       "closedAt": null,
-      "waitingHours": 113.07024277777778,
+      "waitingHours": 141.4385352777778,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -2665,7 +3185,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T02:01:23Z",
       "closedAt": null,
-      "waitingHours": 113.29024277777778,
+      "waitingHours": 141.6585352777778,
       "comments": 1,
       "labels": [
         "bug",
@@ -2683,7 +3203,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T01:55:02Z",
       "closedAt": null,
-      "waitingHours": 113.39607611111111,
+      "waitingHours": 141.7643686111111,
       "comments": 1,
       "labels": [
         "bug",
@@ -2701,7 +3221,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T01:51:27Z",
       "closedAt": null,
-      "waitingHours": 113.45579833333333,
+      "waitingHours": 141.82409083333334,
       "comments": 1,
       "labels": [
         "bug",
@@ -2719,7 +3239,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-04T01:40:56Z",
       "closedAt": null,
-      "waitingHours": 113.63107611111111,
+      "waitingHours": 141.99936861111112,
       "comments": 1,
       "labels": [
         "bug",
@@ -2840,7 +3360,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-03T14:29:42Z",
       "closedAt": null,
-      "waitingHours": 124.81829833333333,
+      "waitingHours": 153.18659083333333,
       "comments": 2,
       "labels": [
         "needs-human"
@@ -2872,7 +3392,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-03T14:17:29Z",
       "closedAt": null,
-      "waitingHours": 125.02190944444445,
+      "waitingHours": 153.39020194444444,
       "comments": 2,
       "labels": [
         "needs-human"
@@ -2976,7 +3496,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-03T09:02:18Z",
       "closedAt": null,
-      "waitingHours": 130.274965,
+      "waitingHours": 158.6432575,
       "comments": 7,
       "labels": [
         "needs-human"
@@ -4170,7 +4690,7 @@
       "isPullRequest": false,
       "createdAt": "2026-11-02T07:00:14Z",
       "closedAt": null,
-      "waitingHours": 156.30940944444444,
+      "waitingHours": 184.67770194444444,
       "comments": 8,
       "labels": [
         "bug",
@@ -6332,7 +6852,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-30T09:28:40Z",
       "closedAt": null,
-      "waitingHours": 225.83552055555555,
+      "waitingHours": 254.20381305555554,
       "comments": 4,
       "labels": [
         "question",
@@ -6366,7 +6886,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-30T09:26:09Z",
       "closedAt": null,
-      "waitingHours": 225.877465,
+      "waitingHours": 254.2457575,
       "comments": 4,
       "labels": [
         "bug",
@@ -8236,7 +8756,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-28T03:53:30Z",
       "closedAt": null,
-      "waitingHours": 279.42163166666666,
+      "waitingHours": 307.78992416666665,
       "comments": 11,
       "labels": [
         "needs-human"
@@ -15177,8 +15697,8 @@
       "isPullRequest": false,
       "createdAt": "2026-10-22T21:41:06Z",
       "closedAt": null,
-      "waitingHours": 405.6282983333333,
-      "comments": 11,
+      "waitingHours": 433.99659083333336,
+      "comments": 12,
       "labels": [
         "bug",
         "needs-human",
@@ -16976,7 +17496,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-21T02:15:52Z",
       "closedAt": null,
-      "waitingHours": 449.0488538888889,
+      "waitingHours": 477.4171463888889,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -17025,7 +17545,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-21T02:03:34Z",
       "closedAt": null,
-      "waitingHours": 449.2538538888889,
+      "waitingHours": 477.6221463888889,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -17471,7 +17991,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-20T06:54:42Z",
       "closedAt": null,
-      "waitingHours": 468.4016316666667,
+      "waitingHours": 496.76992416666667,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -17841,7 +18361,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-20T01:05:45Z",
       "closedAt": null,
-      "waitingHours": 474.217465,
+      "waitingHours": 502.5857575,
       "comments": 12,
       "labels": [
         "enhancement",
@@ -18006,7 +18526,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-19T13:50:30Z",
       "closedAt": null,
-      "waitingHours": 485.47163166666667,
+      "waitingHours": 513.8399241666667,
       "comments": 5,
       "labels": [
         "enhancement",
@@ -18109,7 +18629,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-19T07:54:10Z",
       "closedAt": null,
-      "waitingHours": 491.41052055555554,
+      "waitingHours": 519.7788130555556,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -18395,7 +18915,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-18T22:47:58Z",
       "closedAt": null,
-      "waitingHours": 500.5138538888889,
+      "waitingHours": 528.8821463888889,
       "comments": 4,
       "labels": [
         "enhancement",
@@ -18697,7 +19217,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-18T13:50:02Z",
       "closedAt": null,
-      "waitingHours": 509.47940944444446,
+      "waitingHours": 537.8477019444445,
       "comments": 10,
       "labels": [
         "enhancement",
@@ -18750,7 +19270,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-18T13:43:05Z",
       "closedAt": null,
-      "waitingHours": 509.5952427777778,
+      "waitingHours": 537.9635352777777,
       "comments": 3,
       "labels": [
         "enhancement",
@@ -20310,7 +20830,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-16T14:35:59Z",
       "closedAt": null,
-      "waitingHours": 556.7135761111111,
+      "waitingHours": 585.0818686111111,
       "comments": 3,
       "labels": [
         "enhancement",
@@ -20819,7 +21339,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T16:16:05Z",
       "closedAt": null,
-      "waitingHours": 603.0452427777777,
+      "waitingHours": 631.4135352777778,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -20837,7 +21357,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T16:15:59Z",
       "closedAt": null,
-      "waitingHours": 603.0469094444444,
+      "waitingHours": 631.4152019444444,
       "comments": 3,
       "labels": [
         "enhancement",
@@ -20855,7 +21375,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T16:15:53Z",
       "closedAt": null,
-      "waitingHours": 603.0485761111111,
+      "waitingHours": 631.4168686111111,
       "comments": 3,
       "labels": [
         "enhancement",
@@ -20874,7 +21394,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T16:15:48Z",
       "closedAt": null,
-      "waitingHours": 603.049965,
+      "waitingHours": 631.4182575,
       "comments": 2,
       "labels": [
         "enhancement",
@@ -20934,7 +21454,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T16:15:21Z",
       "closedAt": null,
-      "waitingHours": 603.057465,
+      "waitingHours": 631.4257575,
       "comments": 5,
       "labels": [
         "enhancement",
@@ -21327,7 +21847,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T08:29:38Z",
       "closedAt": null,
-      "waitingHours": 610.8194094444444,
+      "waitingHours": 639.1877019444445,
       "comments": 0,
       "labels": [
         "enhancement",
@@ -21345,7 +21865,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T08:29:37Z",
       "closedAt": null,
-      "waitingHours": 610.8196872222222,
+      "waitingHours": 639.1879797222222,
       "comments": 0,
       "labels": [
         "enhancement",
@@ -21377,7 +21897,7 @@
       "isPullRequest": false,
       "createdAt": "2026-10-14T08:26:31Z",
       "closedAt": null,
-      "waitingHours": 610.8713538888888,
+      "waitingHours": 639.2396463888889,
       "comments": 0,
       "labels": [
         "enhancement",
