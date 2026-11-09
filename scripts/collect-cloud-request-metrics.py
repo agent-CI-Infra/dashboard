@@ -258,7 +258,8 @@ def pool(results):
         for day in result.get("days", []):
             target = days.setdefault(day["date"], {
                 "requests": set(), "gateway": [], "workswarm": [], "overhead": [],
-                "ttft": [], "tpot": [],
+                "ttft": [], "tpot": [], "first_token": [], "answer_first": [], "react": [],
+                "tool": [], "tool_failed": 0,
                 "input": 0, "output": 0, "total": 0, "success": 0, "failed": 0,
             })
             target["requests"].update(day.get("rids") or [])
@@ -267,6 +268,11 @@ def pool(results):
             target["overhead"].extend(day.get("overhead") or [])
             target["ttft"].extend(day.get("ttft") or [])
             target["tpot"].extend(day.get("tpot") or [])
+            target["first_token"].extend(day.get("first_token") or [])
+            target["answer_first"].extend(day.get("answer_first") or [])
+            target["react"].extend(day.get("react") or [])
+            target["tool"].extend(day.get("tool") or [])
+            target["tool_failed"] += day.get("tool_failed") or 0
             tokens = day.get("tokens") or {}
             target["input"] += tokens.get("input", 0)
             target["output"] += tokens.get("output", 0)
@@ -289,6 +295,21 @@ def pool(results):
             "overhead": stats(rec["overhead"], 1),
             "ttft": stats(rec["ttft"], 2),
             "tpot": weighted_stats(rec["tpot"]),
+            # Gateway dispatch -> first chunk carrying visible text. Fewer
+            # samples than "n": the gateway only logs the first three chunks,
+            # so a reply that opens with more than three non-text chunks cannot
+            # be measured.
+            "first_token": stats(rec["first_token"], 1),
+            # Request scope, but two different end markers: answer_first stops
+            # at the first answer-text chunk (chat.delta), react covers only the
+            # thinking/tool phase between the first text chunk and that answer.
+            # Both inherit first_token's coverage limit.
+            "answer_first": stats(rec["answer_first"], 1),
+            "react": stats(rec["react"], 1),
+            # One sample per finished tool call, timed by the product adapter.
+            # "n" here counts tool calls, not requests.
+            "tool": stats(rec["tool"], 1),
+            "tool_failed": rec["tool_failed"],
             "tokens": {"input": rec["input"], "output": rec["output"], "total": rec["total"]},
             "calls": {"total": calls_total, "success": rec["success"], "failed": rec["failed"]},
             "failure_rate": round(rec["failed"] / calls_total, 4) if calls_total else 0.0,
@@ -300,7 +321,7 @@ def merge(previous, fresh):
     days = {day["date"]: day for day in previous.get("days", [])}
     today = datetime.datetime.now(CST).strftime("%Y-%m-%d")
     for day in fresh["days"]:
-        if not day["n"] and not day["calls"]["total"]:
+        if not day["n"] and not day["calls"]["total"] and not day["tool"]["n"]:
             continue
         old = days.get(day["date"])
         # A restarted environment can serve fewer requests than the published
@@ -308,6 +329,7 @@ def merge(previous, fresh):
         if old is not None and (
             day["n"] < old.get("n", 0)
             or day["calls"]["total"] < (old.get("calls") or {}).get("total", 0)
+            or day["tool"]["n"] < (old.get("tool") or {}).get("n", 0)
         ):
             continue
         if old is not None and day["date"] != today and old.get("partial") is False:
@@ -317,6 +339,12 @@ def merge(previous, fresh):
     merged = dict(previous)
     merged["days"] = ordered
     merged["generated_at"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    defs = dict(previous.get("definitions") or {})
+    defs["first_token"] = "请求口径：网关受理 → 首个携带文本的 chunk（chat.delta / chat.reasoning）"
+    defs["answer_first"] = "请求口径：网关受理 → 首个答案文本 chunk（chat.delta）"
+    defs["react"] = "请求口径：首个文本 chunk → 首个答案文本 chunk（思考与工具阶段）"
+    defs["tool"] = "工具口径：chat.tool_call → chat.tool_result（服务端适配器记录，含下发、执行与结果返回；不含端侧）"
+    merged["definitions"] = defs
     scope = dict(previous.get("metric_scope") or {})
     scope["valid_calls"] = sum(day.get("calls", {}).get("success", 0) for day in ordered)
     if "noise" in fresh:

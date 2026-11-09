@@ -687,6 +687,41 @@ function envLatencyDailySeries(rows, group, field) {
   });
 }
 
+// Cloud first-token latency: from the moment the cloud gateway accepts the
+// request to the first streamed chunk that carries visible text. This is the
+// user-perceived "starts speaking" latency, not the model call's own TTFT
+// below: it also covers routing, agent wake-up and pre-token work.
+const ENV_FIRST_TOKEN_SERIES = [
+  { key: 'ft_mean', label: '首吐字均值', group: 'first_token', field: 'mean', style: 'env-ft-mean' },
+  { key: 'ft_p50', label: '首吐字 P50', group: 'first_token', field: 'p50', style: 'env-ft-p50', below: true },
+  { key: 'ft_p95', label: '首吐字 P95', group: 'first_token', field: 'p95', style: 'env-ft-p95' },
+];
+
+// Answer first token: the same request span as first_token, but it stops at the
+// first answer-text chunk (chat.delta) instead of the first visible chunk.
+const ENV_ANSWER_FIRST_SERIES = [
+  { key: 'af_mean', label: '答案首吐字均值', group: 'answer_first', field: 'mean', style: 'env-af-mean' },
+  { key: 'af_p50', label: '答案首吐字 P50', group: 'answer_first', field: 'p50', style: 'env-af-p50', below: true },
+  { key: 'af_p95', label: '答案首吐字 P95', group: 'answer_first', field: 'p95', style: 'env-af-p95' },
+];
+
+// ReAct phase: first visible text -> first answer text. This is the thinking
+// and tool-calling the agent does before it starts writing the answer; zero
+// when the reply opens straight with the answer.
+const ENV_REACT_SERIES = [
+  { key: 'react_mean', label: 'ReAct 阶段均值', group: 'react', field: 'mean', style: 'env-react-mean' },
+  { key: 'react_p50', label: 'ReAct P50', group: 'react', field: 'p50', style: 'env-react-p50', below: true },
+  { key: 'react_p95', label: 'ReAct P95', group: 'react', field: 'p95', style: 'env-react-p95' },
+];
+
+// One sample per finished tool call, timed by the server-side adapter from its
+// tool_call event to its tool_result event.
+const ENV_TOOL_SERIES = [
+  { key: 'tool_mean', label: '工具调用均值', group: 'tool', field: 'mean', style: 'env-tool-mean' },
+  { key: 'tool_p50', label: '工具调用 P50', group: 'tool', field: 'p50', style: 'env-tool-p50', below: true },
+  { key: 'tool_p95', label: '工具调用 P95', group: 'tool', field: 'p95', style: 'env-tool-p95' },
+];
+
 // Daily cloud TTFT (first token) series. Cloud call scope: one record per
 // model call, timed by the cloud runtime's llm_usage metadata.
 const ENV_TTFT_SERIES = [
@@ -810,16 +845,72 @@ function envLatencyTrend(doc) {
   });
 }
 
+function envFirstTokenTrend(doc) {
+  return envTrendChart(doc, {
+    title: '云侧 Agent 首吐字时间（s）',
+    ariaLabel: '云侧 Agent 首吐字时间每日均值及 P50/P95',
+    series: ENV_FIRST_TOKEN_SERIES,
+    height: 300,
+    formatAxis: fmtAxisSeconds,
+    labelFormat: fmtAxisSeconds,
+    sample: (row) => ({ n: row?.first_token?.n, note: '个请求' }),
+    note: '云侧 Agent 请求口径（每个请求一条记录）：首吐字时间 = 网关受理请求 → 首个携带文本的流式 chunk（chat.delta / chat.reasoning），舍去仅状态、工具事件的 chunk；含路由、Agent 唤醒与调用模型前的全部耗时。网关日志只记录每次请求的前 3 个 chunk，若前 3 个都不是文本 chunk 则该请求不计入，样本数会小于请求数；P50/P95 为请求级最近排名分位；* 为部分日，缺失值留空不补 0。',
+  });
+}
+
+function envAnswerFirstTrend(doc) {
+  return envTrendChart(doc, {
+    title: '云侧 Agent 答案首吐字时间（s）',
+    ariaLabel: '云侧 Agent 答案首吐字时间每日均值及 P50/P95',
+    series: ENV_ANSWER_FIRST_SERIES,
+    height: 300,
+    formatAxis: fmtAxisSeconds,
+    labelFormat: fmtAxisSeconds,
+    sample: (row) => ({ n: row?.answer_first?.n, note: '个请求' }),
+    note: '云侧 Agent 请求口径（每个请求一条记录）：答案首吐字时间 = 网关受理请求 → 首个答案文本 chunk（chat.delta），不把状态、思考（chat.reasoning）与工具事件的 chunk 算作答案。它总是 ≥ 首吐字时间，两者之差即下方 ReAct 阶段。网关日志只记录每次请求的前 3 个 chunk，若前 3 个里没有答案文本则该请求不计入，样本数会小于请求数；P50/P95 为请求级最近排名分位；* 为部分日，缺失值留空不补 0。',
+  });
+}
+
+function envReactTrend(doc) {
+  return envTrendChart(doc, {
+    title: '云侧 Agent ReAct 阶段（s）',
+    ariaLabel: '云侧 Agent ReAct 阶段每日均值及 P50/P95',
+    series: ENV_REACT_SERIES,
+    height: 300,
+    formatAxis: fmtAxisSeconds,
+    labelFormat: fmtAxisSeconds,
+    sample: (row) => ({ n: row?.react?.n, note: '个请求' }),
+    note: '云侧 Agent 请求口径（每个请求一条记录）：ReAct 阶段 = 首个文本 chunk（开始思考）→ 首个答案文本 chunk，即 Agent 在给出答案前的思考与工具调用耗时，不含网关受理、路由与 Agent 唤醒；回复一开始就是答案时记为 0。它不按模型调用计时，与下方模型调用 TTFT 的样本口径不同。网关日志只记录每次请求的前 3 个 chunk，两个端点都出现才计入；P50/P95 为请求级最近排名分位；* 为部分日，缺失值留空不补 0。',
+  });
+}
+
+function envToolTrend(doc) {
+  return envTrendChart(doc, {
+    title: '云侧工具调用耗时（ms）',
+    ariaLabel: '云侧工具调用耗时每日均值及 P50/P95',
+    series: ENV_TOOL_SERIES,
+    height: 300,
+    formatAxis: fmtAxis,
+    formatValue: fmtDuration,
+    labelFormat: fmtDuration,
+    sample: (row) => ({
+      n: row?.tool?.n,
+      note: Number.isFinite(row?.tool_failed) ? `次工具调用 · 失败 ${fmtCount(row.tool_failed)}` : '次工具调用',
+    }),
+    note: '工具调用口径（每次工具调用一条记录）：工具调用耗时 = 服务端适配器收到 chat.tool_call → 收到 chat.tool_result，含工具下发、执行与结果返回，不含模型思考与端侧网络。数据由产品侧适配器单独记录，不依赖网关日志级别；只有已部署该埋点的环境才有样本，缺失值留空不补 0；P50/P95 为工具调用级最近排名分位；* 为部分日。',
+  });
+}
+
 function envTtftTrend(doc) {
   return envTrendChart(doc, {
-    title: '云侧 Agent TTFT（首 Token 耗时）',
-    ariaLabel: '云侧 Agent TTFT 每日均值及 P50/P95',
+    title: '模型调用 TTFT（llm_usage 计时）',
+    ariaLabel: '模型调用 TTFT 每日均值及 P50/P95',
     series: ENV_TTFT_SERIES,
     height: 300,
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.ttft?.n, note: '次模型调用' }),
-    note: '云侧 Agent 调用口径（每次模型调用）：TTFT 为模型调用开始至首个 Token，由云侧 Agent 运行时计时，可能包含上游等待与网络耗时；仅统计 0 < TTFT ≤ 调用总耗时的调用；P50/P95 为调用级最近排名分位，均值按有效调用数计算；* 为部分日，缺失值留空不补 0。',
+    note: '模型调用口径（每次模型调用）：TTFT 为模型调用开始至该次调用首个 Token，由云侧 Agent 运行时计时，可能包含上游等待与网络耗时，不含路由与 Agent 唤醒，因此通常小于上方的首吐字时间；仅统计 0 < TTFT ≤ 调用总耗时的调用；P50/P95 为调用级最近排名分位，均值按有效调用数计算；* 为部分日，缺失值留空不补 0。',
   });
 }
 
@@ -856,6 +947,25 @@ function envSummary(doc) {
   const tokenBare = (value) => (Number.isFinite(value) && value >= 0
     ? trimNumberZeros((value / tokenDiv).toFixed(value / tokenDiv >= 100 ? 1 : 2))
     : '—');
+  // These metrics arrive with newer collector versions or the adapter that
+  // records tool timing; a day without samples must not show an all-dash tile.
+  const requestTile = (key, label, hint) => (Number.isFinite(anchor[key]?.n) && anchor[key].n > 0
+    ? `<div class="stat-card">
+      <div class="stat-label">云侧 Agent<strong>${label}</strong> 平均 / P50 / P95（s）</div>
+      <div class="stat-value combo">${seconds(anchor[key]?.mean)} / ${seconds(anchor[key]?.p50)} / ${seconds(anchor[key]?.p95)}</div>
+      <div class="stat-hint">${fmtCount(anchor[key]?.n)} 个请求 · ${hint}</div>
+    </div>`
+    : '');
+  const firstTile = requestTile('first_token', '首吐字', '网关受理 → 首个文本 chunk');
+  const answerTile = requestTile('answer_first', '答案首吐字', '网关受理 → 首个答案 chunk');
+  const reactTile = requestTile('react', 'ReAct 阶段', '首个文本 chunk → 答案首吐字 · 思考 + 工具');
+  const toolTile = Number.isFinite(anchor.tool?.n) && anchor.tool.n > 0
+    ? `<div class="stat-card">
+      <div class="stat-label">云侧 Agent<strong>工具调用</strong> 平均 / P50 / P95</div>
+      <div class="stat-value combo">${fmtDuration(anchor.tool?.mean)} / ${fmtDuration(anchor.tool?.p50)} / ${fmtDuration(anchor.tool?.p95)}</div>
+      <div class="stat-hint">${fmtCount(anchor.tool?.n)} 次工具调用 · 失败 ${fmtCount(anchor.tool_failed)} · tool_call → tool_result</div>
+    </div>`
+    : '';
   return `<section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>调用数</strong> / <strong>请求失败率</strong></div>
@@ -867,11 +977,10 @@ function envSummary(doc) {
       <div class="stat-value combo">${seconds(anchor.gateway.mean)} / ${seconds(anchor.gateway.p50)} / ${seconds(anchor.gateway.p95)}</div>
       <div class="stat-hint">${fmtCount(anchor.gateway.n)} 个成功请求 · 不含端侧与网络</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">云侧 Agent<strong>TTFT</strong> 平均 / P50 / P95（s）</div>
-      <div class="stat-value combo">${seconds(anchor.ttft?.mean)} / ${seconds(anchor.ttft?.p50)} / ${seconds(anchor.ttft?.p95)}</div>
-      <div class="stat-hint">${fmtCount(anchor.ttft?.n)} 次模型调用 · 调用级分位</div>
-    </div>
+    ${firstTile}
+    ${answerTile}
+    ${reactTile}
+    ${toolTile}
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>TPOT</strong> 平均 / P50 / P95（ms/token）</div>
       <div class="stat-value combo">${fmtTpotBare(anchor.tpot?.mean)} / ${fmtTpotBare(anchor.tpot?.p50)} / ${fmtTpotBare(anchor.tpot?.p95)}</div>
@@ -985,27 +1094,51 @@ function envCallTrend(doc) {
 }
 
 function envCallDetail(doc) {
-  const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date && (row.ttft || row.tpot)) : [];
+  const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date && (row.ttft || row.tpot || row.first_token || row.answer_first || row.react || row.tool)) : [];
   if (!rows.length) return '';
+  // Same rule as the summary tiles: a column group appears only when some row
+  // has samples for it, so a board fed by an older collector or an environment
+  // without the adapter keeps its table narrow instead of showing dash columns.
+  const hasSamples = (key) => rows.some((row) => Number.isFinite(row[key]?.n) && row[key].n > 0);
+  const hasFirst = hasSamples('first_token');
+  const hasAnswer = hasSamples('answer_first');
+  const hasReact = hasSamples('react');
+  const hasTool = hasSamples('tool');
   // Same day-over-day chip as the model-side stats table, so the two detail
   // tables read the same way.
   const cell = (value, previous, format) => {
     const chip = deltaChip(value, previous, { lowerIsBetter: true, label: '' });
     return `<td class="num metric-column"><span class="metric-cell"><span>${format(value)}</span><span class="metric-change">${chip}</span></span></td>`;
   };
+  const head = (label, enabled) => (enabled
+    ? `<th>${label}样本</th><th>${label}均值</th><th>${label} P50</th><th>${label} P95</th>`
+    : '');
   const body = rows
     .map((row, index) => {
       // Compare with the calendar day before, not merely the previous row: a
       // gap in the log must not turn a multi-day change into a daily one.
       const prior = index > 0 ? rows[index - 1] : null;
       const previous = prior && addDays(prior.date, 1) === row.date ? prior : null;
-      return `<tr><td>${esc(row.date)}${row.partial ? '*' : ''}</td><td>${fmtCount(row.ttft?.n)}</td>${cell(row.ttft?.mean, previous?.ttft?.mean, fmtDuration)}${cell(row.ttft?.p50, previous?.ttft?.p50, fmtDuration)}${cell(row.ttft?.p95, previous?.ttft?.p95, fmtDuration)}<td>${fmtCount(row.tpot?.n)}</td>${cell(row.tpot?.mean, previous?.tpot?.mean, fmtTpot)}${cell(row.tpot?.p50, previous?.tpot?.p50, fmtTpot)}${cell(row.tpot?.p95, previous?.tpot?.p95, fmtTpot)}</tr>`;
+      const block = (key, enabled) => (enabled
+        ? `<td>${fmtCount(row[key]?.n)}</td>${cell(row[key]?.mean, previous?.[key]?.mean, fmtDuration)}${cell(row[key]?.p50, previous?.[key]?.p50, fmtDuration)}${cell(row[key]?.p95, previous?.[key]?.p95, fmtDuration)}`
+        : '');
+      return `<tr><td>${esc(row.date)}${row.partial ? '*' : ''}</td>${block('first_token', hasFirst)}${block('answer_first', hasAnswer)}${block('react', hasReact)}${block('tool', hasTool)}<td>${fmtCount(row.ttft?.n)}</td>${cell(row.ttft?.mean, previous?.ttft?.mean, fmtDuration)}${cell(row.ttft?.p50, previous?.ttft?.p50, fmtDuration)}${cell(row.ttft?.p95, previous?.ttft?.p95, fmtDuration)}<td>${fmtCount(row.tpot?.n)}</td>${cell(row.tpot?.mean, previous?.tpot?.mean, fmtTpot)}${cell(row.tpot?.p50, previous?.tpot?.p50, fmtTpot)}${cell(row.tpot?.p95, previous?.tpot?.p95, fmtTpot)}</tr>`;
     })
     // Newest first, like the model-side stats table; the chips were computed
     // against the previous calendar day before the rows were flipped.
     .reverse()
     .join('');
-  return `<details class="env-call-detail" open><summary>云侧 Agent TTFT / TPOT 每日明细</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>日期</th><th>TTFT 样本</th><th>TTFT 均值</th><th>TTFT P50</th><th>TTFT P95</th><th>TPOT 样本</th><th>TPOT 加权均值</th><th>TPOT P50</th><th>TPOT P95</th></tr></thead><tbody>${body}</tbody></table></div><p class="chart-note">云侧 Agent 调用口径：每次模型调用一条记录；TTFT 为模型调用开始至首个 Token，TPOT 按输出 Token 数减一加权；* 为部分日。</p></details>`;
+  const groups = [hasFirst && '首吐字', hasAnswer && '答案首吐字', hasReact && 'ReAct', hasTool && '工具', 'TTFT', 'TPOT'].filter(Boolean);
+  const notes = [];
+  const spans = [
+    hasFirst && '首吐字 = 网关受理 → 首个文本 chunk（含思考）',
+    hasAnswer && '答案首吐字 = 网关受理 → 首个答案 chunk',
+    hasReact && 'ReAct = 两者的时间差（思考 + 工具阶段）',
+  ].filter(Boolean);
+  if (spans.length) notes.push(`${spans.join('，')}，均按请求统计`);
+  if (hasTool) notes.push('工具按工具调用统计（tool_call → tool_result，服务端适配器记录）');
+  notes.push('TTFT 按模型调用统计（llm_usage 计时），TPOT 按输出 Token 数减一加权');
+  return `<details class="env-call-detail" open><summary>云侧 Agent ${groups.join(' / ')} 每日明细</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>日期</th>${head('首吐字', hasFirst)}${head('答案首吐字', hasAnswer)}${head('ReAct', hasReact)}${head('工具', hasTool)}<th>TTFT 样本</th><th>TTFT 均值</th><th>TTFT P50</th><th>TTFT P95</th><th>TPOT 样本</th><th>TPOT 加权均值</th><th>TPOT P50</th><th>TPOT P95</th></tr></thead><tbody>${body}</tbody></table></div><p class="chart-note">${notes.join('；')}；* 为部分日。</p></details>`;
 }
 
 function fmtToken(value) {
@@ -2956,7 +3089,7 @@ async function loadEnvLatency() {
     daily = null;
   }
   const charts = daily && daily.schema === 'digitalmate/env-request-latency-daily@1'
-    ? `${envSummary(daily)}${envCallTrend(daily)}${envLatencyTrend(daily)}${envTtftTrend(daily)}${envTpotTrend(daily)}${envCallDetail(daily)}`
+    ? `${envSummary(daily)}${envCallTrend(daily)}${envLatencyTrend(daily)}${envFirstTokenTrend(daily)}${envAnswerFirstTrend(daily)}${envReactTrend(daily)}${envToolTrend(daily)}${envTtftTrend(daily)}${envTpotTrend(daily)}${envCallDetail(daily)}`
     : '';
   // The per-environment GateWay / WorkSwarm table is parked for now; the daily
   // charts carry the same measurements in a more readable form.

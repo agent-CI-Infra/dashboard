@@ -13,14 +13,21 @@ day bucketing is UTC+8.
 Optional environment:
   DM_LOG    log path (default /data/state/workswarm/process.log)
   DM_UNTIL  ISO-8601 UTC cut-off, for reproducing a historical snapshot
+
+Tool durations come from tool-calls-*.jsonl files in the log's directory. The
+product adapter writes one JSON record per finished tool call there, next to
+process.log, so this script does not depend on the gateway's log level.
 """
 import datetime
+import glob
 import json
+import math
 import os
 import re
 import sys
 
 LOG = os.environ.get("DM_LOG", "/data/state/workswarm/process.log")
+TOOL_GLOB = os.path.join(os.path.dirname(LOG), "tool-calls-*.jsonl")
 CST = datetime.timezone(datetime.timedelta(hours=8))
 UTC = datetime.timezone.utc
 
@@ -30,6 +37,16 @@ if _until:
     UNTIL = datetime.datetime.fromisoformat(_until.replace("Z", "+00:00")).timestamp()
 
 REQ = re.compile(r"request_id=")
+# The gateway logs the first three chunks of every stream with their event type,
+# which is where the cloud side's first visible token shows up.
+CHUNK = re.compile(r"\[MessageHandler\] process_stream chunk #(\d+): request_id=\S+ event_type=(\S*)")
+# Event types that carry text the user can see; the first one of these marks the
+# cloud side's first token (chat.reasoning is the model's visible thinking).
+VISIBLE = {"chat.delta", "chat.reasoning"}
+# Answer text only. A stream usually opens with status/thinking chunks and only
+# starts emitting chat.delta once the ReAct loop has produced its reply, so the
+# gap between the two markers is the thinking/tool phase.
+ANSWER = {"chat.delta"}
 TTFT = re.compile(r"'ttft_ms':\s*([0-9.]+)")
 TPOT = re.compile(r"'tpot_ms':\s*([0-9.]+)")
 TOK_IN = re.compile(r"'input_tokens':\s*(\d+)")
@@ -66,7 +83,8 @@ noise = 0
 def bucket(day):
     return days.setdefault(day, {
         "gateway": [], "workswarm": [], "overhead": [],
-        "ttft": [], "tpot": [],
+        "ttft": [], "tpot": [], "first_token": [], "answer_first": [], "react": [],
+        "tool": [], "tool_failed": 0,
         "input": 0, "output": 0, "total": 0,
         "success": 0, "failed": 0, "models": {},
     })
@@ -87,7 +105,9 @@ with open(LOG, encoding="utf-8", errors="ignore") as fh:
         if at:
             rid = line[at.end():].split()[0].strip(",;")
             if rid.startswith("digitalmate-"):
-                spans = requests.setdefault(rid, [None, None, None, None])
+                # dispatch, stream end, agent entry, agent exit, first text
+                # chunk, first answer chunk
+                spans = requests.setdefault(rid, [None, None, None, None, None, None])
                 if "[MessageHandler] dispatch:" in line and spans[0] is None:
                     spans[0] = ts
                 elif "[MessageHandler] Stream " in line and "total_chunks=" in line and spans[1] is None:
@@ -96,6 +116,11 @@ with open(LOG, encoding="utf-8", errors="ignore") as fh:
                     spans[2] = ts
                 elif "run_stream_task finished" in line and spans[3] is None:
                     spans[3] = ts
+                chunk = CHUNK.search(line)
+                if chunk and spans[4] is None and chunk.group(2) in VISIBLE:
+                    spans[4] = ts
+                if chunk and spans[5] is None and chunk.group(2) in ANSWER:
+                    spans[5] = ts
 
         if "llm_usage" in line:
             if "llm_usage chunk: type='llm_usage'" not in line:
@@ -125,15 +150,56 @@ with open(LOG, encoding="utf-8", errors="ignore") as fh:
         if "llm_call_error" in line:
             rec["failed"] += 1
 
+# Tool durations are one JSON record per line, written by the product adapter.
+# A record can be half-written while the process is appending; parse failures
+# are skipped, and the next run picks the complete record up.
+for path in sorted(glob.glob(TOOL_GLOB)):
+    try:
+        fh = open(path, encoding="utf-8", errors="ignore")
+    except OSError:
+        continue
+    with fh:
+        for line in fh:
+            try:
+                item = json.loads(line)
+                t = float(item["t"])
+                ms = float(item["ms"])
+            except (ValueError, TypeError, KeyError):
+                continue
+            if not math.isfinite(t) or not math.isfinite(ms) or ms < 0:
+                continue
+            if UNTIL is not None and t > UNTIL:
+                continue
+            if first_ts is None or t < first_ts:
+                first_ts = t
+            rec = bucket(day_of(t))
+            rec["tool"].append(round(ms, 1))
+            if item.get("status") == "error":
+                rec["tool_failed"] += 1
+
 # Requests belong to the day their gateway dispatch happened, so a request that
 # crosses midnight is counted once instead of being split by marker day.
-for rid, (g0, g1, w0, w1) in requests.items():
+for rid, (g0, g1, w0, w1, t0, a1) in requests.items():
     if g0 is None:
         continue
     rec = bucket(day_of(g0))
     rec.setdefault("requests", set()).add(rid)
     if g1 is not None:
         rec["gateway"].append(round((g1 - g0) * 1000.0, 1))
+    # Cloud first-token latency: from the gateway accepting the request to the
+    # first chunk that carries visible text. Independent of the model call's own
+    # ttft_ms: it also covers routing, agent wake-up and pre-token work.
+    if t0 is not None:
+        rec["first_token"].append(round((t0 - g0) * 1000.0, 1))
+    # Answer first token: the same span, but the answer text only — a request
+    # that opens with thinking/status chunks reaches this marker later.
+    if a1 is not None:
+        rec["answer_first"].append(round((a1 - g0) * 1000.0, 1))
+    # ReAct phase: first visible text -> first answer text, i.e. the thinking
+    # and tool-calling the agent does before it starts writing the answer. Zero
+    # when the reply opens straight with the answer.
+    if t0 is not None and a1 is not None and a1 >= t0:
+        rec["react"].append(round((a1 - t0) * 1000.0, 1))
     if w0 is not None and w1 is not None:
         rec["workswarm"].append(round((w1 - w0) * 1000.0, 1))
         if g1 is not None:
@@ -150,6 +216,11 @@ for day in sorted(days):
         "overhead": rec["overhead"],
         "ttft": rec["ttft"],
         "tpot": rec["tpot"],
+        "first_token": rec["first_token"],
+        "answer_first": rec["answer_first"],
+        "react": rec["react"],
+        "tool": rec["tool"],
+        "tool_failed": rec["tool_failed"],
         "tokens": {"input": rec["input"], "output": rec["output"], "total": rec["total"]},
         "calls": {
             "total": rec["success"] + rec["failed"],

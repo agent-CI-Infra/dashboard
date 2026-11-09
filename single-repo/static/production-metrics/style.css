@@ -1836,6 +1836,54 @@ h1 {
 .latency-layer.env-ws-p95 .trend-dot { fill: #065f46; }
 .latency-layer.env-ov-mean .trend-dot { fill: #ea580c; }
 
+/* Cloud first-token latency is per request (gateway accept -> first text
+   chunk), so it gets its own solid lines to stay distinct from the dotted
+   per-model-call TTFT/TPOT trends below. */
+.legend-line.env-ft-mean { border-top-color: #7c3aed; border-top-width: 3px; }
+.legend-line.env-ft-p50 { border-top-color: #0d9488; border-top-style: dashed; }
+.legend-line.env-ft-p95 { border-top-color: #be123c; }
+.latency-layer.env-ft-mean .trend-series { stroke: #7c3aed; stroke-width: 2.4; }
+.latency-layer.env-ft-p50 .trend-series { stroke: #0d9488; stroke-width: 1.8; stroke-dasharray: 5 3; }
+.latency-layer.env-ft-p95 .trend-series { stroke: #be123c; stroke-width: 1.8; }
+.latency-layer.env-ft-mean .trend-dot { fill: #7c3aed; }
+.latency-layer.env-ft-p50 .trend-dot { fill: #0d9488; }
+.latency-layer.env-ft-p95 .trend-dot { fill: #be123c; }
+
+/* Answer first token and the ReAct phase are request scoped like the first
+   token above, but they read as a decomposition of it, so they keep the same
+   solid-line family with their own colors. */
+.legend-line.env-af-mean { border-top-color: #0891b2; border-top-width: 3px; }
+.legend-line.env-af-p50 { border-top-color: #65a30d; border-top-style: dashed; }
+.legend-line.env-af-p95 { border-top-color: #db2777; }
+.latency-layer.env-af-mean .trend-series { stroke: #0891b2; stroke-width: 2.4; }
+.latency-layer.env-af-p50 .trend-series { stroke: #65a30d; stroke-width: 1.8; stroke-dasharray: 5 3; }
+.latency-layer.env-af-p95 .trend-series { stroke: #db2777; stroke-width: 1.8; }
+.latency-layer.env-af-mean .trend-dot { fill: #0891b2; }
+.latency-layer.env-af-p50 .trend-dot { fill: #65a30d; }
+.latency-layer.env-af-p95 .trend-dot { fill: #db2777; }
+
+.legend-line.env-react-mean { border-top-color: #b45309; border-top-width: 3px; }
+.legend-line.env-react-p50 { border-top-color: #4f46e5; border-top-style: dashed; }
+.legend-line.env-react-p95 { border-top-color: #15803d; }
+.latency-layer.env-react-mean .trend-series { stroke: #b45309; stroke-width: 2.4; }
+.latency-layer.env-react-p50 .trend-series { stroke: #4f46e5; stroke-width: 1.8; stroke-dasharray: 5 3; }
+.latency-layer.env-react-p95 .trend-series { stroke: #15803d; stroke-width: 1.8; }
+.latency-layer.env-react-mean .trend-dot { fill: #b45309; }
+.latency-layer.env-react-p50 .trend-dot { fill: #4f46e5; }
+.latency-layer.env-react-p95 .trend-dot { fill: #15803d; }
+
+/* Tool timing is one sample per finished tool call, recorded by the product
+   adapter, so it also lives outside the per-model-call scope below. */
+.legend-line.env-tool-mean { border-top-color: #9333ea; border-top-width: 3px; }
+.legend-line.env-tool-p50 { border-top-color: #c2410c; border-top-style: dashed; }
+.legend-line.env-tool-p95 { border-top-color: #1e40af; }
+.latency-layer.env-tool-mean .trend-series { stroke: #9333ea; stroke-width: 2.4; }
+.latency-layer.env-tool-p50 .trend-series { stroke: #c2410c; stroke-width: 1.8; stroke-dasharray: 5 3; }
+.latency-layer.env-tool-p95 .trend-series { stroke: #1e40af; stroke-width: 1.8; }
+.latency-layer.env-tool-mean .trend-dot { fill: #9333ea; }
+.latency-layer.env-tool-p50 .trend-dot { fill: #c2410c; }
+.latency-layer.env-tool-p95 .trend-dot { fill: #1e40af; }
+
 /* Cloud TTFT / TPOT trends use the cloud-call (per model call) scope. */
 .legend-line.env-ttft-mean, .legend-line.env-tpot-mean { border-top-width: 3px; }
 .legend-line.env-ttft-mean, .legend-line.env-tpot-mean { border-top-style: dotted; }
