@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/e2e-performance-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updated_at": "2026-11-09T09:28:07.198Z",
+  "updated_at": "2026-11-09T14:42:05.691Z",
   "cases": {
     "DM-WF-CHROME-01": {
       "id": "DM-WF-CHROME-01",
@@ -1905,6 +1905,16 @@
           "run_id": "nightly-42504489179-1",
           "commit": "a84d496da135ec43a9aa1734c584d790ec7db87b",
           "finished_at": "2026-11-08T17:42:33.716Z"
+        },
+        {
+          "date": "2026-11-09",
+          "status": "BLOCKED",
+          "query_ms": 27904,
+          "query_count": 1,
+          "duration_ms": 179008,
+          "run_id": "nightly-42636115442-1",
+          "commit": "26d98fd1cd567782fe686c2237051fc717dd6371",
+          "finished_at": "2026-11-09T14:42:03.961Z"
         }
       ],
       "latest": {
@@ -1913,70 +1923,70 @@
         "mode": "single-turn",
         "status": "BLOCKED",
         "failure": "F02-before cloud.inspect 失败：[ENV_DOWN] cloud.inspect control failed before a verifiable receipt; private adapter errors were not recorded",
-        "started_at": "2026-11-08T17:40:35.707Z",
-        "finished_at": "2026-11-08T17:42:33.716Z",
-        "duration_ms": 118009,
+        "started_at": "2026-11-09T14:39:04.953Z",
+        "finished_at": "2026-11-09T14:42:03.961Z",
+        "duration_ms": 179008,
         "query_count": 1,
-        "query_ms": 33502,
-        "first_text_ms": 33502,
-        "display_ms": 35713,
+        "query_ms": 27904,
+        "first_text_ms": 27904,
+        "display_ms": 33460,
         "queries": [
           {
-            "started_at": "2026-11-08T17:41:15.020Z",
-            "task_id": "task-5cac29ac0b9f448482409b74d113f641",
-            "submission_id": "62c6768f-63b4-4ce4-8cc2-0ee0246ee776",
-            "duration_ms": 33502,
-            "first_text_ms": 33502,
-            "display_ms": 35713,
+            "started_at": "2026-11-09T14:40:26.991Z",
+            "task_id": "task-328ccc18624749f6bb7fc20feb7f5e40",
+            "submission_id": "baaa1c3c-555c-4539-b717-445d4ca52d65",
+            "duration_ms": 27904,
+            "first_text_ms": 27904,
+            "display_ms": 33460,
             "outcome": "completed",
-            "text_chars": 113,
+            "text_chars": 102,
             "request_bytes": 580,
-            "response_bytes": 4209053,
+            "response_bytes": 7465550,
             "stages": [
               {
                 "name": "tap",
-                "at_ms": 1794159675020,
+                "at_ms": 1794235226991,
                 "detail": null
               },
               {
                 "name": "queued",
-                "at_ms": 1794159675020,
+                "at_ms": 1794235226991,
                 "detail": null
               },
               {
                 "name": "dequeued",
-                "at_ms": 1794159675037,
+                "at_ms": 1794235227064,
                 "detail": null
               },
               {
                 "name": "wire_send",
-                "at_ms": 1794159675046,
-                "detail": "encode=0 send=1 attempt=1"
+                "at_ms": 1794235227131,
+                "detail": "encode=0 send=0 attempt=1"
               },
               {
                 "name": "ack",
-                "at_ms": 1794159676789,
+                "at_ms": 1794235232230,
                 "detail": null
               },
               {
                 "name": "first_text",
-                "at_ms": 1794159708522,
-                "detail": "chars=113"
+                "at_ms": 1794235254895,
+                "detail": "chars=102"
               },
               {
                 "name": "last_text",
-                "at_ms": 1794159708522,
-                "detail": "chars=113 events=1"
+                "at_ms": 1794235254895,
+                "detail": "chars=102 events=1"
               },
               {
                 "name": "task_done",
-                "at_ms": 1794159709960,
+                "at_ms": 1794235260451,
                 "detail": "completed"
               },
               {
                 "name": "display_done",
-                "at_ms": 1794159710733,
-                "detail": null
+                "at_ms": 1794235260451,
+                "detail": "no-reveal"
               }
             ]
           }
@@ -2007,80 +2017,80 @@
             "id": "S-start",
             "action": "app.coldStart",
             "status": "ok",
-            "started_at": "2026-11-08T17:40:35.707Z",
-            "duration_ms": 5076,
+            "started_at": "2026-11-09T14:39:04.954Z",
+            "duration_ms": 5111,
             "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
             "id": "S-reset",
             "action": "app.resetState",
             "status": "ok",
-            "started_at": "2026-11-08T17:40:40.783Z",
-            "duration_ms": 18728,
-            "detail": "已重置到初始状态（11-09 01:40:47.374 33822 33822 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=2 files=3 notifications=skipped room=room-d8ef829828fd48ff9c45b494b4acda9f）"
+            "started_at": "2026-11-09T14:39:10.065Z",
+            "duration_ms": 61101,
+            "detail": "已重置到初始状态（11-09 22:39:44.262 10676 10676 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-56600a4d138547d5b9bdf2acfb5b8624）"
           },
           {
             "id": "S00",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-08T17:40:59.511Z",
-            "duration_ms": 2079,
+            "started_at": "2026-11-09T14:40:11.166Z",
+            "duration_ms": 2019,
             "detail": "截图 00-before"
           },
           {
             "id": "S01",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-08T17:41:01.590Z",
-            "duration_ms": 17403,
+            "started_at": "2026-11-09T14:40:13.185Z",
+            "duration_ms": 17319,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S02",
             "action": "approval.allow",
             "status": "skipped",
-            "started_at": "2026-11-08T17:41:18.993Z",
-            "duration_ms": 60911,
+            "started_at": "2026-11-09T14:40:30.504Z",
+            "duration_ms": 62641,
             "detail": "没有出现工具审批卡"
           },
           {
             "id": "S03",
             "action": "approval.allow",
             "status": "skipped",
-            "started_at": "2026-11-08T17:42:19.904Z",
-            "duration_ms": 6662,
+            "started_at": "2026-11-09T14:41:33.145Z",
+            "duration_ms": 6529,
             "detail": "没有出现工具审批卡"
           },
           {
             "id": "S04",
             "action": "wait.turn.complete",
             "status": "ok",
-            "started_at": "2026-11-08T17:42:26.566Z",
-            "duration_ms": 5171,
+            "started_at": "2026-11-09T14:41:39.674Z",
+            "duration_ms": 5065,
             "detail": "完成行 0 → 0（new-text-any）"
           },
           {
             "id": "F02-before",
             "action": "cloud.inspect",
             "status": "failed",
-            "started_at": "2026-11-08T17:42:31.737Z",
-            "duration_ms": 1979,
+            "started_at": "2026-11-09T14:41:44.739Z",
+            "duration_ms": 19222,
             "detail": "[ENV_DOWN] cloud.inspect control failed before a verifiable receipt; private adapter errors were not recorded"
           },
           {
             "id": "S-failure",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-08T17:42:33.716Z",
+            "started_at": "2026-11-09T14:42:03.961Z",
             "duration_ms": 0,
             "detail": null
           }
         ],
         "screenshots": 2,
         "profiling_files": 1,
-        "run_id": "nightly-42504489179-1",
-        "commit": "a84d496da135ec43a9aa1734c584d790ec7db87b",
-        "generated_at": "2026-11-08T18:15:02.025Z"
+        "run_id": "nightly-42636115442-1",
+        "commit": "26d98fd1cd567782fe686c2237051fc717dd6371",
+        "generated_at": "2026-11-09T14:42:05.691Z"
       }
     },
     "DM-WF-MATH-01": {
