@@ -1,20 +1,513 @@
 {
-  "generatedAt": "2026-11-09T23:40:53.727Z",
+  "generatedAt": "2026-11-10T21:11:06.718Z",
   "items": [
+    {
+      "number": 2810,
+      "title": "fix(project-metrics): drop the five-minute buckets the cache can never answer again",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "open",
+      "isDraft": false,
+      "createdAt": "2026-11-10T11:39:27Z",
+      "mergedAt": null,
+      "closedAt": null,
+      "waitingHours": 9.527699444444444,
+      "comments": 1,
+      "labels": [
+        "agent-pr",
+        "risk:T2"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2810"
+    },
+    {
+      "number": 2809,
+      "title": "fix(memory): cap the memory journal so it keeps its newest changes",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "open",
+      "isDraft": false,
+      "createdAt": "2026-11-10T11:33:48Z",
+      "mergedAt": null,
+      "closedAt": null,
+      "waitingHours": 9.62186611111111,
+      "comments": 0,
+      "labels": [
+        "agent-pr",
+        "risk:T2"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2809"
+    },
+    {
+      "number": 2803,
+      "title": "fix(tree): pass jobTimeoutMs from the plugin config to the organizer",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T09:32:45Z",
+      "mergedAt": "2026-11-10T10:13:55Z",
+      "closedAt": "2026-11-10T10:13:55Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2803"
+    },
+    {
+      "number": 2802,
+      "title": "Draw masked connector credentials in a bordered field wrapper",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T09:28:48Z",
+      "mergedAt": "2026-11-10T09:41:23Z",
+      "closedAt": "2026-11-10T09:41:23Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2802"
+    },
+    {
+      "number": 2801,
+      "title": "fix(remote-chat): key a remote chat by its room, so one published room is one row (#2797)",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T09:27:33Z",
+      "mergedAt": "2026-11-10T09:49:50Z",
+      "closedAt": "2026-11-10T09:49:50Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2801"
+    },
+    {
+      "number": 2798,
+      "title": "Make the healthy-floor no-warn guard read the message that was logged",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T08:54:24Z",
+      "mergedAt": "2026-11-10T09:18:49Z",
+      "closedAt": "2026-11-10T09:18:49Z",
+      "waitingHours": null,
+      "comments": 1,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2798"
+    },
+    {
+      "number": 2794,
+      "title": "test(home-lock): remove the host test's home after the host disposes",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T08:38:12Z",
+      "mergedAt": "2026-11-10T09:14:56Z",
+      "closedAt": "2026-11-10T09:14:56Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2794"
+    },
+    {
+      "number": 2793,
+      "title": "fix(risk): drop a T1 path rule the wider T2 rule already covers",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T08:36:17Z",
+      "mergedAt": "2026-11-10T08:53:09Z",
+      "closedAt": "2026-11-10T08:53:09Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2793"
+    },
+    {
+      "number": 2791,
+      "title": "read_group_chat bypasses the join-floor clamp, so a Bot's floor above seq reads a full room as empty",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T08:09:00Z",
+      "mergedAt": "2026-11-10T08:38:14Z",
+      "closedAt": "2026-11-10T08:38:14Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2791"
+    },
+    {
+      "number": 2789,
+      "title": "fix(workflow): drain the lane's queue when a takeover reap ends a run",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T07:40:19Z",
+      "mergedAt": "2026-11-10T08:30:55Z",
+      "closedAt": "2026-11-10T08:30:55Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "risk:T3",
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2789"
+    },
+    {
+      "number": 2788,
+      "title": "room-share: a legacy room's read recomputes the clamp target per line, so a long log reads in quadratic time",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T07:12:39Z",
+      "mergedAt": "2026-11-10T07:35:22Z",
+      "closedAt": "2026-11-10T07:35:22Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2788"
+    },
+    {
+      "number": 2786,
+      "title": "fix(workflow): release the Bots a late spawn failure made",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T06:31:37Z",
+      "mergedAt": "2026-11-10T07:12:36Z",
+      "closedAt": "2026-11-10T07:12:36Z",
+      "waitingHours": null,
+      "comments": 4,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2786"
+    },
+    {
+      "number": 2784,
+      "title": "fix(host): serialize two answers on one approval record (#2782)",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T06:11:12Z",
+      "mergedAt": "2026-11-10T07:00:42Z",
+      "closedAt": "2026-11-10T07:00:42Z",
+      "waitingHours": null,
+      "comments": 4,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2784"
+    },
+    {
+      "number": 2783,
+      "title": "fix(groups): say how many room lines a capped read left out",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T06:03:43Z",
+      "mergedAt": "2026-11-10T07:03:49Z",
+      "closedAt": "2026-11-10T07:03:50Z",
+      "waitingHours": null,
+      "comments": 3,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2783"
+    },
+    {
+      "number": 2781,
+      "title": "fix(dev): read the usage ledger where the host writes it (#2778)",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T05:22:05Z",
+      "mergedAt": "2026-11-10T06:18:19Z",
+      "closedAt": "2026-11-10T06:18:19Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2781"
+    },
+    {
+      "number": 2779,
+      "title": "fix(tools): refuse an unknown bot colour instead of dropping it silently",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T05:08:40Z",
+      "mergedAt": "2026-11-10T05:46:55Z",
+      "closedAt": "2026-11-10T05:46:55Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2779"
+    },
+    {
+      "number": 2777,
+      "title": "Release v0.2.28",
+      "author": "Birfy",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T04:50:06Z",
+      "mergedAt": "2026-11-10T04:57:21Z",
+      "closedAt": "2026-11-10T04:57:21Z",
+      "waitingHours": null,
+      "comments": 0,
+      "labels": [],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2777"
+    },
+    {
+      "number": 2776,
+      "title": "fix(host): stop calling a checkpointed current part \"in your context\" (#2774)",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T04:13:44Z",
+      "mergedAt": "2026-11-10T05:10:56Z",
+      "closedAt": "2026-11-10T05:10:56Z",
+      "waitingHours": null,
+      "comments": 3,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2776"
+    },
+    {
+      "number": 2773,
+      "title": "workflow: end a run whose host call never answers (#2748)",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T03:51:15Z",
+      "mergedAt": "2026-11-10T06:08:20Z",
+      "closedAt": "2026-11-10T06:08:20Z",
+      "waitingHours": null,
+      "comments": 6,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2773"
+    },
+    {
+      "number": 2772,
+      "title": "fix(host): refuse an ask_user card outside two to four answers (#2771)",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T03:36:30Z",
+      "mergedAt": "2026-11-10T05:00:12Z",
+      "closedAt": "2026-11-10T05:00:12Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2772"
+    },
+    {
+      "number": 2769,
+      "title": "bot_schedules: an inactive task has no next run",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T01:21:53Z",
+      "mergedAt": "2026-11-10T04:54:41Z",
+      "closedAt": "2026-11-10T04:54:41Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2769"
+    },
+    {
+      "number": 2768,
+      "title": "fix(approvals): roll a standing grant back when its save is refused",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T01:16:07Z",
+      "mergedAt": "2026-11-10T05:07:47Z",
+      "closedAt": "2026-11-10T05:07:47Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2768"
+    },
+    {
+      "number": 2765,
+      "title": "workflow-store: replace a saved definition instead of truncating it",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T01:05:58Z",
+      "mergedAt": "2026-11-10T05:50:08Z",
+      "closedAt": "2026-11-10T05:50:08Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2765"
+    },
+    {
+      "number": 2763,
+      "title": "track_tasks: a refused batch save leaves the board mutated, so a ghost card survives the error",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T00:57:55Z",
+      "mergedAt": "2026-11-10T05:52:55Z",
+      "closedAt": "2026-11-10T05:52:55Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2763"
+    },
+    {
+      "number": 2760,
+      "title": "host: repair a null saved record instead of failing every load",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T00:28:09Z",
+      "mergedAt": "2026-11-10T05:55:48Z",
+      "closedAt": "2026-11-10T05:55:48Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2760"
+    },
+    {
+      "number": 2759,
+      "title": "room-share: a room whose stored joined floor is above its own seq shows nothing, and never heals",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T00:26:13Z",
+      "mergedAt": "2026-11-10T05:58:44Z",
+      "closedAt": "2026-11-10T05:58:44Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2759"
+    },
+    {
+      "number": 2758,
+      "title": "tree: bound each reorganization job so a hung host call cannot block the queue",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T00:22:07Z",
+      "mergedAt": "2026-11-10T05:18:11Z",
+      "closedAt": "2026-11-10T05:18:11Z",
+      "waitingHours": null,
+      "comments": 2,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2758"
+    },
+    {
+      "number": 2757,
+      "title": "fix(workflow): drain the queue when a load-time reap ends a run",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T00:21:36Z",
+      "mergedAt": "2026-11-10T06:24:21Z",
+      "closedAt": "2026-11-10T06:24:21Z",
+      "waitingHours": null,
+      "comments": 5,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2757"
+    },
+    {
+      "number": 2756,
+      "title": "host: every completed turn should carry its own outcome, not leave workflow steps parsing prose",
+      "author": "HugoXK",
+      "contributionType": "internal",
+      "state": "merged",
+      "isDraft": false,
+      "createdAt": "2026-11-10T00:12:28Z",
+      "mergedAt": "2026-11-10T06:41:31Z",
+      "closedAt": "2026-11-10T06:41:31Z",
+      "waitingHours": null,
+      "comments": 7,
+      "labels": [
+        "pass"
+      ],
+      "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2756"
+    },
     {
       "number": 2753,
       "title": "workflow: a Stop whose release always fails is retried for ever and keeps its lane slot",
       "author": "HugoXK",
       "contributionType": "internal",
-      "state": "open",
+      "state": "merged",
       "isDraft": false,
       "createdAt": "2026-11-09T10:01:53Z",
-      "mergedAt": null,
-      "closedAt": null,
-      "waitingHours": 13.650201944444444,
-      "comments": 2,
+      "mergedAt": "2026-11-10T05:15:16Z",
+      "closedAt": "2026-11-10T05:15:16Z",
+      "waitingHours": null,
+      "comments": 4,
       "labels": [
-        "risk:T2"
+        "risk:T2",
+        "pass"
       ],
       "url": "https://github.com/ThinkFlowLab/FlyBot/pull/2753"
     },
@@ -533,7 +1026,7 @@
       "createdAt": "2026-11-08T10:15:20Z",
       "mergedAt": null,
       "closedAt": null,
-      "waitingHours": 37.42603527777778,
+      "waitingHours": 58.92964388888889,
       "comments": 2,
       "labels": [
         "agent-pr",
@@ -619,7 +1112,7 @@
       "createdAt": "2026-11-08T05:56:55Z",
       "mergedAt": null,
       "closedAt": null,
-      "waitingHours": 41.732979722222225,
+      "waitingHours": 63.23658833333333,
       "comments": 1,
       "labels": [
         "agent-pr",
@@ -1767,8 +2260,8 @@
       "createdAt": "2026-11-05T14:37:48Z",
       "mergedAt": null,
       "closedAt": null,
-      "waitingHours": 105.05159083333334,
-      "comments": 3,
+      "waitingHours": 126.55519944444444,
+      "comments": 5,
       "labels": [
         "risk:T3"
       ],
@@ -1946,8 +2439,8 @@
       "createdAt": "2026-11-05T13:06:03Z",
       "mergedAt": null,
       "closedAt": null,
-      "waitingHours": 106.5807575,
-      "comments": 1,
+      "waitingHours": 128.0843661111111,
+      "comments": 2,
       "labels": [
         "risk:T3"
       ],
@@ -2044,7 +2537,7 @@
       "createdAt": "2026-11-05T10:13:04Z",
       "mergedAt": null,
       "closedAt": null,
-      "waitingHours": 109.46381305555556,
+      "waitingHours": 130.96742166666667,
       "comments": 2,
       "labels": [
         "risk:T3"
@@ -2061,7 +2554,7 @@
       "createdAt": "2026-11-05T08:26:32Z",
       "mergedAt": null,
       "closedAt": null,
-      "waitingHours": 111.23936861111112,
+      "waitingHours": 132.7429772222222,
       "comments": 1,
       "labels": [
         "risk:T3"
@@ -2724,7 +3217,7 @@
       "mergedAt": null,
       "closedAt": "2026-11-05T08:06:55Z",
       "waitingHours": null,
-      "comments": 1,
+      "comments": 2,
       "labels": [
         "risk:T3"
       ],
@@ -2741,7 +3234,7 @@
       "mergedAt": null,
       "closedAt": "2026-11-05T08:06:58Z",
       "waitingHours": null,
-      "comments": 1,
+      "comments": 2,
       "labels": [
         "risk:T3"
       ],
@@ -2826,7 +3319,7 @@
       "mergedAt": null,
       "closedAt": "2026-11-05T08:07:00Z",
       "waitingHours": null,
-      "comments": 2,
+      "comments": 3,
       "labels": [
         "risk:T3"
       ],
@@ -2894,7 +3387,7 @@
       "mergedAt": null,
       "closedAt": "2026-11-05T08:07:03Z",
       "waitingHours": null,
-      "comments": 2,
+      "comments": 3,
       "labels": [
         "risk:T3"
       ],
