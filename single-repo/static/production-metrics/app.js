@@ -2692,7 +2692,7 @@ function modelFailureAnalysis(days) {
         <td>${esc(fmtDateTime(item.start_time))}</td>
         <td class="num">${fmtDuration(item.duration_ms)}</td>
         <td>${esc(reason)}</td>
-        <td class="run-id" title="${esc(item.request_id || '')}">${item.request_id ? `<button class="trace-link" type="button" data-model-trace-id="${esc(item.request_id)}">${esc(item.request_id)}</button>` : '—'}</td>
+        <td class="run-id" title="${esc(item.request_id || '')}">${esc(item.request_id || '—')}</td>
         <td class="run-id" title="${esc(item.call_id || '')}">${esc(item.call_id || '—')}</td>
       </tr>`;
     })
@@ -3441,8 +3441,8 @@ function bindRequestLookup() {
   })
 }
 
-// Slow cloud requests and model spend-log calls use different identifiers.
-// Only draw phases explicitly recorded for this exact cloud request.
+// Only cloud-side slow or timed-out requests belong in the trajectory picker.
+// Model-call identifiers cannot establish a cloud-session relationship.
 function slowTraceCandidates(doc) {
   const byId = new Map();
   for (const day of Array.isArray(doc?.days) ? doc.days : []) {
@@ -3462,20 +3462,32 @@ function traceRows(item) {
   const total = item?.gateway;
   if (!Number.isFinite(total) || total <= 0) return [];
   const valid = (n) => Number.isFinite(n) && n >= 0 && n <= total;
+  const rows = [{label: '本轮运行', start: 0, duration: total, kind: 'total', detail: '云侧任务或请求的已记录时长'}];
+  if (item.scope === 'local') {
+    if (valid(item.user_event_ms)) rows.push({label: 'WorkSwarm 接收请求', start: item.user_event_ms, duration: 0, kind: 'event', detail: '用户请求进入 WorkSwarm 的事件时间点'});
+    for (const tool of Array.isArray(item.tools) ? item.tools : []) {
+      if (!valid(tool.start_ms) || !Number.isFinite(tool.duration_ms) || tool.duration_ms < 0 || tool.start_ms + tool.duration_ms > total) continue;
+      const name = ['bash', 'grep', 'read_file', 'tool_search'].includes(tool.name) ? tool.name : '工具';
+      const summary = typeof tool.summary === 'string' ? tool.summary : '';
+      rows.push({label: `${String(tool.index).padStart(2, '0')} · ${name}${summary ? ` · ${summary}` : ''}`, start: tool.start_ms, duration: tool.duration_ms, kind: tool.success === false ? 'error' : 'tool', detail: `工具调用事件到结果事件；状态：${tool.success === false ? '失败' : '成功'}${Number.isFinite(tool.result_chars) ? `；结果长度：${tool.result_chars} 字符` : ''}`});
+    }
+    for (const model of Array.isArray(item.models) ? item.models : []) {
+      if (!valid(model.time_ms)) continue;
+      const counts = [['输入 Token', model.input_tokens], ['缓存读取', model.cache_read_tokens], ['缓存未命中', model.cache_miss_tokens]].filter(([, value]) => Number.isFinite(value)).map(([key, value]) => `${key}：${value}`).join('；');
+      rows.push({label: `${String(model.index).padStart(2, '0')} · 模型用量记录`, start: model.time_ms, duration: 0, kind: 'model-point', detail: `调用后的记账时间点，无法推算模型耗时${counts ? `；${counts}` : ''}`});
+    }
+    if (valid(item.final_ms)) rows.push({label: '最终回复事件', start: item.final_ms, duration: 0, kind: 'event', detail: '最终回复事件的记录时间，不等同于首次可见文本'});
+    return [rows[0], ...rows.slice(1).sort((a, b) => a.start - b.start)];
+  }
   const first = item.first_token;
   const answer = item.answer_first;
-  const rows = [{label: item.scope === 'model' ? '模型调用' : '云侧请求', start: 0, duration: total, kind: 'total'}];
-  if (valid(first)) rows.push({label: '至首个文本', start: 0, duration: first, kind: 'first'});
-  if (valid(first) && valid(answer) && answer >= first) {
-    rows.push({label: '思考与工具阶段', start: first, duration: answer - first, kind: 'react'});
-  }
-  if (valid(answer)) rows.push({label: '答案输出阶段', start: answer, duration: total - answer, kind: 'answer'});
-  // Optional records must contain actual offsets relative to the gateway start.
-  // Never infer a per-tool interval from the aggregate ReAct duration.
-  for (const tool of Array.isArray(item.tool_events) ? item.tool_events : []) {
+  if (valid(first)) rows.push({label: '至首个文本', start: 0, duration: first, kind: 'first', detail: '网关受理至首个可见文本事件'});
+  if (valid(first) && valid(answer) && answer >= first) rows.push({label: '思考与工具阶段', start: first, duration: answer - first, kind: 'react', detail: '首个文本至首个答案文本，包含思考和工具'});
+  if (valid(answer)) rows.push({label: '答案输出阶段', start: answer, duration: total - answer, kind: 'answer', detail: '首个答案文本至请求结束'});
+  for (const [index, tool] of (Array.isArray(item.tool_events) ? item.tool_events : []).entries()) {
     if (!valid(tool.start_ms) || !Number.isFinite(tool.duration_ms) || tool.duration_ms < 0 || tool.start_ms + tool.duration_ms > total) continue;
     const name = ['bash', 'grep', 'read_file', 'tool_search'].includes(tool.name) ? tool.name : '工具';
-    rows.push({label: name, start: tool.start_ms, duration: tool.duration_ms, kind: tool.status === 'error' ? 'error' : 'tool'});
+    rows.push({label: `${String(index + 1).padStart(2, '0')} · ${name}`, start: tool.start_ms, duration: tool.duration_ms, kind: tool.status === 'error' ? 'error' : 'tool', detail: `工具调用事件到结果事件；状态：${tool.status === 'error' ? '失败' : '成功'}`});
   }
   return rows;
 }
@@ -3484,31 +3496,60 @@ function traceHtml(item) {
   if (!item) return '<p class="empty">所选范围没有可选择的慢请求或超时请求。</p>';
   const rows = traceRows(item);
   if (!rows.length) return '<p class="empty">该请求只记录了标识，暂无可绘制的耗时。</p>';
+  state.currentTraceRows = rows;
   const total = item.gateway;
-  const bars = rows.map((row) => `<div class="trace-row"><span class="trace-label">${esc(row.label)}</span><span class="trace-track"><span class="trace-bar trace-${row.kind}" style="left:${(100 * row.start / total).toFixed(3)}%;width:${(100 * row.duration / total).toFixed(3)}%"></span></span><span class="trace-duration">${fmtDuration(row.duration)}</span></div>`).join('');
+  const filter = state.traceFilter || 'tools';
+  const visible = rows.map((row, index) => ({...row, index})).filter((row) => row.kind === 'total' || filter === 'all' || (filter === 'tools' && ['tool', 'error', 'event', 'first', 'react', 'answer'].includes(row.kind)) || (filter === 'models' && ['model-point', 'event'].includes(row.kind)));
+  const styleFor = (row) => `left:${(100 * row.start / total).toFixed(3)}%;width:${(100 * row.duration / total).toFixed(3)}%`;
+  const marks = rows.slice(1).map((row) => `<span class="trace-overview-mark trace-${row.kind}${row.duration === 0 ? ' trace-point' : ''}" style="${styleFor(row)}" title="${esc(row.label)}"></span>`).join('');
+  const bars = visible.filter((row) => row.kind !== 'total').map((row) => `<button type="button" class="trace-event-row" data-trace-row="${row.index}" data-trace-text="${esc(row.label.toLowerCase())}"><span class="trace-event-name">${esc(row.label)}</span><span class="trace-event-track"><span class="trace-bar trace-${row.kind}${row.duration === 0 ? ' trace-point' : ''}" style="${styleFor(row)}"></span></span><span class="trace-duration">${row.duration === 0 ? '时间点' : fmtDuration(row.duration)}</span></button>`).join('');
+  const filters = [['all', '全部事件'], ['tools', '工具调用'], ['models', '模型记账']].map(([key, label]) => `<button type="button" class="trace-filter${filter === key ? ' active' : ''}" data-trace-filter="${key}" aria-pressed="${filter === key}">${label}</button>`).join('');
+  const ticks = [0, .25, .5, .75, 1].map((fraction) => `<span>${fmtDuration(total * fraction)}</span>`).join('');
   const hasTools = rows.some((row) => row.kind === 'tool' || row.kind === 'error');
-  const note = item.scope === 'model' ? '这是一次模型调用；尚无可靠标识关联完整云侧会话，不能显示该会话工具明细。' : (hasTools ? '工具区间为调用事件到结果事件的间隔；采集有文件和大小上限，明细可能不完整。' : '当前快照没有逐次工具调用时间，暂无法绘制工具明细；思考与工具阶段不等于单次工具调用。');
-  return `<div class="trace-chart" role="group" aria-label="请求阶段时间线">${bars}</div><p class="chart-note">各条长度表示实际记录的时间。${note}</p>`;
+  const missingPhases = item.scope === 'cloud' && (!Number.isFinite(item.first_token) || !Number.isFinite(item.answer_first));
+  const note = item.scope === 'local' ? '本地云侧历史样例（不属于当前范围的慢请求榜单）：工具区间为调用事件到结果事件的间隔；模型记账只表示时间点，不能当作模型耗时。'
+    : hasTools ? '工具区间为调用事件到结果事件的间隔；采集有文件和大小上限，明细可能不完整；模型调用时间未可靠关联。'
+    : '当前快照没有逐次工具调用时间，暂无法绘制工具明细；思考与工具阶段不等于单次工具调用。';
+  const phaseNote = missingPhases ? ' 部分阶段标记未记录，无法绘制对应区间。' : '';
+  const emptyList = filter === 'models' ? '该请求没有可可靠关联的模型记账记录。' : '当前筛选没有可展示的事件。';
+  return `<div class="trajectory-head"><div><strong>执行轨迹</strong><span class="muted">${fmtDuration(total)} · ${rows.length} 条记录 · 当前 ${visible.length} 条</span></div><p>${esc(note + phaseNote)}</p></div>
+    <div class="trace-overview" aria-label="轨迹总览"><div class="trace-overview-total"></div><div class="trace-overview-events">${marks}</div></div>
+    <div class="trajectory-legend"><span><i class="legend-dot total-dot"></i>本轮运行</span><span><i class="legend-dot event-dot"></i>事件</span><span><i class="legend-dot tool-dot"></i>工具</span><span><i class="legend-dot model-dot"></i>模型记账点</span></div>
+    <div class="trajectory-toolbar"><label><span class="sr-only">搜索轨迹</span><input id="trace-search" type="search" placeholder="搜索事件或工具" autocomplete="off"></label><div class="trace-filters" aria-label="轨迹筛选">${filters}</div></div>
+    <div class="trajectory-table"><div class="trajectory-columns"><span>事件</span><span class="trajectory-ticks">${ticks}</span><span>耗时</span></div><details class="trace-group" open><summary class="trace-root-row"><span>${esc(rows[0].label)} <small>${visible.length - 1}</small></span><span class="trace-root-track"><span class="trace-bar trace-total"></span></span><span class="trace-duration">${fmtDuration(total)}</span></summary><div class="trace-event-list">${bars || `<p class="trace-empty">${esc(emptyList)}</p>`}</div></details></div>
+    <div id="trace-detail" class="trace-detail" aria-live="polite">点击一条事件查看时间和指标。</div>`;
+}
+
+function availableTraceCandidates(doc, localTrace) {
+  const cloud = slowTraceCandidates(doc);
+  return localTrace ? [...cloud, localTrace] : cloud;
 }
 
 function renderRequestTraces(doc) {
   const picker = $('trace-picker');
   const result = $('trace-result');
   if (!picker || !result) return;
-  const candidates = slowTraceCandidates(doc);
-  const byModelId = new Map();
-  if (state.history && state.model) {
-    for (const point of modelFailurePoints(state.history, state.model, currentModelDays())) {
-      for (const item of [...(point.slow_requests || []), ...(point.timeout_requests || [])]) {
-        if (item?.request_id && !byModelId.has(item.request_id)) byModelId.set(item.request_id, {...item, date: point.date, gateway: item.duration_ms, scope: 'model'});
-      }
-    }
-  }
-  candidates.push(...[...byModelId.values()].sort((a, b) => (b.gateway ?? -1) - (a.gateway ?? -1)).slice(0, 200));
+  // A local, read-only collection is newer than published aggregate snapshots.
+  // Keep its coverage explicit; do not mix rows from different populations.
+  const publishedTraces = doc?.cloud_trace_collection;
+  const traceCollection = state.localCloudTraces || (publishedTraces?.schema === 'digitalmate/cloud-traces@1' ? publishedTraces : null);
+  const localDays = traceCollection?.days;
+  const source = Array.isArray(localDays) ? {...traceCollection, days: inRange(localDays, state.rangeDays, todayShanghai())} : doc;
+  const candidates = availableTraceCandidates(source, state.localTrace);
+  const cloudCount = candidates.filter((item) => item.scope === 'cloud').length;
   state.traceCandidates = candidates;
   const traceKey = (item) => `${item.scope}:${item.request_id}`;
-  if (!candidates.some((item) => traceKey(item) === state.traceId)) state.traceId = candidates.length ? traceKey(candidates[0]) : '';
-  picker.innerHTML = candidates.length ? `<label class="trace-select-label" for="trace-select">选择请求 <select id="trace-select">${candidates.map((item, index) => `<option value="${index}"${traceKey(item) === state.traceId ? ' selected' : ''}>${item.scope === 'model' ? '模型' : '云侧'} · ${esc(item.date)} · ${esc(fmtDuration(item.gateway))} · ${esc(item.request_id)}</option>`).join('')}</select></label>` : '';
+  if (!state.traceTouched || !candidates.some((item) => traceKey(item) === state.traceId)) {
+    state.traceId = candidates.length ? traceKey(candidates[0]) : '';
+  }
+  const coverage = traceCollection
+    ? `现网只读采集于 ${fmtDateTime(traceCollection.generated_at)}：${fmtCount(traceCollection.read_log_count)} / ${fmtCount(traceCollection.binding_count)} 个绑定读取到日志；排名仅覆盖已读取日志中的已结束请求，工具明细可能不完整。`
+    : '生产快照采集数据';
+  const note = cloudCount ? `${coverage} 当前范围共 ${cloudCount} 条云侧慢请求${traceCollection ? '' : '或超时请求'}。`
+    : `${coverage} 当前范围没有可用的云侧慢请求明细。${state.localTrace ? '下方历史样例不属于当前榜单。' : ''}`;
+  const cloudRows = candidates.map((item, index) => ({item, index})).filter(({item}) => item.scope === 'cloud').slice(0, 20);
+  const table = cloudRows.length ? `<details class="cloud-trace-list" open><summary>云侧慢请求列表（展示 ${cloudRows.length} 条）</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>开始时间</th><th class="num">云侧耗时</th><th class="num">已匹配工具事件</th><th>request_id</th><th>轨迹</th></tr></thead><tbody>${cloudRows.map(({item,index}) => `<tr><td>${esc(item.start_time ? fmtDateTime(item.start_time) : item.date)}</td><td class="num">${fmtDuration(item.gateway)}</td><td class="num">${Array.isArray(item.tool_events) && item.tool_events.length ? item.tool_events.length : '—'}</td><td class="run-id">${esc(item.request_id)}</td><td><button type="button" class="trace-link" data-cloud-select="${index}">查看轨迹</button></td></tr>`).join('')}</tbody></table></div></details>` : '';
+  picker.innerHTML = `<p class="data-freshness">${esc(note)}</p>` + table + (candidates.length ? `<label class="trace-select-label" for="trace-select">选择云侧请求 <select id="trace-select">${candidates.map((item, index) => `<option value="${index}"${traceKey(item) === state.traceId ? ' selected' : ''}>${item.scope === 'local' ? '本地云侧历史样例 · Issue #1031（不受时间筛选）' : '云侧慢请求'} · ${esc(item.start_time ? fmtDateTime(item.start_time) : item.date)} · ${esc(fmtDuration(item.gateway))}${item.scope === 'cloud' ? ` · ${esc(item.request_id)}` : ''}</option>`).join('')}</select></label>` : '');
   result.innerHTML = traceHtml(candidates.find((item) => traceKey(item) === state.traceId));
 }
 
@@ -3516,9 +3557,74 @@ $('request-traces').addEventListener('change', (event) => {
   if (event.target.id !== 'trace-select') return;
   const item = state.traceCandidates?.[Number(event.target.value)];
   if (!item) return;
+  state.traceTouched = true;
   state.traceId = `${item.scope}:${item.request_id}`;
+  state.traceFilter = 'tools';
   $('trace-result').innerHTML = traceHtml(item);
 });
+
+$('request-traces').addEventListener('click', (event) => {
+  const select = event.target.closest('[data-cloud-select]');
+  if (select) {
+    const index = Number(select.dataset.cloudSelect);
+    const item = state.traceCandidates?.[index];
+    if (!item || item.scope !== 'cloud') return;
+    state.traceTouched = true;
+    state.traceId = `${item.scope}:${item.request_id}`;
+    state.traceFilter = 'tools';
+    $('trace-select').value = String(index);
+    $('trace-result').innerHTML = traceHtml(item);
+    $('trace-result').scrollIntoView({behavior:'smooth', block:'start'});
+    return;
+  }
+  const filter = event.target.closest('[data-trace-filter]');
+  if (filter) {
+    state.traceFilter = filter.dataset.traceFilter;
+    const item = state.traceCandidates?.find((row) => `${row.scope}:${row.request_id}` === state.traceId);
+    $('trace-result').innerHTML = traceHtml(item);
+    return;
+  }
+  const button = event.target.closest('[data-trace-row]');
+  if (!button) return;
+  const row = state.currentTraceRows?.[Number(button.dataset.traceRow)];
+  if (!row) return;
+  $('request-traces').querySelectorAll('[data-trace-row]').forEach((node) => node.classList.toggle('selected', node === button));
+  const detail = $('trace-detail');
+  button.insertAdjacentElement('afterend', detail);
+  detail.innerHTML = `<strong>${esc(row.label)}</strong><div>相对开始：${(row.start / 1000).toFixed(3)} 秒 · ${row.duration === 0 ? '记录类型：时间点' : `事件间隔：${(row.duration / 1000).toFixed(3)} 秒`}</div><div>${esc(row.detail || '')}</div>`;
+});
+
+$('request-traces').addEventListener('input', (event) => {
+  if (event.target.id !== 'trace-search') return;
+  const query = event.target.value.trim().toLowerCase();
+  $('request-traces').querySelectorAll('[data-trace-row]').forEach((node) => { node.hidden = !node.dataset.traceText.includes(query); });
+});
+
+// Local diagnostic artifacts never load from the published GitHub Pages site.
+async function loadLocalTrace() {
+  if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) return;
+  try {
+    const response = await fetch('../data/request-trace-local.json', {cache: 'no-store'});
+    if (!response.ok) return;
+    const data = await response.json();
+    if (!Number.isFinite(data.total_ms) || data.total_ms <= 0 || !Array.isArray(data.tools) || !Array.isArray(data.models)) return;
+    state.localTrace = {...data, request_id: 'issue-1031', date: '2026-11-09', scope: 'local', gateway: data.total_ms};
+    renderEnv();
+  } catch { /* A local diagnostic is optional. */ }
+}
+
+// Local production evidence is never loaded from the public site.
+async function loadLocalCloudTraces() {
+  if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) return;
+  try {
+    const response = await fetch('../data/request-cloud-traces-local.json', {cache: 'no-store'});
+    if (!response.ok) return;
+    const data = await response.json();
+    if (!['digitalmate/local-cloud-traces@1', 'digitalmate/cloud-traces@1'].includes(data?.schema) || !Array.isArray(data.days)) return;
+    state.localCloudTraces = data;
+    renderEnv();
+  } catch { /* A local read-only collection is optional. */ }
+}
 
 // The production snapshot is optional and may live behind a slow private data
 // path. Load it independently so it can never delay or fail the history view.
@@ -3576,7 +3682,7 @@ async function loadEnvLatency() {
 // pooled collector stopped writing it; a stale file must not hide the analysis.
 function newestEnvDaily(candidates) {
   const freshness = (doc) => {
-    const stamp = Date.parse(doc?.generated_at || doc?.updated_at || '');
+    const stamp = Date.parse(doc?.cloud_trace_collection?.generated_at || doc?.generated_at || doc?.updated_at || '');
     return Number.isFinite(stamp) ? stamp : -Infinity;
   };
   let daily = null;
@@ -3584,7 +3690,7 @@ function newestEnvDaily(candidates) {
     if (doc?.schema !== 'digitalmate/env-request-latency-daily@1' || doc.env !== 'adx-jiuwen') continue;
     // A recently re-published document may contain only old days. Prefer the
     // document with the latest actual data day, then its publication time.
-    const latestDay = (candidate) => (Array.isArray(candidate?.days) ? candidate.days : [])
+    const latestDay = (candidate) => [...(Array.isArray(candidate?.days) ? candidate.days : []), ...(Array.isArray(candidate?.cloud_trace_collection?.days) ? candidate.cloud_trace_collection.days : [])]
       .map((row) => typeof row?.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(row.date) ? row.date : '')
       .sort().at(-1) || '';
     if (!daily || latestDay(doc) > latestDay(daily)
@@ -3643,6 +3749,8 @@ async function load() {
     state.model = busiestModel(history);
     void loadProductionMetrics();
     void loadEnvLatency();
+    void loadLocalTrace();
+    void loadLocalCloudTraces();
     const cases = sortedCases();
     state.selected = cases.find((entry) => entry.id === 'DM-WF-BACK-01')?.id || cases[0]?.id || null;
     render();
@@ -3748,18 +3856,10 @@ $('model-trends').addEventListener('click', (event) => {
   if (next) next.focus();
 });
 
-$('model-failure').addEventListener('click', (event) => {
-  const button = event.target.closest('[data-model-trace-id]');
-  if (!button) return;
-  state.traceId = `model:${button.dataset.modelTraceId}`;
-  const index = state.traceCandidates?.findIndex((item) => `${item.scope}:${item.request_id}` === state.traceId) ?? -1;
-  if (index >= 0) { $('trace-select').value = String(index); $('trace-result').innerHTML = traceHtml(state.traceCandidates[index]); }
-  $('request-traces')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-});
-
 $('env-latency').addEventListener('click', (event) => {
   const traceButton = event.target.closest('[data-trace-id]');
   if (traceButton) {
+    state.traceTouched = true;
     state.traceId = `cloud:${traceButton.dataset.traceId}`;
     const index = state.traceCandidates?.findIndex((item) => `${item.scope}:${item.request_id}` === state.traceId) ?? -1;
     if (index >= 0) { $('trace-select').value = String(index); $('trace-result').innerHTML = traceHtml(state.traceCandidates[index]); }

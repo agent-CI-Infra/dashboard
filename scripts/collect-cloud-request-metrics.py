@@ -19,6 +19,7 @@ Environment:
 """
 import base64
 import datetime
+import importlib.util
 import json
 import math
 import os
@@ -775,12 +776,34 @@ def production_seed(previous):
     return candidate
 
 
+def collect_workspace_traces():
+    """Collect bounded, sanitized traces without opening or waking environments."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'collect-production-workspace-traces.py')
+    spec = importlib.util.spec_from_file_location('production_workspace_traces', path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError('workspace trace collector unavailable')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.collect()
+
+
+def with_workspace_traces(previous, traces):
+    """Preserve existing metric timestamps; trace coverage has its own clock."""
+    if not isinstance(traces, dict) or traces.get('schema') != 'digitalmate/cloud-traces@1':
+        raise ValueError('invalid workspace trace collection')
+    if not isinstance(traces.get('read_log_count'), int) or traces['read_log_count'] <= 0:
+        raise ValueError('empty workspace trace collection')
+    result = dict(previous)
+    result['cloud_trace_collection'] = traces
+    return result
+
+
 def main():
     if not TOKEN:
         raise SystemExit("ADX_TOKEN is not set")
     if len(sys.argv) >= 2 and sys.argv[1] == "--raw":
-        fresh = collect(os.environ.get("DM_UNTIL", ""))
-        json.dump(fresh, sys.stdout, ensure_ascii=False, indent=1)
+        traces = collect_workspace_traces()
+        json.dump(traces, sys.stdout, ensure_ascii=False, indent=1)
         sys.stdout.write("\n")
         return
     if len(sys.argv) != 3:
@@ -789,8 +812,8 @@ def main():
     with open(previous_path, encoding="utf-8") as fh:
         previous = json.load(fh)
     previous = production_seed(previous)
-    fresh = collect(os.environ.get("DM_UNTIL", ""))
-    merged = merge(previous, fresh)
+    traces = collect_workspace_traces()
+    merged = with_workspace_traces(previous, traces)
     with open(output, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(merged, fh, ensure_ascii=False, indent=1)
         fh.write("\n")

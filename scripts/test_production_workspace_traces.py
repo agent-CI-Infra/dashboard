@@ -1,0 +1,59 @@
+import datetime as dt
+import importlib.util
+import io
+import json
+from pathlib import Path
+import unittest
+from unittest.mock import patch
+
+spec = importlib.util.spec_from_file_location('local_traces', Path(__file__).with_name('collect-production-workspace-traces.py'))
+collector = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(collector)
+
+class ProductionTraceTests(unittest.TestCase):
+    def test_log_parser_pairs_same_request_and_limits_fields(self):
+        now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+        start = now - dt.timedelta(seconds=10)
+        stamp = lambda t: t.strftime('%Y-%m-%d %H:%M:%S.000')
+        log = '\n'.join([
+            f'{stamp(start)} [MessageHandler] dispatch: request_id=digitalmate-valid private prompt',
+            f'{stamp(start + dt.timedelta(seconds=2))} [MessageHandler] process_stream chunk #1: request_id=digitalmate-valid event_type=chat.reasoning',
+            f'{stamp(start + dt.timedelta(seconds=7))} [MessageHandler] process_stream chunk #2: request_id=digitalmate-valid event_type=chat.delta',
+            f'{stamp(now)} [MessageHandler] Stream done request_id=digitalmate-valid total_chunks=2',
+            f'{stamp(start)} [MessageHandler] dispatch: request_id=digitalmate-unfinished',
+        ])
+        with patch.object(collector, 'query_for', return_value={}), \
+             patch.object(collector, 'listing', return_value=[{'name':'process.log','type':'file','size':len(log)}]), \
+             patch.object(collector, 'download_log', return_value=iter(log.splitlines())):
+            _, rows, status = collector.read_log({})
+        self.assertEqual(status, 'ok')
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]['gateway'], 10000)
+        self.assertEqual(rows[0]['react'], 5000)
+        self.assertNotIn('private prompt', json.dumps(rows))
+
+    def test_streamed_log_must_match_advertised_length(self):
+        class Response(io.BytesIO):
+            headers = {'Content-Length': '10'}
+        with patch.object(collector.OPENER, 'open', return_value=Response(b'abc\n')):
+            with self.assertRaisesRegex(ValueError, 'incomplete'):
+                list(collector.download_log({}))
+
+    def test_history_pairs_exact_request_and_drops_private_fields(self):
+        start = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+        row = {'request_id':'digitalmate-a','gateway':10000,'start_time':start.isoformat()}
+        event = lambda rid, ts, typ, **fields: {'request_id':rid,'timestamp':start.timestamp()+ts,'event_type':typ,**fields}
+        records = [
+            event('digitalmate-a', 1, 'chat.tool_call', tool_call={'tool_call_id':'1','name':'bash','arguments':{'command':'PRIVATE_COMMAND'}}),
+            event('digitalmate-b', 2, 'chat.tool_result', tool_call_id='1', success=False, result='PRIVATE_OTHER'),
+            event('digitalmate-a', 3, 'chat.tool_result', tool_call_id='1', success=False, result='PRIVATE_RESULT'),
+        ]
+        with patch.object(collector,'listing',return_value=[{'type':'directory','name':'session'}]), \
+             patch.object(collector,'fetch',return_value='\n'.join(map(json.dumps,records))):
+            collector.attach_tool_events({},[row])
+        self.assertEqual(row['tool_events'],[{'name':'bash','start_ms':1000.0,'duration_ms':2000.0,'status':'error'}])
+        self.assertNotIn('PRIVATE_',json.dumps(row))
+        self.assertFalse(row['trace_complete'])
+
+if __name__ == '__main__':
+    unittest.main()

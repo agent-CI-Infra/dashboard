@@ -107,6 +107,30 @@ class TraceCollectionTests(unittest.TestCase):
             with self.assertRaisesRegex(SystemExit, 'repeated'):
                 collector.bindings()
 
+    def test_publication_keeps_old_aggregate_clock_and_publishes_trace_coverage(self):
+        previous = {'env': 'adx-jiuwen', 'generated_at': '2026-11-08T00:00:00Z', 'days': [{'date': '2026-11-08'}]}
+        traces = {'schema': 'digitalmate/cloud-traces@1', 'read_log_count': 2, 'binding_count': 3, 'days': []}
+        result = collector.with_workspace_traces(previous, traces)
+        self.assertEqual(result['generated_at'], previous['generated_at'])
+        self.assertEqual(result['days'], previous['days'])
+        self.assertEqual(result['cloud_trace_collection']['binding_count'], 3)
+        with self.assertRaises(ValueError):
+            collector.with_workspace_traces(previous, {**traces, 'read_log_count': 0})
+
+    def test_main_uses_read_only_workspace_collection(self):
+        with tempfile.TemporaryDirectory() as directory:
+            previous = Path(directory) / 'previous.json'
+            output = Path(directory) / 'out.json'
+            previous.write_text(json.dumps({'env':'adx-jiuwen','schema':'digitalmate/env-request-latency-daily@1','days':[]}),encoding='utf-8')
+            trace = {'schema':'digitalmate/cloud-traces@1','read_log_count':1,'days':[]}
+            with patch.object(collector,'TOKEN','dummy'), \
+                 patch.object(collector.sys,'argv',['collector',str(output),str(previous)]), \
+                 patch.object(collector,'collect_workspace_traces',return_value=trace), \
+                 patch.object(collector,'collect') as legacy:
+                collector.main()
+                legacy.assert_not_called()
+            self.assertEqual(json.loads(output.read_text(encoding='utf-8'))['cloud_trace_collection'],trace)
+
     def test_failure_of_an_active_environment_keeps_old_snapshot(self):
         with patch.object(collector, 'bindings', return_value=[{}, {}]), \
              patch.object(collector, 'collect_environment', side_effect=[{'days': []}, RuntimeError('unavailable')]):
