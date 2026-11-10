@@ -931,6 +931,15 @@ function envTpotTrend(doc) {
   });
 }
 
+// Client-observed one-way network samples. The keys are part of the published
+// daily document contract; until the gateway release that emits them is
+// deployed, every day reports n=0 and the cards explain they are waiting.
+const NETWORK_TILES = [
+  ['uplink_send', '上行 send 单程', '端侧 send → 网关收到'],
+  ['downlink_first_text', '下行首文本 recv 单程', '网关文本帧 → 端侧 recv'],
+  ['downlink_terminal', '下行终态 recv 单程', '网关终态帧 → 端侧 recv'],
+];
+
 // Headline tiles for the cloud-side agent, mirroring the model summary: one
 // card per metric family, values joined by "/", anchored on the latest
 // complete day so a partial day never sets the numbers.
@@ -963,13 +972,32 @@ function envSummary(doc) {
   const firstTile = requestTile('first_token', '首吐字', '网关受理 → 首个文本 chunk');
   const answerTile = requestTile('answer_first', '答案首吐字', '网关受理 → 首个答案 chunk');
   const reactTile = requestTile('react', 'ReAct 阶段', '首个文本 chunk → 答案首吐字 · 思考 + 工具');
-  const toolTile = Number.isFinite(anchor.tool?.n) && anchor.tool.n > 0
-    ? `<div class="stat-card">
+  const toolCount = Number.isFinite(anchor.tool?.n) ? anchor.tool.n : 0;
+  const toolHint = toolCount > 0
+    ? `${fmtCount(toolCount)} 次工具调用 · 失败 ${fmtCount(anchor.tool_failed)} · tool_call → tool_result`
+    : '0 次工具调用 · 当日无样本 · tool_call → tool_result';
+  const toolTile = `<div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>工具调用</strong> 平均 / P50 / P95</div>
       <div class="stat-value combo">${fmtDuration(anchor.tool?.mean)} / ${fmtDuration(anchor.tool?.p50)} / ${fmtDuration(anchor.tool?.p95)}</div>
-      <div class="stat-hint">${fmtCount(anchor.tool?.n)} 次工具调用 · 失败 ${fmtCount(anchor.tool_failed)} · tool_call → tool_result</div>
-    </div>`
-    : '';
+      <div class="stat-hint">${toolHint}</div>
+    </div>`;
+  // One-way network latency is sampled on the client by the next gateway
+  // release. The cards stay on the board before that so a missing metric is
+  // visible as "not instrumented yet", not as a card that silently disappears.
+  const networkSeen = rows.some((row) => NETWORK_TILES.some(([key]) => Number.isFinite(row?.[key]?.n) && row[key].n > 0));
+  const networkTile = (key, label, hint) => {
+    const count = Number.isFinite(anchor[key]?.n) ? anchor[key].n : 0;
+    const availability = count > 0
+      ? `${fmtCount(count)} 个样本 · ${hint}`
+      : networkSeen
+        ? '0 个样本 · 当日无样本'
+        : '等待网关发版后埋点';
+    return `<div class="stat-card">
+      <div class="stat-label">云侧 Agent<strong>${label}</strong> 平均 / P50 / P95</div>
+      <div class="stat-value combo">${fmtDuration(anchor[key]?.mean)} / ${fmtDuration(anchor[key]?.p50)} / ${fmtDuration(anchor[key]?.p95)}</div>
+      <div class="stat-hint">${availability}</div>
+    </div>`;
+  };
   return `<section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>调用数</strong> / <strong>请求失败率</strong></div>
@@ -985,6 +1013,7 @@ function envSummary(doc) {
     ${answerTile}
     ${reactTile}
     ${toolTile}
+    ${NETWORK_TILES.map(([key, label, hint]) => networkTile(key, label, hint)).join('')}
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>TPOT</strong> 平均 / P50 / P95（ms/token）</div>
       <div class="stat-value combo">${fmtTpotBare(anchor.tpot?.mean)} / ${fmtTpotBare(anchor.tpot?.p50)} / ${fmtTpotBare(anchor.tpot?.p95)}</div>
@@ -996,6 +1025,99 @@ function envSummary(doc) {
       <div class="stat-hint">成功调用 ${fmtCount(anchor.calls?.success)} 次 · llm_usage 累计</div>
     </div>
   </section>`;
+}
+
+// Outlier analysis. A metric's own same-day P95 would always put about 5% of
+// the day outside it, so the threshold is the pooled P95 of the previous seven
+// complete days. The table shows how many samples exceed that baseline per
+// metric; the cohort table compares the phase profile of slow requests
+// (gateway duration > baseline P95) with the rest of the day, the same
+// "latency breakdown" APM tools use to point at the dominant phase.
+const ANOMALY_METRICS = [
+  ['gateway', '请求耗时', 'duration'],
+  ['first_token', '首吐字', 'duration'],
+  ['answer_first', '答案首吐字', 'duration'],
+  ['react', 'ReAct 阶段', 'duration'],
+  ['ttft', '模型调用 TTFT', 'duration'],
+  ['tpot', 'TPOT（ms/token）', 'tpot'],
+  ['tool', '工具调用', 'duration'],
+];
+
+const ANOMALY_PHASES = [
+  ['gateway', '请求耗时'],
+  ['first_token', '首吐字'],
+  ['react', 'ReAct 阶段'],
+  ['answer_tail', '答案尾段（首答案→结束）'],
+  ['workswarm', 'Agent 内执行'],
+  ['overhead', '网关开销'],
+];
+
+function envAnomaly(doc) {
+  const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date) : [];
+  const analysed = rows.filter((row) => row.anomaly?.available
+    && Object.values(row.anomaly.metrics || {}).some((metric) => Number.isFinite(metric?.baseline_p95)));
+  const anchor = [...analysed].reverse().find((row) => !row.partial) || analysed[analysed.length - 1];
+  const head = (windowDays) => `<div class="trend-head"><h3>异常请求分析</h3><span class="muted">超基线 P95 · 近 ${fmtCount(windowDays)} 个完整日</span></div>`;
+  if (!anchor) {
+    return `<div class="trend-card wide env-anomaly">${head(7)}<p class="empty">等待下一次采集生成异常分析（需要按请求合并各阶段耗时）。</p><p class="chart-note">异常判定以当日之前的完整日为基线，不使用当日 P95，避免固定比例的样本被机械标为异常。</p></div>`;
+  }
+  const a = anchor.anomaly;
+  const gateway = a.metrics?.gateway || {};
+  const cohort = a.cohort && a.cohort.outliers > 0 ? a.cohort : null;
+  const metricValue = (value, kind) => (kind === 'tpot' ? fmtTpotBare(value) : fmtDuration(value));
+  const rate = Number.isFinite(gateway.rate) ? fmtPercent(gateway.rate * 100) : '—';
+  const phaseLabels = Object.fromEntries(ANOMALY_PHASES);
+  const driver = cohort?.driver && Number.isFinite(cohort.driver_delta_ms)
+    ? `${phaseLabels[cohort.driver] || cohort.driver} +${fmtDuration(cohort.driver_delta_ms)}`
+    : '—';
+  const lead = `<div class="anomaly-lead">
+    <div class="stat-card">
+      <div class="stat-label">超基线请求</div>
+      <div class="stat-value">${fmtCount(gateway.outliers)} / ${fmtCount(gateway.n)}</div>
+      <div class="stat-hint">${rate} · 请求耗时 &gt; 基线 P95${Number.isFinite(gateway.baseline_p95) ? ` ${fmtDuration(gateway.baseline_p95)}` : ''}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">主要拉高阶段</div>
+      <div class="stat-value">${esc(driver)}</div>
+      <div class="stat-hint">异常组均值 − 正常组均值</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">基线窗口</div>
+      <div class="stat-value">${fmtCount(a.baseline?.days)} 个完整日</div>
+      <div class="stat-hint">${esc(a.baseline?.from || '—')} 至 ${esc(a.baseline?.to || '—')} · 每项至少 ${fmtCount(a.baseline?.min_samples)} 个样本</div>
+    </div>
+  </div>`;
+
+  const metricRows = ANOMALY_METRICS.map(([key, label, kind]) => {
+    const metric = a.metrics?.[key] || {};
+    const baseline = Number.isFinite(metric.baseline_p95)
+      ? `${metricValue(metric.baseline_p95, kind)} <span class="muted">(n=${fmtCount(metric.baseline_n)})</span>`
+      : `基线不足 <span class="muted">(n=${fmtCount(metric.baseline_n)})</span>`;
+    const share = Number.isFinite(metric.rate)
+      ? `<div class="anomaly-rate"><span class="anomaly-track"><span class="anomaly-fill" style="width:${Math.min(100, metric.rate * 100).toFixed(1)}%"></span></span><span>${fmtPercent(metric.rate * 100)}</span></div>`
+      : '<span class="muted">—</span>';
+    return `<tr><td>${label}</td><td>${baseline}</td><td class="num">${fmtCount(metric.n)}</td><td class="num">${Number.isFinite(metric.outliers) ? fmtCount(metric.outliers) : '—'}</td><td>${share}</td></tr>`;
+  }).join('');
+
+  const cohortRows = cohort
+    ? ANOMALY_PHASES.map(([key, label]) => {
+      const phase = cohort.phases?.[key] || {};
+      const normal = phase.normal || {};
+      const outlier = phase.outlier || {};
+      const delta = Number.isFinite(normal.mean) && Number.isFinite(outlier.mean) ? outlier.mean - normal.mean : null;
+      const deltaText = delta === null ? '—' : `${delta >= 0 ? '+' : '−'}${fmtDuration(Math.abs(delta))}`;
+      return `<tr><td>${label}</td><td class="num">${fmtDuration(normal.mean)} <span class="muted">(n=${fmtCount(normal.n)})</span></td><td class="num">${fmtDuration(outlier.mean)} <span class="muted">(n=${fmtCount(outlier.n)})</span></td><td class="num">${deltaText}</td></tr>`;
+    }).join('')
+    : '';
+
+  return `<div class="trend-card wide env-anomaly" aria-label="异常请求分析">
+    ${head(a.baseline?.days)}
+    <p class="chart-note">${esc(anchor.date)}${anchor.partial ? ' · 部分日' : ''} · 基线为 ${esc(a.baseline?.from || '—')} 至 ${esc(a.baseline?.to || '—')} 的 ${fmtCount(a.baseline?.days)} 个完整日合并样本。异常请求 = 云侧请求耗时超过基线 P95 的请求；低于基线的请求归入正常组。</p>
+    ${lead}
+    <div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>指标</th><th>基线 P95</th><th class="num">当日样本</th><th class="num">超基线</th><th>占比</th></tr></thead><tbody>${metricRows}</tbody></table></div>
+    ${cohort ? `<h4 class="anomaly-subhead">慢请求阶段对比（均值）</h4><div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>阶段</th><th class="num">正常请求</th><th class="num">异常请求</th><th class="num">增量</th></tr></thead><tbody>${cohortRows}</tbody></table></div>` : ''}
+    <p class="chart-note">基线取该日之前最近 7 个完整日（不含当日与部分日）的合并样本，P95 为最近排名分位，每项至少 20 个基线样本；异常 = 当日样本严格大于基线 P95；各指标单独判定，同一请求可能同时计入请求耗时与某个阶段指标。分布稳定时约 5% 的样本会自然超过基线 P95，应关注占比持续升高或集中在同一阶段的日期。阶段均值只统计该阶段有样本的请求，增量 = 异常组 − 正常组；首吐字 + ReAct 阶段 + 答案尾段构成请求耗时，因此增量最大的阶段即主要拉高项。请求耗时 / 首吐字 / 答案首吐字 / ReAct 按请求统计，TTFT / TPOT 按模型调用统计，工具调用按每次工具调用统计。基线不是当日 P95，避免固定约 5% 的样本被机械标为异常。公开看板不发布 request_id 与原始样本；需要定位单条请求时，请使用下方「按请求 ID 查询」。</p>
+  </div>`;
 }
 
 // Cloud call volume and failure rate share one card: counts on the left axis,
@@ -3154,7 +3276,7 @@ function renderEnv() {
   const through = [...all].reverse().find((row) => !row.partial)?.date;
   const capped = through ? all.filter((row) => row.date <= through) : all;
   const scoped = { ...daily, days: inRange(capped, state.rangeDays) };
-  target.innerHTML = `${envSummary(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTtftTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
+  target.innerHTML = `${envSummary(scoped)}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTtftTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
   refineCharts(target);
 }
 

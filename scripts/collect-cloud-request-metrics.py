@@ -20,6 +20,7 @@ Environment:
 import base64
 import datetime
 import json
+import math
 import os
 import re
 import sys
@@ -242,6 +243,202 @@ def weighted_stats(pairs):
     }
 
 
+ANOMALY_WINDOW_DAYS = 7
+ANOMALY_MIN_SAMPLES = 20
+# Columns of one row emitted by cloud-request-log-aggregate.py:
+# [gateway, first_token, answer_first, react, workswarm].
+REQUEST_SAMPLE_FIELDS = (
+    ("gateway", 0),
+    ("first_token", 1),
+    ("answer_first", 2),
+    ("react", 3),
+)
+ARRAY_METRICS = ("ttft", "tpot", "tool")
+COHORT_PHASES = ("gateway", "first_token", "react", "answer_tail", "workswarm", "overhead")
+
+
+def number(value):
+    """A finite float, or None for anything that cannot be compared."""
+    if isinstance(value, bool):
+        return None
+    try:
+        value = float(value)
+    except (TypeError, ValueError):
+        return None
+    return value if math.isfinite(value) else None
+
+
+def request_values(day, index):
+    values = []
+    for sample in day.get("samples") or []:
+        if not isinstance(sample, (list, tuple)) or len(sample) <= index:
+            continue
+        value = number(sample[index])
+        if value is not None:
+            values.append(value)
+    return values
+
+
+def array_values(day, name):
+    # A pooled row keeps the per-call arrays under "_raw" for the anomaly
+    # baseline: the public fields of the same name are already summaries.
+    source = day.get("_raw") or {}
+    values = []
+    for item in source.get(name, day.get(name)) or []:
+        raw = item[0] if name == "tpot" and isinstance(item, (list, tuple)) and item else item
+        value = number(raw)
+        if value is not None:
+            values.append(value)
+    return values
+
+
+def summary_values(values):
+    values = sorted(value for value in values if value is not None)
+    if not values:
+        return {"n": 0}
+    return {
+        "n": len(values),
+        "mean": round(sum(values) / len(values), 1),
+        "p50": round(percentile(values, 0.5), 1),
+    }
+
+
+def metric_anomaly(values, baseline):
+    """Count samples above the baseline P95 for one metric.
+
+    The threshold comes from earlier complete days, not from the day being
+    analysed: using the same day's P95 would mechanically label about 5% of
+    its samples as anomalous.
+    """
+    values = [value for value in values if value is not None]
+    baseline = [value for value in baseline if value is not None]
+    record = {"n": len(values), "baseline_n": len(baseline)}
+    if len(baseline) < ANOMALY_MIN_SAMPLES:
+        record["insufficient_baseline"] = True
+        return record
+    threshold = percentile(baseline, 0.95)
+    record["baseline_p95"] = round(threshold, 1)
+    if not values:
+        # No sample today: a 0% outlier rate would claim the metric was clean
+        # rather than unmeasured.
+        record.update({"outliers": None, "rate": None})
+        return record
+    outliers = sum(1 for value in values if value > threshold)
+    record.update({
+        "outliers": outliers,
+        "rate": round(outliers / len(values), 4),
+    })
+    return record
+
+
+def cohort_analysis(day, threshold):
+    """Compare the phase profile of slow requests with the rest of the day.
+
+    A request is in the outlier cohort when its gateway duration exceeds the
+    gateway baseline P95. first_token + react + answer_tail partitions that
+    duration, so the phase with the largest mean increase points at what
+    dragged the slow requests out.
+    """
+    outlier_rows = []
+    normal_rows = []
+    for sample in day.get("samples") or []:
+        if not isinstance(sample, (list, tuple)) or len(sample) < 5:
+            continue
+        gateway = number(sample[0])
+        if gateway is None:
+            continue
+        row = {
+            "gateway": gateway,
+            "first_token": number(sample[1]),
+            "answer_first": number(sample[2]),
+            "react": number(sample[3]),
+            "workswarm": number(sample[4]),
+        }
+        # A phase cannot be longer than the request that contains it. Treat
+        # out-of-order log markers as missing rather than as a huge outlier.
+        for key in ("first_token", "answer_first", "react", "workswarm"):
+            if row[key] is not None and row[key] > gateway:
+                row[key] = None
+        if row["answer_first"] is not None and 0 <= row["answer_first"] <= gateway:
+            row["answer_tail"] = gateway - row["answer_first"]
+        if row["workswarm"] is not None and 0 <= row["workswarm"] <= gateway:
+            row["overhead"] = gateway - row["workswarm"]
+        (outlier_rows if gateway > threshold else normal_rows).append(row)
+
+    phases = {}
+    for phase in COHORT_PHASES:
+        phases[phase] = {
+            "outlier": summary_values(row.get(phase) for row in outlier_rows),
+            "normal": summary_values(row.get(phase) for row in normal_rows),
+        }
+
+    driver = None
+    driver_delta = None
+    for phase in ("first_token", "react", "answer_tail"):
+        outlier = phases[phase]["outlier"]
+        normal = phases[phase]["normal"]
+        if not outlier.get("n") or not normal.get("n"):
+            continue
+        # A handful of outlier requests makes a median jumpy (two samples put
+        # the median on the lower one); the mean is the stabler driver signal.
+        delta = outlier["mean"] - normal["mean"]
+        if driver_delta is None or delta > driver_delta:
+            driver, driver_delta = phase, delta
+    if driver_delta is not None and driver_delta <= 0:
+        driver, driver_delta = None, None
+
+    return {
+        "outliers": len(outlier_rows),
+        "normal": len(normal_rows),
+        "phases": phases,
+        "driver": driver,
+        "driver_delta_ms": round(driver_delta, 1) if driver_delta is not None else None,
+    }
+
+
+def annotate_anomalies(days):
+    """Attach a per-day outlier summary to every day in place.
+
+    Only aggregate counts and cohort means are attached; the per-request
+    rows stay in the collector's memory and are never written to the board.
+    """
+    ordered = sorted(days, key=lambda day: day["date"])
+    complete = [day for day in ordered if not day.get("partial")]
+    for day in ordered:
+        refs = [ref for ref in complete if ref["date"] < day["date"]][-ANOMALY_WINDOW_DAYS:]
+        if not refs:
+            day["anomaly"] = {"available": False, "reason": "no_complete_baseline"}
+            continue
+
+        metrics = {}
+        for name, index in REQUEST_SAMPLE_FIELDS:
+            baseline = []
+            for ref in refs:
+                baseline.extend(request_values(ref, index))
+            metrics[name] = metric_anomaly(request_values(day, index), baseline)
+        for name in ARRAY_METRICS:
+            baseline = []
+            for ref in refs:
+                baseline.extend(array_values(ref, name))
+            metrics[name] = metric_anomaly(array_values(day, name), baseline)
+
+        record = {
+            "available": True,
+            "baseline": {
+                "from": refs[0]["date"],
+                "to": refs[-1]["date"],
+                "days": len(refs),
+                "min_samples": ANOMALY_MIN_SAMPLES,
+            },
+            "metrics": metrics,
+        }
+        gateway = metrics["gateway"]
+        if gateway.get("baseline_p95") is not None:
+            record["cohort"] = cohort_analysis(day, gateway["baseline_p95"])
+        day["anomaly"] = record
+    return days
+
+
 def pool(results):
     """Pool the per-environment samples of every day, then summarise."""
     days = {}
@@ -260,6 +457,11 @@ def pool(results):
                 "requests": set(), "gateway": [], "workswarm": [], "overhead": [],
                 "ttft": [], "tpot": [], "first_token": [], "answer_first": [], "react": [],
                 "tool": [], "tool_failed": 0,
+                "samples": [],
+                # One-way network metrics arrive with a later gateway release;
+                # the keys are carried through now so the cards light up as
+                # soon as an aggregator version emits them.
+                "uplink_send": [], "downlink_first_text": [], "downlink_terminal": [],
                 "input": 0, "output": 0, "total": 0, "success": 0, "failed": 0,
             })
             target["requests"].update(day.get("rids") or [])
@@ -273,6 +475,9 @@ def pool(results):
             target["react"].extend(day.get("react") or [])
             target["tool"].extend(day.get("tool") or [])
             target["tool_failed"] += day.get("tool_failed") or 0
+            target["samples"].extend(day.get("samples") or [])
+            for key in ("uplink_send", "downlink_first_text", "downlink_terminal"):
+                target[key].extend(day.get(key) or [])
             tokens = day.get("tokens") or {}
             target["input"] += tokens.get("input", 0)
             target["output"] += tokens.get("output", 0)
@@ -305,14 +510,31 @@ def pool(results):
             # thinking/tool phase between the first text chunk and that answer.
             "answer_first": stats(rec["answer_first"], 1),
             "react": stats(rec["react"], 1),
+            # Per-request rows are used by annotate_anomalies below and removed
+            # before the document is returned.
+            "samples": rec["samples"],
+            # The summary above replaces these arrays in the public row; the
+            # outlier baseline still needs the individual values, so they ride
+            # along privately until annotate_anomalies has run.
+            "_raw": {"ttft": rec["ttft"], "tpot": rec["tpot"], "tool": rec["tool"]},
             # One sample per finished tool call, timed by the product adapter.
             # "n" here counts tool calls, not requests.
             "tool": stats(rec["tool"], 1),
             "tool_failed": rec["tool_failed"],
+            # Client-observed one-way network latency. The gateway release that
+            # emits these markers is not deployed yet, so the groups are empty
+            # today and carry n=0.
+            "uplink_send": stats(rec["uplink_send"], 1),
+            "downlink_first_text": stats(rec["downlink_first_text"], 1),
+            "downlink_terminal": stats(rec["downlink_terminal"], 1),
             "tokens": {"input": rec["input"], "output": rec["output"], "total": rec["total"]},
             "calls": {"total": calls_total, "success": rec["success"], "failed": rec["failed"]},
             "failure_rate": round(rec["failed"] / calls_total, 4) if calls_total else 0.0,
         })
+    annotate_anomalies(out)
+    for day in out:
+        day.pop("samples", None)
+        day.pop("_raw", None)
     return {"days": out, "noise": noise}
 
 
@@ -335,6 +557,12 @@ def merge(previous, fresh):
             day["partial"] = False
         days[day["date"]] = day
     ordered = [days[key] for key in sorted(days)]
+    # The per-request rows and raw arrays are an internal collection detail;
+    # never let one survive into the published document, even if an old
+    # snapshot had one.
+    for day in ordered:
+        day.pop("samples", None)
+        day.pop("_raw", None)
     merged = dict(previous)
     merged["days"] = ordered
     merged["generated_at"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -343,7 +571,12 @@ def merge(previous, fresh):
     defs["answer_first"] = "请求口径：网关受理 → 首个答案文本 chunk（chat.delta）"
     defs["react"] = "请求口径：首个文本 chunk → 首个答案文本 chunk（思考与工具阶段）"
     defs["tool"] = "工具口径：chat.tool_call → chat.tool_result（服务端适配器记录，含下发、执行与结果返回；不含端侧）"
+    defs["uplink_send"] = "端侧发送口径：客户端 send → 网关收到该帧（单程，不含服务端处理）"
+    defs["downlink_first_text"] = "端侧接收口径：网关发出首个文本帧 → 客户端 recv 返回（单程）"
+    defs["downlink_terminal"] = "端侧接收口径：网关发出终态帧 → 客户端 recv 返回（单程）"
+    defs["anomaly"] = "基线 P95 = 该日之前最近 7 个完整日的合并样本 P95（每项至少 20 个样本）；异常 = 当日样本严格大于基线 P95；异常请求 = 请求耗时超过基线 P95 的请求"
     merged["definitions"] = defs
+    merged["anomaly_version"] = 1
     scope = dict(previous.get("metric_scope") or {})
     scope["valid_calls"] = sum(day.get("calls", {}).get("success", 0) for day in ordered)
     if "noise" in fresh:

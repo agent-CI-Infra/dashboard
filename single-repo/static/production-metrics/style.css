@@ -1927,3 +1927,62 @@ h1 {
 .env-summary {
   margin-bottom: 16px;
 }
+
+/* Outlier analysis: a compact lead row, then the metric and cohort tables. */
+.env-anomaly {
+  margin-bottom: 12px;
+}
+
+.anomaly-lead {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 10px 0 12px;
+}
+
+.anomaly-lead .stat-card {
+  box-shadow: none;
+}
+
+.anomaly-lead .stat-value {
+  font-size: 18px;
+}
+
+.anomaly-subhead {
+  margin: 14px 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.anomaly-table td,
+.anomaly-table th {
+  vertical-align: middle;
+}
+
+.anomaly-rate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+}
+
+.anomaly-track {
+  flex: 1;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--line-soft);
+}
+
+.anomaly-fill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--failed);
+}
+
+@media (max-width: 720px) {
+  .anomaly-lead {
+    grid-template-columns: 1fr;
+  }
+}

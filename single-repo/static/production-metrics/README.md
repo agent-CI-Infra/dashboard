@@ -16,3 +16,13 @@ Metric definitions (`metrics_version: 6`):
 TTFT is completionStartTime minus startTime. TPOT is token-weighted: sum of (endTime minus completionStartTime) divided by sum of (completion_tokens minus one) for eligible calls, separately for confirmed and unknown streaming. The collector preserves elapsed sums, token weights, and request sample counts for accurate daily and weekly rollups; coverage remains a request-based ratio. A previous snapshot with an older `metrics_version` is rebuilt in full once so every retained day uses the same definitions. The page rejects older snapshots until that rebuild succeeds. Other boards do not show this tab.
 
 Estimated TTFT and TPOT P50/P95 use mergeable 2%-wide logarithmic histograms of per-request values, separately for confirmed and unknown stream status. Bucket midpoints have at most about 1% relative error; each percentile requires at least 20 valid requests.
+
+## Cloud-side one-way network metrics
+
+`uplink_send`, `downlink_first_text`, and `downlink_terminal` carry client-observed one-way latency (`n`, `mean`, `p50`, `p95`, milliseconds) in each daily row. They are emitted by a later gateway instrumentation release, so until that release is deployed every day reports `n: 0` and the cards say the metric is waiting for instrumentation. The collector and aggregator already carry the keys and buckets; adding the release's log parsing and the daily trend charts remains for that release.
+
+## Outlier analysis
+
+`anomaly_version: 1` adds an `anomaly` object to every cloud-side daily row. For each day, the collector pools the previous up-to-seven complete days (excluding the day itself and any partial day) and computes a nearest-rank P95 per metric. A sample is an outlier when it is strictly greater than that baseline P95. `metrics` reports `n`, `baseline_n`, `baseline_p95`, `outliers`, and `rate` for request duration, first token, answer first token, ReAct, model-call TTFT, TPOT, and tool calls; a metric with fewer than 20 baseline samples is marked `insufficient_baseline` instead of being scored. `cohort` compares the phase profile of requests whose gateway duration exceeds the gateway baseline P95 with the rest of the day: `first_token`, `react`, and `answer_tail` partition gateway duration, so `driver` names the phase with the largest mean increase.
+
+The per-request rows that join a request's phases exist only inside the collection run. Only aggregate counts and cohort means are published; request IDs and raw samples never reach the board. The baseline deliberately comes from earlier complete days rather than the analysed day's own P95, because the latter would mechanically label about 5% of every day as anomalous.

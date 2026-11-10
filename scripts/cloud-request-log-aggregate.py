@@ -87,6 +87,14 @@ def bucket(day):
         "gateway": [], "workswarm": [], "overhead": [],
         "ttft": [], "tpot": [], "first_token": [], "answer_first": [], "react": [],
         "tool": [], "tool_failed": 0,
+        # Per-request phase values, aligned in one row so the collector can
+        # identify which phase makes a request an outlier. Row layout:
+        # [gateway, first_token, answer_first, react, workswarm].
+        "samples": [],
+        # Client-observed one-way network samples arrive with a later gateway
+        # release; keep the buckets so the collector contract is already in
+        # place when the log markers are added.
+        "uplink_send": [], "downlink_first_text": [], "downlink_terminal": [],
         "input": 0, "output": 0, "total": 0,
         "success": 0, "failed": 0, "models": {},
     })
@@ -206,6 +214,19 @@ for rid, (g0, g1, w0, w1, t0, a1) in requests.items():
         rec["workswarm"].append(round((w1 - w0) * 1000.0, 1))
         if g1 is not None:
             rec["overhead"].append(round((g1 - g0 - (w1 - w0)) * 1000.0, 1))
+    # One aligned row per request for the collector's outlier analysis. The
+    # separate arrays above remain the source for the daily percentiles; this
+    # row is the only place where a request's phases are joined, and it is
+    # reduced to anomaly counts before anything is published.
+    sample = [
+        round((g1 - g0) * 1000.0, 1) if g1 is not None else None,
+        round((t0 - g0) * 1000.0, 1) if t0 is not None else None,
+        round((a1 - g0) * 1000.0, 1) if a1 is not None else None,
+        round((a1 - t0) * 1000.0, 1) if t0 is not None and a1 is not None and a1 >= t0 else None,
+        round((w1 - w0) * 1000.0, 1) if w0 is not None and w1 is not None else None,
+    ]
+    if any(value is not None for value in sample):
+        rec["samples"].append(sample)
 
 out = []
 for day in sorted(days):
@@ -221,6 +242,10 @@ for day in sorted(days):
         "first_token": rec["first_token"],
         "answer_first": rec["answer_first"],
         "react": rec["react"],
+        "samples": rec["samples"],
+        "uplink_send": rec["uplink_send"],
+        "downlink_first_text": rec["downlink_first_text"],
+        "downlink_terminal": rec["downlink_terminal"],
         "tool": rec["tool"],
         "tool_failed": rec["tool_failed"],
         "tokens": {"input": rec["input"], "output": rec["output"], "total": rec["total"]},

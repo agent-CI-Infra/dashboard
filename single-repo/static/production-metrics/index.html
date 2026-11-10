@@ -132,7 +132,7 @@
           <div>
             <p class="eyebrow">云侧 Agent</p>
             <h2>云侧 Agent 调用指标</h2>
-            <p class="section-note">请求耗时（网关受理→响应结束）、首吐字（网关受理→首个文本 chunk）、答案首吐字（网关受理→首个答案 chunk）、ReAct 阶段（首个文本 chunk→首个答案 chunk，即思考与工具耗时）、工具调用耗时（tool_call→tool_result）、模型调用 TTFT / TPOT、调用数与 Token；首吐字 / 答案首吐字 / ReAct 按请求统计，工具耗时按工具调用统计，TTFT / TPOT 按模型调用统计，与上方模型侧口径相互独立。</p>
+            <p class="section-note">请求耗时（网关受理→响应结束）、首吐字（网关受理→首个文本 chunk）、答案首吐字（网关受理→首个答案 chunk）、ReAct 阶段（首个文本 chunk→首个答案 chunk，即思考与工具耗时）、工具调用耗时（tool_call→tool_result）、上行 send / 下行首文本 / 下行终态单程（端侧采样、依赖两侧时钟同步的网络单程）、模型调用 TTFT / TPOT、调用数与 Token；并基于近 7 个完整日的基线 P95 给出异常请求分析。首吐字 / 答案首吐字 / ReAct 与网络单程按请求或消息统计，工具耗时按工具调用统计，TTFT / TPOT 按模型调用统计，与上方模型侧口径相互独立。</p>
           </div>
         </header>
 
