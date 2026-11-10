@@ -359,6 +359,22 @@ def request_rows(day):
             "react": number(sample[3]),
             "workswarm": number(sample[4]),
         }
+        # Only the four fixed fields from the in-environment allowlist may
+        # survive into public slow-request rows; never copy raw history.
+        tools = sample[6] if len(sample) > 6 and isinstance(sample[6], list) else []
+        allowed_names = {"bash", "grep", "read_file", "tool_search", "tool"}
+        cleaned = []
+        for item in tools[:200]:
+            if not isinstance(item, dict):
+                continue
+            start, duration = number(item.get("start_ms")), number(item.get("duration_ms"))
+            if start is None or duration is None or start < 0 or duration < 0 or start + duration > gateway:
+                continue
+            cleaned.append({"name": item.get("name") if item.get("name") in allowed_names else "tool",
+                            "start_ms": start, "duration_ms": duration,
+                            "status": "error" if item.get("status") == "error" else "ok"})
+        if cleaned:
+            row["tool_events"] = cleaned
         for key in ("first_token", "answer_first", "react", "workswarm"):
             # A phase cannot be longer than its request; out-of-order markers
             # are missing data, not a huge phase.
@@ -635,7 +651,10 @@ def pool(results):
 
 
 def merge(previous, fresh):
-    days = {day["date"]: day for day in previous.get("days", [])}
+    days = {day["date"]: dict(day) for day in previous.get("days", [])}
+    # Legacy retained days have no trustworthy observation timestamp. Keep it
+    # unknown instead of assigning a newer document generation time.
+    observed_at = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     today = datetime.datetime.now(CST).strftime("%Y-%m-%d")
     for day in fresh["days"]:
         if not day["n"] and not day["calls"]["total"] and not day["tool"]["n"]:
@@ -651,6 +670,7 @@ def merge(previous, fresh):
             continue
         if old is not None and day["date"] != today and old.get("partial") is False:
             day["partial"] = False
+        day["observed_at"] = observed_at
         days[day["date"]] = day
     ordered = [days[key] for key in sorted(days)]
     # The per-request rows and raw arrays are an internal collection detail;
@@ -661,7 +681,7 @@ def merge(previous, fresh):
         day.pop("_raw", None)
     merged = dict(previous)
     merged["days"] = ordered
-    merged["generated_at"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    merged["generated_at"] = observed_at
     defs = dict(previous.get("definitions") or {})
     defs["first_token"] = "请求口径：网关受理 → 首个携带文本的 chunk（chat.delta / chat.reasoning）"
     defs["answer_first"] = "请求口径：网关受理 → 首个答案文本 chunk（chat.delta）"
@@ -689,6 +709,7 @@ def collect(until=""):
     with open(AGGREGATOR, encoding="utf-8") as fh:
         script = fh.read()
     results = []
+    failed = 0
     items = bindings()
     for index, item in enumerate(items, 1):
         # A binding can outlive its environment (deleted generation); the
@@ -701,8 +722,11 @@ def collect(until=""):
             results.append(collect_environment(item, script, until))
             if os.environ.get("ADX_DEBUG"):
                 print(f"environment {index}/{len(items)} ok", file=sys.stderr)
-        except Exception as error:  # one broken environment must not sink the run
+        except Exception as error:
+            failed += 1
             print(f"environment {index}/{len(items)} failed: {error}", file=sys.stderr)
+    if failed:
+        raise SystemExit(f"{failed} active environments failed; retain previous snapshot")
     if not results:
         raise SystemExit("every environment failed to report metrics")
     return pool(results)

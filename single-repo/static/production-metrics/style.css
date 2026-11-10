@@ -1986,3 +1986,18 @@ h1 {
     grid-template-columns: 1fr;
   }
 }
+
+/* Request timeline uses only observed phase offsets. */
+.slow-request-details > summary { cursor: pointer; }
+.trace-link { border: 0; background: none; color: #2563eb; cursor: pointer; text-align: left; font: inherit; padding: 0; overflow-wrap: anywhere; }
+.trace-select-label { display: flex; align-items: center; gap: 12px; margin: 12px 0 18px; color: #475569; }
+.trace-select-label select { max-width: 100%; min-width: 0; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; }
+.trace-chart { display: grid; gap: 10px; padding: 12px 0; }
+.trace-row { display: grid; grid-template-columns: minmax(100px, 180px) minmax(100px, 1fr) 80px; gap: 10px; align-items: center; font-size: 13px; }
+.trace-track { position: relative; height: 18px; background: #eef2f6; border-radius: 4px; }
+.trace-bar { position: absolute; height: 100%; border-radius: 4px; min-width: 1px; }
+.trace-total { background: #64748b; } .trace-first { background: #60a5fa; } .trace-react { background: #a78bfa; } .trace-answer { background: #34d399; } .trace-tool { background: #f59e0b; } .trace-error { background: #ef4444; }
+.trace-duration { text-align: right; font-variant-numeric: tabular-nums; }
+@media (max-width: 600px) { .trace-row { grid-template-columns: 90px minmax(60px, 1fr) 65px; } .trace-select-label { display: grid; } }
+
+.data-freshness { margin: 0 0 12px; color: #64748b; font-size: 13px; }

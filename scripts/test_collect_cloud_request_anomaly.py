@@ -2,6 +2,12 @@ import datetime
 import importlib.util
 from pathlib import Path
 import unittest
+from unittest.mock import patch
+import json
+import os
+import subprocess
+import sys
+import tempfile
 
 spec = importlib.util.spec_from_file_location('cloud_collector', Path(__file__).with_name('collect-cloud-request-metrics.py'))
 collector = importlib.util.module_from_spec(spec)
@@ -25,6 +31,56 @@ def make_day(date, values, partial=False, sample=None):
         'tool': [item[3] for item in samples],
     }
 
+
+class TraceCollectionTests(unittest.TestCase):
+    def test_exact_request_tool_events_are_paired_and_redacted(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            logs = root / 'process.log'
+            logs.write_text('2026-11-09 00:00:00.000 [MessageHandler] dispatch: request_id=digitalmate-one\n'
+                            '2026-11-09 00:00:10.000 [MessageHandler] Stream done request_id=digitalmate-one total_chunks=2\n', encoding='utf-8')
+            history = root / '.jiuwenswarm' / 'agent' / 'sessions' / 'session' / 'history.jsonl'
+            history.parent.mkdir(parents=True)
+            events = [
+                {'request_id': 'digitalmate-one', 'timestamp': 1794182401, 'event_type': 'chat.tool_call',
+                 'tool_call': {'tool_call_id': 'one', 'name': 'bash', 'arguments': {'command': 'PRIVATE_COMMAND'}}},
+                {'request_id': 'digitalmate-one', 'timestamp': 1794182403, 'event_type': 'chat.tool_result',
+                 'tool_call_id': 'one', 'success': False, 'result': 'PRIVATE_RESULT'},
+                {'request_id': 'digitalmate-other', 'timestamp': 1794182402, 'event_type': 'chat.tool_call',
+                 'tool_call': {'tool_call_id': 'other', 'name': 'private_name', 'arguments': 'PRIVATE_OTHER'}},
+            ]
+            history.write_text('\n'.join(json.dumps(event) for event in events), encoding='utf-8')
+            env = dict(os.environ, DM_LOG=str(logs))
+            completed = subprocess.run([sys.executable, str(Path(__file__).with_name('cloud-request-log-aggregate.py'))],
+                                       env=env, capture_output=True, text=True, check=True)
+            self.assertNotIn('PRIVATE_', completed.stdout)
+            doc = json.loads(completed.stdout)
+            sample = doc['days'][0]['samples'][0]
+            self.assertEqual(sample[5], 'digitalmate-one')
+            self.assertEqual(sample[6], [{'name': 'bash', 'start_ms': 1000.0, 'duration_ms': 2000.0, 'status': 'error'}])
+            published = collector.request_rows({'samples': [sample]})[0]
+            self.assertEqual(published['tool_events'], sample[6])
+
+    def test_rejects_raw_fields_and_invalid_intervals(self):
+        row = collector.request_rows({'samples': [[100, 20, 80, 60, 90, 'rid', [
+            {'name': 'secret_tool', 'start_ms': 10, 'duration_ms': 20, 'status': 'ok', 'arguments': 'secret'},
+            {'name': 'bash', 'start_ms': 95, 'duration_ms': 20},
+        ]]]})[0]
+        self.assertEqual(row['tool_events'], [{'name': 'tool', 'start_ms': 10.0, 'duration_ms': 20.0, 'status': 'ok'}])
+        self.assertNotIn('secret', json.dumps(row))
+
+    def test_retained_day_does_not_receive_a_false_new_observation_time(self):
+        old = {'date': '2026-11-08', 'n': 20, 'calls': {'total': 20}, 'tool': {'n': 20}}
+        new = {'date': '2026-11-08', 'n': 1, 'calls': {'total': 1}, 'tool': {'n': 1}}
+        merged = collector.merge({'days': [old], 'generated_at': '2026-11-09T00:00:00Z'}, {'days': [new]})
+        self.assertNotIn('observed_at', merged['days'][0])
+        self.assertEqual(merged['days'][0]['n'], 20)
+
+    def test_failure_of_an_active_environment_keeps_old_snapshot(self):
+        with patch.object(collector, 'bindings', return_value=[{}, {}]), \
+             patch.object(collector, 'collect_environment', side_effect=[{'days': []}, RuntimeError('unavailable')]):
+            with self.assertRaises(SystemExit):
+                collector.collect()
 
 class AnomalyTests(unittest.TestCase):
     def test_baseline_skips_partial_days_and_scores_against_earlier_complete_days(self):
