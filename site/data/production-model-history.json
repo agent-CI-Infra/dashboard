@@ -1,15 +1,15 @@
 {
  "schema": "digitalmate/e2e-performance-history@1",
  "metrics_version": 7,
- "generated_at": "2026-11-10T14:56:33Z",
- "updated_at": "2026-11-10T14:56:33Z",
- "window_start": "2026-10-06T16:00:00+00:00",
- "window_end": "2026-11-10T14:55:19+00:00",
+ "generated_at": "2026-11-10T21:20:13Z",
+ "updated_at": "2026-11-10T21:20:13Z",
+ "window_start": "2026-10-07T16:00:00+00:00",
+ "window_end": "2026-11-10T21:19:03+00:00",
  "current_day_partial": true,
- "complete_through": "2026-11-09",
- "partial_day": "2026-11-10",
+ "complete_through": "2026-11-10",
+ "partial_day": "2026-11-11",
  "source_scope": "gateway-all-requests",
- "excluded_missing_model": 4,
+ "excluded_missing_model": 0,
  "device": {
   "model": "现网网关 prod / adx-jiuwen",
   "kind": "gateway"
@@ -657,17 +657,17 @@
     {
      "date": "2026-11-10",
      "status": "COMPLETED",
-     "partial": true,
-     "query_ms": 260,
-     "duration_sum_ms": 265609,
-     "duration_sample_count": 1021,
-     "duration_p50_ms": 229,
-     "duration_p95_ms": 437,
-     "success_count": 1021,
-     "query_count": 1021,
+     "partial": false,
+     "query_ms": 259,
+     "duration_sum_ms": 309191,
+     "duration_sample_count": 1193,
+     "duration_p50_ms": 230,
+     "duration_p95_ms": 433,
+     "success_count": 1193,
+     "query_count": 1193,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-10T14:54:04Z",
+     "finished_at": "2026-11-10T15:59:57Z",
      "failed_queries": 0,
      "unknown_status_count": 0,
      "blocked_queries": 0,
@@ -682,8 +682,8 @@
       "status": "success",
       "reason": null
      },
-     "slow_count": 52,
-     "slow_threshold_ms": 437,
+     "slow_count": 60,
+     "slow_threshold_ms": 433,
      "hours": [
       {
        "hour": 0,
@@ -831,18 +831,26 @@
       },
       {
        "hour": 22,
-       "calls": 141,
-       "success_count": 141,
-       "duration_sum_ms": 37335,
-       "duration_sample_count": 141,
+       "calls": 153,
+       "success_count": 153,
+       "duration_sum_ms": 40306,
+       "duration_sample_count": 153,
+       "failed": 0
+      },
+      {
+       "hour": 23,
+       "calls": 160,
+       "success_count": 160,
+       "duration_sum_ms": 40611,
+       "duration_sample_count": 160,
        "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/bge-m3",
-       "call_count": 1021,
-       "success_count": 1021,
+       "call_count": 1193,
+       "success_count": 1193,
        "failed_count": 0,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
@@ -852,7 +860,7 @@
        "ttft_estimated_sample_count": 0,
        "ttft_estimated_sum_ms": null,
        "ttft_estimated_histogram": [],
-       "ttft_filtered_count": 521,
+       "ttft_filtered_count": 601,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
@@ -864,14 +872,14 @@
        "tpot_histogram": [],
        "tpot_estimated_histogram": [],
        "tpot_filtered_count": 0,
-       "duration_sum_ms": 265609,
-       "duration_p50_ms": 229,
-       "duration_p95_ms": 437,
-       "duration_sample_count": 1021,
-       "input_tokens": 45057,
+       "duration_sum_ms": 309191,
+       "duration_p50_ms": 230,
+       "duration_p95_ms": 433,
+       "duration_sample_count": 1193,
+       "input_tokens": 66570,
        "output_tokens": 0,
-       "total_tokens": 45057,
-       "token_sample_count": 1021,
+       "total_tokens": 66570,
+       "token_sample_count": 1193,
        "token_coverage": 1.0,
        "failed_input_tokens": null,
        "failed_output_tokens": null,
@@ -893,6 +901,14 @@
        "call_id": "b306e31a-2329-4941-8468-426dee62275a",
        "start_time": "2026-11-10T09:43:37.359+00:00",
        "duration_ms": 803,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "ee2cc93e-3c8d-449e-962f-6f4eedf0926c",
+       "call_id": "ee2cc93e-3c8d-449e-962f-6f4eedf0926c",
+       "start_time": "2026-11-10T15:00:50.561+00:00",
+       "duration_ms": 784,
        "status": "success",
        "reason": null
       },
@@ -925,6 +941,14 @@
        "call_id": "54c066bc-4861-46b4-9e26-380396609058",
        "start_time": "2026-11-10T05:46:31.264+00:00",
        "duration_ms": 682,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "d8ae72b5-5274-4875-8396-704a6518b114",
+       "call_id": "d8ae72b5-5274-4875-8396-704a6518b114",
+       "start_time": "2026-11-10T15:29:46.858+00:00",
+       "duration_ms": 681,
        "status": "success",
        "reason": null
       },
@@ -985,10 +1009,26 @@
        "reason": null
       },
       {
+       "request_id": "f05dc2f5-e203-4b7a-968a-1d14a3b33ecc",
+       "call_id": "f05dc2f5-e203-4b7a-968a-1d14a3b33ecc",
+       "start_time": "2026-11-10T15:17:17.757+00:00",
+       "duration_ms": 616,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "fb267b75-12db-4a5d-a159-f0de74a14a9a",
        "call_id": "fb267b75-12db-4a5d-a159-f0de74a14a9a",
        "start_time": "2026-11-10T10:05:45.116+00:00",
        "duration_ms": 609,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "5dc08bbd-c496-44f9-9149-c779983eb356",
+       "call_id": "5dc08bbd-c496-44f9-9149-c779983eb356",
+       "start_time": "2026-11-10T15:14:01.936+00:00",
+       "duration_ms": 605,
        "status": "success",
        "reason": null
       },
@@ -1145,6 +1185,14 @@
        "reason": null
       },
       {
+       "request_id": "883dd683-f32f-48eb-9a00-b201aac0f5b8",
+       "call_id": "883dd683-f32f-48eb-9a00-b201aac0f5b8",
+       "start_time": "2026-11-10T15:51:27.587+00:00",
+       "duration_ms": 530,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "279bcb14-4c19-4ed5-8afa-9c1c2cf58e23",
        "call_id": "279bcb14-4c19-4ed5-8afa-9c1c2cf58e23",
        "start_time": "2026-11-10T02:25:37.166+00:00",
@@ -1239,44 +1287,137 @@
        "duration_ms": 482,
        "status": "success",
        "reason": null
+      }
+     ],
+     "timeout_requests": []
+    },
+    {
+     "date": "2026-11-11",
+     "status": "COMPLETED",
+     "partial": true,
+     "query_ms": 258,
+     "duration_sum_ms": 21420,
+     "duration_sample_count": 83,
+     "duration_p50_ms": 251,
+     "duration_p95_ms": 320,
+     "success_count": 83,
+     "query_count": 83,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-11-10T17:05:28Z",
+     "failed_queries": 0,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "failure_reasons": {},
+     "timeout_count": 0,
+     "latency_max_ms": 468,
+     "latency_max_request": {
+      "request_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
+      "call_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
+      "start_time": "2026-11-10T16:12:12.357+00:00",
+      "duration_ms": 468,
+      "status": "success",
+      "reason": null
+     },
+     "slow_count": 5,
+     "slow_threshold_ms": 320,
+     "hours": [
+      {
+       "hour": 0,
+       "calls": 69,
+       "success_count": 69,
+       "duration_sum_ms": 18004,
+       "duration_sample_count": 69,
+       "failed": 0
       },
       {
-       "request_id": "390fae91-89af-44ca-acb5-ac572d1f436c",
-       "call_id": "390fae91-89af-44ca-acb5-ac572d1f436c",
-       "start_time": "2026-11-10T05:47:15.841+00:00",
-       "duration_ms": 474,
+       "hour": 1,
+       "calls": 14,
+       "success_count": 14,
+       "duration_sum_ms": 3416,
+       "duration_sample_count": 14,
+       "failed": 0
+      }
+     ],
+     "benchmark_models": [
+      {
+       "model": "openai/bge-m3",
+       "call_count": 83,
+       "success_count": 83,
+       "failed_count": 0,
+       "unknown_status_count": 0,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "ttft_sum_ms": null,
+       "ttft_estimated_avg_ms": null,
+       "ttft_estimated_sample_count": 0,
+       "ttft_estimated_sum_ms": null,
+       "ttft_estimated_histogram": [],
+       "ttft_filtered_count": 52,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "tpot_decode_sum_ms": null,
+       "tpot_weight_tokens": 0,
+       "tpot_estimated_avg_ms": null,
+       "tpot_estimated_sample_count": 0,
+       "tpot_estimated_decode_sum_ms": null,
+       "tpot_estimated_weight_tokens": 0,
+       "tpot_histogram": [],
+       "tpot_estimated_histogram": [],
+       "tpot_filtered_count": 0,
+       "duration_sum_ms": 21420,
+       "duration_p50_ms": 251,
+       "duration_p95_ms": 320,
+       "duration_sample_count": 83,
+       "input_tokens": 14358,
+       "output_tokens": 0,
+       "total_tokens": 14358,
+       "token_sample_count": 83,
+       "token_coverage": 1.0,
+       "failed_input_tokens": null,
+       "failed_output_tokens": null,
+       "failed_total_tokens": null,
+       "failed_token_sample_count": 0
+      }
+     ],
+     "slow_requests": [
+      {
+       "request_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
+       "call_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
+       "start_time": "2026-11-10T16:12:12.357+00:00",
+       "duration_ms": 468,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "670a4bc2-bbf3-4075-8f65-b5809f568de8",
-       "call_id": "670a4bc2-bbf3-4075-8f65-b5809f568de8",
-       "start_time": "2026-11-10T10:05:44.830+00:00",
-       "duration_ms": 472,
+       "request_id": "e62b762a-3be9-41fa-83ad-22d195f70a92",
+       "call_id": "e62b762a-3be9-41fa-83ad-22d195f70a92",
+       "start_time": "2026-11-10T16:01:26.650+00:00",
+       "duration_ms": 466,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "27fd8967-925e-400a-9355-c5ce5c25e2eb",
-       "call_id": "27fd8967-925e-400a-9355-c5ce5c25e2eb",
-       "start_time": "2026-11-09T16:52:09.994+00:00",
-       "duration_ms": 459,
+       "request_id": "42327fb8-8731-49c4-a155-7fb979456c4a",
+       "call_id": "42327fb8-8731-49c4-a155-7fb979456c4a",
+       "start_time": "2026-11-10T16:21:56.045+00:00",
+       "duration_ms": 404,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "fe3fb185-f365-4e3b-b472-5091eb11434d",
-       "call_id": "fe3fb185-f365-4e3b-b472-5091eb11434d",
-       "start_time": "2026-11-10T13:29:08.792+00:00",
-       "duration_ms": 458,
+       "request_id": "8de635ea-92b7-4a51-8b31-7b46b43dc1fb",
+       "call_id": "8de635ea-92b7-4a51-8b31-7b46b43dc1fb",
+       "start_time": "2026-11-10T16:51:57.767+00:00",
+       "duration_ms": 377,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "378de05e-ad29-4b0a-85c3-0dc8780a3b39",
-       "call_id": "378de05e-ad29-4b0a-85c3-0dc8780a3b39",
-       "start_time": "2026-11-09T16:07:11.006+00:00",
-       "duration_ms": 456,
+       "request_id": "cb035757-409a-4e66-9ed7-882621246f55",
+       "call_id": "cb035757-409a-4e66-9ed7-882621246f55",
+       "start_time": "2026-11-10T16:37:31.509+00:00",
+       "duration_ms": 320,
        "status": "success",
        "reason": null
       }
@@ -1285,194 +1426,58 @@
     }
    ],
    "latest": {
-    "date": "2026-11-10",
+    "date": "2026-11-11",
     "status": "COMPLETED",
     "partial": true,
-    "query_ms": 260,
-    "duration_sum_ms": 265609,
-    "duration_sample_count": 1021,
-    "duration_p50_ms": 229,
-    "duration_p95_ms": 437,
-    "success_count": 1021,
-    "query_count": 1021,
+    "query_ms": 258,
+    "duration_sum_ms": 21420,
+    "duration_sample_count": 83,
+    "duration_p50_ms": 251,
+    "duration_p95_ms": 320,
+    "success_count": 83,
+    "query_count": 83,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-10T14:54:04Z",
+    "finished_at": "2026-11-10T17:05:28Z",
     "failed_queries": 0,
     "unknown_status_count": 0,
     "blocked_queries": 0,
     "failure_reasons": {},
     "timeout_count": 0,
-    "latency_max_ms": 985,
+    "latency_max_ms": 468,
     "latency_max_request": {
-     "request_id": "2926be6a-421c-4c89-9792-352fc2ee882b",
-     "call_id": "2926be6a-421c-4c89-9792-352fc2ee882b",
-     "start_time": "2026-11-10T13:19:08.511+00:00",
-     "duration_ms": 985,
+     "request_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
+     "call_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
+     "start_time": "2026-11-10T16:12:12.357+00:00",
+     "duration_ms": 468,
      "status": "success",
      "reason": null
     },
-    "slow_count": 52,
-    "slow_threshold_ms": 437,
+    "slow_count": 5,
+    "slow_threshold_ms": 320,
     "hours": [
      {
       "hour": 0,
-      "calls": 114,
-      "success_count": 114,
-      "duration_sum_ms": 27880,
-      "duration_sample_count": 114,
+      "calls": 69,
+      "success_count": 69,
+      "duration_sum_ms": 18004,
+      "duration_sample_count": 69,
       "failed": 0
      },
      {
       "hour": 1,
-      "calls": 33,
-      "success_count": 33,
-      "duration_sum_ms": 7635,
-      "duration_sample_count": 33,
-      "failed": 0
-     },
-     {
-      "hour": 5,
-      "calls": 1,
-      "success_count": 1,
-      "duration_sum_ms": 292,
-      "duration_sample_count": 1,
-      "failed": 0
-     },
-     {
-      "hour": 6,
-      "calls": 2,
-      "success_count": 2,
-      "duration_sum_ms": 465,
-      "duration_sample_count": 2,
-      "failed": 0
-     },
-     {
-      "hour": 8,
-      "calls": 3,
-      "success_count": 3,
-      "duration_sum_ms": 650,
-      "duration_sample_count": 3,
-      "failed": 0
-     },
-     {
-      "hour": 9,
-      "calls": 85,
-      "success_count": 85,
-      "duration_sum_ms": 22846,
-      "duration_sample_count": 85,
-      "failed": 0
-     },
-     {
-      "hour": 10,
-      "calls": 18,
-      "success_count": 18,
-      "duration_sum_ms": 5041,
-      "duration_sample_count": 18,
-      "failed": 0
-     },
-     {
-      "hour": 11,
-      "calls": 28,
-      "success_count": 28,
-      "duration_sum_ms": 7240,
-      "duration_sample_count": 28,
-      "failed": 0
-     },
-     {
-      "hour": 12,
-      "calls": 12,
-      "success_count": 12,
-      "duration_sum_ms": 2916,
-      "duration_sample_count": 12,
-      "failed": 0
-     },
-     {
-      "hour": 13,
-      "calls": 23,
-      "success_count": 23,
-      "duration_sum_ms": 6511,
-      "duration_sample_count": 23,
-      "failed": 0
-     },
-     {
-      "hour": 14,
-      "calls": 25,
-      "success_count": 25,
-      "duration_sum_ms": 6405,
-      "duration_sample_count": 25,
-      "failed": 0
-     },
-     {
-      "hour": 15,
-      "calls": 47,
-      "success_count": 47,
-      "duration_sum_ms": 13067,
-      "duration_sample_count": 47,
-      "failed": 0
-     },
-     {
-      "hour": 16,
-      "calls": 35,
-      "success_count": 35,
-      "duration_sum_ms": 9262,
-      "duration_sample_count": 35,
-      "failed": 0
-     },
-     {
-      "hour": 17,
-      "calls": 67,
-      "success_count": 67,
-      "duration_sum_ms": 18061,
-      "duration_sample_count": 67,
-      "failed": 0
-     },
-     {
-      "hour": 18,
-      "calls": 45,
-      "success_count": 45,
-      "duration_sum_ms": 13638,
-      "duration_sample_count": 45,
-      "failed": 0
-     },
-     {
-      "hour": 19,
-      "calls": 30,
-      "success_count": 30,
-      "duration_sum_ms": 7860,
-      "duration_sample_count": 30,
-      "failed": 0
-     },
-     {
-      "hour": 20,
-      "calls": 73,
-      "success_count": 73,
-      "duration_sum_ms": 18126,
-      "duration_sample_count": 73,
-      "failed": 0
-     },
-     {
-      "hour": 21,
-      "calls": 239,
-      "success_count": 239,
-      "duration_sum_ms": 60379,
-      "duration_sample_count": 239,
-      "failed": 0
-     },
-     {
-      "hour": 22,
-      "calls": 141,
-      "success_count": 141,
-      "duration_sum_ms": 37335,
-      "duration_sample_count": 141,
+      "calls": 14,
+      "success_count": 14,
+      "duration_sum_ms": 3416,
+      "duration_sample_count": 14,
       "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/bge-m3",
-      "call_count": 1021,
-      "success_count": 1021,
+      "call_count": 83,
+      "success_count": 83,
       "failed_count": 0,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
@@ -1482,7 +1487,7 @@
       "ttft_estimated_sample_count": 0,
       "ttft_estimated_sum_ms": null,
       "ttft_estimated_histogram": [],
-      "ttft_filtered_count": 521,
+      "ttft_filtered_count": 52,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
@@ -1494,14 +1499,14 @@
       "tpot_histogram": [],
       "tpot_estimated_histogram": [],
       "tpot_filtered_count": 0,
-      "duration_sum_ms": 265609,
-      "duration_p50_ms": 229,
-      "duration_p95_ms": 437,
-      "duration_sample_count": 1021,
-      "input_tokens": 45057,
+      "duration_sum_ms": 21420,
+      "duration_p50_ms": 251,
+      "duration_p95_ms": 320,
+      "duration_sample_count": 83,
+      "input_tokens": 14358,
       "output_tokens": 0,
-      "total_tokens": 45057,
-      "token_sample_count": 1021,
+      "total_tokens": 14358,
+      "token_sample_count": 83,
       "token_coverage": 1.0,
       "failed_input_tokens": null,
       "failed_output_tokens": null,
@@ -1511,402 +1516,42 @@
     ],
     "slow_requests": [
      {
-      "request_id": "2926be6a-421c-4c89-9792-352fc2ee882b",
-      "call_id": "2926be6a-421c-4c89-9792-352fc2ee882b",
-      "start_time": "2026-11-10T13:19:08.511+00:00",
-      "duration_ms": 985,
+      "request_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
+      "call_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
+      "start_time": "2026-11-10T16:12:12.357+00:00",
+      "duration_ms": 468,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "b306e31a-2329-4941-8468-426dee62275a",
-      "call_id": "b306e31a-2329-4941-8468-426dee62275a",
-      "start_time": "2026-11-10T09:43:37.359+00:00",
-      "duration_ms": 803,
+      "request_id": "e62b762a-3be9-41fa-83ad-22d195f70a92",
+      "call_id": "e62b762a-3be9-41fa-83ad-22d195f70a92",
+      "start_time": "2026-11-10T16:01:26.650+00:00",
+      "duration_ms": 466,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "c3cb35fd-97b8-4426-b1f9-97ff4d2310f5",
-      "call_id": "c3cb35fd-97b8-4426-b1f9-97ff4d2310f5",
-      "start_time": "2026-11-10T12:49:24.680+00:00",
-      "duration_ms": 768,
+      "request_id": "42327fb8-8731-49c4-a155-7fb979456c4a",
+      "call_id": "42327fb8-8731-49c4-a155-7fb979456c4a",
+      "start_time": "2026-11-10T16:21:56.045+00:00",
+      "duration_ms": 404,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "f2a537b9-8765-4a79-8989-3e23a2474aef",
-      "call_id": "f2a537b9-8765-4a79-8989-3e23a2474aef",
-      "start_time": "2026-11-10T07:45:02.029+00:00",
-      "duration_ms": 759,
+      "request_id": "8de635ea-92b7-4a51-8b31-7b46b43dc1fb",
+      "call_id": "8de635ea-92b7-4a51-8b31-7b46b43dc1fb",
+      "start_time": "2026-11-10T16:51:57.767+00:00",
+      "duration_ms": 377,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "248c5af0-9432-453e-b66e-fcd3d700fcc1",
-      "call_id": "248c5af0-9432-453e-b66e-fcd3d700fcc1",
-      "start_time": "2026-11-10T01:01:05.514+00:00",
-      "duration_ms": 751,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "54c066bc-4861-46b4-9e26-380396609058",
-      "call_id": "54c066bc-4861-46b4-9e26-380396609058",
-      "start_time": "2026-11-10T05:46:31.264+00:00",
-      "duration_ms": 682,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "6e34b0c3-7846-4171-96c4-254a21fd0f05",
-      "call_id": "6e34b0c3-7846-4171-96c4-254a21fd0f05",
-      "start_time": "2026-11-10T08:29:46.857+00:00",
-      "duration_ms": 679,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "3070991d-a948-4ae6-82cd-955fb04d01fa",
-      "call_id": "3070991d-a948-4ae6-82cd-955fb04d01fa",
-      "start_time": "2026-11-10T10:15:35.776+00:00",
-      "duration_ms": 679,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "95310a61-3a38-4de3-8a08-9b1f928a2c62",
-      "call_id": "95310a61-3a38-4de3-8a08-9b1f928a2c62",
-      "start_time": "2026-11-10T05:47:13.341+00:00",
-      "duration_ms": 655,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "5a36bdb9-57ab-47bd-aee9-53bf08c0fc53",
-      "call_id": "5a36bdb9-57ab-47bd-aee9-53bf08c0fc53",
-      "start_time": "2026-11-10T13:37:35.804+00:00",
-      "duration_ms": 654,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "6c6e2f60-e74f-4e1e-ab9c-b93d91b09707",
-      "call_id": "6c6e2f60-e74f-4e1e-ab9c-b93d91b09707",
-      "start_time": "2026-11-10T14:48:32.635+00:00",
-      "duration_ms": 653,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "7c2af543-3b41-484f-afe9-e12d2df4e78f",
-      "call_id": "7c2af543-3b41-484f-afe9-e12d2df4e78f",
-      "start_time": "2026-11-09T16:00:14.840+00:00",
-      "duration_ms": 639,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "ccf818eb-a925-4372-bef1-a37713ecf8c3",
-      "call_id": "ccf818eb-a925-4372-bef1-a37713ecf8c3",
-      "start_time": "2026-11-10T07:21:51.740+00:00",
-      "duration_ms": 621,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "fb267b75-12db-4a5d-a159-f0de74a14a9a",
-      "call_id": "fb267b75-12db-4a5d-a159-f0de74a14a9a",
-      "start_time": "2026-11-10T10:05:45.116+00:00",
-      "duration_ms": 609,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "b053ba14-8047-444b-ab8c-31edc7cf07bb",
-      "call_id": "b053ba14-8047-444b-ab8c-31edc7cf07bb",
-      "start_time": "2026-11-09T16:13:56.296+00:00",
-      "duration_ms": 591,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "e3bc9622-d29a-437b-ad30-cedc3fa9e844",
-      "call_id": "e3bc9622-d29a-437b-ad30-cedc3fa9e844",
-      "start_time": "2026-11-10T13:25:01.577+00:00",
-      "duration_ms": 589,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "ff8b8e5f-5c48-462e-a739-768fb887da31",
-      "call_id": "ff8b8e5f-5c48-462e-a739-768fb887da31",
-      "start_time": "2026-11-10T08:16:41.005+00:00",
-      "duration_ms": 587,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "8e5fd5f6-9a9b-46cf-b273-854abfb49382",
-      "call_id": "8e5fd5f6-9a9b-46cf-b273-854abfb49382",
-      "start_time": "2026-11-10T07:54:14.778+00:00",
-      "duration_ms": 587,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "a06a9c2f-1caa-4746-8425-de16a9395981",
-      "call_id": "a06a9c2f-1caa-4746-8425-de16a9395981",
-      "start_time": "2026-11-10T14:07:28.045+00:00",
-      "duration_ms": 585,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "72f4c10e-1f97-41b5-b372-30e201eeaa57",
-      "call_id": "72f4c10e-1f97-41b5-b372-30e201eeaa57",
-      "start_time": "2026-11-10T09:47:50.014+00:00",
-      "duration_ms": 585,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "094dfeff-6ef1-4725-88e2-ff5b84f05488",
-      "call_id": "094dfeff-6ef1-4725-88e2-ff5b84f05488",
-      "start_time": "2026-11-10T04:00:47.496+00:00",
-      "duration_ms": 581,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "48c4ab3d-6476-408f-b654-27e82888d76a",
-      "call_id": "48c4ab3d-6476-408f-b654-27e82888d76a",
-      "start_time": "2026-11-10T14:50:24.511+00:00",
-      "duration_ms": 573,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "2cb22317-40ed-4762-a104-bdc7c3897ba5",
-      "call_id": "2cb22317-40ed-4762-a104-bdc7c3897ba5",
-      "start_time": "2026-11-10T14:47:54.187+00:00",
-      "duration_ms": 566,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "205cca7a-5b5a-4d31-aba9-33e60a1985db",
-      "call_id": "205cca7a-5b5a-4d31-aba9-33e60a1985db",
-      "start_time": "2026-11-09T16:00:05.780+00:00",
-      "duration_ms": 563,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "ebbd8c27-ef9e-4b78-8871-66d5497e473e",
-      "call_id": "ebbd8c27-ef9e-4b78-8871-66d5497e473e",
-      "start_time": "2026-11-10T14:51:05.483+00:00",
-      "duration_ms": 557,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "d8f1223d-e38e-4f23-8ff1-762b2d0653e3",
-      "call_id": "d8f1223d-e38e-4f23-8ff1-762b2d0653e3",
-      "start_time": "2026-11-10T13:15:19.440+00:00",
-      "duration_ms": 557,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "a383c0b0-2580-40c6-8823-193348f223dd",
-      "call_id": "a383c0b0-2580-40c6-8823-193348f223dd",
-      "start_time": "2026-11-09T16:23:21.804+00:00",
-      "duration_ms": 544,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "e007661c-14c0-4426-956d-16b0ded134f1",
-      "call_id": "e007661c-14c0-4426-956d-16b0ded134f1",
-      "start_time": "2026-11-10T10:16:55.038+00:00",
-      "duration_ms": 541,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "ae33daaf-1345-4691-8989-81b8d9dc2d17",
-      "call_id": "ae33daaf-1345-4691-8989-81b8d9dc2d17",
-      "start_time": "2026-11-10T13:53:35.795+00:00",
-      "duration_ms": 541,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "142dbb87-e71f-42f7-a469-a5a1edae0ab1",
-      "call_id": "142dbb87-e71f-42f7-a469-a5a1edae0ab1",
-      "start_time": "2026-11-10T01:09:24.292+00:00",
-      "duration_ms": 541,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "2d41691b-97a7-4208-b8cc-516a6ec1ccc0",
-      "call_id": "2d41691b-97a7-4208-b8cc-516a6ec1ccc0",
-      "start_time": "2026-11-09T16:22:31.590+00:00",
-      "duration_ms": 540,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "172818a5-9821-4ac1-9241-881ae0a3f829",
-      "call_id": "172818a5-9821-4ac1-9241-881ae0a3f829",
-      "start_time": "2026-11-10T11:35:22.579+00:00",
-      "duration_ms": 533,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "9fb5dba0-8448-4e44-95b5-eef7ac1fe6e5",
-      "call_id": "9fb5dba0-8448-4e44-95b5-eef7ac1fe6e5",
-      "start_time": "2026-11-10T13:34:13.252+00:00",
-      "duration_ms": 530,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "279bcb14-4c19-4ed5-8afa-9c1c2cf58e23",
-      "call_id": "279bcb14-4c19-4ed5-8afa-9c1c2cf58e23",
-      "start_time": "2026-11-10T02:25:37.166+00:00",
-      "duration_ms": 530,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "9840051c-7fac-43b5-95b4-9605740e5faa",
-      "call_id": "9840051c-7fac-43b5-95b4-9605740e5faa",
-      "start_time": "2026-11-10T12:08:21.952+00:00",
-      "duration_ms": 526,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "abe4e014-eeb2-405e-a131-04fa611b432f",
-      "call_id": "abe4e014-eeb2-405e-a131-04fa611b432f",
-      "start_time": "2026-11-10T09:50:51.341+00:00",
-      "duration_ms": 525,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "52738d5e-2be7-4912-bdcd-b93e4ef94305",
-      "call_id": "52738d5e-2be7-4912-bdcd-b93e4ef94305",
-      "start_time": "2026-11-10T07:39:33.901+00:00",
-      "duration_ms": 522,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "5ede6aac-1d25-49b8-8b64-43f8d703418b",
-      "call_id": "5ede6aac-1d25-49b8-8b64-43f8d703418b",
-      "start_time": "2026-11-10T09:27:01.881+00:00",
-      "duration_ms": 518,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "0857e875-109c-48b3-88a9-bcf3bf76740b",
-      "call_id": "0857e875-109c-48b3-88a9-bcf3bf76740b",
-      "start_time": "2026-11-10T10:02:02.619+00:00",
-      "duration_ms": 507,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "ac13674d-b8fe-4ba9-a459-9b6f06574853",
-      "call_id": "ac13674d-b8fe-4ba9-a459-9b6f06574853",
-      "start_time": "2026-11-10T02:23:19.454+00:00",
-      "duration_ms": 498,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "f30b5d2e-5cd1-444a-af2a-c10fb1ee5845",
-      "call_id": "f30b5d2e-5cd1-444a-af2a-c10fb1ee5845",
-      "start_time": "2026-11-10T07:45:43.397+00:00",
-      "duration_ms": 490,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "13910434-73f6-4167-a588-60a31f666582",
-      "call_id": "13910434-73f6-4167-a588-60a31f666582",
-      "start_time": "2026-11-10T06:27:36.497+00:00",
-      "duration_ms": 489,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "ee63c009-7d86-48b8-a388-610fd4d8a18d",
-      "call_id": "ee63c009-7d86-48b8-a388-610fd4d8a18d",
-      "start_time": "2026-11-10T14:11:42.382+00:00",
-      "duration_ms": 488,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "a2f8499d-44f9-432e-977d-c0ef81d24882",
-      "call_id": "a2f8499d-44f9-432e-977d-c0ef81d24882",
-      "start_time": "2026-11-10T01:08:55.753+00:00",
-      "duration_ms": 483,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "cbf4b565-0d2d-4c41-8357-79cf6339690d",
-      "call_id": "cbf4b565-0d2d-4c41-8357-79cf6339690d",
-      "start_time": "2026-11-10T03:27:01.242+00:00",
-      "duration_ms": 482,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "390fae91-89af-44ca-acb5-ac572d1f436c",
-      "call_id": "390fae91-89af-44ca-acb5-ac572d1f436c",
-      "start_time": "2026-11-10T05:47:15.841+00:00",
-      "duration_ms": 474,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "670a4bc2-bbf3-4075-8f65-b5809f568de8",
-      "call_id": "670a4bc2-bbf3-4075-8f65-b5809f568de8",
-      "start_time": "2026-11-10T10:05:44.830+00:00",
-      "duration_ms": 472,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "27fd8967-925e-400a-9355-c5ce5c25e2eb",
-      "call_id": "27fd8967-925e-400a-9355-c5ce5c25e2eb",
-      "start_time": "2026-11-09T16:52:09.994+00:00",
-      "duration_ms": 459,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "fe3fb185-f365-4e3b-b472-5091eb11434d",
-      "call_id": "fe3fb185-f365-4e3b-b472-5091eb11434d",
-      "start_time": "2026-11-10T13:29:08.792+00:00",
-      "duration_ms": 458,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "378de05e-ad29-4b0a-85c3-0dc8780a3b39",
-      "call_id": "378de05e-ad29-4b0a-85c3-0dc8780a3b39",
-      "start_time": "2026-11-09T16:07:11.006+00:00",
-      "duration_ms": 456,
+      "request_id": "cb035757-409a-4e66-9ed7-882621246f55",
+      "call_id": "cb035757-409a-4e66-9ed7-882621246f55",
+      "start_time": "2026-11-10T16:37:31.509+00:00",
+      "duration_ms": 320,
       "status": "success",
       "reason": null
      }
@@ -8968,410 +8613,7 @@
        "failed_total_tokens": 158468,
        "failed_token_sample_count": 4
       }
-     ],
-     "slow_requests": [
-      {
-       "request_id": "8a0efbe1d196490693bea112b9cc11ff",
-       "call_id": "dec06969-b311-4cd4-98ec-df047ccf1434",
-       "start_time": "2026-11-04T02:40:55.403+00:00",
-       "duration_ms": 61427,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "2b9ca448bca94f8d8d8429d9ec5e4eda",
-       "call_id": "3d4ab169-fd9c-4f98-8b34-eac46d043afe",
-       "start_time": "2026-11-04T13:18:52.107+00:00",
-       "duration_ms": 59023,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "72dd001cc55240d1835598f56c49406f",
-       "call_id": "6060cadd-fe09-4d2c-825f-3b1ab610f0fc",
-       "start_time": "2026-11-04T08:37:48.169+00:00",
-       "duration_ms": 57731,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "a4f378a5eda14fac969f2cb256815d77",
-       "call_id": "0cf4ca81-9692-4f2c-b676-e7a9bc8c390b",
-       "start_time": "2026-11-04T13:19:09.962+00:00",
-       "duration_ms": 55110,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "07ea7a896d8a4565b0982c55f2f6a405",
-       "call_id": "c3870a28-07fa-4b79-9fe1-8674629b53c7",
-       "start_time": "2026-11-04T13:12:45.734+00:00",
-       "duration_ms": 53125,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "b204a7a869f6437aa3c447e1f6cc9322",
-       "call_id": "fdee1550-c2d7-4319-aa62-0c844f09f8bd",
-       "start_time": "2026-11-04T13:20:39.499+00:00",
-       "duration_ms": 51353,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "c60c22b1efb147a18dae53514b617eb1",
-       "call_id": "fdbaac47-85f8-4a66-a559-0a750cc2d75b",
-       "start_time": "2026-11-04T12:08:24.535+00:00",
-       "duration_ms": 50992,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "88f51f6dc4bf4bfaa75b4b98492b2626",
-       "call_id": "1c199c85-9692-4607-80fe-5847ab8d9456",
-       "start_time": "2026-11-04T13:26:49.643+00:00",
-       "duration_ms": 48594,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "f261a451dc974c2e9ce515f91c32f4f3",
-       "call_id": "62bdacff-ba90-4777-91c0-b734c4f6c03b",
-       "start_time": "2026-11-03T17:06:04.502+00:00",
-       "duration_ms": 48586,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "b34c5a7addcd438eabe5242f3543939f",
-       "call_id": "65395c52-a70d-421c-bbd6-82b2ca4a7b4e",
-       "start_time": "2026-11-04T14:11:43.872+00:00",
-       "duration_ms": 47578,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "9ac7c05fc1ef48f388e45979f4140493",
-       "call_id": "c347ef8b-d312-466d-a781-d9dd38f5fe59",
-       "start_time": "2026-11-04T09:32:31.073+00:00",
-       "duration_ms": 47199,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "4c30cd6214f44de49c423f6789d66b1a",
-       "call_id": "809a28fc-966f-4c82-823a-6213d71dd1fb",
-       "start_time": "2026-11-04T08:57:23.485+00:00",
-       "duration_ms": 45665,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "bfcbf98023e74317aa04a8a4a6d09180",
-       "call_id": "d380e8bd-c27b-4570-bde1-782338665eac",
-       "start_time": "2026-11-04T14:03:53.573+00:00",
-       "duration_ms": 45393,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "2f28d2aa3d9048e699aa6230039ad705",
-       "call_id": "f76e16b9-582c-4d02-9a5d-f0cb8ee66709",
-       "start_time": "2026-11-04T13:23:07.794+00:00",
-       "duration_ms": 45062,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "9b7906f78f524afe9e680609372d35fc",
-       "call_id": "bbeca10d-f9f7-4188-8f0c-a246e6e60cb2",
-       "start_time": "2026-11-04T10:10:34.387+00:00",
-       "duration_ms": 44393,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "7d107e6c3d3d48318ef6638a056837d3",
-       "call_id": "cae3bb4e-3ffd-427a-93a9-595f6d0e7a31",
-       "start_time": "2026-11-04T02:57:46.362+00:00",
-       "duration_ms": 41995,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "40355a5e78ce4fd1a2648ea419003a44",
-       "call_id": "7db17573-58e0-4ae2-8b81-d47d47f5b183",
-       "start_time": "2026-11-04T03:49:12.436+00:00",
-       "duration_ms": 40974,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "e34855478878482f8a491a7ff60a7df8",
-       "call_id": "97df72b2-a65f-40a9-b826-08c0c60004a8",
-       "start_time": "2026-11-04T13:26:23.029+00:00",
-       "duration_ms": 40926,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "20fc24356e214492be251c76fd8b168c",
-       "call_id": "4ca68899-97a7-4510-947f-07209e0c1628",
-       "start_time": "2026-11-04T03:49:12.434+00:00",
-       "duration_ms": 40869,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "4e9da4806aa649969a4e219814666c00",
-       "call_id": "92ed8d70-782a-45b3-965c-129e4b9af50a",
-       "start_time": "2026-11-04T11:58:44.378+00:00",
-       "duration_ms": 40703,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "e204b2856b124c15b75031522695c0e7",
-       "call_id": "8e9c541b-426a-4a54-a951-98a4faf7281f",
-       "start_time": "2026-11-04T13:13:39.439+00:00",
-       "duration_ms": 39643,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "f74591d156ec405393ba6bb8cbbd45d9",
-       "call_id": "6cc5b31c-ff69-4f9f-bbb9-d26eedb14872",
-       "start_time": "2026-11-04T09:31:51.267+00:00",
-       "duration_ms": 38443,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "a3953207b93f437abf7eb5290674c721",
-       "call_id": "8499f048-dd89-4da0-b198-513ad0d7121e",
-       "start_time": "2026-11-04T13:21:03.831+00:00",
-       "duration_ms": 37817,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "0e8b26a1379545c5a36bb93fe48a348f",
-       "call_id": "9c6a9f9b-aa85-4415-ae11-2e4fbdc24489",
-       "start_time": "2026-11-04T13:52:26.469+00:00",
-       "duration_ms": 37555,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "b837e08219c34caaab82970b490b3605",
-       "call_id": "2ee3ebf4-06eb-474c-9a9a-6b2992d952ca",
-       "start_time": "2026-11-04T12:13:01.748+00:00",
-       "duration_ms": 36561,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "e327ae94954d4694b7d5b67151ec932f",
-       "call_id": "e774b338-9d0b-4be2-a29c-430b2072ba32",
-       "start_time": "2026-11-04T07:11:13.733+00:00",
-       "duration_ms": 35789,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "8fb62e17c2dd4f16bb32c5f832395c57",
-       "call_id": "327ba149-ef2f-47f1-bc2b-1bc01e640fde",
-       "start_time": "2026-11-04T13:25:59.407+00:00",
-       "duration_ms": 35738,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "c4cb443a6ad2459cabc2a93d88e898ba",
-       "call_id": "142ddcbc-3d13-4716-8e5d-a004f8d4bf68",
-       "start_time": "2026-11-04T09:28:12.559+00:00",
-       "duration_ms": 35105,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "b40f602e061346d4846939b1d22fcb76",
-       "call_id": "930eb2f6-bac8-409c-9515-2408d285180f",
-       "start_time": "2026-11-04T12:10:06.746+00:00",
-       "duration_ms": 34356,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "8ea17f93f34e4c1b884e3263a27c6131",
-       "call_id": "308ea944-30b0-4cb1-9e11-0300dda8a8ea",
-       "start_time": "2026-11-04T13:20:05.650+00:00",
-       "duration_ms": 32710,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "e5f8db4324a140f3877e03bcd100d8dc",
-       "call_id": "9f288e9e-0103-4d66-ad08-aa9edf795ebd",
-       "start_time": "2026-11-04T09:30:47.253+00:00",
-       "duration_ms": 32654,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "5ed726ff416c43728773cfa2b9dd08a3",
-       "call_id": "5f29252f-21db-4931-b014-1d0ea02b89f9",
-       "start_time": "2026-11-04T13:17:24.455+00:00",
-       "duration_ms": 32386,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "40254cd188ff4344ab71dba95576bff4",
-       "call_id": "a0ba32e2-812d-40bd-9c6a-3637b36e4a24",
-       "start_time": "2026-11-04T09:59:24.055+00:00",
-       "duration_ms": 32215,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "3793dae60b734de19f103a49903e9dd6",
-       "call_id": "a8877a08-bc15-4da5-9edb-2ad12045bda5",
-       "start_time": "2026-11-04T13:28:43.351+00:00",
-       "duration_ms": 31473,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "ac1a3562cdaf4cc9856fa606d44bbc11",
-       "call_id": "f9d49e9f-193f-4885-bf72-1ff3e01d4b17",
-       "start_time": "2026-11-04T07:08:09.924+00:00",
-       "duration_ms": 31323,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "04a744bf185243578dce1bb2ee8cf233",
-       "call_id": "ef895e64-888e-44f4-af38-f5f1fa137914",
-       "start_time": "2026-11-04T13:20:12.522+00:00",
-       "duration_ms": 31000,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "df3e1faca9be44efab3da74e28ed5067",
-       "call_id": "be62efa0-9a4c-4df6-b96b-902dc578846f",
-       "start_time": "2026-11-04T02:50:25.157+00:00",
-       "duration_ms": 30827,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "53980d8a2cd44a51822fd0e978b2cba9",
-       "call_id": "2325367d-5d3e-4c6b-a9c7-d78491255605",
-       "start_time": "2026-11-04T00:15:44.478+00:00",
-       "duration_ms": 29296,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "d53e96f34ce5492d9ea89ff70c4f7139",
-       "call_id": "f7e738bb-ff26-4912-82b8-6dacf8bbfabd",
-       "start_time": "2026-11-03T23:54:45.853+00:00",
-       "duration_ms": 28582,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "08c4a273b802441da0decc4e9bc24834",
-       "call_id": "16f06960-42cb-4b99-af4d-729692336382",
-       "start_time": "2026-11-04T07:06:55.035+00:00",
-       "duration_ms": 28271,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "5c70bc5c37a849d8afdb76e03e0bb7ee",
-       "call_id": "7ff9b7db-7fee-4d7f-a2ba-a0fe75c3af6f",
-       "start_time": "2026-11-04T13:29:16.023+00:00",
-       "duration_ms": 27924,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "906ed9cbb6034d4498c1db8764e50204",
-       "call_id": "c930ba01-93f5-4809-9b36-478608c57205",
-       "start_time": "2026-11-03T23:34:29.018+00:00",
-       "duration_ms": 27918,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "ddacac961b1c4c3c8efb6c2015cff8e2",
-       "call_id": "5568ec27-d217-4093-bccc-db03a4a56f22",
-       "start_time": "2026-11-04T14:14:08.879+00:00",
-       "duration_ms": 27482,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "ae48324799d74b2a95ef643f65e787e9",
-       "call_id": "b2bfc3d8-36c3-4853-b279-076fdba87b25",
-       "start_time": "2026-11-04T09:31:21.882+00:00",
-       "duration_ms": 26553,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "c67114e563d948f1b0eb0125267bb115",
-       "call_id": "957ec474-2be2-4cdd-84bb-9b96875b5726",
-       "start_time": "2026-11-04T12:09:17.667+00:00",
-       "duration_ms": 26381,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "5955f3a774c04014b9e0bc219bde9b3c",
-       "call_id": "e33c6bb1-712f-4901-a80b-60c8e54db0be",
-       "start_time": "2026-11-04T06:16:09.066+00:00",
-       "duration_ms": 26112,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "af381306c2c5481785a22816abcb375d",
-       "call_id": "2be32c82-3e51-48df-99d5-ce27a1a160bc",
-       "start_time": "2026-11-04T13:25:30.082+00:00",
-       "duration_ms": 25545,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "7f77444c9dc64ec8adbb9ed18b662be3",
-       "call_id": "f4b771de-d82c-467b-8e0d-df86d02d26a1",
-       "start_time": "2026-11-04T09:35:22.668+00:00",
-       "duration_ms": 25543,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "c48a7f4435284a1b8829170ff51aba7e",
-       "call_id": "8424212a-02dc-4b8a-a38a-fc4903076860",
-       "start_time": "2026-11-04T02:55:30.836+00:00",
-       "duration_ms": 25472,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "e4c69b0f2a3a471b85c62ee235a49eb7",
-       "call_id": "da9d6dd7-eeaa-4b42-bf66-a54df3793030",
-       "start_time": "2026-11-04T13:13:25.095+00:00",
-       "duration_ms": 25377,
-       "status": "success",
-       "reason": null
-      }
-     ],
-     "timeout_requests": []
+     ]
     },
     {
      "date": "2026-11-05",
@@ -17135,23 +16377,23 @@
     {
      "date": "2026-11-10",
      "status": "COMPLETED",
-     "partial": true,
-     "query_ms": 9985,
-     "duration_sum_ms": 23714079,
-     "duration_sample_count": 2375,
-     "duration_p50_ms": 6555,
-     "duration_p95_ms": 30702,
-     "success_count": 2375,
-     "query_count": 3800,
+     "partial": false,
+     "query_ms": 10385,
+     "duration_sum_ms": 32578121,
+     "duration_sample_count": 3137,
+     "duration_p50_ms": 6893,
+     "duration_p95_ms": 31323,
+     "success_count": 3137,
+     "query_count": 4595,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-10T14:55:19Z",
-     "failed_queries": 1425,
+     "finished_at": "2026-11-10T16:00:18Z",
+     "failed_queries": 1458,
      "unknown_status_count": 0,
      "blocked_queries": 0,
      "failure_reasons": {
       "content_blocked": 1395,
-      "rate_limit": 30
+      "rate_limit": 63
      },
      "timeout_count": 0,
      "latency_max_ms": 112346,
@@ -17163,8 +16405,8 @@
       "status": "success",
       "reason": null
      },
-     "slow_count": 190,
-     "slow_threshold_ms": 25874,
+     "slow_count": 230,
+     "slow_threshold_ms": 27845,
      "hours": [
       {
        "hour": 0,
@@ -17344,26 +16586,34 @@
       },
       {
        "hour": 22,
-       "calls": 292,
-       "success_count": 292,
-       "duration_sum_ms": 3454039,
-       "duration_sample_count": 292,
-       "failed": 0
+       "calls": 358,
+       "success_count": 351,
+       "duration_sum_ms": 4003880,
+       "duration_sample_count": 351,
+       "failed": 7
+      },
+      {
+       "hour": 23,
+       "calls": 729,
+       "success_count": 703,
+       "duration_sum_ms": 8314201,
+       "duration_sample_count": 703,
+       "failed": 26
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 3800,
-       "success_count": 2375,
-       "failed_count": 1425,
+       "call_count": 4595,
+       "success_count": 3137,
+       "failed_count": 1458,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
        "ttft_sample_count": 0,
        "ttft_sum_ms": null,
-       "ttft_estimated_avg_ms": 3972,
-       "ttft_estimated_sample_count": 1274,
-       "ttft_estimated_sum_ms": 5059825,
+       "ttft_estimated_avg_ms": 4160,
+       "ttft_estimated_sample_count": 1758,
+       "ttft_estimated_sum_ms": 7312581,
        "ttft_estimated_histogram": [
         [
          310,
@@ -17407,7 +16657,7 @@
         ],
         [
          334,
-         1
+         2
         ],
         [
          335,
@@ -17415,7 +16665,7 @@
         ],
         [
          336,
-         4
+         6
         ],
         [
          337,
@@ -17435,11 +16685,11 @@
         ],
         [
          341,
-         4
+         5
         ],
         [
          342,
-         4
+         6
         ],
         [
          343,
@@ -17447,287 +16697,287 @@
         ],
         [
          344,
-         8
+         12
         ],
         [
          345,
-         11
+         14
         ],
         [
          346,
-         14
+         15
         ],
         [
          347,
-         9
+         15
         ],
         [
          348,
-         7
+         11
         ],
         [
          349,
-         11
+         13
         ],
         [
          350,
-         10
+         12
         ],
         [
          351,
-         12
+         15
         ],
         [
          352,
-         10
-        ],
-        [
-         353,
-         17
-        ],
-        [
-         354,
-         19
-        ],
-        [
-         355,
-         12
-        ],
-        [
-         356,
-         11
-        ],
-        [
-         357,
-         11
-        ],
-        [
-         358,
-         8
-        ],
-        [
-         359,
-         27
-        ],
-        [
-         360,
-         12
-        ],
-        [
-         361,
-         15
-        ],
-        [
-         362,
          18
         ],
         [
-         363,
+         353,
          19
+        ],
+        [
+         354,
+         27
+        ],
+        [
+         355,
+         15
+        ],
+        [
+         356,
+         16
+        ],
+        [
+         357,
+         16
+        ],
+        [
+         358,
+         17
+        ],
+        [
+         359,
+         30
+        ],
+        [
+         360,
+         15
+        ],
+        [
+         361,
+         20
+        ],
+        [
+         362,
+         28
+        ],
+        [
+         363,
+         25
         ],
         [
          364,
-         16
-        ],
-        [
-         365,
-         20
-        ],
-        [
-         366,
          19
         ],
         [
+         365,
+         23
+        ],
+        [
+         366,
+         23
+        ],
+        [
          367,
-         11
+         16
         ],
         [
          368,
-         17
-        ],
-        [
-         369,
          20
         ],
         [
+         369,
+         23
+        ],
+        [
          370,
-         17
+         22
         ],
         [
          371,
-         14
+         16
         ],
         [
          372,
-         13
+         17
         ],
         [
          373,
-         16
+         22
         ],
         [
          374,
-         12
+         17
         ],
         [
          375,
-         15
+         19
         ],
         [
          376,
-         12
-        ],
-        [
-         377,
-         8
-        ],
-        [
-         378,
-         9
-        ],
-        [
-         379,
-         8
-        ],
-        [
-         380,
-         9
-        ],
-        [
-         381,
-         9
-        ],
-        [
-         382,
-         15
-        ],
-        [
-         383,
-         15
-        ],
-        [
-         384,
-         10
-        ],
-        [
-         385,
-         12
-        ],
-        [
-         386,
-         9
-        ],
-        [
-         387,
-         14
-        ],
-        [
-         388,
-         12
-        ],
-        [
-         389,
-         11
-        ],
-        [
-         390,
-         14
-        ],
-        [
-         391,
-         14
-        ],
-        [
-         392,
-         10
-        ],
-        [
-         393,
          16
         ],
         [
-         394,
+         377,
+         12
+        ],
+        [
+         378,
+         12
+        ],
+        [
+         379,
          10
         ],
         [
-         395,
-         10
-        ],
-        [
-         396,
-         13
-        ],
-        [
-         397,
-         10
-        ],
-        [
-         398,
-         10
-        ],
-        [
-         399,
-         9
-        ],
-        [
-         400,
-         9
-        ],
-        [
-         401,
-         10
-        ],
-        [
-         402,
-         7
-        ],
-        [
-         403,
-         7
-        ],
-        [
-         404,
-         7
-        ],
-        [
-         405,
-         10
-        ],
-        [
-         406,
+         380,
          15
         ],
         [
+         381,
+         11
+        ],
+        [
+         382,
+         24
+        ],
+        [
+         383,
+         19
+        ],
+        [
+         384,
+         11
+        ],
+        [
+         385,
+         16
+        ],
+        [
+         386,
+         11
+        ],
+        [
+         387,
+         20
+        ],
+        [
+         388,
+         13
+        ],
+        [
+         389,
+         12
+        ],
+        [
+         390,
+         17
+        ],
+        [
+         391,
+         15
+        ],
+        [
+         392,
+         11
+        ],
+        [
+         393,
+         20
+        ],
+        [
+         394,
+         16
+        ],
+        [
+         395,
+         13
+        ],
+        [
+         396,
+         18
+        ],
+        [
+         397,
+         14
+        ],
+        [
+         398,
+         14
+        ],
+        [
+         399,
+         12
+        ],
+        [
+         400,
+         15
+        ],
+        [
+         401,
+         15
+        ],
+        [
+         402,
+         9
+        ],
+        [
+         403,
+         9
+        ],
+        [
+         404,
+         9
+        ],
+        [
+         405,
+         13
+        ],
+        [
+         406,
+         17
+        ],
+        [
          407,
-         6
+         9
         ],
         [
          408,
-         5
+         9
         ],
         [
          409,
-         8
+         10
         ],
         [
          410,
-         7
+         9
         ],
         [
          411,
-         6
+         10
         ],
         [
          412,
-         4
+         6
         ],
         [
          413,
-         8
+         11
         ],
         [
          414,
-         6
+         10
         ],
         [
          415,
@@ -17735,7 +16985,7 @@
         ],
         [
          416,
-         4
+         5
         ],
         [
          417,
@@ -17743,67 +16993,67 @@
         ],
         [
          418,
-         6
+         9
         ],
         [
          419,
-         10
+         13
         ],
         [
          420,
-         5
+         9
         ],
         [
          421,
-         2
-        ],
-        [
-         422,
-         6
-        ],
-        [
-         423,
-         7
-        ],
-        [
-         424,
-         8
-        ],
-        [
-         425,
-         3
-        ],
-        [
-         426,
-         6
-        ],
-        [
-         427,
-         7
-        ],
-        [
-         428,
          4
         ],
         [
-         429,
+         422,
+         8
+        ],
+        [
+         423,
+         14
+        ],
+        [
+         424,
+         14
+        ],
+        [
+         425,
+         5
+        ],
+        [
+         426,
          10
+        ],
+        [
+         427,
+         11
+        ],
+        [
+         428,
+         6
+        ],
+        [
+         429,
+         14
         ],
         [
          430,
-         10
+         14
         ],
         [
          431,
-         10
+         12
         ],
         [
          432,
-         7
+         9
         ],
         [
          433,
-         6
+         9
         ],
         [
          434,
@@ -17811,35 +17061,35 @@
         ],
         [
          435,
-         11
+         18
         ],
         [
          436,
-         5
+         9
         ],
         [
          437,
-         4
+         8
         ],
         [
          438,
-         6
+         16
         ],
         [
          439,
-         6
+         8
         ],
         [
          440,
-         3
+         8
         ],
         [
          441,
-         2
+         6
         ],
         [
          442,
-         10
+         14
         ],
         [
          443,
@@ -17847,63 +17097,63 @@
         ],
         [
          444,
-         6
+         12
         ],
         [
          445,
-         8
+         12
         ],
         [
          446,
-         5
+         9
         ],
         [
          447,
-         4
+         5
         ],
         [
          448,
-         5
+         7
         ],
         [
          449,
-         5
+         9
         ],
         [
          450,
-         3
+         6
         ],
         [
          451,
-         6
+         11
         ],
         [
          452,
-         4
+         10
         ],
         [
          453,
-         2
+         5
         ],
         [
          454,
-         3
+         10
         ],
         [
          455,
-         1
+         3
         ],
         [
          456,
-         4
+         8
         ],
         [
          457,
-         6
+         10
         ],
         [
          458,
-         5
+         8
         ],
         [
          459,
@@ -17911,55 +17161,55 @@
         ],
         [
          460,
-         7
+         10
         ],
         [
          461,
-         2
+         4
         ],
         [
          462,
-         5
+         6
         ],
         [
          463,
-         3
+         6
         ],
         [
          464,
-         2
+         5
         ],
         [
          465,
-         1
-        ],
-        [
-         466,
          2
         ],
         [
+         466,
+         3
+        ],
+        [
          467,
-         4
+         5
         ],
         [
          468,
-         7
+         9
         ],
         [
          469,
-         1
+         2
         ],
         [
          470,
-         4
+         6
         ],
         [
          471,
-         4
+         9
         ],
         [
          472,
-         4
+         7
         ],
         [
          473,
@@ -17967,7 +17217,7 @@
         ],
         [
          474,
-         7
+         9
         ],
         [
          475,
@@ -17975,7 +17225,7 @@
         ],
         [
          476,
-         3
+         6
         ],
         [
          477,
@@ -17987,11 +17237,11 @@
         ],
         [
          479,
-         5
+         6
         ],
         [
          480,
-         2
+         4
         ],
         [
          481,
@@ -18007,23 +17257,23 @@
         ],
         [
          484,
-         1
+         4
         ],
         [
          485,
-         2
-        ],
-        [
-         486,
-         2
-        ],
-        [
-         487,
          3
         ],
         [
+         486,
+         3
+        ],
+        [
+         487,
+         4
+        ],
+        [
          488,
-         2
+         3
         ],
         [
          489,
@@ -18043,11 +17293,11 @@
         ],
         [
          493,
-         1
+         2
         ],
         [
          494,
-         3
+         4
         ],
         [
          495,
@@ -18055,7 +17305,7 @@
         ],
         [
          496,
-         2
+         4
         ],
         [
          497,
@@ -18063,11 +17313,11 @@
         ],
         [
          498,
-         1
+         2
         ],
         [
          499,
-         1
+         3
         ],
         [
          500,
@@ -18078,11 +17328,27 @@
          1
         ],
         [
+         502,
+         1
+        ],
+        [
          504,
-         2
+         3
+        ],
+        [
+         505,
+         1
+        ],
+        [
+         506,
+         1
         ],
         [
          507,
+         1
+        ],
+        [
+         511,
          1
         ],
         [
@@ -18110,6 +17376,10 @@
          1
         ],
         [
+         520,
+         1
+        ],
+        [
          521,
          2
         ],
@@ -18119,7 +17389,7 @@
         ],
         [
          530,
-         1
+         2
         ],
         [
          532,
@@ -18138,15 +17408,15 @@
          1
         ]
        ],
-       "ttft_filtered_count": 551,
+       "ttft_filtered_count": 688,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
        "tpot_weight_tokens": 0,
-       "tpot_estimated_avg_ms": 5.733838817578734,
-       "tpot_estimated_sample_count": 1274,
-       "tpot_estimated_decode_sum_ms": 7684680.0,
-       "tpot_estimated_weight_tokens": 1340233,
+       "tpot_estimated_avg_ms": 5.468962274760548,
+       "tpot_estimated_sample_count": 1758,
+       "tpot_estimated_decode_sum_ms": 11038898.0,
+       "tpot_estimated_weight_tokens": 2018463,
        "tpot_histogram": [],
        "tpot_estimated_histogram": [
         [
@@ -18159,14 +17429,18 @@
         ],
         [
          30,
-         1
+         2
         ],
         [
          32,
-         3
+         4
         ],
         [
          33,
+         1
+        ],
+        [
+         34,
          1
         ],
         [
@@ -18178,6 +17452,10 @@
          1
         ],
         [
+         37,
+         3
+        ],
+        [
          38,
          4
         ],
@@ -18187,23 +17465,23 @@
         ],
         [
          40,
-         4
+         6
         ],
         [
          41,
-         4
+         7
         ],
         [
          42,
-         4
+         5
         ],
         [
          43,
-         3
+         6
         ],
         [
          44,
-         2
+         3
         ],
         [
          45,
@@ -18211,235 +17489,235 @@
         ],
         [
          46,
-         5
+         9
         ],
         [
          47,
-         5
+         8
         ],
         [
          48,
-         2
+         6
         ],
         [
          49,
-         6
-        ],
-        [
-         50,
-         4
-        ],
-        [
-         51,
-         5
-        ],
-        [
-         52,
-         9
-        ],
-        [
-         53,
-         9
-        ],
-        [
-         54,
-         7
-        ],
-        [
-         55,
-         6
-        ],
-        [
-         56,
-         7
-        ],
-        [
-         57,
-         11
-        ],
-        [
-         58,
-         14
-        ],
-        [
-         59,
-         13
-        ],
-        [
-         60,
-         15
-        ],
-        [
-         61,
-         14
-        ],
-        [
-         62,
-         14
-        ],
-        [
-         63,
-         17
-        ],
-        [
-         64,
-         24
-        ],
-        [
-         65,
-         15
-        ],
-        [
-         66,
-         26
-        ],
-        [
-         67,
-         17
-        ],
-        [
-         68,
-         23
-        ],
-        [
-         69,
-         16
-        ],
-        [
-         70,
-         25
-        ],
-        [
-         71,
-         21
-        ],
-        [
-         72,
-         19
-        ],
-        [
-         73,
-         17
-        ],
-        [
-         74,
-         24
-        ],
-        [
-         75,
-         31
-        ],
-        [
-         76,
-         31
-        ],
-        [
-         77,
-         23
-        ],
-        [
-         78,
-         29
-        ],
-        [
-         79,
-         30
-        ],
-        [
-         80,
-         21
-        ],
-        [
-         81,
-         30
-        ],
-        [
-         82,
-         21
-        ],
-        [
-         83,
-         26
-        ],
-        [
-         84,
-         33
-        ],
-        [
-         85,
-         38
-        ],
-        [
-         86,
-         17
-        ],
-        [
-         87,
-         28
-        ],
-        [
-         88,
-         37
-        ],
-        [
-         89,
-         30
-        ],
-        [
-         90,
-         29
-        ],
-        [
-         91,
-         22
-        ],
-        [
-         92,
-         20
-        ],
-        [
-         93,
-         18
-        ],
-        [
-         94,
-         15
-        ],
-        [
-         95,
-         19
-        ],
-        [
-         96,
-         20
-        ],
-        [
-         97,
-         23
-        ],
-        [
-         98,
-         27
-        ],
-        [
-         99,
-         15
-        ],
-        [
-         100,
-         16
-        ],
-        [
-         101,
-         15
-        ],
-        [
-         102,
          12
         ],
         [
-         103,
+         50,
+         6
+        ],
+        [
+         51,
+         9
+        ],
+        [
+         52,
+         12
+        ],
+        [
+         53,
          14
+        ],
+        [
+         54,
+         9
+        ],
+        [
+         55,
+         14
+        ],
+        [
+         56,
+         11
+        ],
+        [
+         57,
+         17
+        ],
+        [
+         58,
+         24
+        ],
+        [
+         59,
+         18
+        ],
+        [
+         60,
+         23
+        ],
+        [
+         61,
+         20
+        ],
+        [
+         62,
+         17
+        ],
+        [
+         63,
+         25
+        ],
+        [
+         64,
+         36
+        ],
+        [
+         65,
+         25
+        ],
+        [
+         66,
+         35
+        ],
+        [
+         67,
+         28
+        ],
+        [
+         68,
+         32
+        ],
+        [
+         69,
+         27
+        ],
+        [
+         70,
+         35
+        ],
+        [
+         71,
+         31
+        ],
+        [
+         72,
+         34
+        ],
+        [
+         73,
+         27
+        ],
+        [
+         74,
+         35
+        ],
+        [
+         75,
+         39
+        ],
+        [
+         76,
+         42
+        ],
+        [
+         77,
+         39
+        ],
+        [
+         78,
+         43
+        ],
+        [
+         79,
+         37
+        ],
+        [
+         80,
+         29
+        ],
+        [
+         81,
+         46
+        ],
+        [
+         82,
+         30
+        ],
+        [
+         83,
+         36
+        ],
+        [
+         84,
+         52
+        ],
+        [
+         85,
+         54
+        ],
+        [
+         86,
+         26
+        ],
+        [
+         87,
+         39
+        ],
+        [
+         88,
+         49
+        ],
+        [
+         89,
+         35
+        ],
+        [
+         90,
+         38
+        ],
+        [
+         91,
+         32
+        ],
+        [
+         92,
+         30
+        ],
+        [
+         93,
+         29
+        ],
+        [
+         94,
+         25
+        ],
+        [
+         95,
+         26
+        ],
+        [
+         96,
+         23
+        ],
+        [
+         97,
+         28
+        ],
+        [
+         98,
+         30
+        ],
+        [
+         99,
+         17
+        ],
+        [
+         100,
+         18
+        ],
+        [
+         101,
+         16
+        ],
+        [
+         102,
+         16
+        ],
+        [
+         103,
+         15
         ],
         [
          104,
@@ -18447,7 +17725,7 @@
         ],
         [
          105,
-         16
+         18
         ],
         [
          106,
@@ -18455,15 +17733,15 @@
         ],
         [
          107,
-         7
-        ],
-        [
-         108,
          9
         ],
         [
-         109,
+         108,
          10
+        ],
+        [
+         109,
+         11
         ],
         [
          110,
@@ -18479,7 +17757,7 @@
         ],
         [
          113,
-         8
+         9
         ],
         [
          114,
@@ -18503,11 +17781,11 @@
         ],
         [
          119,
-         4
+         5
         ],
         [
          120,
-         6
+         7
         ],
         [
          121,
@@ -18527,6 +17805,10 @@
         ],
         [
          125,
+         1
+        ],
+        [
+         126,
          1
         ],
         [
@@ -18610,20 +17892,20 @@
          1
         ]
        ],
-       "tpot_filtered_count": 551,
-       "duration_sum_ms": 23714079,
-       "duration_p50_ms": 6555,
-       "duration_p95_ms": 30702,
-       "duration_sample_count": 2375,
-       "input_tokens": 90111323,
-       "output_tokens": 2627391,
-       "total_tokens": 92738714,
-       "token_sample_count": 2375,
+       "tpot_filtered_count": 688,
+       "duration_sum_ms": 32578121,
+       "duration_p50_ms": 6893,
+       "duration_p95_ms": 31323,
+       "duration_sample_count": 3137,
+       "input_tokens": 126249152,
+       "output_tokens": 3681796,
+       "total_tokens": 129930948,
+       "token_sample_count": 3137,
        "token_coverage": 1.0,
-       "failed_input_tokens": 4257011,
+       "failed_input_tokens": 5007385,
        "failed_output_tokens": 0,
-       "failed_total_tokens": 4257011,
-       "failed_token_sample_count": 1425
+       "failed_total_tokens": 5007385,
+       "failed_token_sample_count": 1458
       }
      ],
      "slow_requests": [
@@ -18676,6 +17958,14 @@
        "reason": null
       },
       {
+       "request_id": "45ceba50d60c446bb1c74dda791c477f",
+       "call_id": "24c02b34-f568-4744-8fc0-d68d5dea4259",
+       "start_time": "2026-11-10T15:00:21.966+00:00",
+       "duration_ms": 73476,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "441648bec9644af6a5f2472ddb6a39b2",
        "call_id": "2f37e90d-8179-4d43-9863-34d6ea104eaf",
        "start_time": "2026-11-10T03:58:04.038+00:00",
@@ -18724,6 +18014,14 @@
        "reason": null
       },
       {
+       "request_id": "eb43ee9784bc4613ad067e085d153548",
+       "call_id": "9e06e019-0714-4c99-ae76-86939c5a2526",
+       "start_time": "2026-11-10T15:35:40.157+00:00",
+       "duration_ms": 63528,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "bb5a151622b242808268fa18b213bb07",
        "call_id": "bf1f14f4-cd54-43a3-b55d-34221f5f9346",
        "start_time": "2026-11-10T13:22:17.326+00:00",
@@ -18752,6 +18050,14 @@
        "call_id": "ee88e477-1c55-47fe-8c41-a4bd97c007c0",
        "start_time": "2026-11-10T07:43:35.125+00:00",
        "duration_ms": 60858,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "ff2908ea4f524aa8b4139945c7c7c5d9",
+       "call_id": "5c83c39d-c5f2-4c6b-8ca2-b8094622bbf2",
+       "start_time": "2026-11-10T15:11:24.672+00:00",
+       "duration_ms": 60215,
        "status": "success",
        "reason": null
       },
@@ -18804,6 +18110,30 @@
        "reason": null
       },
       {
+       "request_id": "d05928491fbb4194ae04635f5244fc17",
+       "call_id": "e0d31d84-966e-437e-8692-b874ed9e0f55",
+       "start_time": "2026-11-10T15:06:31.420+00:00",
+       "duration_ms": 54685,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "3f8fd878d5f34e78b3a09a1d38b2b8e1",
+       "call_id": "60aac508-9f8d-4e5e-9884-86d3321ccacc",
+       "start_time": "2026-11-10T15:33:31.587+00:00",
+       "duration_ms": 53790,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "c905b37e858d495ca4f1b508ee4dc8e0",
+       "call_id": "afc620d4-81a5-4ccb-835a-4455f2c58c90",
+       "start_time": "2026-11-10T15:55:55.975+00:00",
+       "duration_ms": 53547,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "d71ba2cba2a344378b31d00af2b2460a",
        "call_id": "89e33e8c-b495-4bd2-a382-f1594ebdaa93",
        "start_time": "2026-11-09T16:11:12.197+00:00",
@@ -18824,6 +18154,14 @@
        "call_id": "f99b76ac-cf26-4694-a959-12eea640a98d",
        "start_time": "2026-11-10T02:23:43.305+00:00",
        "duration_ms": 52118,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "ad1640357cdd4de1b166ce353cebdc03",
+       "call_id": "00005bf3-8968-46e0-93ae-6e9942ec2cbe",
+       "start_time": "2026-11-10T15:35:29.376+00:00",
+       "duration_ms": 51862,
        "status": "success",
        "reason": null
       },
@@ -18852,10 +18190,26 @@
        "reason": null
       },
       {
+       "request_id": "66bd04cd17a44638bd587235cb83fd56",
+       "call_id": "85ee841c-5be7-4a35-af26-e1399be1b846",
+       "start_time": "2026-11-10T15:37:30.495+00:00",
+       "duration_ms": 51112,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "800c7d42485544aca8b47c8adb8f7f67",
        "call_id": "68e7b29c-b28d-41c3-914b-1171381ee158",
        "start_time": "2026-11-10T13:27:26.084+00:00",
        "duration_ms": 49988,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "a18132761c9f4f8d81e9d28fc57b12cc",
+       "call_id": "f4e6fd84-c786-4219-bc47-8d0b6186bc34",
+       "start_time": "2026-11-10T15:07:01.077+00:00",
+       "duration_ms": 48997,
        "status": "success",
        "reason": null
       },
@@ -18900,6 +18254,14 @@
        "reason": null
       },
       {
+       "request_id": "33033ad287aa44fb9d1bf2c1d6cfe2f7",
+       "call_id": "69f32677-6456-4fe1-92d9-7edd6ac05862",
+       "start_time": "2026-11-10T14:58:49.315+00:00",
+       "duration_ms": 47811,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "ef3c5259c7f94987b4ee169ff16b3a26",
        "call_id": "9289f06c-9e76-4f91-aeb2-727de4edbd60",
        "start_time": "2026-11-10T13:42:08.160+00:00",
@@ -18924,6 +18286,14 @@
        "reason": null
       },
       {
+       "request_id": "246d97aa0fa94459b48ae104f92155d7",
+       "call_id": "c90cd162-2cf5-4822-9634-b1ee58672561",
+       "start_time": "2026-11-10T15:36:41.866+00:00",
+       "duration_ms": 46715,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "b9bf067e09014d90bdbe5aff7bdce210",
        "call_id": "2a366e55-0c79-4f9a-ab28-2409e286673c",
        "start_time": "2026-11-10T14:39:40.872+00:00",
@@ -18938,92 +18308,525 @@
        "duration_ms": 46244,
        "status": "success",
        "reason": null
+      }
+     ],
+     "timeout_requests": []
+    },
+    {
+     "date": "2026-11-11",
+     "status": "COMPLETED",
+     "partial": true,
+     "query_ms": 10849,
+     "duration_sum_ms": 2039565,
+     "duration_sample_count": 188,
+     "duration_p50_ms": 8839,
+     "duration_p95_ms": 25133,
+     "success_count": 188,
+     "query_count": 194,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-11-10T17:03:11Z",
+     "failed_queries": 6,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "failure_reasons": {
+      "rate_limit": 6
+     },
+     "timeout_count": 0,
+     "latency_max_ms": 58768,
+     "latency_max_request": {
+      "request_id": "8d24366e95214b0f92998a539c696131",
+      "call_id": "03b0c38c-0603-4d7b-980a-d34b8547ad76",
+      "start_time": "2026-11-10T16:11:13.141+00:00",
+      "duration_ms": 58768,
+      "status": "success",
+      "reason": null
+     },
+     "slow_count": 10,
+     "slow_threshold_ms": 25133,
+     "hours": [
+      {
+       "hour": 0,
+       "calls": 163,
+       "success_count": 159,
+       "duration_sum_ms": 1810876,
+       "duration_sample_count": 159,
+       "failed": 4
       },
       {
-       "request_id": "b5e28cc9ee364514b533a804b7256d70",
-       "call_id": "3c082ec4-7a6b-4f91-b013-843069cb58e3",
-       "start_time": "2026-11-10T10:09:46.440+00:00",
-       "duration_ms": 45328,
+       "hour": 1,
+       "calls": 31,
+       "success_count": 29,
+       "duration_sum_ms": 228689,
+       "duration_sample_count": 29,
+       "failed": 2
+      }
+     ],
+     "benchmark_models": [
+      {
+       "model": "openai/deepseek-v4.1-flash-1017",
+       "call_count": 194,
+       "success_count": 188,
+       "failed_count": 6,
+       "unknown_status_count": 0,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "ttft_sum_ms": null,
+       "ttft_estimated_avg_ms": 4610,
+       "ttft_estimated_sample_count": 59,
+       "ttft_estimated_sum_ms": 271968,
+       "ttft_estimated_histogram": [
+        [
+         316,
+         1
+        ],
+        [
+         345,
+         1
+        ],
+        [
+         353,
+         1
+        ],
+        [
+         355,
+         1
+        ],
+        [
+         366,
+         1
+        ],
+        [
+         368,
+         2
+        ],
+        [
+         369,
+         1
+        ],
+        [
+         370,
+         1
+        ],
+        [
+         372,
+         1
+        ],
+        [
+         373,
+         1
+        ],
+        [
+         375,
+         1
+        ],
+        [
+         376,
+         2
+        ],
+        [
+         377,
+         1
+        ],
+        [
+         379,
+         1
+        ],
+        [
+         381,
+         3
+        ],
+        [
+         384,
+         1
+        ],
+        [
+         389,
+         1
+        ],
+        [
+         390,
+         1
+        ],
+        [
+         392,
+         1
+        ],
+        [
+         395,
+         1
+        ],
+        [
+         400,
+         2
+        ],
+        [
+         404,
+         1
+        ],
+        [
+         405,
+         1
+        ],
+        [
+         407,
+         2
+        ],
+        [
+         411,
+         1
+        ],
+        [
+         417,
+         1
+        ],
+        [
+         418,
+         1
+        ],
+        [
+         425,
+         1
+        ],
+        [
+         426,
+         1
+        ],
+        [
+         427,
+         1
+        ],
+        [
+         430,
+         1
+        ],
+        [
+         431,
+         1
+        ],
+        [
+         433,
+         1
+        ],
+        [
+         435,
+         1
+        ],
+        [
+         437,
+         1
+        ],
+        [
+         438,
+         1
+        ],
+        [
+         440,
+         1
+        ],
+        [
+         445,
+         3
+        ],
+        [
+         446,
+         1
+        ],
+        [
+         448,
+         1
+        ],
+        [
+         449,
+         1
+        ],
+        [
+         450,
+         1
+        ],
+        [
+         455,
+         1
+        ],
+        [
+         458,
+         1
+        ],
+        [
+         462,
+         1
+        ],
+        [
+         470,
+         1
+        ],
+        [
+         471,
+         2
+        ],
+        [
+         473,
+         1
+        ],
+        [
+         479,
+         1
+        ],
+        [
+         486,
+         1
+        ]
+       ],
+       "ttft_filtered_count": 65,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "tpot_decode_sum_ms": null,
+       "tpot_weight_tokens": 0,
+       "tpot_estimated_avg_ms": 5.917735404365214,
+       "tpot_estimated_sample_count": 59,
+       "tpot_estimated_decode_sum_ms": 472040.0,
+       "tpot_estimated_weight_tokens": 79767,
+       "tpot_histogram": [],
+       "tpot_estimated_histogram": [
+        [
+         24,
+         1
+        ],
+        [
+         42,
+         1
+        ],
+        [
+         50,
+         1
+        ],
+        [
+         51,
+         1
+        ],
+        [
+         61,
+         1
+        ],
+        [
+         62,
+         3
+        ],
+        [
+         67,
+         1
+        ],
+        [
+         68,
+         1
+        ],
+        [
+         69,
+         1
+        ],
+        [
+         70,
+         2
+        ],
+        [
+         73,
+         1
+        ],
+        [
+         74,
+         2
+        ],
+        [
+         76,
+         1
+        ],
+        [
+         77,
+         1
+        ],
+        [
+         79,
+         1
+        ],
+        [
+         81,
+         1
+        ],
+        [
+         83,
+         2
+        ],
+        [
+         84,
+         2
+        ],
+        [
+         85,
+         2
+        ],
+        [
+         86,
+         5
+        ],
+        [
+         87,
+         1
+        ],
+        [
+         88,
+         3
+        ],
+        [
+         89,
+         1
+        ],
+        [
+         90,
+         3
+        ],
+        [
+         91,
+         2
+        ],
+        [
+         92,
+         1
+        ],
+        [
+         93,
+         3
+        ],
+        [
+         94,
+         1
+        ],
+        [
+         95,
+         1
+        ],
+        [
+         97,
+         2
+        ],
+        [
+         99,
+         2
+        ],
+        [
+         103,
+         2
+        ],
+        [
+         104,
+         1
+        ],
+        [
+         105,
+         3
+        ],
+        [
+         109,
+         1
+        ],
+        [
+         111,
+         1
+        ]
+       ],
+       "tpot_filtered_count": 65,
+       "duration_sum_ms": 2039565,
+       "duration_p50_ms": 8839,
+       "duration_p95_ms": 25133,
+       "duration_sample_count": 188,
+       "input_tokens": 5536634,
+       "output_tokens": 253074,
+       "total_tokens": 5789708,
+       "token_sample_count": 188,
+       "token_coverage": 1.0,
+       "failed_input_tokens": 1474,
+       "failed_output_tokens": 0,
+       "failed_total_tokens": 1474,
+       "failed_token_sample_count": 6
+      }
+     ],
+     "slow_requests": [
+      {
+       "request_id": "8d24366e95214b0f92998a539c696131",
+       "call_id": "03b0c38c-0603-4d7b-980a-d34b8547ad76",
+       "start_time": "2026-11-10T16:11:13.141+00:00",
+       "duration_ms": 58768,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "0e9c0fe8a9f649ed9bd7daea803757d6",
-       "call_id": "14d40851-c93e-4373-a9a7-6d88d2df85f5",
-       "start_time": "2026-11-10T06:56:05.429+00:00",
-       "duration_ms": 44893,
+       "request_id": "d8c0bbbd6ac74c0897d682ee2539e7f8",
+       "call_id": "151db763-3102-44db-8fe1-95e550f7d427",
+       "start_time": "2026-11-10T16:27:50.332+00:00",
+       "duration_ms": 46908,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "e0db10af9e4348ebbd33c13b466c1479",
-       "call_id": "84ee8192-3272-4662-9092-46c88405265e",
-       "start_time": "2026-11-10T02:20:38.725+00:00",
-       "duration_ms": 44790,
+       "request_id": "f9507246f6c94102974a54cfe33040f1",
+       "call_id": "c1709ae1-4696-445a-aff9-7bfab94c8877",
+       "start_time": "2026-11-10T16:25:10.796+00:00",
+       "duration_ms": 41440,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "f57dddecf42c4b289d8716b100a7fd8f",
-       "call_id": "a7b1432f-b580-436f-ac58-a382ef03e4a9",
-       "start_time": "2026-11-10T07:18:07.598+00:00",
-       "duration_ms": 44370,
+       "request_id": "4edfb9f743c846df9211d6a6a5ae6142",
+       "call_id": "29443159-db84-4cf0-81e1-255bfae45197",
+       "start_time": "2026-11-10T16:37:32.835+00:00",
+       "duration_ms": 36950,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "6fcb2107f8674d819c22d6e7e5787a57",
-       "call_id": "bbcf9994-14f8-4c39-b514-a42efd536106",
-       "start_time": "2026-11-10T14:07:29.015+00:00",
-       "duration_ms": 43367,
+       "request_id": "87d1a02a55b74fb3b074ec16261a2f43",
+       "call_id": "48b61da6-ed1b-4ecb-b139-fbc5fac87a25",
+       "start_time": "2026-11-10T16:54:29.190+00:00",
+       "duration_ms": 36179,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "5527a8d9d8574f2db48e81377be54ad0",
-       "call_id": "6a27088c-ff74-4cd1-bcb3-8a41615d2dc9",
-       "start_time": "2026-11-10T14:07:36.461+00:00",
-       "duration_ms": 43285,
+       "request_id": "3c9be343f9f7415e946373a8cd01fd3b",
+       "call_id": "0cf0a9ab-9e4b-4b13-8af7-a860ce0504fd",
+       "start_time": "2026-11-10T16:19:50.105+00:00",
+       "duration_ms": 28448,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "60657222768147daa876effa09de4987",
-       "call_id": "99789f80-29f2-474a-a2a1-0ff750b7058f",
-       "start_time": "2026-11-10T09:34:29.419+00:00",
-       "duration_ms": 43160,
+       "request_id": "5e5084fa30a84f2bba2ab2f7565122e9",
+       "call_id": "bbd5d6c2-d410-4ddd-a92c-84fb76facd31",
+       "start_time": "2026-11-10T16:19:50.642+00:00",
+       "duration_ms": 27969,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "fd7b1a1d756d4db59e17d85727d18e28",
-       "call_id": "f5dfa0a4-c828-4184-8d26-1041cdcc40c0",
-       "start_time": "2026-11-09T16:34:12.755+00:00",
-       "duration_ms": 42922,
+       "request_id": "983d904a5af14f3cb89be249030798b1",
+       "call_id": "0f20b8cc-44c3-4482-b555-45cb5915cc22",
+       "start_time": "2026-11-10T16:22:28.263+00:00",
+       "duration_ms": 26763,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "6a4e26a06acb40cf92080014cbb2e735",
-       "call_id": "f76b807c-4515-4bb2-84fd-dcaf032cfe55",
-       "start_time": "2026-11-09T16:44:50.739+00:00",
-       "duration_ms": 42166,
+       "request_id": "8d1b50658c18458b9e6b7860821ee051",
+       "call_id": "1f3ce6e0-af86-4763-b2aa-1271fec6d035",
+       "start_time": "2026-11-10T16:21:57.523+00:00",
+       "duration_ms": 26109,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "49ddf04856af4ce0937598d388f9f596",
-       "call_id": "f9308357-3a10-40da-83ef-a7a620991602",
-       "start_time": "2026-11-09T16:14:53.833+00:00",
-       "duration_ms": 41993,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "b34c96115f254d1aad3b839448742750",
-       "call_id": "7fab17f5-ec4b-4214-9ed7-d43128a38726",
-       "start_time": "2026-11-10T11:25:44.317+00:00",
-       "duration_ms": 41959,
+       "request_id": "924ca30aba71468c919c32f5a15ef485",
+       "call_id": "00255c3f-7d41-4f14-bec9-90c95b0d09b6",
+       "start_time": "2026-11-10T16:23:35.386+00:00",
+       "duration_ms": 25133,
        "status": "success",
        "reason": null
       }
@@ -19032,1897 +18835,520 @@
     }
    ],
    "latest": {
-    "date": "2026-11-10",
+    "date": "2026-11-11",
     "status": "COMPLETED",
     "partial": true,
-    "query_ms": 9985,
-    "duration_sum_ms": 23714079,
-    "duration_sample_count": 2375,
-    "duration_p50_ms": 6555,
-    "duration_p95_ms": 30702,
-    "success_count": 2375,
-    "query_count": 3800,
+    "query_ms": 10849,
+    "duration_sum_ms": 2039565,
+    "duration_sample_count": 188,
+    "duration_p50_ms": 8839,
+    "duration_p95_ms": 25133,
+    "success_count": 188,
+    "query_count": 194,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-10T14:55:19Z",
-    "failed_queries": 1425,
+    "finished_at": "2026-11-10T17:03:11Z",
+    "failed_queries": 6,
     "unknown_status_count": 0,
     "blocked_queries": 0,
     "failure_reasons": {
-     "content_blocked": 1395,
-     "rate_limit": 30
+     "rate_limit": 6
     },
     "timeout_count": 0,
-    "latency_max_ms": 112346,
+    "latency_max_ms": 58768,
     "latency_max_request": {
-     "request_id": "ae67a22cb2fa42fd9700ec92d366eeb0",
-     "call_id": "2e70ceb7-e35d-4a14-8462-1030a8e11b79",
-     "start_time": "2026-11-10T12:01:55.659+00:00",
-     "duration_ms": 112346,
+     "request_id": "8d24366e95214b0f92998a539c696131",
+     "call_id": "03b0c38c-0603-4d7b-980a-d34b8547ad76",
+     "start_time": "2026-11-10T16:11:13.141+00:00",
+     "duration_ms": 58768,
      "status": "success",
      "reason": null
     },
-    "slow_count": 190,
-    "slow_threshold_ms": 25874,
+    "slow_count": 10,
+    "slow_threshold_ms": 25133,
     "hours": [
      {
       "hour": 0,
-      "calls": 407,
-      "success_count": 289,
-      "duration_sum_ms": 2650327,
-      "duration_sample_count": 289,
-      "failed": 118
-     },
-     {
-      "hour": 1,
-      "calls": 166,
-      "success_count": 54,
-      "duration_sum_ms": 541945,
-      "duration_sample_count": 54,
-      "failed": 112
-     },
-     {
-      "hour": 2,
-      "calls": 111,
-      "success_count": 0,
-      "duration_sum_ms": 0,
-      "duration_sample_count": 0,
-      "failed": 111
-     },
-     {
-      "hour": 3,
-      "calls": 110,
-      "success_count": 0,
-      "duration_sum_ms": 0,
-      "duration_sample_count": 0,
-      "failed": 110
-     },
-     {
-      "hour": 4,
-      "calls": 111,
-      "success_count": 0,
-      "duration_sum_ms": 0,
-      "duration_sample_count": 0,
-      "failed": 111
-     },
-     {
-      "hour": 5,
-      "calls": 111,
-      "success_count": 0,
-      "duration_sum_ms": 0,
-      "duration_sample_count": 0,
-      "failed": 111
-     },
-     {
-      "hour": 6,
-      "calls": 124,
-      "success_count": 14,
-      "duration_sum_ms": 91809,
-      "duration_sample_count": 14,
-      "failed": 110
-     },
-     {
-      "hour": 7,
-      "calls": 111,
-      "success_count": 0,
-      "duration_sum_ms": 0,
-      "duration_sample_count": 0,
-      "failed": 111
-     },
-     {
-      "hour": 8,
-      "calls": 125,
-      "success_count": 14,
-      "duration_sum_ms": 136131,
-      "duration_sample_count": 14,
-      "failed": 111
-     },
-     {
-      "hour": 9,
-      "calls": 299,
-      "success_count": 203,
-      "duration_sum_ms": 1489240,
-      "duration_sample_count": 203,
-      "failed": 96
-     },
-     {
-      "hour": 10,
-      "calls": 226,
-      "success_count": 126,
-      "duration_sum_ms": 1342323,
-      "duration_sample_count": 126,
-      "failed": 100
-     },
-     {
-      "hour": 11,
-      "calls": 185,
-      "success_count": 90,
-      "duration_sum_ms": 626465,
-      "duration_sample_count": 90,
-      "failed": 95
-     },
-     {
-      "hour": 12,
-      "calls": 132,
-      "success_count": 25,
-      "duration_sum_ms": 144347,
-      "duration_sample_count": 25,
-      "failed": 107
-     },
-     {
-      "hour": 13,
-      "calls": 42,
-      "success_count": 29,
-      "duration_sum_ms": 181485,
-      "duration_sample_count": 29,
-      "failed": 13
-     },
-     {
-      "hour": 14,
-      "calls": 31,
-      "success_count": 31,
-      "duration_sum_ms": 194662,
-      "duration_sample_count": 31,
-      "failed": 0
-     },
-     {
-      "hour": 15,
-      "calls": 91,
-      "success_count": 90,
-      "duration_sum_ms": 1090802,
-      "duration_sample_count": 90,
-      "failed": 1
-     },
-     {
-      "hour": 16,
-      "calls": 76,
-      "success_count": 76,
-      "duration_sum_ms": 692542,
-      "duration_sample_count": 76,
-      "failed": 0
-     },
-     {
-      "hour": 17,
-      "calls": 165,
-      "success_count": 162,
-      "duration_sum_ms": 1489378,
-      "duration_sample_count": 162,
-      "failed": 3
-     },
-     {
-      "hour": 18,
-      "calls": 141,
-      "success_count": 141,
-      "duration_sum_ms": 1317147,
-      "duration_sample_count": 141,
-      "failed": 0
-     },
-     {
-      "hour": 19,
-      "calls": 62,
-      "success_count": 62,
-      "duration_sum_ms": 607596,
-      "duration_sample_count": 62,
-      "failed": 0
-     },
-     {
-      "hour": 20,
-      "calls": 137,
-      "success_count": 136,
-      "duration_sum_ms": 1265103,
-      "duration_sample_count": 136,
-      "failed": 1
-     },
-     {
-      "hour": 21,
-      "calls": 545,
-      "success_count": 541,
-      "duration_sum_ms": 6398738,
-      "duration_sample_count": 541,
+      "calls": 163,
+      "success_count": 159,
+      "duration_sum_ms": 1810876,
+      "duration_sample_count": 159,
       "failed": 4
      },
      {
-      "hour": 22,
-      "calls": 292,
-      "success_count": 292,
-      "duration_sum_ms": 3454039,
-      "duration_sample_count": 292,
-      "failed": 0
+      "hour": 1,
+      "calls": 31,
+      "success_count": 29,
+      "duration_sum_ms": 228689,
+      "duration_sample_count": 29,
+      "failed": 2
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 3800,
-      "success_count": 2375,
-      "failed_count": 1425,
+      "call_count": 194,
+      "success_count": 188,
+      "failed_count": 6,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
       "ttft_sample_count": 0,
       "ttft_sum_ms": null,
-      "ttft_estimated_avg_ms": 3972,
-      "ttft_estimated_sample_count": 1274,
-      "ttft_estimated_sum_ms": 5059825,
+      "ttft_estimated_avg_ms": 4610,
+      "ttft_estimated_sample_count": 59,
+      "ttft_estimated_sum_ms": 271968,
       "ttft_estimated_histogram": [
        [
-        310,
+        316,
         1
-       ],
-       [
-        315,
-        1
-       ],
-       [
-        319,
-        2
-       ],
-       [
-        324,
-        1
-       ],
-       [
-        326,
-        1
-       ],
-       [
-        327,
-        1
-       ],
-       [
-        330,
-        1
-       ],
-       [
-        331,
-        1
-       ],
-       [
-        332,
-        2
-       ],
-       [
-        333,
-        2
-       ],
-       [
-        334,
-        1
-       ],
-       [
-        335,
-        1
-       ],
-       [
-        336,
-        4
-       ],
-       [
-        337,
-        7
-       ],
-       [
-        338,
-        4
-       ],
-       [
-        339,
-        3
-       ],
-       [
-        340,
-        4
-       ],
-       [
-        341,
-        4
-       ],
-       [
-        342,
-        4
-       ],
-       [
-        343,
-        10
-       ],
-       [
-        344,
-        8
        ],
        [
         345,
-        11
-       ],
-       [
-        346,
-        14
-       ],
-       [
-        347,
-        9
-       ],
-       [
-        348,
-        7
-       ],
-       [
-        349,
-        11
-       ],
-       [
-        350,
-        10
-       ],
-       [
-        351,
-        12
-       ],
-       [
-        352,
-        10
+        1
        ],
        [
         353,
-        17
-       ],
-       [
-        354,
-        19
+        1
        ],
        [
         355,
-        12
-       ],
-       [
-        356,
-        11
-       ],
-       [
-        357,
-        11
-       ],
-       [
-        358,
-        8
-       ],
-       [
-        359,
-        27
-       ],
-       [
-        360,
-        12
-       ],
-       [
-        361,
-        15
-       ],
-       [
-        362,
-        18
-       ],
-       [
-        363,
-        19
-       ],
-       [
-        364,
-        16
-       ],
-       [
-        365,
-        20
+        1
        ],
        [
         366,
-        19
-       ],
-       [
-        367,
-        11
+        1
        ],
        [
         368,
-        17
+        2
        ],
        [
         369,
-        20
+        1
        ],
        [
         370,
-        17
-       ],
-       [
-        371,
-        14
+        1
        ],
        [
         372,
-        13
+        1
        ],
        [
         373,
-        16
-       ],
-       [
-        374,
-        12
+        1
        ],
        [
         375,
-        15
+        1
        ],
        [
         376,
-        12
+        2
        ],
        [
         377,
-        8
-       ],
-       [
-        378,
-        9
+        1
        ],
        [
         379,
-        8
-       ],
-       [
-        380,
-        9
+        1
        ],
        [
         381,
-        9
-       ],
-       [
-        382,
-        15
-       ],
-       [
-        383,
-        15
+        3
        ],
        [
         384,
-        10
-       ],
-       [
-        385,
-        12
-       ],
-       [
-        386,
-        9
-       ],
-       [
-        387,
-        14
-       ],
-       [
-        388,
-        12
+        1
        ],
        [
         389,
-        11
+        1
        ],
        [
         390,
-        14
-       ],
-       [
-        391,
-        14
+        1
        ],
        [
         392,
-        10
-       ],
-       [
-        393,
-        16
-       ],
-       [
-        394,
-        10
+        1
        ],
        [
         395,
-        10
-       ],
-       [
-        396,
-        13
-       ],
-       [
-        397,
-        10
-       ],
-       [
-        398,
-        10
-       ],
-       [
-        399,
-        9
+        1
        ],
        [
         400,
-        9
-       ],
-       [
-        401,
-        10
-       ],
-       [
-        402,
-        7
-       ],
-       [
-        403,
-        7
+        2
        ],
        [
         404,
-        7
+        1
        ],
        [
         405,
-        10
-       ],
-       [
-        406,
-        15
+        1
        ],
        [
         407,
-        6
-       ],
-       [
-        408,
-        5
-       ],
-       [
-        409,
-        8
-       ],
-       [
-        410,
-        7
+        2
        ],
        [
         411,
-        6
-       ],
-       [
-        412,
-        4
-       ],
-       [
-        413,
-        8
-       ],
-       [
-        414,
-        6
-       ],
-       [
-        415,
-        11
-       ],
-       [
-        416,
-        4
+        1
        ],
        [
         417,
-        4
+        1
        ],
        [
         418,
-        6
-       ],
-       [
-        419,
-        10
-       ],
-       [
-        420,
-        5
-       ],
-       [
-        421,
-        2
-       ],
-       [
-        422,
-        6
-       ],
-       [
-        423,
-        7
-       ],
-       [
-        424,
-        8
+        1
        ],
        [
         425,
-        3
+        1
        ],
        [
         426,
-        6
+        1
        ],
        [
         427,
-        7
-       ],
-       [
-        428,
-        4
-       ],
-       [
-        429,
-        10
+        1
        ],
        [
         430,
-        10
+        1
        ],
        [
         431,
-        10
-       ],
-       [
-        432,
-        7
+        1
        ],
        [
         433,
-        6
-       ],
-       [
-        434,
-        3
+        1
        ],
        [
         435,
-        11
-       ],
-       [
-        436,
-        5
+        1
        ],
        [
         437,
-        4
+        1
        ],
        [
         438,
-        6
-       ],
-       [
-        439,
-        6
+        1
        ],
        [
         440,
-        3
-       ],
-       [
-        441,
-        2
-       ],
-       [
-        442,
-        10
-       ],
-       [
-        443,
-        6
-       ],
-       [
-        444,
-        6
+        1
        ],
        [
         445,
-        8
+        3
        ],
        [
         446,
-        5
-       ],
-       [
-        447,
-        4
+        1
        ],
        [
         448,
-        5
+        1
        ],
        [
         449,
-        5
+        1
        ],
        [
         450,
-        3
-       ],
-       [
-        451,
-        6
-       ],
-       [
-        452,
-        4
-       ],
-       [
-        453,
-        2
-       ],
-       [
-        454,
-        3
+        1
        ],
        [
         455,
         1
        ],
        [
-        456,
-        4
-       ],
-       [
-        457,
-        6
-       ],
-       [
         458,
-        5
-       ],
-       [
-        459,
-        3
-       ],
-       [
-        460,
-        7
-       ],
-       [
-        461,
-        2
-       ],
-       [
-        462,
-        5
-       ],
-       [
-        463,
-        3
-       ],
-       [
-        464,
-        2
-       ],
-       [
-        465,
         1
        ],
        [
-        466,
-        2
-       ],
-       [
-        467,
-        4
-       ],
-       [
-        468,
-        7
-       ],
-       [
-        469,
+        462,
         1
        ],
        [
         470,
-        4
+        1
        ],
        [
         471,
-        4
-       ],
-       [
-        472,
-        4
+        2
        ],
        [
         473,
-        5
-       ],
-       [
-        474,
-        7
-       ],
-       [
-        475,
-        5
-       ],
-       [
-        476,
-        3
-       ],
-       [
-        477,
-        3
-       ],
-       [
-        478,
         1
        ],
        [
         479,
-        5
-       ],
-       [
-        480,
-        2
-       ],
-       [
-        481,
-        2
-       ],
-       [
-        482,
-        2
-       ],
-       [
-        483,
-        2
-       ],
-       [
-        484,
         1
-       ],
-       [
-        485,
-        2
        ],
        [
         486,
-        2
-       ],
-       [
-        487,
-        3
-       ],
-       [
-        488,
-        2
-       ],
-       [
-        489,
-        1
-       ],
-       [
-        490,
-        1
-       ],
-       [
-        491,
-        1
-       ],
-       [
-        492,
-        3
-       ],
-       [
-        493,
-        1
-       ],
-       [
-        494,
-        3
-       ],
-       [
-        495,
-        3
-       ],
-       [
-        496,
-        2
-       ],
-       [
-        497,
-        1
-       ],
-       [
-        498,
-        1
-       ],
-       [
-        499,
-        1
-       ],
-       [
-        500,
-        3
-       ],
-       [
-        501,
-        1
-       ],
-       [
-        504,
-        2
-       ],
-       [
-        507,
-        1
-       ],
-       [
-        513,
-        1
-       ],
-       [
-        514,
-        1
-       ],
-       [
-        516,
-        1
-       ],
-       [
-        517,
-        1
-       ],
-       [
-        518,
-        1
-       ],
-       [
-        519,
-        1
-       ],
-       [
-        521,
-        2
-       ],
-       [
-        524,
-        1
-       ],
-       [
-        530,
-        1
-       ],
-       [
-        532,
-        1
-       ],
-       [
-        534,
-        1
-       ],
-       [
-        539,
-        1
-       ],
-       [
-        541,
         1
        ]
       ],
-      "ttft_filtered_count": 551,
+      "ttft_filtered_count": 65,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
       "tpot_weight_tokens": 0,
-      "tpot_estimated_avg_ms": 5.733838817578734,
-      "tpot_estimated_sample_count": 1274,
-      "tpot_estimated_decode_sum_ms": 7684680.0,
-      "tpot_estimated_weight_tokens": 1340233,
+      "tpot_estimated_avg_ms": 5.917735404365214,
+      "tpot_estimated_sample_count": 59,
+      "tpot_estimated_decode_sum_ms": 472040.0,
+      "tpot_estimated_weight_tokens": 79767,
       "tpot_histogram": [],
       "tpot_estimated_histogram": [
        [
-        13,
-        1
-       ],
-       [
         24,
-        3
-       ],
-       [
-        30,
         1
-       ],
-       [
-        32,
-        3
-       ],
-       [
-        33,
-        1
-       ],
-       [
-        35,
-        2
-       ],
-       [
-        36,
-        1
-       ],
-       [
-        38,
-        4
-       ],
-       [
-        39,
-        1
-       ],
-       [
-        40,
-        4
-       ],
-       [
-        41,
-        4
        ],
        [
         42,
-        4
-       ],
-       [
-        43,
-        3
-       ],
-       [
-        44,
-        2
-       ],
-       [
-        45,
-        4
-       ],
-       [
-        46,
-        5
-       ],
-       [
-        47,
-        5
-       ],
-       [
-        48,
-        2
-       ],
-       [
-        49,
-        6
+        1
        ],
        [
         50,
-        4
+        1
        ],
        [
         51,
-        5
-       ],
-       [
-        52,
-        9
-       ],
-       [
-        53,
-        9
-       ],
-       [
-        54,
-        7
-       ],
-       [
-        55,
-        6
-       ],
-       [
-        56,
-        7
-       ],
-       [
-        57,
-        11
-       ],
-       [
-        58,
-        14
-       ],
-       [
-        59,
-        13
-       ],
-       [
-        60,
-        15
+        1
        ],
        [
         61,
-        14
+        1
        ],
        [
         62,
-        14
-       ],
-       [
-        63,
-        17
-       ],
-       [
-        64,
-        24
-       ],
-       [
-        65,
-        15
-       ],
-       [
-        66,
-        26
+        3
        ],
        [
         67,
-        17
+        1
        ],
        [
         68,
-        23
+        1
        ],
        [
         69,
-        16
+        1
        ],
        [
         70,
-        25
-       ],
-       [
-        71,
-        21
-       ],
-       [
-        72,
-        19
+        2
        ],
        [
         73,
-        17
+        1
        ],
        [
         74,
-        24
-       ],
-       [
-        75,
-        31
+        2
        ],
        [
         76,
-        31
+        1
        ],
        [
         77,
-        23
-       ],
-       [
-        78,
-        29
+        1
        ],
        [
         79,
-        30
-       ],
-       [
-        80,
-        21
+        1
        ],
        [
         81,
-        30
-       ],
-       [
-        82,
-        21
+        1
        ],
        [
         83,
-        26
+        2
        ],
        [
         84,
-        33
+        2
        ],
        [
         85,
-        38
+        2
        ],
        [
         86,
-        17
+        5
        ],
        [
         87,
-        28
+        1
        ],
        [
         88,
-        37
+        3
        ],
        [
         89,
-        30
+        1
        ],
        [
         90,
-        29
+        3
        ],
        [
         91,
-        22
+        2
        ],
        [
         92,
-        20
+        1
        ],
        [
         93,
-        18
+        3
        ],
        [
         94,
-        15
+        1
        ],
        [
         95,
-        19
-       ],
-       [
-        96,
-        20
+        1
        ],
        [
         97,
-        23
-       ],
-       [
-        98,
-        27
+        2
        ],
        [
         99,
-        15
-       ],
-       [
-        100,
-        16
-       ],
-       [
-        101,
-        15
-       ],
-       [
-        102,
-        12
+        2
        ],
        [
         103,
-        14
+        2
        ],
        [
         104,
-        11
+        1
        ],
        [
         105,
-        16
-       ],
-       [
-        106,
-        12
-       ],
-       [
-        107,
-        7
-       ],
-       [
-        108,
-        9
+        3
        ],
        [
         109,
-        10
-       ],
-       [
-        110,
-        2
+        1
        ],
        [
         111,
-        5
-       ],
-       [
-        112,
-        6
-       ],
-       [
-        113,
-        8
-       ],
-       [
-        114,
-        2
-       ],
-       [
-        115,
-        7
-       ],
-       [
-        116,
-        4
-       ],
-       [
-        117,
-        3
-       ],
-       [
-        118,
-        5
-       ],
-       [
-        119,
-        4
-       ],
-       [
-        120,
-        6
-       ],
-       [
-        121,
-        3
-       ],
-       [
-        122,
-        4
-       ],
-       [
-        123,
-        2
-       ],
-       [
-        124,
-        1
-       ],
-       [
-        125,
-        1
-       ],
-       [
-        127,
-        2
-       ],
-       [
-        128,
-        1
-       ],
-       [
-        129,
-        2
-       ],
-       [
-        130,
-        3
-       ],
-       [
-        131,
-        1
-       ],
-       [
-        132,
-        1
-       ],
-       [
-        133,
-        1
-       ],
-       [
-        134,
-        1
-       ],
-       [
-        135,
-        3
-       ],
-       [
-        136,
-        1
-       ],
-       [
-        138,
-        1
-       ],
-       [
-        139,
-        3
-       ],
-       [
-        142,
-        1
-       ],
-       [
-        144,
-        1
-       ],
-       [
-        146,
-        1
-       ],
-       [
-        154,
-        1
-       ],
-       [
-        155,
-        1
-       ],
-       [
-        168,
-        1
-       ],
-       [
-        175,
-        1
-       ],
-       [
-        197,
         1
        ]
       ],
-      "tpot_filtered_count": 551,
-      "duration_sum_ms": 23714079,
-      "duration_p50_ms": 6555,
-      "duration_p95_ms": 30702,
-      "duration_sample_count": 2375,
-      "input_tokens": 90111323,
-      "output_tokens": 2627391,
-      "total_tokens": 92738714,
-      "token_sample_count": 2375,
+      "tpot_filtered_count": 65,
+      "duration_sum_ms": 2039565,
+      "duration_p50_ms": 8839,
+      "duration_p95_ms": 25133,
+      "duration_sample_count": 188,
+      "input_tokens": 5536634,
+      "output_tokens": 253074,
+      "total_tokens": 5789708,
+      "token_sample_count": 188,
       "token_coverage": 1.0,
-      "failed_input_tokens": 4257011,
+      "failed_input_tokens": 1474,
       "failed_output_tokens": 0,
-      "failed_total_tokens": 4257011,
-      "failed_token_sample_count": 1425
+      "failed_total_tokens": 1474,
+      "failed_token_sample_count": 6
      }
     ],
     "slow_requests": [
      {
-      "request_id": "ae67a22cb2fa42fd9700ec92d366eeb0",
-      "call_id": "2e70ceb7-e35d-4a14-8462-1030a8e11b79",
-      "start_time": "2026-11-10T12:01:55.659+00:00",
-      "duration_ms": 112346,
+      "request_id": "8d24366e95214b0f92998a539c696131",
+      "call_id": "03b0c38c-0603-4d7b-980a-d34b8547ad76",
+      "start_time": "2026-11-10T16:11:13.141+00:00",
+      "duration_ms": 58768,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "2a43e631fc094df6b0b29349994d772c",
-      "call_id": "0862e430-b859-4844-81a8-2480adbbf076",
-      "start_time": "2026-11-10T13:11:22.256+00:00",
-      "duration_ms": 93351,
+      "request_id": "d8c0bbbd6ac74c0897d682ee2539e7f8",
+      "call_id": "151db763-3102-44db-8fe1-95e550f7d427",
+      "start_time": "2026-11-10T16:27:50.332+00:00",
+      "duration_ms": 46908,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "623f97899bc34ab89fdc0ee41fb96197",
-      "call_id": "ed097073-003d-41a8-be21-2dfdc533609d",
-      "start_time": "2026-11-10T14:03:17.581+00:00",
-      "duration_ms": 92925,
+      "request_id": "f9507246f6c94102974a54cfe33040f1",
+      "call_id": "c1709ae1-4696-445a-aff9-7bfab94c8877",
+      "start_time": "2026-11-10T16:25:10.796+00:00",
+      "duration_ms": 41440,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "b60d98c989de4f83b91cd038c67b39b7",
-      "call_id": "7afcc621-c7d6-4150-a51d-f113ba31616f",
-      "start_time": "2026-11-10T13:20:54.696+00:00",
-      "duration_ms": 81889,
+      "request_id": "4edfb9f743c846df9211d6a6a5ae6142",
+      "call_id": "29443159-db84-4cf0-81e1-255bfae45197",
+      "start_time": "2026-11-10T16:37:32.835+00:00",
+      "duration_ms": 36950,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "591e3d0be7e54095bc6981c56f9b1942",
-      "call_id": "1e475e67-827c-4424-8dd8-3c28b079bfa9",
-      "start_time": "2026-11-10T02:21:37.893+00:00",
-      "duration_ms": 76988,
+      "request_id": "87d1a02a55b74fb3b074ec16261a2f43",
+      "call_id": "48b61da6-ed1b-4ecb-b139-fbc5fac87a25",
+      "start_time": "2026-11-10T16:54:29.190+00:00",
+      "duration_ms": 36179,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "00dc018586584b89b6613d898c0ec715",
-      "call_id": "46d368ff-eed4-4a28-b03b-44105cc12d54",
-      "start_time": "2026-11-10T07:19:24.776+00:00",
-      "duration_ms": 75856,
+      "request_id": "3c9be343f9f7415e946373a8cd01fd3b",
+      "call_id": "0cf0a9ab-9e4b-4b13-8af7-a860ce0504fd",
+      "start_time": "2026-11-10T16:19:50.105+00:00",
+      "duration_ms": 28448,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "441648bec9644af6a5f2472ddb6a39b2",
-      "call_id": "2f37e90d-8179-4d43-9863-34d6ea104eaf",
-      "start_time": "2026-11-10T03:58:04.038+00:00",
-      "duration_ms": 72969,
+      "request_id": "5e5084fa30a84f2bba2ab2f7565122e9",
+      "call_id": "bbd5d6c2-d410-4ddd-a92c-84fb76facd31",
+      "start_time": "2026-11-10T16:19:50.642+00:00",
+      "duration_ms": 27969,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "4a77f4685195440fa55b3c8826b3c12d",
-      "call_id": "be37b1fa-6c22-4685-ba95-91ed054120cc",
-      "start_time": "2026-11-09T16:48:28.218+00:00",
-      "duration_ms": 67026,
+      "request_id": "983d904a5af14f3cb89be249030798b1",
+      "call_id": "0f20b8cc-44c3-4482-b555-45cb5915cc22",
+      "start_time": "2026-11-10T16:22:28.263+00:00",
+      "duration_ms": 26763,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "ac18e1936bfc427b995688171ceb5c9c",
-      "call_id": "fac112b4-d8aa-4701-9eb3-1ab357ce8990",
-      "start_time": "2026-11-10T09:59:24.204+00:00",
-      "duration_ms": 65689,
+      "request_id": "8d1b50658c18458b9e6b7860821ee051",
+      "call_id": "1f3ce6e0-af86-4763-b2aa-1271fec6d035",
+      "start_time": "2026-11-10T16:21:57.523+00:00",
+      "duration_ms": 26109,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "e027c18f6fe04690a87d34e296873083",
-      "call_id": "af1c1f99-558f-40a5-b26b-a8034c97e892",
-      "start_time": "2026-11-10T13:46:16.714+00:00",
-      "duration_ms": 64545,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "9d315e2c3d6144928f6074c22355b840",
-      "call_id": "e792a991-5d61-4f0b-a0d2-a442237acf2d",
-      "start_time": "2026-11-10T13:18:46.216+00:00",
-      "duration_ms": 63991,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "9ca8cb9d34d84942b649d926bf970bc0",
-      "call_id": "a16e2feb-9fcb-4bc9-ac79-86d15c979e3a",
-      "start_time": "2026-11-10T09:35:53.889+00:00",
-      "duration_ms": 63770,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "bb5a151622b242808268fa18b213bb07",
-      "call_id": "bf1f14f4-cd54-43a3-b55d-34221f5f9346",
-      "start_time": "2026-11-10T13:22:17.326+00:00",
-      "duration_ms": 63516,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "ea323ccc5d9944eaa3a7bbc808e29d37",
-      "call_id": "bf293840-9fe1-430a-b729-eeafd127b8d0",
-      "start_time": "2026-11-10T13:54:09.478+00:00",
-      "duration_ms": 63505,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "2c0497c2560642eeae300e112842b79f",
-      "call_id": "924bafbc-b04e-4768-90fd-46c10166b949",
-      "start_time": "2026-11-10T13:23:03.534+00:00",
-      "duration_ms": 62937,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "bae9a765ded549859fcacdaf85a9946b",
-      "call_id": "ee88e477-1c55-47fe-8c41-a4bd97c007c0",
-      "start_time": "2026-11-10T07:43:35.125+00:00",
-      "duration_ms": 60858,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "e1bfdd664f6c40748f577d4e474658d7",
-      "call_id": "f950995c-bce5-45a9-a664-78d4c3d4628c",
-      "start_time": "2026-11-10T02:22:32.445+00:00",
-      "duration_ms": 60059,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "fc3e0f23ac7c4312bcd993bb625957ec",
-      "call_id": "0968bd36-dcd2-441f-a4cd-53b47ac1618c",
-      "start_time": "2026-11-10T07:56:21.273+00:00",
-      "duration_ms": 59660,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "6b0a8196309940a58f3d30b36fe4f6a2",
-      "call_id": "6e70eb48-1148-411c-8299-4aac8784b400",
-      "start_time": "2026-11-10T02:00:11.028+00:00",
-      "duration_ms": 58506,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "fa7e44c2eb9d4e8991d3e662e76aaba9",
-      "call_id": "9dde51f0-09d0-4a86-9bce-a499234c5bae",
-      "start_time": "2026-11-10T02:23:53.438+00:00",
-      "duration_ms": 58074,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "1eeabc8e042f4185a3feec70a02f5668",
-      "call_id": "b5014fae-1187-48d3-86ec-3f13b05ecfb7",
-      "start_time": "2026-11-10T05:46:32.395+00:00",
-      "duration_ms": 55236,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "5b87e70c15074eef9567e00865227e3a",
-      "call_id": "6d9fe95a-5347-4ae2-a28e-350b5463dcf8",
-      "start_time": "2026-11-10T13:31:51.850+00:00",
-      "duration_ms": 55118,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "d71ba2cba2a344378b31d00af2b2460a",
-      "call_id": "89e33e8c-b495-4bd2-a382-f1594ebdaa93",
-      "start_time": "2026-11-09T16:11:12.197+00:00",
-      "duration_ms": 53186,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "338782fd8c284b0283a4363b9c5989ec",
-      "call_id": "c81d1d85-a1f8-4270-8ce6-3687c88a3a17",
-      "start_time": "2026-11-10T13:40:53.511+00:00",
-      "duration_ms": 52352,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "ce106a5104e74c6a81ffedd48f924822",
-      "call_id": "f99b76ac-cf26-4694-a959-12eea640a98d",
-      "start_time": "2026-11-10T02:23:43.305+00:00",
-      "duration_ms": 52118,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "d3fdd590c10247338bac7e74ea547e5b",
-      "call_id": "0e59894f-a8f9-4c5b-9d76-e2bcd400edcb",
-      "start_time": "2026-11-09T17:02:59.466+00:00",
-      "duration_ms": 51678,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "64ff833589d44351a06389129b670d6b",
-      "call_id": "ea50b2df-f718-404a-a54c-8a5fd082a5be",
-      "start_time": "2026-11-10T13:39:39.162+00:00",
-      "duration_ms": 51602,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "ba5191e419a241b889e516f153fb9b04",
-      "call_id": "c524256b-dfc5-4c1d-b16f-6627b69792d3",
-      "start_time": "2026-11-10T14:44:05.920+00:00",
-      "duration_ms": 51598,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "800c7d42485544aca8b47c8adb8f7f67",
-      "call_id": "68e7b29c-b28d-41c3-914b-1171381ee158",
-      "start_time": "2026-11-10T13:27:26.084+00:00",
-      "duration_ms": 49988,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "bf557a21e8ec4bb5b78803e599b9a872",
-      "call_id": "5489b04f-4b94-4e5f-a65c-e55e0442a768",
-      "start_time": "2026-11-10T13:42:36.389+00:00",
-      "duration_ms": 48757,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "1840a3113fe548c0a6dfd280f19143a4",
-      "call_id": "f30dd8b9-be1b-4323-9e1a-af2e542d676b",
-      "start_time": "2026-11-10T07:19:05.966+00:00",
-      "duration_ms": 48410,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "c55201e66b3945168f3be34b634db3aa",
-      "call_id": "4603eed8-19e2-41f7-b759-fa0711c58157",
-      "start_time": "2026-11-10T13:41:47.077+00:00",
-      "duration_ms": 48156,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "7b7af90f0faa4e5192bf91bab91842ed",
-      "call_id": "5b5b7fd0-dd9e-408e-bd5e-6de74c9f3d24",
-      "start_time": "2026-11-10T13:16:02.376+00:00",
-      "duration_ms": 47968,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "c19624dc778d4832bdeb8cfe08e85e31",
-      "call_id": "2e8e193e-14d3-43c4-ae3a-984661a2920e",
-      "start_time": "2026-11-10T09:42:05.362+00:00",
-      "duration_ms": 47833,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "ef3c5259c7f94987b4ee169ff16b3a26",
-      "call_id": "9289f06c-9e76-4f91-aeb2-727de4edbd60",
-      "start_time": "2026-11-10T13:42:08.160+00:00",
-      "duration_ms": 47564,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "47f617c23c254f46ab746d999abee7fb",
-      "call_id": "a463f020-417d-4369-8702-3c51eaaaf2c1",
-      "start_time": "2026-11-10T02:09:10.698+00:00",
-      "duration_ms": 47495,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "87a87d9465e74d03b53c44987b95d77b",
-      "call_id": "62f0749b-40bd-4854-82ef-b7e47644647b",
-      "start_time": "2026-11-10T10:12:45.322+00:00",
-      "duration_ms": 46733,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "b9bf067e09014d90bdbe5aff7bdce210",
-      "call_id": "2a366e55-0c79-4f9a-ab28-2409e286673c",
-      "start_time": "2026-11-10T14:39:40.872+00:00",
-      "duration_ms": 46442,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "1e589ea39f574edd86ba94d62c64becd",
-      "call_id": "fa90d225-3c1f-43cf-9fbf-cb2c5cb34343",
-      "start_time": "2026-11-10T14:08:39.263+00:00",
-      "duration_ms": 46244,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "b5e28cc9ee364514b533a804b7256d70",
-      "call_id": "3c082ec4-7a6b-4f91-b013-843069cb58e3",
-      "start_time": "2026-11-10T10:09:46.440+00:00",
-      "duration_ms": 45328,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "0e9c0fe8a9f649ed9bd7daea803757d6",
-      "call_id": "14d40851-c93e-4373-a9a7-6d88d2df85f5",
-      "start_time": "2026-11-10T06:56:05.429+00:00",
-      "duration_ms": 44893,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "e0db10af9e4348ebbd33c13b466c1479",
-      "call_id": "84ee8192-3272-4662-9092-46c88405265e",
-      "start_time": "2026-11-10T02:20:38.725+00:00",
-      "duration_ms": 44790,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "f57dddecf42c4b289d8716b100a7fd8f",
-      "call_id": "a7b1432f-b580-436f-ac58-a382ef03e4a9",
-      "start_time": "2026-11-10T07:18:07.598+00:00",
-      "duration_ms": 44370,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "6fcb2107f8674d819c22d6e7e5787a57",
-      "call_id": "bbcf9994-14f8-4c39-b514-a42efd536106",
-      "start_time": "2026-11-10T14:07:29.015+00:00",
-      "duration_ms": 43367,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "5527a8d9d8574f2db48e81377be54ad0",
-      "call_id": "6a27088c-ff74-4cd1-bcb3-8a41615d2dc9",
-      "start_time": "2026-11-10T14:07:36.461+00:00",
-      "duration_ms": 43285,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "60657222768147daa876effa09de4987",
-      "call_id": "99789f80-29f2-474a-a2a1-0ff750b7058f",
-      "start_time": "2026-11-10T09:34:29.419+00:00",
-      "duration_ms": 43160,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "fd7b1a1d756d4db59e17d85727d18e28",
-      "call_id": "f5dfa0a4-c828-4184-8d26-1041cdcc40c0",
-      "start_time": "2026-11-09T16:34:12.755+00:00",
-      "duration_ms": 42922,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "6a4e26a06acb40cf92080014cbb2e735",
-      "call_id": "f76b807c-4515-4bb2-84fd-dcaf032cfe55",
-      "start_time": "2026-11-09T16:44:50.739+00:00",
-      "duration_ms": 42166,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "49ddf04856af4ce0937598d388f9f596",
-      "call_id": "f9308357-3a10-40da-83ef-a7a620991602",
-      "start_time": "2026-11-09T16:14:53.833+00:00",
-      "duration_ms": 41993,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "b34c96115f254d1aad3b839448742750",
-      "call_id": "7fab17f5-ec4b-4214-9ed7-d43128a38726",
-      "start_time": "2026-11-10T11:25:44.317+00:00",
-      "duration_ms": 41959,
+      "request_id": "924ca30aba71468c919c32f5a15ef485",
+      "call_id": "00255c3f-7d41-4f14-bec9-90c95b0d09b6",
+      "start_time": "2026-11-10T16:23:35.386+00:00",
+      "duration_ms": 25133,
       "status": "success",
       "reason": null
      }
@@ -21480,22 +19906,22 @@
     {
      "date": "2026-11-10",
      "status": "COMPLETED",
-     "partial": true,
-     "query_ms": 6257,
-     "duration_sum_ms": 42525954,
-     "duration_sample_count": 6797,
-     "duration_p50_ms": 5103,
-     "duration_p95_ms": 16498,
-     "success_count": 6797,
-     "query_count": 6840,
+     "partial": false,
+     "query_ms": 6357,
+     "duration_sum_ms": 47032279,
+     "duration_sample_count": 7399,
+     "duration_p50_ms": 5173,
+     "duration_p95_ms": 16726,
+     "success_count": 7399,
+     "query_count": 7452,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-10T14:55:21Z",
-     "failed_queries": 43,
+     "finished_at": "2026-11-10T16:00:03Z",
+     "failed_queries": 53,
      "unknown_status_count": 0,
      "blocked_queries": 0,
      "failure_reasons": {
-      "rate_limit": 23,
+      "rate_limit": 33,
       "content_blocked": 20
      },
      "timeout_count": 0,
@@ -21508,8 +19934,8 @@
       "status": "success",
       "reason": null
      },
-     "slow_count": 342,
-     "slow_threshold_ms": 16485,
+     "slow_count": 373,
+     "slow_threshold_ms": 16689,
      "hours": [
       {
        "hour": 0,
@@ -21689,19 +20115,27 @@
       },
       {
        "hour": 22,
-       "calls": 485,
-       "success_count": 485,
-       "duration_sum_ms": 3963110,
-       "duration_sample_count": 485,
-       "failed": 0
+       "calls": 532,
+       "success_count": 531,
+       "duration_sum_ms": 4329341,
+       "duration_sample_count": 531,
+       "failed": 1
+      },
+      {
+       "hour": 23,
+       "calls": 565,
+       "success_count": 556,
+       "duration_sum_ms": 4140094,
+       "duration_sample_count": 556,
+       "failed": 9
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 6840,
-       "success_count": 6797,
-       "failed_count": 43,
+       "call_count": 7452,
+       "success_count": 7399,
+       "failed_count": 53,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
        "ttft_sample_count": 0,
@@ -21710,7 +20144,7 @@
        "ttft_estimated_sample_count": 0,
        "ttft_estimated_sum_ms": null,
        "ttft_estimated_histogram": [],
-       "ttft_filtered_count": 3409,
+       "ttft_filtered_count": 3713,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
@@ -21721,20 +20155,20 @@
        "tpot_estimated_weight_tokens": 0,
        "tpot_histogram": [],
        "tpot_estimated_histogram": [],
-       "tpot_filtered_count": 3409,
-       "duration_sum_ms": 42525954,
-       "duration_p50_ms": 5103,
-       "duration_p95_ms": 16498,
-       "duration_sample_count": 6797,
-       "input_tokens": 101094979,
-       "output_tokens": 5519478,
-       "total_tokens": 106614457,
-       "token_sample_count": 6797,
+       "tpot_filtered_count": 3713,
+       "duration_sum_ms": 47032279,
+       "duration_p50_ms": 5173,
+       "duration_p95_ms": 16726,
+       "duration_sample_count": 7399,
+       "input_tokens": 106521464,
+       "output_tokens": 5994066,
+       "total_tokens": 112515530,
+       "token_sample_count": 7399,
        "token_coverage": 1.0,
-       "failed_input_tokens": 1662580,
+       "failed_input_tokens": 1774124,
        "failed_output_tokens": 0,
-       "failed_total_tokens": 1662580,
-       "failed_token_sample_count": 43
+       "failed_total_tokens": 1774124,
+       "failed_token_sample_count": 53
       }
      ],
      "slow_requests": [
@@ -21787,6 +20221,14 @@
        "reason": null
       },
       {
+       "request_id": "9a56042fc7d1492ea6d290debed7b5be",
+       "call_id": "7bb8b88a-008d-46bc-81ee-676b107847e4",
+       "start_time": "2026-11-10T15:42:39.045+00:00",
+       "duration_ms": 47446,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "6d2796d976c947e29df2e4e5f860ea7b",
        "call_id": "dec73d2f-3a53-41c1-9972-763c0405f76d",
        "start_time": "2026-11-10T01:01:43.506+00:00",
@@ -21799,6 +20241,14 @@
        "call_id": "1a6ccdd3-685b-49d5-b380-66a281366c06",
        "start_time": "2026-11-10T10:35:41.828+00:00",
        "duration_ms": 46471,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "f9b612c8773e4df6ad0e4d3de72daded",
+       "call_id": "b53be7f6-1e5c-4053-995a-2e1cf1448a13",
+       "start_time": "2026-11-10T15:25:52.167+00:00",
+       "duration_ms": 45118,
        "status": "success",
        "reason": null
       },
@@ -21871,6 +20321,14 @@
        "call_id": "f0c811ef-8004-45fa-9964-3bca84c742ca",
        "start_time": "2026-11-10T12:38:34.421+00:00",
        "duration_ms": 41582,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "52526a47de4e429388422227e01937dc",
+       "call_id": "64cc1cb4-8584-4d3a-b6d3-00f22c099324",
+       "start_time": "2026-11-10T15:27:17.467+00:00",
+       "duration_ms": 41355,
        "status": "success",
        "reason": null
       },
@@ -22059,6 +20517,14 @@
        "reason": null
       },
       {
+       "request_id": "f92d97ad16404d19ad00968353281ffd",
+       "call_id": "392c854d-5851-42e3-952c-e53a28b255e8",
+       "start_time": "2026-11-10T15:13:12.942+00:00",
+       "duration_ms": 32990,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "5b7bf59acd61464c9a5c86576a12d02f",
        "call_id": "07d8eacf-35db-483e-8fa0-9c39ca62c7cf",
        "start_time": "2026-11-09T20:00:01.067+00:00",
@@ -22083,6 +20549,14 @@
        "reason": null
       },
       {
+       "request_id": "ea64fccbd0cb431a9775ca65f8741283",
+       "call_id": "108333a3-4e18-4b91-8d41-f74ac99174a3",
+       "start_time": "2026-11-10T14:55:26.779+00:00",
+       "duration_ms": 32073,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "540f36d777f94418b4d83e5257e8133b",
        "call_id": "894e56c9-c2cf-4e6f-82db-3ffb8d8ae2cf",
        "start_time": "2026-11-10T14:46:31.980+00:00",
@@ -22097,44 +20571,395 @@
        "duration_ms": 31949,
        "status": "success",
        "reason": null
+      }
+     ],
+     "timeout_requests": []
+    },
+    {
+     "date": "2026-11-11",
+     "status": "COMPLETED",
+     "partial": true,
+     "query_ms": 6720,
+     "duration_sum_ms": 4670334,
+     "duration_sample_count": 695,
+     "duration_p50_ms": 5341,
+     "duration_p95_ms": 18675,
+     "success_count": 695,
+     "query_count": 700,
+     "run_id": "prod-adx-jiuwen",
+     "commit": "",
+     "finished_at": "2026-11-10T19:25:08Z",
+     "failed_queries": 5,
+     "unknown_status_count": 0,
+     "blocked_queries": 0,
+     "failure_reasons": {
+      "rate_limit": 5
+     },
+     "timeout_count": 0,
+     "latency_max_ms": 53585,
+     "latency_max_request": {
+      "request_id": "a664abffe6d6417d8ae3468d3507ccd8",
+      "call_id": "c1691f86-2a72-45ee-9eeb-305a4804d209",
+      "start_time": "2026-11-10T17:12:03.529+00:00",
+      "duration_ms": 53585,
+      "status": "success",
+      "reason": null
+     },
+     "slow_count": 35,
+     "slow_threshold_ms": 18675,
+     "hours": [
+      {
+       "hour": 0,
+       "calls": 382,
+       "success_count": 379,
+       "duration_sum_ms": 3041396,
+       "duration_sample_count": 379,
+       "failed": 3
       },
       {
-       "request_id": "0e40ea3696a145919950acfe1ab8b408",
-       "call_id": "a7fe17f4-c4de-42ea-8878-b36efa264065",
-       "start_time": "2026-11-10T01:45:20.804+00:00",
-       "duration_ms": 31777,
+       "hour": 1,
+       "calls": 165,
+       "success_count": 163,
+       "duration_sum_ms": 1042743,
+       "duration_sample_count": 163,
+       "failed": 2
+      },
+      {
+       "hour": 2,
+       "calls": 107,
+       "success_count": 107,
+       "duration_sum_ms": 413715,
+       "duration_sample_count": 107,
+       "failed": 0
+      },
+      {
+       "hour": 3,
+       "calls": 46,
+       "success_count": 46,
+       "duration_sum_ms": 172480,
+       "duration_sample_count": 46,
+       "failed": 0
+      }
+     ],
+     "benchmark_models": [
+      {
+       "model": "openai/deepseek-v4.1-flash-1017",
+       "call_count": 700,
+       "success_count": 695,
+       "failed_count": 5,
+       "unknown_status_count": 0,
+       "ttft_avg_ms": null,
+       "ttft_sample_count": 0,
+       "ttft_sum_ms": null,
+       "ttft_estimated_avg_ms": null,
+       "ttft_estimated_sample_count": 0,
+       "ttft_estimated_sum_ms": null,
+       "ttft_estimated_histogram": [],
+       "ttft_filtered_count": 333,
+       "tpot_avg_ms": null,
+       "tpot_sample_count": 0,
+       "tpot_decode_sum_ms": null,
+       "tpot_weight_tokens": 0,
+       "tpot_estimated_avg_ms": null,
+       "tpot_estimated_sample_count": 0,
+       "tpot_estimated_decode_sum_ms": null,
+       "tpot_estimated_weight_tokens": 0,
+       "tpot_histogram": [],
+       "tpot_estimated_histogram": [],
+       "tpot_filtered_count": 333,
+       "duration_sum_ms": 4670334,
+       "duration_p50_ms": 5341,
+       "duration_p95_ms": 18675,
+       "duration_sample_count": 695,
+       "input_tokens": 6753586,
+       "output_tokens": 461286,
+       "total_tokens": 7214872,
+       "token_sample_count": 695,
+       "token_coverage": 1.0,
+       "failed_input_tokens": 127928,
+       "failed_output_tokens": 0,
+       "failed_total_tokens": 127928,
+       "failed_token_sample_count": 5
+      }
+     ],
+     "slow_requests": [
+      {
+       "request_id": "a664abffe6d6417d8ae3468d3507ccd8",
+       "call_id": "c1691f86-2a72-45ee-9eeb-305a4804d209",
+       "start_time": "2026-11-10T17:12:03.529+00:00",
+       "duration_ms": 53585,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "0364342d54264f6bb76c2f3bd75b4e21",
-       "call_id": "8b0cee37-9485-4b80-abd2-b09681d31313",
-       "start_time": "2026-11-10T10:59:58.623+00:00",
-       "duration_ms": 31674,
+       "request_id": "b1aa26b2d8d6445c868fe1dbe794db2f",
+       "call_id": "c83d0638-3ca4-46a5-84ca-cfbca8bfe601",
+       "start_time": "2026-11-10T16:24:46.015+00:00",
+       "duration_ms": 47178,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "e98d346b2eb9419982a83051b84ba98d",
-       "call_id": "57831aa9-ccb7-4181-bddf-df561065a218",
-       "start_time": "2026-11-10T08:46:16.720+00:00",
-       "duration_ms": 31669,
+       "request_id": "1946dc6ec45347bc96526785e141e345",
+       "call_id": "be221ded-2e32-40d9-8798-91484c8b18e3",
+       "start_time": "2026-11-10T16:46:49.016+00:00",
+       "duration_ms": 43133,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "2b13cf5bb5914a1f96e890f93e277c4e",
-       "call_id": "eff0cda2-a8a8-4a9e-a56e-9b7244eec088",
-       "start_time": "2026-11-09T17:40:30.727+00:00",
-       "duration_ms": 31478,
+       "request_id": "f4bd471970bd45a8b55d67c506c5c834",
+       "call_id": "5f39e482-bf92-44bc-b9da-a1b37f2804ef",
+       "start_time": "2026-11-10T16:42:52.180+00:00",
+       "duration_ms": 32459,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "8909641d1f6448c7bf3454fb69a3cdf4",
-       "call_id": "91fe2e14-00c8-4d1a-988b-c1af095e04c6",
-       "start_time": "2026-11-10T13:58:17.538+00:00",
-       "duration_ms": 31446,
+       "request_id": "0f0638994e9a4b49ba39e076e7eecc7e",
+       "call_id": "0a299771-cd8a-4a52-b6ec-2f46da61e3d3",
+       "start_time": "2026-11-10T16:00:38.443+00:00",
+       "duration_ms": 31663,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "dd9f02eeea964511b73f04e28b214280",
+       "call_id": "a7d9fc21-1bde-4787-8e78-d1359f00ed70",
+       "start_time": "2026-11-10T17:11:24.456+00:00",
+       "duration_ms": 30724,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "a4f3a305cfe348f1a858e802e4683f2b",
+       "call_id": "7b9ce231-8ee2-48e6-9cb4-f86e5f156c95",
+       "start_time": "2026-11-10T16:49:40.609+00:00",
+       "duration_ms": 30010,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "db02c5439ad04651aec401d43ec4dcf7",
+       "call_id": "33e15fd0-572b-4e84-bf5e-9a7e6223b9f0",
+       "start_time": "2026-11-10T16:19:33.492+00:00",
+       "duration_ms": 29962,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "316fc0a014414c3ab94052f0d855d27d",
+       "call_id": "78f10136-1767-4851-962a-649855c8600e",
+       "start_time": "2026-11-10T17:11:15.524+00:00",
+       "duration_ms": 28770,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "543a2f1434334aea899f98370cbed11a",
+       "call_id": "4f2fb127-2796-4c43-a008-7afe3087cf80",
+       "start_time": "2026-11-10T17:10:36.462+00:00",
+       "duration_ms": 28135,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "83d81097d1e74eb78707adbc2297f0ab",
+       "call_id": "27e32c92-1227-4e75-b65b-18326de7c540",
+       "start_time": "2026-11-10T16:50:55.754+00:00",
+       "duration_ms": 27635,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "b350c8b0ea96412cb5dfb21cbf2738c9",
+       "call_id": "c30e0b0d-ff06-4ff0-9bb4-8ec2214c537f",
+       "start_time": "2026-11-10T16:14:50.788+00:00",
+       "duration_ms": 27324,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "21e29d69f1ed4453beaf3d09bc38a2c3",
+       "call_id": "b45fd8a8-6ec5-4ae7-926a-4912678d4c5a",
+       "start_time": "2026-11-10T16:51:07.504+00:00",
+       "duration_ms": 27260,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "56a6eea6f6ad4b559e2083f49327a5a2",
+       "call_id": "b80e2e2e-0d90-47e4-af3e-d32a024e0236",
+       "start_time": "2026-11-10T17:10:27.537+00:00",
+       "duration_ms": 27011,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "9a1061bed2e54e7d8dc34880632bad4b",
+       "call_id": "af8097e9-a1a5-4a0c-81fd-b752b4be38e0",
+       "start_time": "2026-11-10T16:47:27.787+00:00",
+       "duration_ms": 26197,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "700bd5203caf4ae6ac705b5f187386b4",
+       "call_id": "28636360-19fa-49dc-9d69-5d5630d6dc8a",
+       "start_time": "2026-11-10T16:55:51.456+00:00",
+       "duration_ms": 25813,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "05cebf8a96ba4ab2973d2eb6a8d797a7",
+       "call_id": "da44d218-f0c7-43dd-9282-6dc27a5bd94b",
+       "start_time": "2026-11-10T16:45:02.145+00:00",
+       "duration_ms": 25658,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "b61e5623219b45cd9afecd0fca839256",
+       "call_id": "e4445d38-9bca-4e58-986c-ae66e1c17166",
+       "start_time": "2026-11-10T17:11:01.779+00:00",
+       "duration_ms": 25055,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "3798e233e74c4b1a86543a788fb1b7dd",
+       "call_id": "7b6ddfd6-850b-42e2-a74f-84148f27ebd1",
+       "start_time": "2026-11-10T17:10:22.981+00:00",
+       "duration_ms": 25033,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "380ea94172f74ad2b00858144ddbef5f",
+       "call_id": "22ac43c7-3d95-41f6-8b3e-3c1b7b04e924",
+       "start_time": "2026-11-10T16:00:40.875+00:00",
+       "duration_ms": 25013,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "890a299bfc5f4fe5a094dd3cdb217ae9",
+       "call_id": "7064e73e-510c-443e-8f50-d253e95078e6",
+       "start_time": "2026-11-10T17:12:57.455+00:00",
+       "duration_ms": 24878,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "1de052ff8f9b49878b4e0eb7644d725c",
+       "call_id": "b11ade49-b9fc-4f17-906c-c9a5922812fc",
+       "start_time": "2026-11-10T17:01:48.509+00:00",
+       "duration_ms": 24531,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "85ae27f3ba8a4f0fb9f7b0039079082b",
+       "call_id": "46d895ba-78a9-41a8-96b5-a8262ac27808",
+       "start_time": "2026-11-10T16:20:03.381+00:00",
+       "duration_ms": 23827,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "a6343d295fed43dfa4137375e32bd674",
+       "call_id": "12b6c8b6-f170-4ae8-add1-e7671efdb24e",
+       "start_time": "2026-11-10T16:17:29.792+00:00",
+       "duration_ms": 23703,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "a01798ab414c43738bbfccaaa4e11699",
+       "call_id": "45a1c8de-0656-4489-bb75-b489950b4d2d",
+       "start_time": "2026-11-10T16:26:57.303+00:00",
+       "duration_ms": 23631,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "fd3c840246fc407397e7a0989901ac0e",
+       "call_id": "00ec2aa3-d0f1-495d-a50a-508f7a846e6e",
+       "start_time": "2026-11-10T18:03:45.448+00:00",
+       "duration_ms": 22936,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "4f713c7068ab4060ba90a9005af70477",
+       "call_id": "da6e8b7c-56ce-4da8-b391-b13a1b1d3657",
+       "start_time": "2026-11-10T16:28:53.292+00:00",
+       "duration_ms": 22610,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "250dbf0201c744a0ac95531f5736c745",
+       "call_id": "f35072c7-5f20-4fda-bfa4-24fbe17dcb2d",
+       "start_time": "2026-11-10T16:39:01.707+00:00",
+       "duration_ms": 20703,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "610e14e7ef0d4f498ad8bafa6677821f",
+       "call_id": "8a42a183-acb8-41ab-b9b3-148b982579f6",
+       "start_time": "2026-11-10T16:32:36.579+00:00",
+       "duration_ms": 20038,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "c58ba436fd8f43d88cd92168bc26aff0",
+       "call_id": "c35aeb87-edd4-4a86-be38-aa9949b4155d",
+       "start_time": "2026-11-10T19:10:04.302+00:00",
+       "duration_ms": 19309,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "e0c287f0c8c5454b8869181e89727c4b",
+       "call_id": "98e8711f-9b51-45a7-bf03-bfc31468f201",
+       "start_time": "2026-11-10T16:35:50.458+00:00",
+       "duration_ms": 19255,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "4c60f46e431e4670921eaeab6fe958eb",
+       "call_id": "e2e3a911-77f3-49ca-b16e-c2243f13790e",
+       "start_time": "2026-11-10T16:03:02.252+00:00",
+       "duration_ms": 19108,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "73ee77d69843468fabedda805087d5c0",
+       "call_id": "4cb7afca-def2-490c-b4b1-868217c33935",
+       "start_time": "2026-11-10T16:52:01.455+00:00",
+       "duration_ms": 19018,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "6f74d1bba81e482ab4147baa14755021",
+       "call_id": "e05a0145-063f-4444-85d5-86b33cb55465",
+       "start_time": "2026-11-10T18:08:21.585+00:00",
+       "duration_ms": 18728,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "65dfe549bb0f4f588960679142193208",
+       "call_id": "76977741-eeed-4183-9214-29e44675060e",
+       "start_time": "2026-11-10T16:30:47.023+00:00",
+       "duration_ms": 18675,
        "status": "success",
        "reason": null
       }
@@ -22143,230 +20968,77 @@
     }
    ],
    "latest": {
-    "date": "2026-11-10",
+    "date": "2026-11-11",
     "status": "COMPLETED",
     "partial": true,
-    "query_ms": 6257,
-    "duration_sum_ms": 42525954,
-    "duration_sample_count": 6797,
-    "duration_p50_ms": 5103,
-    "duration_p95_ms": 16498,
-    "success_count": 6797,
-    "query_count": 6840,
+    "query_ms": 6720,
+    "duration_sum_ms": 4670334,
+    "duration_sample_count": 695,
+    "duration_p50_ms": 5341,
+    "duration_p95_ms": 18675,
+    "success_count": 695,
+    "query_count": 700,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-10T14:55:21Z",
-    "failed_queries": 43,
+    "finished_at": "2026-11-10T19:25:08Z",
+    "failed_queries": 5,
     "unknown_status_count": 0,
     "blocked_queries": 0,
     "failure_reasons": {
-     "rate_limit": 23,
-     "content_blocked": 20
+     "rate_limit": 5
     },
     "timeout_count": 0,
-    "latency_max_ms": 100332,
+    "latency_max_ms": 53585,
     "latency_max_request": {
-     "request_id": "ad542f5b2b7f434e8b0841cd5d1027ce",
-     "call_id": "00b42398-8f7c-4597-b3b2-65f153597032",
-     "start_time": "2026-11-10T08:14:36.768+00:00",
-     "duration_ms": 100332,
+     "request_id": "a664abffe6d6417d8ae3468d3507ccd8",
+     "call_id": "c1691f86-2a72-45ee-9eeb-305a4804d209",
+     "start_time": "2026-11-10T17:12:03.529+00:00",
+     "duration_ms": 53585,
      "status": "success",
      "reason": null
     },
-    "slow_count": 342,
-    "slow_threshold_ms": 16485,
+    "slow_count": 35,
+    "slow_threshold_ms": 18675,
     "hours": [
      {
       "hour": 0,
-      "calls": 474,
-      "success_count": 468,
-      "duration_sum_ms": 3187392,
-      "duration_sample_count": 468,
-      "failed": 6
+      "calls": 382,
+      "success_count": 379,
+      "duration_sum_ms": 3041396,
+      "duration_sample_count": 379,
+      "failed": 3
      },
      {
       "hour": 1,
-      "calls": 261,
-      "success_count": 259,
-      "duration_sum_ms": 1620419,
-      "duration_sample_count": 259,
+      "calls": 165,
+      "success_count": 163,
+      "duration_sum_ms": 1042743,
+      "duration_sample_count": 163,
       "failed": 2
      },
      {
       "hour": 2,
-      "calls": 184,
-      "success_count": 182,
-      "duration_sum_ms": 929898,
-      "duration_sample_count": 182,
-      "failed": 2
+      "calls": 107,
+      "success_count": 107,
+      "duration_sum_ms": 413715,
+      "duration_sample_count": 107,
+      "failed": 0
      },
      {
       "hour": 3,
-      "calls": 184,
-      "success_count": 182,
-      "duration_sum_ms": 853521,
-      "duration_sample_count": 182,
-      "failed": 2
-     },
-     {
-      "hour": 4,
-      "calls": 188,
-      "success_count": 187,
-      "duration_sum_ms": 836146,
-      "duration_sample_count": 187,
-      "failed": 1
-     },
-     {
-      "hour": 5,
-      "calls": 249,
-      "success_count": 249,
-      "duration_sum_ms": 1314620,
-      "duration_sample_count": 249,
-      "failed": 0
-     },
-     {
-      "hour": 6,
-      "calls": 179,
-      "success_count": 179,
-      "duration_sum_ms": 828474,
-      "duration_sample_count": 179,
-      "failed": 0
-     },
-     {
-      "hour": 7,
-      "calls": 111,
-      "success_count": 111,
-      "duration_sum_ms": 271872,
-      "duration_sample_count": 111,
-      "failed": 0
-     },
-     {
-      "hour": 8,
-      "calls": 149,
-      "success_count": 145,
-      "duration_sum_ms": 499798,
-      "duration_sample_count": 145,
-      "failed": 4
-     },
-     {
-      "hour": 9,
-      "calls": 469,
-      "success_count": 469,
-      "duration_sum_ms": 2318003,
-      "duration_sample_count": 469,
-      "failed": 0
-     },
-     {
-      "hour": 10,
-      "calls": 193,
-      "success_count": 193,
-      "duration_sum_ms": 867534,
-      "duration_sample_count": 193,
-      "failed": 0
-     },
-     {
-      "hour": 11,
-      "calls": 251,
-      "success_count": 251,
-      "duration_sum_ms": 1256840,
-      "duration_sample_count": 251,
-      "failed": 0
-     },
-     {
-      "hour": 12,
-      "calls": 283,
-      "success_count": 283,
-      "duration_sum_ms": 1425843,
-      "duration_sample_count": 283,
-      "failed": 0
-     },
-     {
-      "hour": 13,
-      "calls": 208,
-      "success_count": 208,
-      "duration_sum_ms": 724970,
-      "duration_sample_count": 208,
-      "failed": 0
-     },
-     {
-      "hour": 14,
-      "calls": 234,
-      "success_count": 234,
-      "duration_sum_ms": 1043601,
-      "duration_sample_count": 234,
-      "failed": 0
-     },
-     {
-      "hour": 15,
-      "calls": 198,
-      "success_count": 198,
-      "duration_sum_ms": 2019589,
-      "duration_sample_count": 198,
-      "failed": 0
-     },
-     {
-      "hour": 16,
-      "calls": 312,
-      "success_count": 312,
-      "duration_sum_ms": 2964699,
-      "duration_sample_count": 312,
-      "failed": 0
-     },
-     {
-      "hour": 17,
-      "calls": 268,
-      "success_count": 267,
-      "duration_sum_ms": 1822809,
-      "duration_sample_count": 267,
-      "failed": 1
-     },
-     {
-      "hour": 18,
-      "calls": 322,
-      "success_count": 321,
-      "duration_sum_ms": 2016607,
-      "duration_sample_count": 321,
-      "failed": 1
-     },
-     {
-      "hour": 19,
-      "calls": 297,
-      "success_count": 297,
-      "duration_sum_ms": 1525851,
-      "duration_sample_count": 297,
-      "failed": 0
-     },
-     {
-      "hour": 20,
-      "calls": 548,
-      "success_count": 548,
-      "duration_sum_ms": 3654671,
-      "duration_sample_count": 548,
-      "failed": 0
-     },
-     {
-      "hour": 21,
-      "calls": 793,
-      "success_count": 769,
-      "duration_sum_ms": 6579687,
-      "duration_sample_count": 769,
-      "failed": 24
-     },
-     {
-      "hour": 22,
-      "calls": 485,
-      "success_count": 485,
-      "duration_sum_ms": 3963110,
-      "duration_sample_count": 485,
+      "calls": 46,
+      "success_count": 46,
+      "duration_sum_ms": 172480,
+      "duration_sample_count": 46,
       "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 6840,
-      "success_count": 6797,
-      "failed_count": 43,
+      "call_count": 700,
+      "success_count": 695,
+      "failed_count": 5,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
       "ttft_sample_count": 0,
@@ -22375,7 +21047,7 @@
       "ttft_estimated_sample_count": 0,
       "ttft_estimated_sum_ms": null,
       "ttft_estimated_histogram": [],
-      "ttft_filtered_count": 3409,
+      "ttft_filtered_count": 333,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
@@ -22386,420 +21058,300 @@
       "tpot_estimated_weight_tokens": 0,
       "tpot_histogram": [],
       "tpot_estimated_histogram": [],
-      "tpot_filtered_count": 3409,
-      "duration_sum_ms": 42525954,
-      "duration_p50_ms": 5103,
-      "duration_p95_ms": 16498,
-      "duration_sample_count": 6797,
-      "input_tokens": 101094979,
-      "output_tokens": 5519478,
-      "total_tokens": 106614457,
-      "token_sample_count": 6797,
+      "tpot_filtered_count": 333,
+      "duration_sum_ms": 4670334,
+      "duration_p50_ms": 5341,
+      "duration_p95_ms": 18675,
+      "duration_sample_count": 695,
+      "input_tokens": 6753586,
+      "output_tokens": 461286,
+      "total_tokens": 7214872,
+      "token_sample_count": 695,
       "token_coverage": 1.0,
-      "failed_input_tokens": 1662580,
+      "failed_input_tokens": 127928,
       "failed_output_tokens": 0,
-      "failed_total_tokens": 1662580,
-      "failed_token_sample_count": 43
+      "failed_total_tokens": 127928,
+      "failed_token_sample_count": 5
      }
     ],
     "slow_requests": [
      {
-      "request_id": "ad542f5b2b7f434e8b0841cd5d1027ce",
-      "call_id": "00b42398-8f7c-4597-b3b2-65f153597032",
-      "start_time": "2026-11-10T08:14:36.768+00:00",
-      "duration_ms": 100332,
+      "request_id": "a664abffe6d6417d8ae3468d3507ccd8",
+      "call_id": "c1691f86-2a72-45ee-9eeb-305a4804d209",
+      "start_time": "2026-11-10T17:12:03.529+00:00",
+      "duration_ms": 53585,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "f41cf851bd464624ba06953cc0a9a8dd",
-      "call_id": "3941dca9-d32a-446d-aaf7-05f7c1830a99",
-      "start_time": "2026-11-10T04:00:09.440+00:00",
-      "duration_ms": 72260,
+      "request_id": "b1aa26b2d8d6445c868fe1dbe794db2f",
+      "call_id": "c83d0638-3ca4-46a5-84ca-cfbca8bfe601",
+      "start_time": "2026-11-10T16:24:46.015+00:00",
+      "duration_ms": 47178,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "cc3209dd24bc4bfba810db08a351881a",
-      "call_id": "e181956c-1a90-461b-a134-3b45705f2230",
-      "start_time": "2026-11-09T17:10:40.696+00:00",
-      "duration_ms": 63188,
+      "request_id": "1946dc6ec45347bc96526785e141e345",
+      "call_id": "be221ded-2e32-40d9-8798-91484c8b18e3",
+      "start_time": "2026-11-10T16:46:49.016+00:00",
+      "duration_ms": 43133,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "1049d60f3ece421a9e75d9ea1d4609c8",
-      "call_id": "bf520f10-ce65-482b-ba6c-148b78f234a2",
-      "start_time": "2026-11-10T11:27:50.011+00:00",
-      "duration_ms": 52743,
+      "request_id": "f4bd471970bd45a8b55d67c506c5c834",
+      "call_id": "5f39e482-bf92-44bc-b9da-a1b37f2804ef",
+      "start_time": "2026-11-10T16:42:52.180+00:00",
+      "duration_ms": 32459,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "e56a320690b14aae83a5f269374429f1",
-      "call_id": "7db32c3c-3e80-4f34-88c3-d3f96631316b",
-      "start_time": "2026-11-09T16:41:26.023+00:00",
-      "duration_ms": 51011,
+      "request_id": "0f0638994e9a4b49ba39e076e7eecc7e",
+      "call_id": "0a299771-cd8a-4a52-b6ec-2f46da61e3d3",
+      "start_time": "2026-11-10T16:00:38.443+00:00",
+      "duration_ms": 31663,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "aa10785acd9f4855910a0677b18452b5",
-      "call_id": "2054ebac-e481-46b2-8619-794f2d3e72e3",
-      "start_time": "2026-11-10T07:40:13.762+00:00",
-      "duration_ms": 49607,
+      "request_id": "dd9f02eeea964511b73f04e28b214280",
+      "call_id": "a7d9fc21-1bde-4787-8e78-d1359f00ed70",
+      "start_time": "2026-11-10T17:11:24.456+00:00",
+      "duration_ms": 30724,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "6d2796d976c947e29df2e4e5f860ea7b",
-      "call_id": "dec73d2f-3a53-41c1-9972-763c0405f76d",
-      "start_time": "2026-11-10T01:01:43.506+00:00",
-      "duration_ms": 46492,
+      "request_id": "a4f3a305cfe348f1a858e802e4683f2b",
+      "call_id": "7b9ce231-8ee2-48e6-9cb4-f86e5f156c95",
+      "start_time": "2026-11-10T16:49:40.609+00:00",
+      "duration_ms": 30010,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "c0400e95d4f244ffb5c87f3809e7c41e",
-      "call_id": "1a6ccdd3-685b-49d5-b380-66a281366c06",
-      "start_time": "2026-11-10T10:35:41.828+00:00",
-      "duration_ms": 46471,
+      "request_id": "db02c5439ad04651aec401d43ec4dcf7",
+      "call_id": "33e15fd0-572b-4e84-bf5e-9a7e6223b9f0",
+      "start_time": "2026-11-10T16:19:33.492+00:00",
+      "duration_ms": 29962,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "fd48322024834d8cbc05d8898e65518c",
-      "call_id": "9419f28e-45c2-4590-b365-0b4f87ce87b1",
-      "start_time": "2026-11-10T14:16:48.496+00:00",
-      "duration_ms": 44767,
+      "request_id": "316fc0a014414c3ab94052f0d855d27d",
+      "call_id": "78f10136-1767-4851-962a-649855c8600e",
+      "start_time": "2026-11-10T17:11:15.524+00:00",
+      "duration_ms": 28770,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "bbe6d54fc1654bbe88f5841d847665d8",
-      "call_id": "2568c49a-d7c0-49ed-bdf5-c3f7f738f47f",
-      "start_time": "2026-11-10T04:08:42.983+00:00",
-      "duration_ms": 44756,
+      "request_id": "543a2f1434334aea899f98370cbed11a",
+      "call_id": "4f2fb127-2796-4c43-a008-7afe3087cf80",
+      "start_time": "2026-11-10T17:10:36.462+00:00",
+      "duration_ms": 28135,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "28b64a2d2c2f43438e97f20efaf7e126",
-      "call_id": "e5f60fcc-080d-4ee3-8922-0f69c2f491b0",
-      "start_time": "2026-11-10T13:31:26.720+00:00",
-      "duration_ms": 44649,
+      "request_id": "83d81097d1e74eb78707adbc2297f0ab",
+      "call_id": "27e32c92-1227-4e75-b65b-18326de7c540",
+      "start_time": "2026-11-10T16:50:55.754+00:00",
+      "duration_ms": 27635,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "71200c87f41e47f3bd229bb45665aaa9",
-      "call_id": "a707d358-457d-4f0c-8015-8777dd16edf5",
-      "start_time": "2026-11-10T08:34:04.699+00:00",
-      "duration_ms": 42716,
+      "request_id": "b350c8b0ea96412cb5dfb21cbf2738c9",
+      "call_id": "c30e0b0d-ff06-4ff0-9bb4-8ec2214c537f",
+      "start_time": "2026-11-10T16:14:50.788+00:00",
+      "duration_ms": 27324,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "50bba3f5cc214eb2873e056f772925f3",
-      "call_id": "9b8fca5a-427b-42ee-a707-194b5bfd5c1c",
-      "start_time": "2026-11-10T08:30:59.313+00:00",
-      "duration_ms": 42006,
+      "request_id": "21e29d69f1ed4453beaf3d09bc38a2c3",
+      "call_id": "b45fd8a8-6ec5-4ae7-926a-4912678d4c5a",
+      "start_time": "2026-11-10T16:51:07.504+00:00",
+      "duration_ms": 27260,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "5add2e4feab24af99faffd1d17066a1f",
-      "call_id": "3dd18959-d000-45bc-af55-a422d5d7766e",
-      "start_time": "2026-11-10T03:16:50.755+00:00",
-      "duration_ms": 41663,
+      "request_id": "56a6eea6f6ad4b559e2083f49327a5a2",
+      "call_id": "b80e2e2e-0d90-47e4-af3e-d32a024e0236",
+      "start_time": "2026-11-10T17:10:27.537+00:00",
+      "duration_ms": 27011,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "076af095c0474130b817fab58b7dc010",
-      "call_id": "0f365949-881d-4549-b012-e9cab89d5987",
-      "start_time": "2026-11-10T07:21:48.333+00:00",
-      "duration_ms": 41645,
+      "request_id": "9a1061bed2e54e7d8dc34880632bad4b",
+      "call_id": "af8097e9-a1a5-4a0c-81fd-b752b4be38e0",
+      "start_time": "2026-11-10T16:47:27.787+00:00",
+      "duration_ms": 26197,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "7a5c2f3d2e5248cc87d5788edb9d1d71",
-      "call_id": "675332f3-c153-4378-8905-5a089234f5f9",
-      "start_time": "2026-11-10T08:28:53.779+00:00",
-      "duration_ms": 41586,
+      "request_id": "700bd5203caf4ae6ac705b5f187386b4",
+      "call_id": "28636360-19fa-49dc-9d69-5d5630d6dc8a",
+      "start_time": "2026-11-10T16:55:51.456+00:00",
+      "duration_ms": 25813,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "638b546e739e40b4907a96e42425e089",
-      "call_id": "f0c811ef-8004-45fa-9964-3bca84c742ca",
-      "start_time": "2026-11-10T12:38:34.421+00:00",
-      "duration_ms": 41582,
+      "request_id": "05cebf8a96ba4ab2973d2eb6a8d797a7",
+      "call_id": "da44d218-f0c7-43dd-9282-6dc27a5bd94b",
+      "start_time": "2026-11-10T16:45:02.145+00:00",
+      "duration_ms": 25658,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "57eeafcb43cd4b549cad9b7fe6f5e92f",
-      "call_id": "ae56cc80-ccc7-466e-8acc-6733f940b271",
-      "start_time": "2026-11-10T01:05:36.173+00:00",
-      "duration_ms": 40740,
+      "request_id": "b61e5623219b45cd9afecd0fca839256",
+      "call_id": "e4445d38-9bca-4e58-986c-ae66e1c17166",
+      "start_time": "2026-11-10T17:11:01.779+00:00",
+      "duration_ms": 25055,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "4c8243db3a7b43beb96f9f84e14fe0c2",
-      "call_id": "51cfdb62-af89-49a1-b97e-438ced5fb398",
-      "start_time": "2026-11-10T12:36:42.099+00:00",
-      "duration_ms": 40536,
+      "request_id": "3798e233e74c4b1a86543a788fb1b7dd",
+      "call_id": "7b6ddfd6-850b-42e2-a74f-84148f27ebd1",
+      "start_time": "2026-11-10T17:10:22.981+00:00",
+      "duration_ms": 25033,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "9a4fa1c4bef246a8ac6d9168360e55e3",
-      "call_id": "9e6a70e2-bc42-4a93-9b12-b5bcf7240083",
-      "start_time": "2026-11-10T03:16:26.515+00:00",
-      "duration_ms": 40334,
+      "request_id": "380ea94172f74ad2b00858144ddbef5f",
+      "call_id": "22ac43c7-3d95-41f6-8b3e-3c1b7b04e924",
+      "start_time": "2026-11-10T16:00:40.875+00:00",
+      "duration_ms": 25013,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "f1411ca0e391490ab50e8bd3a5ee1f26",
-      "call_id": "c2c14b16-a332-486b-809b-0564b118ba68",
-      "start_time": "2026-11-10T04:08:04.258+00:00",
-      "duration_ms": 40281,
+      "request_id": "890a299bfc5f4fe5a094dd3cdb217ae9",
+      "call_id": "7064e73e-510c-443e-8f50-d253e95078e6",
+      "start_time": "2026-11-10T17:12:57.455+00:00",
+      "duration_ms": 24878,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "45b97c65848e40c1bde2531a1e64680d",
-      "call_id": "38e4f0a4-bc61-4acd-8069-b65e6a767ffb",
-      "start_time": "2026-11-10T07:05:14.751+00:00",
-      "duration_ms": 39953,
+      "request_id": "1de052ff8f9b49878b4e0eb7644d725c",
+      "call_id": "b11ade49-b9fc-4f17-906c-c9a5922812fc",
+      "start_time": "2026-11-10T17:01:48.509+00:00",
+      "duration_ms": 24531,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "dd2bbae486804bb3ae7f9df33a5a7adf",
-      "call_id": "6ac7e253-12e9-4414-a45e-9576cab063f0",
-      "start_time": "2026-11-10T07:18:15.084+00:00",
-      "duration_ms": 39752,
+      "request_id": "85ae27f3ba8a4f0fb9f7b0039079082b",
+      "call_id": "46d895ba-78a9-41a8-96b5-a8262ac27808",
+      "start_time": "2026-11-10T16:20:03.381+00:00",
+      "duration_ms": 23827,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "474bbabbfe9341ffa0e8ad257a2fae40",
-      "call_id": "f7d9f541-b919-4175-be0d-32cc742ad571",
-      "start_time": "2026-11-10T14:16:39.578+00:00",
-      "duration_ms": 39671,
+      "request_id": "a6343d295fed43dfa4137375e32bd674",
+      "call_id": "12b6c8b6-f170-4ae8-add1-e7671efdb24e",
+      "start_time": "2026-11-10T16:17:29.792+00:00",
+      "duration_ms": 23703,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "4d4a3f05c8a74dfeb5e71e2613a5ad1e",
-      "call_id": "d2ac4724-eccb-4f02-8b64-b6eff767dfb2",
-      "start_time": "2026-11-10T08:38:37.496+00:00",
-      "duration_ms": 37308,
+      "request_id": "a01798ab414c43738bbfccaaa4e11699",
+      "call_id": "45a1c8de-0656-4489-bb75-b489950b4d2d",
+      "start_time": "2026-11-10T16:26:57.303+00:00",
+      "duration_ms": 23631,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "0110a33073364941bc15bea5e0b4d4a2",
-      "call_id": "3df13856-4091-4201-803a-201fcb4e4c2f",
-      "start_time": "2026-11-10T13:46:25.495+00:00",
-      "duration_ms": 37135,
+      "request_id": "fd3c840246fc407397e7a0989901ac0e",
+      "call_id": "00ec2aa3-d0f1-495d-a50a-508f7a846e6e",
+      "start_time": "2026-11-10T18:03:45.448+00:00",
+      "duration_ms": 22936,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "78bc39ce1ba548968b6a9e613598cec3",
-      "call_id": "c67f652f-b947-4bb2-a378-f48c16ae9765",
-      "start_time": "2026-11-10T08:29:01.764+00:00",
-      "duration_ms": 36565,
+      "request_id": "4f713c7068ab4060ba90a9005af70477",
+      "call_id": "da6e8b7c-56ce-4da8-b391-b13a1b1d3657",
+      "start_time": "2026-11-10T16:28:53.292+00:00",
+      "duration_ms": 22610,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "de654368ce3b4aa1a2921a1de50591a0",
-      "call_id": "153ec5af-3023-4842-9a6b-6bca13cb94ab",
-      "start_time": "2026-11-10T12:07:26.936+00:00",
-      "duration_ms": 36139,
+      "request_id": "250dbf0201c744a0ac95531f5736c745",
+      "call_id": "f35072c7-5f20-4fda-bfa4-24fbe17dcb2d",
+      "start_time": "2026-11-10T16:39:01.707+00:00",
+      "duration_ms": 20703,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "d6b8f0df1e60426fa58376a2a88c4e0a",
-      "call_id": "f5c63899-7e5b-4641-aa34-5f91e248df75",
-      "start_time": "2026-11-10T12:57:38.935+00:00",
-      "duration_ms": 35979,
+      "request_id": "610e14e7ef0d4f498ad8bafa6677821f",
+      "call_id": "8a42a183-acb8-41ab-b9b3-148b982579f6",
+      "start_time": "2026-11-10T16:32:36.579+00:00",
+      "duration_ms": 20038,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "f0cae152ce3e4b52864a2e70737a410c",
-      "call_id": "2b8b86f2-b908-4361-881f-2a02bd2495da",
-      "start_time": "2026-11-10T13:59:05.539+00:00",
-      "duration_ms": 35835,
+      "request_id": "c58ba436fd8f43d88cd92168bc26aff0",
+      "call_id": "c35aeb87-edd4-4a86-be38-aa9949b4155d",
+      "start_time": "2026-11-10T19:10:04.302+00:00",
+      "duration_ms": 19309,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "f73ad6b141384beebd103d83d9fd93f0",
-      "call_id": "f56014ba-c9d9-4365-8dcc-68c168d1e5c3",
-      "start_time": "2026-11-10T13:17:01.519+00:00",
-      "duration_ms": 34700,
+      "request_id": "e0c287f0c8c5454b8869181e89727c4b",
+      "call_id": "98e8711f-9b51-45a7-bf03-bfc31468f201",
+      "start_time": "2026-11-10T16:35:50.458+00:00",
+      "duration_ms": 19255,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "33ff5fc3473643ae9fa8b16370d0ace9",
-      "call_id": "d1357b3d-a86f-42f9-918a-30001ba9aeca",
-      "start_time": "2026-11-10T07:22:23.110+00:00",
-      "duration_ms": 34448,
+      "request_id": "4c60f46e431e4670921eaeab6fe958eb",
+      "call_id": "e2e3a911-77f3-49ca-b16e-c2243f13790e",
+      "start_time": "2026-11-10T16:03:02.252+00:00",
+      "duration_ms": 19108,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "b2a508e2f3644623be449a6d538fc03d",
-      "call_id": "e26a2c01-9936-45be-abad-52848c7b4223",
-      "start_time": "2026-11-09T18:24:43.858+00:00",
-      "duration_ms": 34381,
+      "request_id": "73ee77d69843468fabedda805087d5c0",
+      "call_id": "4cb7afca-def2-490c-b4b1-868217c33935",
+      "start_time": "2026-11-10T16:52:01.455+00:00",
+      "duration_ms": 19018,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "94453a2fa0684de49349953a6fb587ce",
-      "call_id": "96cef98e-b6b2-4c13-8489-25fbd3dc2d96",
-      "start_time": "2026-11-10T09:44:45.521+00:00",
-      "duration_ms": 34236,
+      "request_id": "6f74d1bba81e482ab4147baa14755021",
+      "call_id": "e05a0145-063f-4444-85d5-86b33cb55465",
+      "start_time": "2026-11-10T18:08:21.585+00:00",
+      "duration_ms": 18728,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "570933e94839420ab11db4e957dbb9fd",
-      "call_id": "38e7af43-f538-4320-83e9-a494d5766b0f",
-      "start_time": "2026-11-10T03:54:43.783+00:00",
-      "duration_ms": 34235,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "6fe30483345e47958df0b76c06fc053d",
-      "call_id": "b93e8d89-172a-4f23-91cf-6724fa4fdf6d",
-      "start_time": "2026-11-10T01:27:25.517+00:00",
-      "duration_ms": 34106,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "9c85618321e5437d9b9d63e53bc12df8",
-      "call_id": "cc2f4e7c-f315-4a1b-9fdc-6cbc8a546cb2",
-      "start_time": "2026-11-10T13:14:49.358+00:00",
-      "duration_ms": 33955,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "1c2186eb29ea48138ee32c50edf0f486",
-      "call_id": "f6c061a8-d0bc-4164-aed3-60c653b2b085",
-      "start_time": "2026-11-10T07:34:20.892+00:00",
-      "duration_ms": 33872,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "73e35e896eca41109e7c5d981a15a37d",
-      "call_id": "ebd68de5-9ca5-4082-925c-ce7c6ec5c9fe",
-      "start_time": "2026-11-10T13:31:36.705+00:00",
-      "duration_ms": 33472,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "8bb1d50290cc4b15879f50766650f2ae",
-      "call_id": "6a3ec040-8429-433a-8071-6af9f492e8f4",
-      "start_time": "2026-11-10T13:32:42.534+00:00",
-      "duration_ms": 33001,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "5b7bf59acd61464c9a5c86576a12d02f",
-      "call_id": "07d8eacf-35db-483e-8fa0-9c39ca62c7cf",
-      "start_time": "2026-11-09T20:00:01.067+00:00",
-      "duration_ms": 32506,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "826269597b71465687666f8df6cdcb97",
-      "call_id": "5814a6fc-ff03-4d2f-88b6-87da6eca1560",
-      "start_time": "2026-11-10T13:56:20.755+00:00",
-      "duration_ms": 32221,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "4f8146c3827e4e22b2c010f231b820e0",
-      "call_id": "d1fa8255-8e5d-459b-8aa8-94d4d9b2af94",
-      "start_time": "2026-11-10T07:34:23.231+00:00",
-      "duration_ms": 32174,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "540f36d777f94418b4d83e5257e8133b",
-      "call_id": "894e56c9-c2cf-4e6f-82db-3ffb8d8ae2cf",
-      "start_time": "2026-11-10T14:46:31.980+00:00",
-      "duration_ms": 32026,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "ff6555c6ac0d432bae45d2bd411d58da",
-      "call_id": "8bf4fd7e-3ca5-41b5-ac6a-bc6e593c8dfb",
-      "start_time": "2026-11-10T08:17:44.771+00:00",
-      "duration_ms": 31949,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "0e40ea3696a145919950acfe1ab8b408",
-      "call_id": "a7fe17f4-c4de-42ea-8878-b36efa264065",
-      "start_time": "2026-11-10T01:45:20.804+00:00",
-      "duration_ms": 31777,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "0364342d54264f6bb76c2f3bd75b4e21",
-      "call_id": "8b0cee37-9485-4b80-abd2-b09681d31313",
-      "start_time": "2026-11-10T10:59:58.623+00:00",
-      "duration_ms": 31674,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "e98d346b2eb9419982a83051b84ba98d",
-      "call_id": "57831aa9-ccb7-4181-bddf-df561065a218",
-      "start_time": "2026-11-10T08:46:16.720+00:00",
-      "duration_ms": 31669,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "2b13cf5bb5914a1f96e890f93e277c4e",
-      "call_id": "eff0cda2-a8a8-4a9e-a56e-9b7244eec088",
-      "start_time": "2026-11-09T17:40:30.727+00:00",
-      "duration_ms": 31478,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "8909641d1f6448c7bf3454fb69a3cdf4",
-      "call_id": "91fe2e14-00c8-4d1a-988b-c1af095e04c6",
-      "start_time": "2026-11-10T13:58:17.538+00:00",
-      "duration_ms": 31446,
+      "request_id": "65dfe549bb0f4f588960679142193208",
+      "call_id": "76977741-eeed-4183-9214-29e44675060e",
+      "start_time": "2026-11-10T16:30:47.023+00:00",
+      "duration_ms": 18675,
       "status": "success",
       "reason": null
      }
@@ -29702,7 +28254,7 @@
     {
      "date": "2026-11-10",
      "status": "FAILED",
-     "partial": true,
+     "partial": false,
      "query_ms": null,
      "duration_sum_ms": null,
      "duration_sample_count": 0,
@@ -29798,7 +28350,7 @@
    "latest": {
     "date": "2026-11-10",
     "status": "FAILED",
-    "partial": true,
+    "partial": false,
     "query_ms": null,
     "duration_sum_ms": null,
     "duration_sample_count": 0,
@@ -31500,7 +30052,7 @@
     {
      "date": "2026-11-10",
      "status": "FAILED",
-     "partial": true,
+     "partial": false,
      "query_ms": null,
      "duration_sum_ms": null,
      "duration_sample_count": 0,
@@ -31596,7 +30148,7 @@
    "latest": {
     "date": "2026-11-10",
     "status": "FAILED",
-    "partial": true,
+    "partial": false,
     "query_ms": null,
     "duration_sum_ms": null,
     "duration_sample_count": 0,
