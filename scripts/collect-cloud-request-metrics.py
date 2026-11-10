@@ -14,7 +14,7 @@ Usage:
 
 Environment:
   ADX_TOKEN  bearer token for the console API (required)
-  ADX_BASE   console base URL (default https://onlineswarm.openjiuwen.com:31470)
+  ADX_BASE   console base URL (default https://onlineswarm.openjiuwen.com:31472)
   DM_UNTIL   optional ISO-8601 cut-off passed to the in-env aggregator
 """
 import base64
@@ -30,7 +30,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-BASE = os.environ.get("ADX_BASE", "https://onlineswarm.openjiuwen.com:31470").rstrip("/")
+BASE = os.environ.get("ADX_BASE", "https://onlineswarm.openjiuwen.com:31472").rstrip("/")
 TOKEN = os.environ.get("ADX_TOKEN", "")
 TEMPLATE = os.environ.get("ADX_TEMPLATE", "digitalmate")
 REFERENCE = os.environ.get("ADX_REFERENCE", "production")
@@ -72,13 +72,28 @@ def call(path, method="GET", payload=None, timeout=60):
 
 
 def bindings():
-    query = urllib.parse.urlencode(
-        {"template": TEMPLATE, "reference": REFERENCE, "kind": KIND, "page_size": 50}
-    )
-    items = call(f"/api/bindings?{query}").get("items", [])
-    if not items:
-        raise SystemExit("no ADX bindings for the DigitalMate environment")
-    return items
+    """Read every page; an incomplete inventory must never look complete."""
+    items = []
+    token = None
+    seen_tokens = set()
+    for _ in range(1000):
+        params = {"template": TEMPLATE, "reference": REFERENCE, "kind": KIND, "page_size": 50}
+        if token:
+            params["page_token"] = token
+        data = call(f"/api/bindings?{urllib.parse.urlencode(params)}")
+        page = data.get("items") if isinstance(data, dict) else None
+        if not isinstance(page, list):
+            raise SystemExit("invalid ADX bindings page")
+        items.extend(page)
+        token = data.get("next_page_token")
+        if not token:
+            if not items:
+                raise SystemExit("no ADX bindings for the DigitalMate environment")
+            return items
+        if not isinstance(token, str) or token in seen_tokens:
+            raise SystemExit("invalid or repeated ADX pagination token")
+        seen_tokens.add(token)
+    raise SystemExit("ADX bindings pagination exceeds safety limit")
 
 
 class Terminal:

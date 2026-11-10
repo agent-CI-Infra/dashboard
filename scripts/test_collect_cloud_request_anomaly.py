@@ -93,6 +93,20 @@ class TraceCollectionTests(unittest.TestCase):
         with patch.object(collector.subprocess, 'check_output', return_value=json.dumps(prod).encode()):
             self.assertEqual(collector.production_seed({'env': 'adx-jiuwen-test-0'}), prod)
 
+    def test_binding_inventory_fetches_every_page(self):
+        pages = [{'items': [{'id': 'a'}], 'next_page_token': 'next'},
+                 {'items': [{'id': 'b'}], 'next_page_token': None}]
+        with patch.object(collector, 'call', side_effect=pages) as call:
+            self.assertEqual([item['id'] for item in collector.bindings()], ['a', 'b'])
+            self.assertIn('page_token=next', call.call_args_list[1].args[0])
+
+    def test_binding_inventory_rejects_repeated_page_tokens(self):
+        pages = [{'items': [{'id': 'a'}], 'next_page_token': 'next'},
+                 {'items': [{'id': 'b'}], 'next_page_token': 'next'}]
+        with patch.object(collector, 'call', side_effect=pages):
+            with self.assertRaisesRegex(SystemExit, 'repeated'):
+                collector.bindings()
+
     def test_failure_of_an_active_environment_keeps_old_snapshot(self):
         with patch.object(collector, 'bindings', return_value=[{}, {}]), \
              patch.object(collector, 'collect_environment', side_effect=[{'days': []}, RuntimeError('unavailable')]):
