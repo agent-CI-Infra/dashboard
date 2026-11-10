@@ -3462,21 +3462,39 @@ async function loadEnvLatency() {
   } catch {
     doc = null;
   }
-  let daily = null;
-  // Production boards publish their own cloud aggregate; fall back to the
-  // shared single-environment file so boards without one still render.
+  // Two producers can publish this file. An old per-environment export has
+  // the same schema but no anomaly block, and it can linger after the pooled
+  // collector has moved on. Take the freshest valid document rather than the
+  // first one that answers: a stale stub must not hide the analysis.
+  const candidates = [];
   for (const name of ['production-request-latency-daily.json', 'env-request-latency-daily.json']) {
     try {
       const response = await fetch(`../data/${name}`, { cache: 'no-store' });
-      if (response.ok) { daily = await response.json(); break; }
+      if (response.ok) candidates.push(await response.json());
     } catch {
-      daily = null;
+      // A missing file simply leaves this candidate out.
     }
   }
-  state.envDaily = daily && daily.schema === 'digitalmate/env-request-latency-daily@1' ? daily : null;
+  state.envDaily = newestEnvDaily(candidates);
   // The per-environment GateWay / WorkSwarm table is parked for now; the daily
   // charts carry the same measurements in a more readable form.
   renderEnv();
+}
+
+// Pick the freshest valid cloud-side daily document. A legacy per-environment
+// export shares this schema but can sit on the data branch long after the
+// pooled collector stopped writing it; a stale file must not hide the analysis.
+function newestEnvDaily(candidates) {
+  const freshness = (doc) => {
+    const stamp = Date.parse(doc?.generated_at || doc?.updated_at || '');
+    return Number.isFinite(stamp) ? stamp : -Infinity;
+  };
+  let daily = null;
+  for (const doc of Array.isArray(candidates) ? candidates : []) {
+    if (doc?.schema !== 'digitalmate/env-request-latency-daily@1') continue;
+    if (!daily || freshness(doc) > freshness(daily)) daily = doc;
+  }
+  return daily;
 }
 
 // The cloud-side section answers to the same range control as the model side:
