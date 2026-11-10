@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/e2e-performance-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updated_at": "2026-11-10T10:02:09.098Z",
+  "updated_at": "2026-11-10T12:40:04.570Z",
   "cases": {
     "DM-WF-CHROME-01": {
       "id": "DM-WF-CHROME-01",
@@ -1967,6 +1967,16 @@
           "run_id": "nightly-42636115442-1",
           "commit": "26d98fd1cd567782fe686c2237051fc717dd6371",
           "finished_at": "2026-11-09T14:42:03.961Z"
+        },
+        {
+          "date": "2026-11-10",
+          "status": "BLOCKED",
+          "query_ms": 112761,
+          "query_count": 1,
+          "duration_ms": 264167,
+          "run_id": "nightly-42816896984-1",
+          "commit": "576b1cee194f2d752f7b6dd1a4d5459a6b8165a9",
+          "finished_at": "2026-11-10T12:40:02.909Z"
         }
       ],
       "latest": {
@@ -1974,71 +1984,76 @@
         "title": "文件覆盖发布：单一卡片、最新内容与后台恢复",
         "mode": "single-turn",
         "status": "BLOCKED",
-        "failure": "F02-before cloud.inspect 失败：[ENV_DOWN] cloud.inspect control failed before a verifiable receipt; private adapter errors were not recorded",
-        "started_at": "2026-11-09T14:39:04.953Z",
-        "finished_at": "2026-11-09T14:42:03.961Z",
-        "duration_ms": 179008,
+        "failure": "F02-original-path assert.observation 失败：Original source fields are missing: /firstPath, /path, /samePath",
+        "started_at": "2026-11-10T12:35:38.742Z",
+        "finished_at": "2026-11-10T12:40:02.909Z",
+        "duration_ms": 264167,
         "query_count": 1,
-        "query_ms": 27904,
-        "first_text_ms": 27904,
-        "display_ms": 33460,
+        "query_ms": 112761,
+        "first_text_ms": 31245,
+        "display_ms": 33851,
         "queries": [
           {
-            "started_at": "2026-11-09T14:40:26.991Z",
-            "task_id": "task-328ccc18624749f6bb7fc20feb7f5e40",
-            "submission_id": "baaa1c3c-555c-4539-b717-445d4ca52d65",
-            "duration_ms": 27904,
-            "first_text_ms": 27904,
-            "display_ms": 33460,
+            "started_at": "2026-11-10T12:36:16.914Z",
+            "task_id": "task-d009a84c51c44a069bb699c86621992b",
+            "submission_id": "865679e5-91ba-4096-9da4-c8c12d3e4814",
+            "duration_ms": 112761,
+            "first_text_ms": 31245,
+            "display_ms": 33851,
             "outcome": "completed",
-            "text_chars": 102,
-            "request_bytes": 580,
-            "response_bytes": 7465550,
+            "text_chars": 633,
+            "request_bytes": 554,
+            "response_bytes": 11198524,
             "stages": [
               {
                 "name": "tap",
-                "at_ms": 1794235226991,
+                "at_ms": 1794314176914,
                 "detail": null
               },
               {
                 "name": "queued",
-                "at_ms": 1794235226991,
+                "at_ms": 1794314176914,
                 "detail": null
               },
               {
                 "name": "dequeued",
-                "at_ms": 1794235227064,
+                "at_ms": 1794314176935,
                 "detail": null
               },
               {
                 "name": "wire_send",
-                "at_ms": 1794235227131,
-                "detail": "encode=0 send=0 attempt=1"
+                "at_ms": 1794314176948,
+                "detail": "encode=0 send=2 attempt=1"
               },
               {
                 "name": "ack",
-                "at_ms": 1794235232230,
+                "at_ms": 1794314180017,
                 "detail": null
               },
               {
                 "name": "first_text",
-                "at_ms": 1794235254895,
-                "detail": "chars=102"
-              },
-              {
-                "name": "last_text",
-                "at_ms": 1794235254895,
-                "detail": "chars=102 events=1"
-              },
-              {
-                "name": "task_done",
-                "at_ms": 1794235260451,
-                "detail": "completed"
+                "at_ms": 1794314208159,
+                "detail": "chars=1"
               },
               {
                 "name": "display_done",
-                "at_ms": 1794235260451,
-                "detail": "no-reveal"
+                "at_ms": 1794314210765,
+                "detail": null
+              },
+              {
+                "name": "waiting",
+                "at_ms": 1794314230462,
+                "detail": "hitl"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1794314289675,
+                "detail": "chars=633 events=33"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1794314292212,
+                "detail": "completed"
               }
             ]
           }
@@ -2063,86 +2078,430 @@
             "measured": true
           }
         },
-        "step_count": 9,
+        "step_count": 52,
         "steps": [
           {
             "id": "S-start",
             "action": "app.coldStart",
             "status": "ok",
-            "started_at": "2026-11-09T14:39:04.954Z",
-            "duration_ms": 5111,
+            "started_at": "2026-11-10T12:35:38.743Z",
+            "duration_ms": 5026,
             "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
             "id": "S-reset",
             "action": "app.resetState",
             "status": "ok",
-            "started_at": "2026-11-09T14:39:10.065Z",
-            "duration_ms": 61101,
-            "detail": "已重置到初始状态（11-09 22:39:44.262 10676 10676 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-56600a4d138547d5b9bdf2acfb5b8624）"
+            "started_at": "2026-11-10T12:35:43.769Z",
+            "duration_ms": 14790,
+            "detail": "已重置到初始状态（11-10 20:35:50.190 12195 12195 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=0 databases=0 tables=0 files=0 notifications=skipped room=room-a083fb4bfe084903adcf4d77460f22ed）"
           },
           {
             "id": "S00",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-09T14:40:11.166Z",
-            "duration_ms": 2019,
+            "started_at": "2026-11-10T12:35:58.559Z",
+            "duration_ms": 1729,
             "detail": "截图 00-before"
+          },
+          {
+            "id": "F02-ready",
+            "action": "cloud.inspect",
+            "status": "ok",
+            "started_at": "2026-11-10T12:36:00.288Z",
+            "duration_ms": 3592,
+            "detail": null
+          },
+          {
+            "id": "F02-cleanup",
+            "action": "cloud.inject",
+            "status": "ok",
+            "started_at": "2026-11-10T12:36:03.880Z",
+            "duration_ms": 0,
+            "detail": null
           },
           {
             "id": "S01",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-09T14:40:13.185Z",
-            "duration_ms": 17319,
+            "started_at": "2026-11-10T12:36:03.880Z",
+            "duration_ms": 17023,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S02",
             "action": "approval.allow",
             "status": "skipped",
-            "started_at": "2026-11-09T14:40:30.504Z",
-            "duration_ms": 62641,
+            "started_at": "2026-11-10T12:36:20.903Z",
+            "duration_ms": 62543,
             "detail": "没有出现工具审批卡"
           },
           {
             "id": "S03",
             "action": "approval.allow",
             "status": "skipped",
-            "started_at": "2026-11-09T14:41:33.145Z",
-            "duration_ms": 6529,
+            "started_at": "2026-11-10T12:37:23.446Z",
+            "duration_ms": 6600,
+            "detail": "没有出现工具审批卡"
+          },
+          {
+            "id": "F02-confirmation",
+            "action": "wait.optionCard",
+            "status": "ok",
+            "started_at": "2026-11-10T12:37:30.046Z",
+            "duration_ms": 5102,
+            "detail": null
+          },
+          {
+            "id": "F02-pause",
+            "action": "cloud.inspect",
+            "status": "ok",
+            "started_at": "2026-11-10T12:37:35.148Z",
+            "duration_ms": 4226,
+            "detail": null
+          },
+          {
+            "id": "F02-first",
+            "action": "cloud.inspect",
+            "status": "ok",
+            "started_at": "2026-11-10T12:37:39.374Z",
+            "duration_ms": 1931,
+            "detail": null
+          },
+          {
+            "id": "F02-first-check",
+            "action": "assert.observation",
+            "status": "ok",
+            "started_at": "2026-11-10T12:37:41.305Z",
+            "duration_ms": 2,
+            "detail": "Source query fields match the declared conditions"
+          },
+          {
+            "id": "F02-continue",
+            "action": "requirements.answer",
+            "status": "ok",
+            "started_at": "2026-11-10T12:37:41.307Z",
+            "duration_ms": 13079,
+            "detail": "Answered only the selected production interaction"
+          },
+          {
+            "id": "F02-final-approval",
+            "action": "approval.allow",
+            "status": "skipped",
+            "started_at": "2026-11-10T12:37:54.386Z",
+            "duration_ms": 6417,
             "detail": "没有出现工具审批卡"
           },
           {
             "id": "S04",
             "action": "wait.turn.complete",
             "status": "ok",
-            "started_at": "2026-11-09T14:41:39.674Z",
-            "duration_ms": 5065,
+            "started_at": "2026-11-10T12:38:00.803Z",
+            "duration_ms": 14426,
             "detail": "完成行 0 → 0（new-text-any）"
           },
           {
             "id": "F02-before",
             "action": "cloud.inspect",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:15.229Z",
+            "duration_ms": 5313,
+            "detail": null
+          },
+          {
+            "id": "F02-task",
+            "action": "assert.cloud",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:20.542Z",
+            "duration_ms": 2,
+            "detail": "All declared cloud conditions match source records"
+          },
+          {
+            "id": "F02-final",
+            "action": "cloud.inspect",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:20.544Z",
+            "duration_ms": 1833,
+            "detail": null
+          },
+          {
+            "id": "F02-final-check",
+            "action": "assert.observation",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:22.377Z",
+            "duration_ms": 1,
+            "detail": "Source query fields match the declared conditions"
+          },
+          {
+            "id": "S05",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:22.378Z",
+            "duration_ms": 1611,
+            "detail": "未发现可见的键盘窗口，无需收起"
+          },
+          {
+            "id": "S06",
+            "action": "scroll.down",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:23.989Z",
+            "duration_ms": 7544,
+            "detail": "下滑 2 次"
+          },
+          {
+            "id": "S07",
+            "action": "wait.settled",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:31.533Z",
+            "duration_ms": 3054,
+            "detail": null
+          },
+          {
+            "id": "S08",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:34.587Z",
+            "duration_ms": 1938,
+            "detail": "截图 01-single-card"
+          },
+          {
+            "id": "S08-card-check",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:36.525Z",
+            "duration_ms": 6,
+            "detail": "All declared UI conditions match the original checkpoint hierarchy"
+          },
+          {
+            "id": "S09",
+            "action": "tap.artifact",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:36.531Z",
+            "duration_ms": 3359,
+            "detail": "打开产物「novel-nightly-42816896984-1.txt」"
+          },
+          {
+            "id": "S10",
+            "action": "wait.settled",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:39.890Z",
+            "duration_ms": 3089,
+            "detail": null
+          },
+          {
+            "id": "S11",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:42.979Z",
+            "duration_ms": 2045,
+            "detail": "截图 02-latest-preview"
+          },
+          {
+            "id": "S11-preview-check",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:45.024Z",
+            "duration_ms": 3,
+            "detail": "All declared UI conditions match the original checkpoint hierarchy"
+          },
+          {
+            "id": "S12",
+            "action": "ui.systemBack",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:45.027Z",
+            "duration_ms": 1976,
+            "detail": "Sent one system Back key"
+          },
+          {
+            "id": "S13",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:47.003Z",
+            "duration_ms": 1944,
+            "detail": "截图 03-before-background"
+          },
+          {
+            "id": "S13-card-check",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:48.947Z",
+            "duration_ms": 3,
+            "detail": "All declared UI conditions match the original checkpoint hierarchy"
+          },
+          {
+            "id": "S14",
+            "action": "app.background",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:48.950Z",
+            "duration_ms": 4392,
+            "detail": "HarmonyOS HOME changed the actual focused application"
+          },
+          {
+            "id": "S15",
+            "action": "wait.sleep",
+            "status": "ok",
+            "started_at": "2026-11-10T12:38:53.342Z",
+            "duration_ms": 30003,
+            "detail": "等待 30000ms"
+          },
+          {
+            "id": "S16",
+            "action": "app.foreground",
+            "status": "ok",
+            "started_at": "2026-11-10T12:39:23.345Z",
+            "duration_ms": 4230,
+            "detail": "已核对前台 App 和可见的对话输入框"
+          },
+          {
+            "id": "S17",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T12:39:27.575Z",
+            "duration_ms": 1784,
+            "detail": "截图 04-after-foreground"
+          },
+          {
+            "id": "S17-card-check",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-10T12:39:29.359Z",
+            "duration_ms": 2,
+            "detail": "All declared UI conditions match the original checkpoint hierarchy"
+          },
+          {
+            "id": "F02-after",
+            "action": "cloud.inspect",
+            "status": "ok",
+            "started_at": "2026-11-10T12:39:29.361Z",
+            "duration_ms": 4160,
+            "detail": null
+          },
+          {
+            "id": "F02-binding",
+            "action": "assert.cloud",
+            "status": "ok",
+            "started_at": "2026-11-10T12:39:33.521Z",
+            "duration_ms": 4,
+            "detail": "All declared cloud conditions match source records"
+          },
+          {
+            "id": "S18",
+            "action": "wait.sleep",
+            "status": "ok",
+            "started_at": "2026-11-10T12:39:33.525Z",
+            "duration_ms": 10006,
+            "detail": "等待 10000ms"
+          },
+          {
+            "id": "S19",
+            "action": "wait.settled",
+            "status": "ok",
+            "started_at": "2026-11-10T12:39:43.531Z",
+            "duration_ms": 3120,
+            "detail": null
+          },
+          {
+            "id": "S20",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T12:39:46.651Z",
+            "duration_ms": 1939,
+            "detail": "截图 05-after-resync"
+          },
+          {
+            "id": "S20-card-check",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-10T12:39:48.590Z",
+            "duration_ms": 6,
+            "detail": "All declared UI conditions match the original checkpoint hierarchy"
+          },
+          {
+            "id": "S21",
+            "action": "tap.artifact",
+            "status": "ok",
+            "started_at": "2026-11-10T12:39:48.596Z",
+            "duration_ms": 3237,
+            "detail": "打开产物「novel-nightly-42816896984-1.txt」"
+          },
+          {
+            "id": "S22",
+            "action": "wait.settled",
+            "status": "ok",
+            "started_at": "2026-11-10T12:39:51.833Z",
+            "duration_ms": 3155,
+            "detail": null
+          },
+          {
+            "id": "S23",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T12:39:54.988Z",
+            "duration_ms": 2031,
+            "detail": "截图 06-restored-preview"
+          },
+          {
+            "id": "S23-preview-check",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-10T12:39:57.019Z",
+            "duration_ms": 2,
+            "detail": "All declared UI conditions match the original checkpoint hierarchy"
+          },
+          {
+            "id": "S24",
+            "action": "ui.systemBack",
+            "status": "ok",
+            "started_at": "2026-11-10T12:39:57.021Z",
+            "duration_ms": 1953,
+            "detail": "Sent one system Back key"
+          },
+          {
+            "id": "S25",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T12:39:58.974Z",
+            "duration_ms": 1925,
+            "detail": "截图 07-final-chat"
+          },
+          {
+            "id": "S25-card-check",
+            "action": "assert.ui",
+            "status": "ok",
+            "started_at": "2026-11-10T12:40:00.899Z",
+            "duration_ms": 3,
+            "detail": "All declared UI conditions match the original checkpoint hierarchy"
+          },
+          {
+            "id": "F02-private",
+            "action": "assert.archive",
+            "status": "ok",
+            "started_at": "2026-11-10T12:40:00.902Z",
+            "duration_ms": 84,
+            "detail": "Text evidence contains no detected credential or private-account patterns"
+          },
+          {
+            "id": "F02-original-path",
+            "action": "assert.observation",
             "status": "failed",
-            "started_at": "2026-11-09T14:41:44.739Z",
-            "duration_ms": 19222,
-            "detail": "[ENV_DOWN] cloud.inspect control failed before a verifiable receipt; private adapter errors were not recorded"
+            "started_at": "2026-11-10T12:40:00.986Z",
+            "duration_ms": 1923,
+            "detail": "Original source fields are missing: /firstPath, /path, /samePath"
           },
           {
             "id": "S-failure",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-09T14:42:03.961Z",
+            "started_at": "2026-11-10T12:40:02.909Z",
             "duration_ms": 0,
             "detail": null
           }
         ],
-        "screenshots": 2,
+        "screenshots": 9,
         "profiling_files": 1,
-        "run_id": "nightly-42636115442-1",
-        "commit": "26d98fd1cd567782fe686c2237051fc717dd6371",
-        "generated_at": "2026-11-09T14:42:05.691Z"
+        "run_id": "nightly-42816896984-1",
+        "commit": "576b1cee194f2d752f7b6dd1a4d5459a6b8165a9",
+        "generated_at": "2026-11-10T12:40:04.570Z"
       }
     },
     "DM-WF-MATH-01": {
