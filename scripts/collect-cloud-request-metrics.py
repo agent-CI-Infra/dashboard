@@ -255,6 +255,12 @@ REQUEST_SAMPLE_FIELDS = (
 )
 ARRAY_METRICS = ("ttft", "tpot", "tool")
 COHORT_PHASES = ("gateway", "first_token", "react", "answer_tail", "workswarm", "overhead")
+# The slow tail is a share of the day's requests. Only REQUEST_DETAIL_LIMIT
+# rows are published; they exist to locate a request, not to mirror the log.
+SLOW_TAIL_RATIO = 0.05
+REQUEST_DETAIL_LIMIT = 50
+REQUEST_ID_INDEX = 5
+TIMEOUT_RID_LIMIT = 200
 
 
 def number(value):
@@ -331,6 +337,72 @@ def metric_anomaly(values, baseline):
     return record
 
 
+def request_rows(day):
+    """One row per request with its phase breakdown and opaque identifier.
+
+    Only timing values and request ids are kept; message content never reaches
+    this collector.
+    """
+    rows = []
+    for sample in day.get("samples") or []:
+        if not isinstance(sample, (list, tuple)) or len(sample) < 5:
+            continue
+        gateway = number(sample[0])
+        if gateway is None:
+            continue
+        rid = sample[REQUEST_ID_INDEX] if len(sample) > REQUEST_ID_INDEX else None
+        row = {
+            "request_id": rid if isinstance(rid, str) and rid else None,
+            "gateway": gateway,
+            "first_token": number(sample[1]),
+            "answer_first": number(sample[2]),
+            "react": number(sample[3]),
+            "workswarm": number(sample[4]),
+        }
+        for key in ("first_token", "answer_first", "react", "workswarm"):
+            # A phase cannot be longer than its request; out-of-order markers
+            # are missing data, not a huge phase.
+            if row[key] is not None and row[key] > gateway:
+                row[key] = None
+        rows.append(row)
+    return rows
+
+
+def latency_summary(rows):
+    """Maximum latency and the slowest 5% of requests, with identifiers."""
+    ordered = sorted(rows, key=lambda row: (row["gateway"], row["request_id"] or ""), reverse=True)
+    if not ordered:
+        return {"n": 0, "max_ms": None, "slow_count": 0, "slow_threshold_ms": None, "slow_requests": []}
+    slow_count = math.ceil(len(ordered) * SLOW_TAIL_RATIO)
+    slow = ordered[:slow_count]
+    return {
+        "n": len(ordered),
+        "max_ms": round(ordered[0]["gateway"], 1),
+        "max_request": ordered[0],
+        "slow_count": slow_count,
+        "slow_threshold_ms": round(slow[-1]["gateway"], 1),
+        "slow_requests": slow[:REQUEST_DETAIL_LIMIT],
+    }
+
+
+def timeout_summary(day, rows):
+    """Timed-out request count and the request ids that can be looked up."""
+    categories = day.get("error_categories") if isinstance(day.get("error_categories"), dict) else {}
+    count = categories.get("timeout") if isinstance(categories.get("timeout"), int) else 0
+    by_id = {row["request_id"]: row for row in rows if row.get("request_id")}
+    items = []
+    for rid in day.get("timeout_rids") or []:
+        if not isinstance(rid, str) or not rid:
+            continue
+        items.append(by_id.get(rid) or {"request_id": rid})
+    items.sort(key=lambda row: row.get("gateway") if number(row.get("gateway")) is not None else -1, reverse=True)
+    return {
+        "count": count,
+        "records": len(items),
+        "requests": items[:REQUEST_DETAIL_LIMIT],
+    }
+
+
 def cohort_analysis(day, threshold):
     """Compare the phase profile of slow requests with the rest of the day.
 
@@ -405,9 +477,21 @@ def annotate_anomalies(days):
     ordered = sorted(days, key=lambda day: day["date"])
     complete = [day for day in ordered if not day.get("partial")]
     for day in ordered:
+        rows = request_rows(day)
+        # Maximum latency and the slow/timeout request tables do not need a
+        # baseline; they stay available on the first collected day too.
+        latency = latency_summary(rows)
+        timeouts = timeout_summary(day, rows)
+        categories = day.get("error_categories") if isinstance(day.get("error_categories"), dict) else {}
         refs = [ref for ref in complete if ref["date"] < day["date"]][-ANOMALY_WINDOW_DAYS:]
         if not refs:
-            day["anomaly"] = {"available": False, "reason": "no_complete_baseline"}
+            day["anomaly"] = {
+                "available": False,
+                "reason": "no_complete_baseline",
+                "latency": latency,
+                "timeouts": timeouts,
+                "error_categories": categories,
+            }
             continue
 
         metrics = {}
@@ -431,6 +515,9 @@ def annotate_anomalies(days):
                 "min_samples": ANOMALY_MIN_SAMPLES,
             },
             "metrics": metrics,
+            "latency": latency,
+            "timeouts": timeouts,
+            "error_categories": categories,
         }
         gateway = metrics["gateway"]
         if gateway.get("baseline_p95") is not None:
@@ -458,6 +545,7 @@ def pool(results):
                 "ttft": [], "tpot": [], "first_token": [], "answer_first": [], "react": [],
                 "tool": [], "tool_failed": 0,
                 "samples": [],
+                "error_categories": {}, "timeout_rids": set(),
                 # One-way network metrics arrive with a later gateway release;
                 # the keys are carried through now so the cards light up as
                 # soon as an aggregator version emits them.
@@ -476,6 +564,11 @@ def pool(results):
             target["tool"].extend(day.get("tool") or [])
             target["tool_failed"] += day.get("tool_failed") or 0
             target["samples"].extend(day.get("samples") or [])
+            for category, count in (day.get("error_categories") or {}).items():
+                if isinstance(count, int) and count > 0:
+                    target["error_categories"][category] = target["error_categories"].get(category, 0) + count
+            target["timeout_rids"].update(
+                rid for rid in day.get("timeout_rids") or [] if isinstance(rid, str) and rid)
             for key in ("uplink_send", "downlink_first_text", "downlink_terminal"):
                 target[key].extend(day.get(key) or [])
             tokens = day.get("tokens") or {}
@@ -510,6 +603,9 @@ def pool(results):
             # thinking/tool phase between the first text chunk and that answer.
             "answer_first": stats(rec["answer_first"], 1),
             "react": stats(rec["react"], 1),
+            "error_categories": dict(sorted(rec["error_categories"].items(),
+                                             key=lambda item: (-item[1], item[0]))),
+            "timeout_rids": sorted(rec["timeout_rids"])[:TIMEOUT_RID_LIMIT],
             # Per-request rows are used by annotate_anomalies below and removed
             # before the document is returned.
             "samples": rec["samples"],
@@ -575,8 +671,10 @@ def merge(previous, fresh):
     defs["downlink_first_text"] = "端侧接收口径：网关发出首个文本帧 → 客户端 recv 返回（单程）"
     defs["downlink_terminal"] = "端侧接收口径：网关发出终态帧 → 客户端 recv 返回（单程）"
     defs["anomaly"] = "基线 P95 = 该日之前最近 7 个完整日的合并样本 P95（每项至少 20 个样本）；异常 = 当日样本严格大于基线 P95；异常请求 = 请求耗时超过基线 P95 的请求"
+    defs["timeout"] = "llm_call_error 中含 timeout / timed out / deadline exceeded 的失败调用"
+    defs["slow_requests"] = "按请求耗时排序的最慢 5% 请求；公开近 7 天内的 request_id、各阶段耗时与状态，用于在网关定位单条请求"
     merged["definitions"] = defs
-    merged["anomaly_version"] = 1
+    merged["anomaly_version"] = 2
     scope = dict(previous.get("metric_scope") or {})
     scope["valid_calls"] = sum(day.get("calls", {}).get("success", 0) for day in ordered)
     if "noise" in fresh:

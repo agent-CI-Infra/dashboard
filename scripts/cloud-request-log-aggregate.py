@@ -55,6 +55,11 @@ TOK_IN = re.compile(r"'input_tokens':\s*(\d+)")
 TOK_OUT = re.compile(r"'output_tokens':\s*(\d+)")
 TOK_ALL = re.compile(r"'total_tokens':\s*(\d+)")
 MODEL = re.compile(r"'model_name':\s*'([^']+)'")
+# Provider codes must be whole numbers; a request id or timestamp containing
+# 429 or 81011 is not an error code.
+CODE_429 = re.compile(r"\b429\b")
+CODE_CONTENT_SAFETY = re.compile(r"\b81011\b")
+CODE_INVALID_REQUEST = re.compile(r"\b81001\b")
 
 
 def stamp(line):
@@ -76,6 +81,26 @@ def day_of(ts):
     return datetime.datetime.fromtimestamp(ts, CST).strftime("%Y-%m-%d")
 
 
+def error_category(line):
+    """Classify one llm_call_error line without keeping its content."""
+    text = line.lower()
+    if "timeout" in text or "timed out" in text or "deadline exceeded" in text:
+        return "timeout"
+    if "budget" in text and "exceed" in text:
+        return "budget"
+    if "rate_limit" in text or "rate limit" in text or CODE_429.search(text):
+        return "rate_limit"
+    if ("sensitive" in text or CODE_CONTENT_SAFETY.search(text) or "content_policy" in text
+            or "content filter" in text or "content_filter" in text):
+        return "content_blocked"
+    if "invalid_request" in text or "invalid request" in text or CODE_INVALID_REQUEST.search(text):
+        return "invalid_request"
+        return "invalid_request"
+    if "permission_denied" in text or "permission denied" in text:
+        return "permission_denied"
+    return "other"
+
+
 days = {}
 requests = {}
 first_ts = None
@@ -89,8 +114,11 @@ def bucket(day):
         "tool": [], "tool_failed": 0,
         # Per-request phase values, aligned in one row so the collector can
         # identify which phase makes a request an outlier. Row layout:
-        # [gateway, first_token, answer_first, react, workswarm].
+        # [gateway, first_token, answer_first, react, workswarm, request_id].
         "samples": [],
+        # Failed calls grouped by cause, plus the ids of timed-out requests so
+        # the board can point an operator at the exact request.
+        "error_categories": {}, "timeout_rids": [],
         # Client-observed one-way network samples arrive with a later gateway
         # release; keep the buckets so the collector contract is already in
         # place when the log markers are added.
@@ -112,6 +140,7 @@ with open(LOG, encoding="utf-8", errors="ignore") as fh:
         rec = bucket(day_of(ts))
 
         at = REQ.search(line)
+        rid = None
         if at:
             rid = line[at.end():].split()[0].strip(",;")
             if rid.startswith("digitalmate-"):
@@ -159,6 +188,10 @@ with open(LOG, encoding="utf-8", errors="ignore") as fh:
 
         if "llm_call_error" in line:
             rec["failed"] += 1
+            category = error_category(line)
+            rec["error_categories"][category] = rec["error_categories"].get(category, 0) + 1
+            if category == "timeout" and rid and rid.startswith("digitalmate-"):
+                rec["timeout_rids"].append(rid)
 
 # Tool durations are one JSON record per line, written by the product adapter.
 # A record can be half-written while the process is appending; parse failures
@@ -224,8 +257,9 @@ for rid, (g0, g1, w0, w1, t0, a1) in requests.items():
         round((a1 - g0) * 1000.0, 1) if a1 is not None else None,
         round((a1 - t0) * 1000.0, 1) if t0 is not None and a1 is not None and a1 >= t0 else None,
         round((w1 - w0) * 1000.0, 1) if w0 is not None and w1 is not None else None,
+        rid,
     ]
-    if any(value is not None for value in sample):
+    if any(value is not None for value in sample[:5]):
         rec["samples"].append(sample)
 
 out = []
@@ -243,6 +277,8 @@ for day in sorted(days):
         "answer_first": rec["answer_first"],
         "react": rec["react"],
         "samples": rec["samples"],
+        "error_categories": rec["error_categories"],
+        "timeout_rids": sorted(set(rec["timeout_rids"])),
         "uplink_send": rec["uplink_send"],
         "downlink_first_text": rec["downlink_first_text"],
         "downlink_terminal": rec["downlink_terminal"],

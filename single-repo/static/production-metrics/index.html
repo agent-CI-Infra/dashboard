@@ -54,7 +54,7 @@
           <div>
             <p class="eyebrow">模型侧 · 现网模型请求</p>
             <h2>模型请求指标</h2>
-            <p class="section-note single-line">按模型 × Asia/Shanghai 自然日聚合：请求数与失败率、请求耗时、TTFT / TPOT、Token。模型对比列出所选时间范围内的全部模型；下方汇总、曲线与明细只针对当前所选模型。</p>
+            <p class="section-note single-line">按模型 × Asia/Shanghai 自然日聚合：请求数与失败率、失败原因、超时与最慢 5% 请求、请求耗时、TTFT / TPOT、Token。模型对比列出所选时间范围内的全部模型；下方汇总、曲线与明细只针对当前所选模型。</p>
           </div>
         </header>
 
@@ -111,6 +111,10 @@
           </details>
         </section>
 
+        <section class="card" id="model-failure-card">
+          <div id="model-failure"><p class="empty">加载中…</p></div>
+        </section>
+
         <section class="card">
           <div class="card-head">
             <h2>模型侧统计明细</h2>
@@ -132,7 +136,7 @@
           <div>
             <p class="eyebrow">云侧 Agent</p>
             <h2>云侧 Agent 调用指标</h2>
-            <p class="section-note">请求耗时（网关受理→响应结束）、首吐字（网关受理→首个文本 chunk）、答案首吐字（网关受理→首个答案 chunk）、ReAct 阶段（首个文本 chunk→首个答案 chunk，即思考与工具耗时）、工具调用耗时（tool_call→tool_result）、上行 send / 下行首文本 / 下行终态单程（端侧采样、依赖两侧时钟同步的网络单程）、模型调用 TTFT / TPOT、调用数与 Token；并基于近 7 个完整日的基线 P95 给出异常请求分析。首吐字 / 答案首吐字 / ReAct 与网络单程按请求或消息统计，工具耗时按工具调用统计，TTFT / TPOT 按模型调用统计，与上方模型侧口径相互独立。</p>
+            <p class="section-note">请求耗时（网关受理→响应结束）、首吐字（网关受理→首个文本 chunk）、答案首吐字（网关受理→首个答案 chunk）、ReAct 阶段（首个文本 chunk→首个答案 chunk，即思考与工具耗时）、工具调用耗时（tool_call→tool_result）、上行 send / 下行首文本 / 下行终态单程（端侧采样、依赖两侧时钟同步的网络单程）、模型调用 TTFT / TPOT、调用数与 Token；并基于近 7 个完整日的基线 P95 给出异常请求分析，记录最大时延与超时请求的数量及 request_id，便于到网关定位原始请求。首吐字 / 答案首吐字 / ReAct 与网络单程按请求或消息统计，工具耗时按工具调用统计，TTFT / TPOT 按模型调用统计，与上方模型侧口径相互独立。</p>
           </div>
         </header>
 

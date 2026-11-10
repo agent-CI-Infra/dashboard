@@ -202,11 +202,11 @@ test('separate TPOT chart renders estimated values and tooltip', () => {
     extract('function latencyTrendChart(points', 'function tokenTrendChart(') +
     '; globalThis.chart=tpotTrendChart;', c);
   const html = c.chart([{date:'2026-11-04',tpot_estimated_ms:2.5}], {});
-  assert.match(html, /模型平均 TPOT 趋势（ms\/token）/);
-  assert.match(html, /模型平均 TPOT P50 区间/);
+  assert.match(html, /模型 TPOT（ms\/token）/);
+  assert.match(html, /P50 区间/);
   assert.doesNotMatch(html, /TPOT 加权（流式）|TPOT P50（流式）|TPOT P95（流式）/);
   assert.match(html, /latency-layer tpot-est/);
-  assert.match(html, /TPOT 趋势（ms\/token）/);
+  assert.match(html, /模型 TPOT（ms\/token）/);
   assert.match(html, /2.5 ms\/token/);
 });
 
@@ -298,8 +298,8 @@ test('TTFT chart has only estimated mean and request percentiles', () => {
     const fmtAxis=String; const fmtDuration=(v)=>v+' ms'; const fmtTpot=String; const pointLabel=()=>''; const esc=String;` +
     extract('function latencyTrendChart(points', 'function tokenTrendChart(') + ';globalThis.chart=ttftTrendChart;', c);
   const html=c.chart([{date:'2026-11-05',ttft_estimated_ms:2000,ttft_estimated_p50_ms:1800,ttft_estimated_p95_ms:6000}],{});
-  assert.match(html,/模型平均 TTFT 趋势（s）/); assert.match(html,/<span>模型平均 TTFT<\/span>/);
-  assert.match(html,/模型平均 TTFT P50 区间/); assert.match(html,/模型平均 TTFT P95 区间/);
+  assert.match(html,/模型 TTFT（s）/); assert.match(html,/<span>均值<\/span>/);
+  assert.match(html,/P50 区间/); assert.match(html,/P95 区间/);
   assert.doesNotMatch(html,/TTFT（流式）/); assert.match(html,/1800 ms/);
 });
 

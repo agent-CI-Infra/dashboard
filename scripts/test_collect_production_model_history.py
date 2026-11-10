@@ -15,13 +15,12 @@ spec.loader.exec_module(collector)
 
 class CollectionTests(unittest.TestCase):
     def test_publishes_only_aggregates_and_reports_unknown_stream_as_estimate(self):
-        rows = [{'model_group': 'test', 'model': 'provider/test', 'status': 'success', 'startTime': '2026-11-03T00:00:00+00:00', 'completionStartTime': '2026-11-03T00:00:01+00:00', 'endTime': '2026-11-03T00:00:02+00:00', 'request_duration_ms': 2000, 'prompt_tokens': 10, 'completion_tokens': 4, 'request_id': 'private-id', 'messages': 'private-content'}]
+        rows = [{'model_group': 'test', 'model': 'provider/test', 'status': 'success', 'startTime': '2026-11-03T00:00:00+00:00', 'completionStartTime': '2026-11-03T00:00:01+00:00', 'endTime': '2026-11-03T00:00:02+00:00', 'request_duration_ms': 2000, 'prompt_tokens': 10, 'completion_tokens': 4, 'messages': 'private-content'}]
         with tempfile.TemporaryDirectory() as d, patch.object(collector, 'fetch_window', return_value=rows), patch.dict(os.environ, {'PRODUCTION_GATEWAY_KEY': 'dummy'}), patch.object(sys, 'argv', ['collector', d]), contextlib.redirect_stdout(io.StringIO()):
             collector.main()
             raw = (Path(d) / 'production-model-history.json').read_text(encoding='utf-8')
             point = next(iter(json.loads(raw)['cases'].values()))['points'][0]
             metrics = point['benchmark_models'][0]
-            self.assertNotIn('private-id', raw)
             self.assertNotIn('private-content', raw)
             # Unknown streaming is never mixed into the strict TTFT mean.
             self.assertIsNone(metrics['ttft_avg_ms'])
@@ -260,6 +259,91 @@ class CollectionTests(unittest.TestCase):
         with patch.object(collector, 'fetch_rows_once', side_effect=fetch), patch.object(collector.time, 'sleep'):
             with self.assertRaises(collector.ChangingPagination):
                 collector.fetch_rows('dummy', start, end)
+
+    def test_failure_reasons_timeouts_and_slowest_requests_are_published(self):
+        rows = [
+            {'request_id': 'ok-1', 'status': 'success', 'request_duration_ms': 100,
+             'startTime': '2026-11-10T01:00:00Z', 'metadata': {'litellm_call_id': 'call-ok'}},
+            {'request_id': 'blocked-1', 'status': 'failure', 'request_duration_ms': 50,
+             'startTime': '2026-11-10T01:01:00Z',
+             'metadata': {'error_information': {
+                 'error_message': 'ModelArts.81011 Input text May contain sensitive information'}}},
+            {'request_id': 'budget-1', 'status': 'failed', 'request_duration_ms': 60,
+             'startTime': '2026-11-10T01:02:00Z',
+             'metadata': {'error_information': {'normalized_error': '429_BUDGET_EXCEEDED'}}},
+            {'request_id': 'slow-1', 'status': 'failure', 'request_duration_ms': 900000,
+             'startTime': '2026-11-10T01:03:00Z',
+             'metadata': {'litellm_call_id': 'call-slow', 'error_information': {
+                 'error_class': 'Timeout', 'error_message': 'Request timed out'}}},
+        ]
+        point = collector.aggregate_point(rows, '2026-11-10', 'provider/test', include_details=True)
+        self.assertEqual(point['failure_reasons'],
+                         {'budget': 1, 'content_blocked': 1, 'timeout': 1})
+        self.assertEqual(point['timeout_count'], 1)
+        self.assertEqual(point['latency_max_ms'], 900000)
+        self.assertEqual(point['latency_max_request']['request_id'], 'slow-1')
+        # ceil(4 * 5%) = 1: only the slowest request is recorded.
+        self.assertEqual(point['slow_count'], 1)
+        self.assertEqual([item['request_id'] for item in point['slow_requests']], ['slow-1'])
+        self.assertEqual(point['slow_requests'][0]['call_id'], 'call-slow')
+        self.assertEqual(point['slow_requests'][0]['reason'], 'timeout')
+        self.assertEqual([item['request_id'] for item in point['timeout_requests']], ['slow-1'])
+        # Non-slow identifiers are not published with the detail tables.
+        self.assertNotIn('blocked-1', str(point['slow_requests']))
+        self.assertNotIn('ok-1', str(point['slow_requests']))
+
+    def test_failure_category_ignores_codes_embedded_in_identifiers(self):
+        def category(message):
+            return collector.failure_category({
+                'status': 'failure',
+                'metadata': {'error_information': {'error_message': message}},
+            })
+        self.assertEqual(category('ModelArts.81011 sensitive content'), 'content_blocked')
+        self.assertEqual(category('HTTP 429 Too Many Requests'), 'rate_limit')
+        self.assertEqual(category('request abcd429ef returned no content'), 'other')
+        self.assertNotEqual(category('trace 810011 left the region'), 'content_blocked')
+        self.assertNotEqual(category('trace 810010 left the region'), 'invalid_request')
+
+    def test_slow_tail_is_the_five_percent_cohort_with_a_publish_cap(self):
+        rows = [{'request_id': f'r{index}', 'status': 'success',
+                 'startTime': '2026-11-10T01:00:00Z', 'request_duration_ms': index}
+                for index in range(1, 101)]
+        point = collector.aggregate_point(rows, '2026-11-10', 'provider/test', include_details=True)
+        self.assertEqual(point['slow_count'], 5)
+        self.assertEqual(point['slow_threshold_ms'], 96)
+        self.assertEqual([item['duration_ms'] for item in point['slow_requests']],
+                         [100, 99, 98, 97, 96])
+        self.assertLessEqual(len(point['slow_requests']), collector.REQUEST_DETAIL_LIMIT)
+
+    def test_details_are_pruned_but_counts_survive(self):
+        cases = {'PROD-a': {'title': 'a', 'points': [
+            {'date': '2026-11-01', 'failure_reasons': {'timeout': 1}, 'timeout_count': 1,
+             'latency_max_ms': 10, 'slow_requests': [{'request_id': 'old'}],
+             'timeout_requests': [{'request_id': 'old'}]},
+            {'date': '2026-11-09', 'failure_reasons': {}, 'timeout_count': 0,
+             'latency_max_ms': 5, 'slow_requests': [{'request_id': 'new'}],
+             'timeout_requests': []},
+        ]}}
+        collector.prune_request_details(cases, '2026-11-04')
+        old, new = cases['PROD-a']['points']
+        self.assertNotIn('slow_requests', old)
+        self.assertNotIn('timeout_requests', old)
+        self.assertEqual(old['failure_reasons'], {'timeout': 1})
+        self.assertEqual(old['timeout_count'], 1)
+        self.assertEqual(new['slow_requests'], [{'request_id': 'new'}])
+
+    def test_capped_window_is_split_until_pages_fit(self):
+        start = collector.datetime(2026, 11, 4, tzinfo=collector.timezone.utc)
+        end = start + collector.timedelta(hours=4)
+        def fetch(_, a, b):
+            if (b - a) >= collector.timedelta(hours=4):
+                raise collector.CappedWindow('capped')
+            return [{'request_id': f'{a:%H%M}-{b:%H%M}'}]
+        with patch.object(collector, 'fetch_rows_once', side_effect=fetch):
+            rows = collector.fetch_rows('dummy', start, end)
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0]['request_id'], '0000-0200')
+        self.assertEqual(rows[1]['request_id'], '0200-0400')
 
     def test_merge_history_replaces_fresh_days_and_prunes_aged_points(self):
         today = collector.datetime.now(collector.SH).date()

@@ -15,6 +15,14 @@ the digitalmate/e2e-performance-history@1 schema with one case per model:
                         the same clock window on earlier days
     query_count         number of calls that day (all statuses)
     failed_queries      calls whose status is a failure
+    failure_reasons     failure counts keyed by cause (timeout, budget, rate_limit,
+                        content_blocked, invalid_request, permission_denied, other)
+    timeout_count       failed calls whose gateway error says timeout
+    latency_max_ms      slowest request of the day (any status) and its identifiers
+    slow_count          size of the slowest 5% cohort
+    slow_requests       request_id / litellm_call_id of the slowest requests;
+                        kept for the last REQUEST_DETAIL_DAYS days only
+    timeout_requests    identifiers of the timed-out requests, same retention
     status              FAILED when failures outnumber successes
     benchmark_models[0] per-day TTFT/TPOT/P50/P95/Token stats (physical model)
 
@@ -57,7 +65,7 @@ from pathlib import Path
 
 BASE = 'https://onlineswarm.openjiuwen.com:31474'
 SCHEMA = 'digitalmate/e2e-performance-history@1'
-METRICS_VERSION = 6
+METRICS_VERSION = 7
 RUN_ID = 'prod-adx-jiuwen'
 P50_MIN_SAMPLES = 20
 P95_MIN_SAMPLES = 20
@@ -66,12 +74,31 @@ TPOT_MIN_MS = 0.1
 HISTORY_DAYS = 35
 SH = timezone(timedelta(hours=8))
 FAILURE_STATUSES = ('failure', 'failed', 'error')
+# The slow tail is a share of the day's requests; only this many rows are
+# published, because the table exists to locate requests, not to mirror the log.
+SLOW_TAIL_RATIO = 0.05
+REQUEST_DETAIL_DAYS = 7
+REQUEST_DETAIL_LIMIT = 50
 PAGINATION_ATTEMPTS = 3
 MIN_SPLIT_WINDOW = timedelta(minutes=15)
+# Match provider codes as whole numbers: an id or timestamp that happens to
+# contain 429 or 81011 must not classify an error.
+CODE_429 = re.compile(r'\b429\b')
+CODE_CONTENT_SAFETY = re.compile(r'\b81011\b')
+CODE_INVALID_REQUEST = re.compile(r'\b81001\b')
 
 
 class ChangingPagination(ValueError):
     """The gateway's paginated result changed while it was being read."""
+
+
+class CappedWindow(ValueError):
+    """The gateway refuses to enumerate a window with too many rows.
+
+    The UI endpoint caps a single query at a fixed number of rows and reports
+    total_is_capped instead of paginating further. A busy day can exceed that
+    cap, so the window has to be split before its rows can be read completely.
+    """
 
 
 def fetch_json(path, key, params=None):
@@ -122,6 +149,70 @@ def metric_histogram(values):
 
 def status_of(row):
     return str(row.get('status') or '').lower()
+
+
+def failure_information(row):
+    metadata = row.get('metadata') if isinstance(row.get('metadata'), dict) else {}
+    info = metadata.get('error_information')
+    return info if isinstance(info, dict) else {}
+
+
+def failure_category(row):
+    """Map one failed gateway row to a stable cause key.
+
+    LiteLLM records the provider error under metadata.error_information; the
+    row-level error fields are a fallback for older log shapes. Content safety
+    blocks also arrive as HTTP 403, so that check must precede the generic
+    permission case.
+    """
+    if status_of(row) not in FAILURE_STATUSES:
+        return None
+    info = failure_information(row)
+    parts = [info.get(key) for key in ('normalized_error', 'error_class', 'error_message', 'error_code')]
+    parts.extend(row.get(key) for key in ('error_message', 'error_code'))
+    text = ' '.join(str(value) for value in parts if value).lower()
+    if 'timeout' in text or 'timed out' in text or 'deadline exceeded' in text:
+        return 'timeout'
+    if 'budget_exceeded' in text or 'budget exceeded' in text:
+        return 'budget'
+    if 'rate_limit' in text or 'rate limit' in text or CODE_429.search(text):
+        return 'rate_limit'
+    if ('sensitive' in text or CODE_CONTENT_SAFETY.search(text) or 'content_policy' in text
+            or 'content filter' in text or 'content_filter' in text):
+        return 'content_blocked'
+    if 'invalid_request' in text or 'invalid request' in text or CODE_INVALID_REQUEST.search(text):
+        return 'invalid_request'
+    if 'permission_denied' in text or 'permission denied' in text:
+        return 'permission_denied'
+    return 'other'
+
+
+def request_duration(row):
+    value = row.get('request_duration_ms')
+    if isinstance(value, bool):
+        return None
+    try:
+        value = float(value)
+    except (TypeError, ValueError):
+        return None
+    return value if math.isfinite(value) and value >= 0 else None
+
+
+def request_detail(row):
+    """The identifiers needed to find one request in the gateway console.
+
+    Only opaque request identifiers and timing/status fields are published;
+    prompts, messages and user identifiers never leave the collector.
+    """
+    metadata = row.get('metadata') if isinstance(row.get('metadata'), dict) else {}
+    return {
+        'request_id': str(row.get('request_id') or '') or None,
+        'call_id': str(metadata.get('litellm_call_id') or '') or None,
+        'start_time': row.get('startTime'),
+        'duration_ms': rounded(request_duration(row)),
+        'status': str(row.get('status') or ''),
+        'reason': failure_category(row),
+    }
 
 
 def stream_state(row):
@@ -183,8 +274,10 @@ def fetch_rows_once(key, start, end):
     first = fetch_json('/spend/logs/ui', key, {**window, 'page': 1, 'page_size': page_size})
     total_pages = first.get('total_pages')
     total = first.get('total')
+    if first.get('total_is_capped'):
+        raise CappedWindow('Gateway caps this window before all rows are returned')
     if (not isinstance(total_pages, int) or not 0 <= total_pages <= 2000
-            or not isinstance(total, int) or total < 0 or first.get('total_is_capped')
+            or not isinstance(total, int) or total < 0
             or not isinstance(first.get('data'), list)):
         raise ValueError('Invalid or oversized gateway pagination')
     rows = list(first.get('data', []))
@@ -203,27 +296,34 @@ def fetch_rows_once(key, start, end):
 
 
 def fetch_rows(key, start, end):
-    """Retry a complete window; split persistently changing windows, never publish partial pages."""
+    """Read a complete window; split changing or capped windows, never publish partial pages."""
+    last_error = None
     for attempt in range(PAGINATION_ATTEMPTS):
         try:
             return fetch_rows_once(key, start, end)
-        except ChangingPagination:
+        except CappedWindow as error:
+            # Retrying cannot help: the gateway will cap the same window again.
+            last_error = error
+            break
+        except ChangingPagination as error:
+            last_error = error
             if attempt + 1 < PAGINATION_ATTEMPTS:
                 print(f'Gateway pagination changed for {start:%Y-%m-%d %H:%M:%S}..'
                       f'{end:%Y-%m-%d %H:%M:%S} UTC; retrying the whole window '
                       f'({attempt + 1}/{PAGINATION_ATTEMPTS}).', flush=True)
                 time.sleep(attempt + 1)
                 continue
-            if end - start < MIN_SPLIT_WINDOW * 2:
-                raise
+            break
 
+    if end - start < MIN_SPLIT_WINDOW * 2:
+        raise last_error or ChangingPagination('Cannot split gateway window')
     # API times are serialized at second precision; split on a whole second so
     # adjacent windows overlap only at their shared boundary.
     midpoint = (start + (end - start) / 2).replace(microsecond=0)
     if midpoint <= start or midpoint >= end:
-        raise ChangingPagination('Cannot safely split changing gateway window')
-    print(f'Splitting changing gateway window {start:%Y-%m-%d %H:%M:%S}..'
-          f'{end:%Y-%m-%d %H:%M:%S} UTC.', flush=True)
+        raise last_error or ChangingPagination('Cannot safely split gateway window')
+    print(f'Splitting gateway window {start:%Y-%m-%d %H:%M:%S}..'
+          f'{end:%Y-%m-%d %H:%M:%S} UTC ({last_error}).', flush=True)
     combined = {}
     for row in fetch_rows(key, start, midpoint) + fetch_rows(key, midpoint, end):
         request_id = row['request_id']
@@ -276,6 +376,22 @@ def load_previous_history(path):
     return doc
 
 
+def prune_request_details(cases, keep_from_date):
+    """Drop request-identifier tables from days outside the detail window.
+
+    Counts, causes and the maximum-duration summary stay on every retained day,
+    so a 30-day view keeps its failure trend without carrying identifiers for
+    requests that are already hard to find in the gateway UI.
+    """
+    for case in cases.values():
+        for point in case.get('points') or []:
+            date = point.get('date')
+            if isinstance(date, str) and date < keep_from_date:
+                point.pop('slow_requests', None)
+                point.pop('timeout_requests', None)
+    return cases
+
+
 def merge_history(previous_cases, fresh_cases, cutoff_date):
     """Merge freshly collected days into the published case history.
 
@@ -306,8 +422,14 @@ def merge_history(previous_cases, fresh_cases, cutoff_date):
     }
 
 
-def aggregate_point(day_rows, date, physical, partial_day=None):
-    """Aggregate one (case, Asia/Shanghai day) into a history point."""
+def aggregate_point(day_rows, date, physical, partial_day=None, include_details=True):
+    """Aggregate one (case, Asia/Shanghai day) into a history point.
+
+    include_details controls only the request-identifier tables; counts and the
+    maximum duration stay on every retained day so the range view keeps its
+    failure and latency summaries. Details are pruned after merge by
+    prune_request_details.
+    """
     durations = []
     success_rows = []
     failed_rows = []
@@ -324,6 +446,26 @@ def aggregate_point(day_rows, date, physical, partial_day=None):
         else:
             unknown += 1
     failed = len(failed_rows)
+    failure_reasons = defaultdict(int)
+    timeout_rows = []
+    for row in failed_rows:
+        category = failure_category(row) or 'other'
+        failure_reasons[category] += 1
+        if category == 'timeout':
+            timeout_rows.append(row)
+
+    # Slow-tail and maximum-latency analysis spans all statuses: a timed-out
+    # request is often the slowest row of the day and must not disappear just
+    # because it failed.
+    timed_rows = []
+    for row in day_rows:
+        duration = request_duration(row)
+        if duration is not None:
+            timed_rows.append((duration, row))
+    timed_rows.sort(key=lambda item: (item[0], str(item[1].get('request_id') or '')), reverse=True)
+    slow_count = math.ceil(len(timed_rows) * SLOW_TAIL_RATIO) if timed_rows else 0
+    slow_rows = timed_rows[:slow_count]
+    max_row = timed_rows[0][1] if timed_rows else None
 
     ttft_strict = []
     ttft_estimated = []
@@ -430,7 +572,7 @@ def aggregate_point(day_rows, date, physical, partial_day=None):
         'failed_token_sample_count': failed_samples,
     }
     last_end = max((dt for r in day_rows if (dt := parse_dt(r.get('endTime'))) is not None), default=None)
-    return {
+    point = {
         'date': date,
         'status': 'UNKNOWN' if unknown else ('FAILED' if failed > len(success_rows) else 'COMPLETED'),
         'partial': date == partial_day,
@@ -447,9 +589,22 @@ def aggregate_point(day_rows, date, physical, partial_day=None):
         'failed_queries': failed,
         'unknown_status_count': unknown,
         'blocked_queries': 0,
+        'failure_reasons': dict(sorted(failure_reasons.items(), key=lambda item: (-item[1], item[0]))),
+        'timeout_count': len(timeout_rows),
+        'latency_max_ms': rounded(timed_rows[0][0]) if timed_rows else None,
+        'latency_max_request': request_detail(max_row) if max_row is not None else None,
+        'slow_count': slow_count,
+        'slow_threshold_ms': rounded(slow_rows[-1][0]) if slow_rows else None,
         'hours': [hours[hour] for hour in sorted(hours)],
         'benchmark_models': [benchmark],
     }
+    if include_details:
+        point['slow_requests'] = [request_detail(row) for _, row in slow_rows[:REQUEST_DETAIL_LIMIT]]
+        point['timeout_requests'] = [
+            request_detail(row) for row in sorted(
+                timeout_rows, key=lambda row: request_duration(row) or 0, reverse=True)[:REQUEST_DETAIL_LIMIT]
+        ]
+    return point
 
 
 def main():
@@ -474,6 +629,7 @@ def main():
     end = datetime.now(timezone.utc).replace(microsecond=0)
     today = end.astimezone(SH).replace(hour=0, minute=0, second=0, microsecond=0)
     partial_day = end.astimezone(SH).date().isoformat()
+    detail_from = (end.astimezone(SH).date() - timedelta(days=REQUEST_DETAIL_DAYS - 1)).isoformat()
     complete_through = (end.astimezone(SH).date() - timedelta(days=1)).isoformat()
     history_start = today - timedelta(days=HISTORY_DAYS - 1)
     fetch_start = today - timedelta(days=days - 1)
@@ -506,7 +662,8 @@ def main():
         identifier = model_group + '\0' + physical
         case_id = 'PROD-' + re.sub(r'[^A-Za-z0-9._-]+', '-', model_group + '-' + physical) + '-' + hashlib.sha256(identifier.encode()).hexdigest()[:12]
         points = [
-            aggregate_point(by_day[date], date, physical, partial_day)
+            aggregate_point(by_day[date], date, physical, partial_day,
+                            include_details=date >= detail_from)
             for date in sorted(by_day)
         ]
         if not points:
@@ -520,6 +677,8 @@ def main():
 
     if previous is not None:
         cases = merge_history(previous.get('cases', {}), cases, history_start.date().isoformat())
+    # Older snapshots may still carry detail tables inside the new window.
+    prune_request_details(cases, detail_from)
 
     generated = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     doc = {

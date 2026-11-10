@@ -1054,15 +1054,24 @@ const ANOMALY_PHASES = [
 
 function envAnomaly(doc) {
   const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date) : [];
-  const analysed = rows.filter((row) => row.anomaly?.available
-    && Object.values(row.anomaly.metrics || {}).some((metric) => Number.isFinite(metric?.baseline_p95)));
-  const anchor = [...analysed].reverse().find((row) => !row.partial) || analysed[analysed.length - 1];
+  const hasBaseline = (row) => row.anomaly?.available
+    && Object.values(row.anomaly.metrics || {}).some((metric) => Number.isFinite(metric?.baseline_p95));
+  const analysed = rows.filter(hasBaseline);
+  // The latency maximum and the slow/timeout tables do not need a baseline, so
+  // a first collected day still renders the module.
+  const withDetail = rows.filter((row) => row.anomaly?.latency?.n || row.anomaly?.timeouts?.count);
+  const anchor = [...analysed].reverse().find((row) => !row.partial)
+    || analysed[analysed.length - 1]
+    || [...withDetail].reverse().find((row) => !row.partial)
+    || withDetail[withDetail.length - 1];
   const head = (windowDays) => `<div class="trend-head"><h3>异常请求分析</h3><span class="muted">超基线 P95 · 近 ${fmtCount(windowDays)} 个完整日</span></div>`;
   if (!anchor) {
     return `<div class="trend-card wide env-anomaly">${head(7)}<p class="empty">等待下一次采集生成异常分析（需要按请求合并各阶段耗时）。</p><p class="chart-note">异常判定以当日之前的完整日为基线，不使用当日 P95，避免固定比例的样本被机械标为异常。</p></div>`;
   }
   const a = anchor.anomaly;
   const gateway = a.metrics?.gateway || {};
+  const latency = a.latency || {};
+  const timeouts = a.timeouts || {};
   const cohort = a.cohort && a.cohort.outliers > 0 ? a.cohort : null;
   const metricValue = (value, kind) => (kind === 'tpot' ? fmtTpotBare(value) : fmtDuration(value));
   const rate = Number.isFinite(gateway.rate) ? fmtPercent(gateway.rate * 100) : '—';
@@ -1070,23 +1079,73 @@ function envAnomaly(doc) {
   const driver = cohort?.driver && Number.isFinite(cohort.driver_delta_ms)
     ? `${phaseLabels[cohort.driver] || cohort.driver} +${fmtDuration(cohort.driver_delta_ms)}`
     : '—';
+  const maxHint = Number.isFinite(latency.max_ms)
+    ? `${esc(anchor.date)} · ${esc(latency.max_request?.request_id || 'request_id 未记录')}`
+    : '当日无请求样本';
   const lead = `<div class="anomaly-lead">
     <div class="stat-card">
       <div class="stat-label">超基线请求</div>
-      <div class="stat-value">${fmtCount(gateway.outliers)} / ${fmtCount(gateway.n)}</div>
-      <div class="stat-hint">${rate} · 请求耗时 &gt; 基线 P95${Number.isFinite(gateway.baseline_p95) ? ` ${fmtDuration(gateway.baseline_p95)}` : ''}</div>
+      <div class="stat-value">${a.available ? `${fmtCount(gateway.outliers)} / ${fmtCount(gateway.n)}` : '—'}</div>
+      <div class="stat-hint">${a.available ? `${rate} · 请求耗时 &gt; 基线 P95${Number.isFinite(gateway.baseline_p95) ? ` ${fmtDuration(gateway.baseline_p95)}` : ''}` : '基线样本不足，仅展示最大时延与慢请求'}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">最大时延</div>
+      <div class="stat-value">${fmtDuration(latency.max_ms)}</div>
+      <div class="stat-hint">${maxHint}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">超时请求</div>
+      <div class="stat-value">${fmtCount(timeouts.count)}</div>
+      <div class="stat-hint">llm_call_error 超时 · ${fmtCount(timeouts.records)} 条已记录 request_id</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">主要拉高阶段</div>
       <div class="stat-value">${esc(driver)}</div>
-      <div class="stat-hint">异常组均值 − 正常组均值</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">基线窗口</div>
-      <div class="stat-value">${fmtCount(a.baseline?.days)} 个完整日</div>
-      <div class="stat-hint">${esc(a.baseline?.from || '—')} 至 ${esc(a.baseline?.to || '—')} · 每项至少 ${fmtCount(a.baseline?.min_samples)} 个样本</div>
+      <div class="stat-hint">${a.baseline ? `${esc(a.baseline.from)} 至 ${esc(a.baseline.to)} · ${fmtCount(a.baseline.days)} 个完整日` : '异常组均值 − 正常组均值'}</div>
     </div>
   </div>`;
+
+  // Slowest 5% and timed-out requests: the identifiers that let an operator
+  // open the same request in the gateway console.
+  const detail = new Map();
+  const addRequest = (item, kind) => {
+    if (!item) return;
+    const key = item.request_id || `${kind}-${detail.size}`;
+    const row = detail.get(key) || { ...item, kinds: new Set() };
+    row.kinds.add(kind);
+    if (Number.isFinite(item.gateway)) row.gateway = item.gateway;
+    detail.set(key, row);
+  };
+  for (const item of Array.isArray(latency.slow_requests) ? latency.slow_requests : []) addRequest(item, 'slow');
+  for (const item of Array.isArray(timeouts.requests) ? timeouts.requests : []) addRequest(item, 'timeout');
+  const detailRows = [...detail.values()]
+    .sort((left, right) => (Number.isFinite(right.gateway) ? right.gateway : -1) - (Number.isFinite(left.gateway) ? left.gateway : -1))
+    .slice(0, 20)
+    .map((item) => {
+      const kind = item.kinds.has('slow') && item.kinds.has('timeout')
+        ? '超时 · 最慢 5%'
+        : item.kinds.has('timeout') ? '超时' : '最慢 5%';
+      return `<tr>
+        <td>${esc(kind)}</td>
+        <td class="num">${fmtDuration(item.gateway)}</td>
+        <td class="num">${fmtDuration(item.first_token)}</td>
+        <td class="num">${fmtDuration(item.react)}</td>
+        <td class="run-id" title="${esc(item.request_id || '')}">${esc(item.request_id || '—')}</td>
+      </tr>`;
+    })
+    .join('');
+  const categories = a.error_categories || {};
+  const categoryText = Object.entries(categories)
+    .filter(([, count]) => Number.isFinite(count) && count > 0)
+    .sort((left, right) => right[1] - left[1])
+    .map(([key, count]) => `${MODEL_FAILURE_LABELS[key] || key} ${fmtCount(count)}`)
+    .join(' · ');
+  const slowCount = Number.isFinite(latency.slow_count) ? latency.slow_count : 0;
+  const detailNote = detailRows
+    ? `按请求耗时降序，最多展示 20 条；同一请求同时属于超时与最慢 5% 时合并为一行。`
+    : (slowCount > 0 || timeouts.count > 0
+      ? '当日没有可关联的 request_id（旧版采集器未写入），请等待下一次采集。'
+      : '当日没有超时或慢请求记录。');
 
   const metricRows = ANOMALY_METRICS.map(([key, label, kind]) => {
     const metric = a.metrics?.[key] || {};
@@ -1111,12 +1170,18 @@ function envAnomaly(doc) {
     : '';
 
   return `<div class="trend-card wide env-anomaly" aria-label="异常请求分析">
-    ${head(a.baseline?.days)}
-    <p class="chart-note">${esc(anchor.date)}${anchor.partial ? ' · 部分日' : ''} · 基线为 ${esc(a.baseline?.from || '—')} 至 ${esc(a.baseline?.to || '—')} 的 ${fmtCount(a.baseline?.days)} 个完整日合并样本。异常请求 = 云侧请求耗时超过基线 P95 的请求；低于基线的请求归入正常组。</p>
+    ${head(a.available ? a.baseline.days : 7)}
+    <p class="chart-note">${esc(anchor.date)}${anchor.partial ? ' · 部分日' : ''} · ${a.available
+      ? `基线为 ${esc(a.baseline.from)} 至 ${esc(a.baseline.to)} 的 ${fmtCount(a.baseline.days)} 个完整日合并样本。异常请求 = 云侧请求耗时超过基线 P95 的请求；低于基线的请求归入正常组。`
+      : '当日之前还没有足够的完整日样本，基线判定暂不可用；最大时延、超时与慢请求明细仍按当日样本展示。'}</p>
     ${lead}
-    <div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>指标</th><th>基线 P95</th><th class="num">当日样本</th><th class="num">超基线</th><th>占比</th></tr></thead><tbody>${metricRows}</tbody></table></div>
+    <h4 class="anomaly-subhead">超时与最慢 5% 请求</h4>
+    <div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>类型</th><th class="num">请求耗时</th><th class="num">首吐字</th><th class="num">ReAct 阶段</th><th>request_id</th></tr></thead><tbody>${detailRows || `<tr><td colspan="5" class="muted">${detailNote}</td></tr>`}</tbody></table></div>
+    ${categoryText ? `<p class="chart-note">当日网关失败原因：${esc(categoryText)}。</p>` : ''}
+    ${a.available ? `<div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>指标</th><th>基线 P95</th><th class="num">当日样本</th><th class="num">超基线</th><th>占比</th></tr></thead><tbody>${metricRows}</tbody></table></div>` : ''}
     ${cohort ? `<h4 class="anomaly-subhead">慢请求阶段对比（均值）</h4><div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>阶段</th><th class="num">正常请求</th><th class="num">异常请求</th><th class="num">增量</th></tr></thead><tbody>${cohortRows}</tbody></table></div>` : ''}
-    <p class="chart-note">基线取该日之前最近 7 个完整日（不含当日与部分日）的合并样本，P95 为最近排名分位，每项至少 20 个基线样本；异常 = 当日样本严格大于基线 P95；各指标单独判定，同一请求可能同时计入请求耗时与某个阶段指标。分布稳定时约 5% 的样本会自然超过基线 P95，应关注占比持续升高或集中在同一阶段的日期。阶段均值只统计该阶段有样本的请求，增量 = 异常组 − 正常组；首吐字 + ReAct 阶段 + 答案尾段构成请求耗时，因此增量最大的阶段即主要拉高项。请求耗时 / 首吐字 / 答案首吐字 / ReAct 按请求统计，TTFT / TPOT 按模型调用统计，工具调用按每次工具调用统计。基线不是当日 P95，避免固定约 5% 的样本被机械标为异常。公开看板不发布 request_id 与原始样本；需要定位单条请求时，请使用下方「按请求 ID 查询」。</p>
+    <p class="chart-note">${detailNote} 慢请求 = 当日请求耗时排序的最慢 5%，超时 = <code>llm_call_error</code> 文本含 timeout / timed out / deadline exceeded。公开看板只发布这些请求的不透明 request_id 与各阶段耗时，不包含消息内容、用户标识或 IP；需要继续排查时，可用下方「按请求 ID 查询」检索网关记录。</p>
+    <p class="chart-note">基线取该日之前最近 7 个完整日（不含当日与部分日）的合并样本，P95 为最近排名分位，每项至少 20 个基线样本；异常 = 当日样本严格大于基线 P95；各指标单独判定，同一请求可能同时计入请求耗时与某个阶段指标。分布稳定时约 5% 的样本会自然超过基线 P95，应关注占比持续升高或集中在同一阶段的日期。阶段均值只统计该阶段有样本的请求，增量 = 异常组 − 正常组；首吐字 + ReAct 阶段 + 答案尾段构成请求耗时，因此增量最大的阶段即主要拉高项。请求耗时 / 首吐字 / 答案首吐字 / ReAct 按请求统计，TTFT / TPOT 按模型调用统计，工具调用按每次工具调用统计。基线不是当日 P95，避免固定约 5% 的样本被机械标为异常。</p>
   </div>`;
 }
 
@@ -2247,7 +2312,7 @@ function ttftTrendChart(points, visibility = {}, { columns = 1 } = {}) {
   ];
   const visible = key => visibility[key] !== false;
   const legend = defs.map(([key, label, , style]) => `<button class="legend-toggle latency-toggle${visible(key) ? '' : ' off'}" type="button" data-latency-layer="${key}" aria-pressed="${visible(key)}"><i class="legend-line ${style}"></i><span>${label}</span></button>`).join('');
-  const head = `<div class="trend-head"><h3>模型平均 TTFT（s）</h3><div class="trend-legend">${legend}</div></div>`;
+  const head = `<div class="trend-head"><h3>模型 TTFT（s）</h3><div class="trend-legend">${legend}</div></div>`;
   const values = defs.flatMap(([, , field]) => rows.map(row => row[field]).filter(v => Number.isFinite(v) && v >= 0));
   const cardClass = columns > 1 ? '' : ' wide';
   if (!values.length) return `<div class="trend-card${cardClass}">${head}<p class="empty">暂无 TTFT 数据</p></div>`;
@@ -2294,7 +2359,7 @@ function tpotTrendChart(points, visibility = {}, { columns = 1 } = {}) {
   ];
   const visible = key => visibility[key] !== false;
   const legend = defs.map(([key, label, , style]) => `<button class="legend-toggle latency-toggle${visible(key) ? '' : ' off'}" type="button" data-latency-layer="${key}" aria-pressed="${visible(key)}"><i class="legend-line ${style}"></i><span>${label}</span></button>`).join('');
-  const head = `<div class="trend-head"><h3>模型平均 TPOT（ms/token）</h3><div class="trend-legend">${legend}</div></div>`;
+  const head = `<div class="trend-head"><h3>模型 TPOT（ms/token）</h3><div class="trend-legend">${legend}</div></div>`;
   const values = defs.flatMap(([, , field]) => rows.map(row => row[field]).filter(v => Number.isFinite(v) && v >= 0));
   const cardClass = columns > 1 ? '' : ' wide';
   if (!values.length) return `<div class="trend-card${cardClass}">${head}<p class="empty">暂无 TPOT 数据</p></div>`;
@@ -2508,6 +2573,155 @@ function modelSummary(days, model, { failure = null } = {}) {
       <div class="stat-hint">成功调用 ${fmtCount(totals.success_count)} 次</div>
     </div>
   `;
+}
+
+// Failure causes recorded by the gateway's spend log. The keys are stable
+// contract values; the labels are the only place they become user-facing.
+const MODEL_FAILURE_LABELS = {
+  timeout: '超时 timeout',
+  budget: '额度耗尽 budget',
+  rate_limit: '限流 rate limit',
+  content_blocked: '内容安全拦截',
+  invalid_request: '请求参数无效',
+  permission_denied: '无权限',
+  other: '其他 / 未分类',
+};
+
+const MODEL_FAILURE_DETAIL_LIMIT = 20;
+
+// modelSeries() merges a day into metric accumulators for the charts, which
+// drops the per-point failure and request-detail fields. Select those points
+// directly so the failure card speaks about the same dates as the summary.
+function modelFailurePoints(history, model, days) {
+  const dates = new Set((Array.isArray(days) ? days : []).map((day) => day?.date).filter(Boolean));
+  const points = [];
+  for (const entry of Object.values(history?.cases || {})) {
+    for (const point of entry?.points || []) {
+      if (!dates.has(point?.date)) continue;
+      const matched = (point.benchmark_models || []).filter((row) => benchmarkModelName(row) === model);
+      if (!matched.length) continue;
+      points.push({ ...point, physical: matched.map((row) => row.model).filter(Boolean).join(' / ') });
+    }
+  }
+  return points;
+}
+
+// Failures, timeouts, maximum latency and the request identifiers needed to
+// find the slowest requests in the gateway console. Only opaque ids and timing
+// fields are published; prompts and message content never reach the board.
+function modelFailureAnalysis(days) {
+  const rows = Array.isArray(days) ? days.filter((row) => row && row.date) : [];
+  if (!rows.length) return '';
+  let calls = 0;
+  let failures = 0;
+  let timeouts = 0;
+  let slowTotal = 0;
+  const dates = new Set();
+  const reasonDates = new Set();
+  const reasons = new Map();
+  const requests = new Map();
+  let maximum = null;
+
+  const addRequest = (row, item, kind) => {
+    if (!item) return;
+    const key = item.request_id || item.call_id || `${row.date}-${item.start_time || ''}-${item.duration_ms || ''}`;
+    const existing = requests.get(key) || { ...item, date: row.date, kinds: new Set() };
+    existing.kinds.add(kind);
+    if (Number.isFinite(item.duration_ms) && (!Number.isFinite(existing.duration_ms) || item.duration_ms > existing.duration_ms)) {
+      Object.assign(existing, item);
+    }
+    requests.set(key, existing);
+  };
+
+  for (const row of rows) {
+    dates.add(row.date);
+    calls += Number.isFinite(row.query_count) ? row.query_count : 0;
+    failures += Number.isFinite(row.failed_queries) ? row.failed_queries : 0;
+    timeouts += Number.isFinite(row.timeout_count) ? row.timeout_count : 0;
+    slowTotal += Number.isFinite(row.slow_count) ? row.slow_count : 0;
+    if (row.failure_reasons && typeof row.failure_reasons === 'object') reasonDates.add(row.date);
+    for (const [key, value] of Object.entries(row.failure_reasons || {})) {
+      if (Number.isFinite(value) && value > 0) reasons.set(key, (reasons.get(key) || 0) + value);
+    }
+    if (Number.isFinite(row.latency_max_ms) && (!maximum || row.latency_max_ms > maximum.duration_ms)) {
+      const info = row.latency_max_request || {};
+      maximum = { ...info, date: row.date, duration_ms: row.latency_max_ms };
+    }
+    for (const item of Array.isArray(row.slow_requests) ? row.slow_requests : []) addRequest(row, item, 'slow');
+    for (const item of Array.isArray(row.timeout_requests) ? row.timeout_requests : []) addRequest(row, item, 'timeout');
+  }
+
+  const hasPartial = rows.some((row) => row.partial);
+  const failureRate = calls > 0 ? (failures / calls) * 100 : null;
+  const timeoutShare = failures > 0 ? (timeouts / failures) * 100 : null;
+  const categorized = [...reasons.values()].reduce((sum, value) => sum + value, 0);
+  const covered = reasonDates.size >= dates.size
+    ? ''
+    : ` · 原因明细覆盖 ${fmtCount(reasonDates.size)}/${fmtCount(dates.size)} 天`;
+  const reasonRows = [...reasons.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([key, count]) => {
+      const share = categorized > 0 ? (count / categorized) * 100 : 0;
+      return `<tr>
+        <td>${esc(MODEL_FAILURE_LABELS[key] || key)}</td>
+        <td class="num">${fmtCount(count)}</td>
+        <td class="num">${fmtPercent(share)}</td>
+        <td><div class="anomaly-rate"><span class="anomaly-track"><span class="anomaly-fill" style="width:${Math.min(100, share).toFixed(1)}%"></span></span></div></td>
+      </tr>`;
+    })
+    .join('') || '<tr><td colspan="4" class="muted">所选范围内没有失败请求。</td></tr>';
+
+  const detailRows = [...requests.values()]
+    .sort((a, b) => (Number.isFinite(b.duration_ms) ? b.duration_ms : -1) - (Number.isFinite(a.duration_ms) ? a.duration_ms : -1))
+    .slice(0, MODEL_FAILURE_DETAIL_LIMIT)
+    .map((item) => {
+      const kind = item.kinds.has('timeout') && item.kinds.has('slow')
+        ? '超时 · 最慢 5%'
+        : item.kinds.has('timeout') ? '超时' : '最慢 5%';
+      const reason = item.reason ? (MODEL_FAILURE_LABELS[item.reason] || item.reason) : (item.status || '—');
+      return `<tr>
+        <td>${esc(kind)}</td>
+        <td>${esc(fmtDateTime(item.start_time))}</td>
+        <td class="num">${fmtDuration(item.duration_ms)}</td>
+        <td>${esc(reason)}</td>
+        <td class="run-id" title="${esc(item.request_id || '')}">${esc(item.request_id || '—')}</td>
+        <td class="run-id" title="${esc(item.call_id || '')}">${esc(item.call_id || '—')}</td>
+      </tr>`;
+    })
+    .join('');
+
+  const detailNote = detailRows
+    ? `按耗时降序，最多展示 ${MODEL_FAILURE_DETAIL_LIMIT} 条；同一请求同时属于超时与最慢 5% 时合并为一行。`
+    : (slowTotal > 0 || timeouts > 0
+      ? '所选范围内的请求明细已超出 7 天保留窗口；失败原因、超时数量与最大时延仍按所选范围统计。'
+      : '所选范围内没有超时或慢请求记录。');
+
+  return `<div class="trend-card wide env-anomaly model-failure" aria-label="模型请求失败与慢请求分析">
+    <div class="trend-head"><h3>模型请求失败与慢请求分析</h3><span class="muted">网关 spend log · 所选范围 ${fmtCount(dates.size)} 天${hasPartial ? '（含部分日）' : ''}</span></div>
+    <p class="chart-note">失败原因取自 <code>metadata.error_information</code>；超时 = 错误文本含 timeout / timed out / deadline exceeded；慢请求 = 每个自然日按请求耗时排序的最慢 5%。请求 ID 与调用 ID 均为不透明标识，仅用于在网关定位请求，不包含消息内容。</p>
+    <div class="anomaly-lead">
+      <div class="stat-card">
+        <div class="stat-label">失败请求</div>
+        <div class="stat-value">${fmtCount(failures)} / ${fmtCount(calls)}</div>
+        <div class="stat-hint">失败率 ${fmtPercent(failureRate)} · 成功 ${fmtCount(Math.max(0, calls - failures))}${covered}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">超时请求</div>
+        <div class="stat-value">${fmtCount(timeouts)}</div>
+        <div class="stat-hint">${timeoutShare === null ? '—' : `${fmtPercent(timeoutShare)} 的失败请求 · 已记录 request_id`}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">最大时延</div>
+        <div class="stat-value">${fmtDuration(maximum?.duration_ms)}</div>
+        <div class="stat-hint">${maximum ? `${esc(fmtDateTime(maximum.start_time))} · Asia/Shanghai · ${esc(maximum.status || '—')}` : '所选范围无样本'}</div>
+      </div>
+    </div>
+    <h4 class="anomaly-subhead">失败原因</h4>
+    <div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>原因</th><th class="num">次数</th><th class="num">占有明细的失败</th><th>分布</th></tr></thead><tbody>${reasonRows}</tbody></table></div>
+    <h4 class="anomaly-subhead">超时与最慢 5% 请求</h4>
+    <div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>类型</th><th>开始时间</th><th class="num">时延</th><th>状态 / 原因</th><th>request_id</th><th>litellm_call_id</th></tr></thead><tbody>${detailRows || `<tr><td colspan="6" class="muted">${detailNote}</td></tr>`}</tbody></table></div>
+    <p class="chart-note">${detailNote} 明细只保留最近 7 个自然日（含当日），更早日期只保留失败原因计数、超时数量与最大时延。网关没有独立的 trace_id 字段，request_id 与 litellm_call_id 可直接用于 spend log 或控制台检索。</p>
+  </div>`;
 }
 
 // Day-over-day increases at or above this percentage are treated as
@@ -2879,6 +3093,7 @@ function renderModels() {
   const compareCurrent = $('compare-current');
   const summary = $('model-summary');
   const trends = $('model-trends');
+  const failure = $('model-failure');
   const stats = $('model-stats');
   const range = $('daily-range');
   const scope = $('model-range');
@@ -2891,6 +3106,7 @@ function renderModels() {
       '<p class="empty">历史中没有可确认关联的基准模型调用。nightly 产生 <code>points[].benchmark_models</code> 后，这里会按天展示流式 TTFT、TPOT、请求级 P50 / P95 与 Token 曲线。</p>';
     if (summary) summary.innerHTML = '';
     if (trends) trends.innerHTML = empty;
+    if (failure) failure.innerHTML = '';
     if (stats) stats.innerHTML = '<p class="empty">暂无统计数据。</p>';
     if (insights) insights.innerHTML = '';
     if (compare) compare.innerHTML = '<p class="empty">暂无模型数据。</p>';
@@ -2938,6 +3154,11 @@ function renderModels() {
       volumeVisibility: state.volumeVisibility,
     });
     refineCharts(trends);
+  }
+  if (failure) {
+    failure.innerHTML = modelFailureAnalysis(modelFailurePoints(history, state.model, days));
+    const card = failure.closest('.card');
+    if (card) card.hidden = !failure.innerHTML;
   }
   if (stats) {
     stats.innerHTML =

@@ -53,7 +53,10 @@ class AnomalyTests(unittest.TestCase):
     def test_first_day_has_no_baseline(self):
         days = [make_day('2026-11-01', [100] * 20)]
         collector.annotate_anomalies(days)
-        self.assertEqual(days[0]['anomaly'], {'available': False, 'reason': 'no_complete_baseline'})
+        anomaly = days[0]['anomaly']
+        self.assertFalse(anomaly['available'])
+        self.assertEqual(anomaly['reason'], 'no_complete_baseline')
+        self.assertEqual(anomaly['latency']['max_ms'], 100.0)
 
     def test_metric_with_few_baseline_samples_is_not_scored(self):
         days = [make_day('2026-11-01', [100] * 5)]
@@ -104,6 +107,53 @@ class AnomalyTests(unittest.TestCase):
         # The raw arrays must not survive into the published row.
         self.assertNotIn('_raw', target)
         self.assertNotIn('[10.0, 10.0', str(result))
+
+    def test_latency_max_and_slowest_five_percent_keep_request_ids(self):
+        samples = [[100 + index * 10, 10, 90, 20, 95, f'rid-{index}'] for index in range(20)]
+        day = {'date': '2026-11-10', 'partial': False, 'samples': samples,
+               'error_categories': {}, 'timeout_rids': []}
+        collector.annotate_anomalies([day])
+        # No prior complete day: the baseline is unavailable, but the latency
+        # summary must still be published.
+        self.assertFalse(day['anomaly']['available'])
+        latency = day['anomaly']['latency']
+        self.assertEqual(latency['n'], 20)
+        self.assertEqual(latency['max_ms'], 290.0)
+        self.assertEqual(latency['max_request']['request_id'], 'rid-19')
+        self.assertEqual(latency['slow_count'], 1)
+        self.assertEqual(latency['slow_threshold_ms'], 290.0)
+        self.assertEqual([row['request_id'] for row in latency['slow_requests']], ['rid-19'])
+
+    def test_timeout_summary_links_ids_to_phase_rows_when_available(self):
+        day = {'date': '2026-11-10', 'partial': False,
+               'samples': [[100, 20, 90, 70, 95, 'rid-timeout']],
+               'error_categories': {'timeout': 2},
+               'timeout_rids': ['rid-timeout', 'rid-unmatched']}
+        collector.annotate_anomalies([day])
+        timeouts = day['anomaly']['timeouts']
+        self.assertEqual(timeouts['count'], 2)
+        self.assertEqual(timeouts['records'], 2)
+        matched, unmatched = timeouts['requests']
+        self.assertEqual(matched['request_id'], 'rid-timeout')
+        self.assertEqual(matched['gateway'], 100)
+        self.assertEqual(unmatched, {'request_id': 'rid-unmatched'})
+
+    def test_pool_aggregates_failure_categories_and_timeout_ids(self):
+        raw = {'noise': 0, 'days': [{
+            'date': '2026-11-10',
+            'samples': [], 'gateway': [], 'calls': {'success': 0, 'failed': 3},
+            'tokens': {'input': 0, 'output': 0, 'total': 0},
+            'error_categories': {'timeout': 2, 'rate_limit': 1},
+            'timeout_rids': ['rid-a', 'rid-b'],
+        }]}
+        day = collector.pool([raw])['days'][0]
+        self.assertEqual(day['error_categories'], {'timeout': 2, 'rate_limit': 1})
+        self.assertEqual(day['timeout_rids'], ['rid-a', 'rid-b'])
+        self.assertEqual(day['anomaly']['timeouts']['count'], 2)
+        # Without phase samples, the timeout ids are still published so the
+        # request can be found, but no phase value is invented.
+        self.assertEqual([row['request_id'] for row in day['anomaly']['timeouts']['requests']],
+                         ['rid-a', 'rid-b'])
 
     def test_pool_publishes_aggregates_not_sample_rows(self):
         today = datetime.datetime.now(collector.CST).strftime('%Y-%m-%d')
