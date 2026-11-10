@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/e2e-performance-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updated_at": "2026-11-09T14:42:05.691Z",
+  "updated_at": "2026-11-10T04:07:03.349Z",
   "cases": {
     "DM-WF-CHROME-01": {
       "id": "DM-WF-CHROME-01",
@@ -4985,6 +4985,16 @@
           "run_id": "nightly-42593386906-1",
           "commit": "a0dfb6ee5973e98907749aca3cff3a53fa4cc1fb",
           "finished_at": "2026-11-09T09:28:06.207Z"
+        },
+        {
+          "date": "2026-11-10",
+          "status": "BLOCKED",
+          "query_ms": null,
+          "query_count": 0,
+          "duration_ms": 40418,
+          "run_id": "nightly-42753558900-1",
+          "commit": "d2800d54618c1f292d02a673d636c522d8d949bb",
+          "finished_at": "2026-11-10T04:07:01.930Z"
         }
       ],
       "latest": {
@@ -4992,10 +5002,10 @@
         "title": "上传附件时阻止切换会话",
         "mode": "multi-turn",
         "status": "BLOCKED",
-        "failure": "[SETUP_FAIL] Live control adapter initialization failed; credentials and local adapter errors were not published",
-        "started_at": "2026-11-09T09:28:06.207Z",
-        "finished_at": "2026-11-09T09:28:06.207Z",
-        "duration_ms": 0,
+        "failure": "S04 conversation.switch 失败：[ENV_DOWN] conversation.switch control failed before a verifiable receipt (ATTACH_HK_NATIVE_REPLY_NOT_VISIBLE); private adapter errors were not recorded",
+        "started_at": "2026-11-10T04:06:21.512Z",
+        "finished_at": "2026-11-10T04:07:01.930Z",
+        "duration_ms": 40418,
         "query_count": 0,
         "query_ms": null,
         "first_text_ms": null,
@@ -5021,22 +5031,46 @@
             "measured": true
           }
         },
-        "step_count": 1,
+        "step_count": 4,
         "steps": [
           {
-            "id": "S-setup",
-            "action": "environment",
+            "id": "S00",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-11-10T04:06:21.513Z",
+            "duration_ms": 5500,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S03",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T04:06:27.013Z",
+            "duration_ms": 1694,
+            "detail": "截图 03-checkpoint"
+          },
+          {
+            "id": "S04",
+            "action": "conversation.switch",
             "status": "failed",
-            "started_at": "2026-11-09T09:28:06.207Z",
+            "started_at": "2026-11-10T04:06:28.707Z",
+            "duration_ms": 33223,
+            "detail": "[ENV_DOWN] conversation.switch control failed before a verifiable receipt (ATTACH_HK_NATIVE_REPLY_NOT_VISIBLE); private adapter errors were not recorded"
+          },
+          {
+            "id": "S-failure",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T04:07:01.930Z",
             "duration_ms": 0,
-            "detail": "[SETUP_FAIL] Live control adapter initialization failed; credentials and local adapter errors were not published"
+            "detail": null
           }
         ],
-        "screenshots": 0,
+        "screenshots": 2,
         "profiling_files": 0,
-        "run_id": "nightly-42593386906-1",
-        "commit": "a0dfb6ee5973e98907749aca3cff3a53fa4cc1fb",
-        "generated_at": "2026-11-09T09:28:07.198Z"
+        "run_id": "nightly-42753558900-1",
+        "commit": "d2800d54618c1f292d02a673d636c522d8d949bb",
+        "generated_at": "2026-11-10T04:07:03.349Z"
       }
     },
     "DM-WF-BACK-02": {
