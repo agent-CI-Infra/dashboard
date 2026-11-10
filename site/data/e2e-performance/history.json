@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/e2e-performance-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updated_at": "2026-11-10T12:40:04.570Z",
+  "updated_at": "2026-11-10T19:01:37.940Z",
   "cases": {
     "DM-WF-CHROME-01": {
       "id": "DM-WF-CHROME-01",
@@ -8140,6 +8140,16 @@
           "run_id": "nightly-42504489179-1",
           "commit": "a84d496da135ec43a9aa1734c584d790ec7db87b",
           "finished_at": "2026-11-08T17:57:47.596Z"
+        },
+        {
+          "date": "2026-11-11",
+          "status": "BLOCKED",
+          "query_ms": 22935,
+          "query_count": 5,
+          "duration_ms": 446908,
+          "run_id": "nightly-42879619259-1",
+          "commit": "5a6af3fd67ee44475e19c9b22dc9f1781b292534",
+          "finished_at": "2026-11-10T19:01:26.214Z"
         }
       ],
       "latest": {
@@ -8147,15 +8157,311 @@
         "title": "区分应用提醒和系统闹钟能力",
         "mode": "multi-turn",
         "status": "BLOCKED",
-        "failure": "Live test controls unavailable: device.config; no business actions were attempted",
-        "started_at": "2026-11-08T17:57:47.596Z",
-        "finished_at": "2026-11-08T17:57:47.596Z",
-        "duration_ms": 0,
-        "query_count": 0,
-        "query_ms": null,
-        "first_text_ms": null,
-        "display_ms": null,
-        "queries": [],
+        "failure": "RM-resource-cycle assert.resources 失败：Actual reminder/clock resource inventories and capability query are required",
+        "started_at": "2026-11-10T18:53:59.306Z",
+        "finished_at": "2026-11-10T19:01:26.214Z",
+        "duration_ms": 446908,
+        "query_count": 5,
+        "query_ms": 22935,
+        "first_text_ms": 21542,
+        "display_ms": 24807,
+        "queries": [
+          {
+            "started_at": "2026-11-10T18:54:44.319Z",
+            "task_id": "task-2d1debc368c7402abcdf8a5a77e67861",
+            "submission_id": "ebfe24de-bc4f-4b73-a63e-c24b3aca8d5e",
+            "duration_ms": 12777,
+            "first_text_ms": 12161,
+            "display_ms": 14679,
+            "outcome": "completed",
+            "text_chars": 32,
+            "request_bytes": 370,
+            "response_bytes": 3025095,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1794336884319,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1794336884320,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1794336884338,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1794336884350,
+                "detail": "encode=0 send=1 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1794336887836,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1794336896480,
+                "detail": "chars=2"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1794336897096,
+                "detail": "chars=32 events=5"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1794336898998,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1794336898998,
+                "detail": "no-reveal"
+              }
+            ]
+          },
+          {
+            "started_at": "2026-11-10T18:56:08.299Z",
+            "task_id": "task-6a99e8929a5d4b0a8f28bfa53198966b",
+            "submission_id": "f49d9371-166b-43a5-bf50-fe11e664248f",
+            "duration_ms": 33256,
+            "first_text_ms": 31810,
+            "display_ms": 34860,
+            "outcome": "completed",
+            "text_chars": 411,
+            "request_bytes": 1022,
+            "response_bytes": 3051665,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1794336968299,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1794336968299,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1794336968319,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1794336968333,
+                "detail": "encode=0 send=2 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1794336970691,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1794337000109,
+                "detail": "chars=1"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1794337001555,
+                "detail": "chars=411 events=51"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1794337003159,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1794337003159,
+                "detail": "no-reveal"
+              }
+            ]
+          },
+          {
+            "started_at": "2026-11-10T18:57:28.326Z",
+            "task_id": "task-63fe481fb9934dc880b1c451d1db391f",
+            "submission_id": "f0b28a12-8cd3-4a61-80ee-0c2437e885d1",
+            "duration_ms": 18555,
+            "first_text_ms": 16400,
+            "display_ms": 20600,
+            "outcome": "completed",
+            "text_chars": 405,
+            "request_bytes": 860,
+            "response_bytes": 3078860,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1794337048326,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1794337048326,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1794337048349,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1794337048366,
+                "detail": "encode=0 send=2 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1794337050761,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1794337064726,
+                "detail": "chars=1"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1794337066881,
+                "detail": "chars=405 events=102"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1794337068926,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1794337068926,
+                "detail": "no-reveal"
+              }
+            ]
+          },
+          {
+            "started_at": "2026-11-10T18:59:11.162Z",
+            "task_id": "task-d056d462713249da9ab2ac536620d0db",
+            "submission_id": "4cf91bfb-1232-4d22-a689-7635e7f0393e",
+            "duration_ms": 39315,
+            "first_text_ms": 38085,
+            "display_ms": 40915,
+            "outcome": "completed",
+            "text_chars": 267,
+            "request_bytes": 897,
+            "response_bytes": 3100973,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1794337151162,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1794337151162,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1794337151184,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1794337151202,
+                "detail": "encode=0 send=1 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1794337153415,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1794337189247,
+                "detail": "chars=1"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1794337190477,
+                "detail": "chars=267 events=42"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1794337192077,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1794337192077,
+                "detail": "no-reveal"
+              }
+            ]
+          },
+          {
+            "started_at": "2026-11-10T19:00:11.024Z",
+            "task_id": "task-acc369074d124a89af531d2d5a496e33",
+            "submission_id": "7116ba48-94ae-486e-aa1c-fc6f66e53faf",
+            "duration_ms": 10771,
+            "first_text_ms": 9254,
+            "display_ms": 12983,
+            "outcome": "completed",
+            "text_chars": 313,
+            "request_bytes": 804,
+            "response_bytes": 4157395,
+            "stages": [
+              {
+                "name": "tap",
+                "at_ms": 1794337211024,
+                "detail": null
+              },
+              {
+                "name": "queued",
+                "at_ms": 1794337211024,
+                "detail": null
+              },
+              {
+                "name": "dequeued",
+                "at_ms": 1794337211049,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1794337211068,
+                "detail": "encode=0 send=1 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1794337213295,
+                "detail": null
+              },
+              {
+                "name": "first_text",
+                "at_ms": 1794337220278,
+                "detail": "chars=6"
+              },
+              {
+                "name": "last_text",
+                "at_ms": 1794337221795,
+                "detail": "chars=313 events=59"
+              },
+              {
+                "name": "task_done",
+                "at_ms": 1794337224007,
+                "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1794337224007,
+                "detail": "no-reveal"
+              }
+            ]
+          }
+        ],
         "cloud": {
           "available": false,
           "trace_count": 0,
@@ -8176,22 +8482,310 @@
             "measured": true
           }
         },
-        "step_count": 1,
+        "step_count": 37,
         "steps": [
           {
-            "id": "S-setup",
-            "action": "environment",
+            "id": "S00",
+            "action": "app.coldStart",
+            "status": "ok",
+            "started_at": "2026-11-10T18:53:59.306Z",
+            "duration_ms": 5070,
+            "detail": "已冷启动 App（等价于点击桌面图标）"
+          },
+          {
+            "id": "S01",
+            "action": "app.resetState",
+            "status": "ok",
+            "started_at": "2026-11-10T18:54:04.376Z",
+            "duration_ms": 18461,
+            "detail": "已重置到初始状态（11-11 02:54:13.220 2950 2950 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-1f3e16508ad44f8994aa380cf78ffa86）"
+          },
+          {
+            "id": "S02",
+            "action": "app.freshConversation",
+            "status": "ok",
+            "started_at": "2026-11-10T18:54:22.837Z",
+            "duration_ms": 6483,
+            "detail": "DigitalMate 单会话 Home（设置入口不作为新对话抽屉）"
+          },
+          {
+            "id": "S03",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T18:54:29.320Z",
+            "duration_ms": 1873,
+            "detail": "截图 03-checkpoint"
+          },
+          {
+            "id": "RM-anchor",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-11-10T18:54:31.193Z",
+            "duration_ms": 16998,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "RM-anchor-done",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-11-10T18:54:48.191Z",
+            "duration_ms": 14622,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "RM-anchor-keyboard",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-11-10T18:55:02.813Z",
+            "duration_ms": 4177,
+            "detail": "键盘窗口已关闭"
+          },
+          {
+            "id": "S04",
+            "action": "device.config",
+            "status": "ok",
+            "started_at": "2026-11-10T18:55:06.990Z",
+            "duration_ms": 38741,
+            "detail": null
+          },
+          {
+            "id": "S05",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T18:55:45.731Z",
+            "duration_ms": 2046,
+            "detail": "截图 system-alarm-baseline"
+          },
+          {
+            "id": "S06",
+            "action": "app.foreground",
+            "status": "ok",
+            "started_at": "2026-11-10T18:55:47.777Z",
+            "duration_ms": 3938,
+            "detail": "已核对前台 App 和可见的对话输入框"
+          },
+          {
+            "id": "RM-quote-app",
+            "action": "chat.quoteLatest",
+            "status": "ok",
+            "started_at": "2026-11-10T18:55:51.715Z",
+            "duration_ms": 2989,
+            "detail": "点击最新可见回复的引用图标，未发送消息"
+          },
+          {
+            "id": "S07",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-11-10T18:55:54.704Z",
+            "duration_ms": 17344,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S08",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-11-10T18:56:12.048Z",
+            "duration_ms": 36630,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "RM-app-keyboard",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-11-10T18:56:48.678Z",
+            "duration_ms": 4164,
+            "detail": "键盘窗口已关闭"
+          },
+          {
+            "id": "RM-app-reply",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T18:56:52.842Z",
+            "duration_ms": 1965,
+            "detail": "截图 app-reminder-outcome"
+          },
+          {
+            "id": "RM-app-cloud",
+            "action": "cloud.inspect",
+            "status": "ok",
+            "started_at": "2026-11-10T18:56:54.807Z",
+            "duration_ms": 17407,
+            "detail": null
+          },
+          {
+            "id": "RM-quote-alarm",
+            "action": "chat.quoteLatest",
+            "status": "ok",
+            "started_at": "2026-11-10T18:57:12.214Z",
+            "duration_ms": 2848,
+            "detail": "点击最新可见回复的引用图标，未发送消息"
+          },
+          {
+            "id": "S13",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-11-10T18:57:15.062Z",
+            "duration_ms": 17175,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S14",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-11-10T18:57:32.237Z",
+            "duration_ms": 21012,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "RM-alarm-cloud",
+            "action": "cloud.inspect",
+            "status": "ok",
+            "started_at": "2026-11-10T18:57:53.249Z",
+            "duration_ms": 6261,
+            "detail": null
+          },
+          {
+            "id": "RM-alarm-keyboard",
+            "action": "ui.hideKeyboard",
+            "status": "ok",
+            "started_at": "2026-11-10T18:57:59.510Z",
+            "duration_ms": 3959,
+            "detail": "键盘窗口已关闭"
+          },
+          {
+            "id": "S15",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T18:58:03.469Z",
+            "duration_ms": 1954,
+            "detail": "截图 12-checkpoint"
+          },
+          {
+            "id": "S16",
+            "action": "device.config",
+            "status": "ok",
+            "started_at": "2026-11-10T18:58:05.423Z",
+            "duration_ms": 43471,
+            "detail": null
+          },
+          {
+            "id": "S17",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T18:58:48.894Z",
+            "duration_ms": 2247,
+            "detail": "截图 system-alarm-after-request"
+          },
+          {
+            "id": "S18",
+            "action": "app.foreground",
+            "status": "ok",
+            "started_at": "2026-11-10T18:58:51.141Z",
+            "duration_ms": 4169,
+            "detail": "已核对前台 App 和可见的对话输入框"
+          },
+          {
+            "id": "RM-quote-cancel",
+            "action": "chat.quoteLatest",
+            "status": "ok",
+            "started_at": "2026-11-10T18:58:55.310Z",
+            "duration_ms": 2982,
+            "detail": "点击最新可见回复的引用图标，未发送消息"
+          },
+          {
+            "id": "S19",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-11-10T18:58:58.292Z",
+            "duration_ms": 16709,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S20",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-11-10T18:59:15.001Z",
+            "duration_ms": 39713,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "RM-quote-alarm-cleanup",
+            "action": "chat.quoteLatest",
+            "status": "ok",
+            "started_at": "2026-11-10T18:59:54.714Z",
+            "duration_ms": 2859,
+            "detail": "点击最新可见回复的引用图标，未发送消息"
+          },
+          {
+            "id": "S25",
+            "action": "chat.send",
+            "status": "ok",
+            "started_at": "2026-11-10T18:59:57.573Z",
+            "duration_ms": 17229,
+            "detail": "已发出（第 1 次生效）"
+          },
+          {
+            "id": "S26",
+            "action": "wait.turn.complete",
+            "status": "ok",
+            "started_at": "2026-11-10T19:00:14.802Z",
+            "duration_ms": 11397,
+            "detail": "完成行 0 → 0（new-text-any）"
+          },
+          {
+            "id": "S27",
+            "action": "device.config",
+            "status": "ok",
+            "started_at": "2026-11-10T19:00:26.199Z",
+            "duration_ms": 52394,
+            "detail": null
+          },
+          {
+            "id": "S28",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T19:01:18.593Z",
+            "duration_ms": 2007,
+            "detail": "截图 system-alarm-cleanup"
+          },
+          {
+            "id": "S29",
+            "action": "app.foreground",
+            "status": "ok",
+            "started_at": "2026-11-10T19:01:20.600Z",
+            "duration_ms": 3616,
+            "detail": "已核对前台 App 和可见的对话输入框"
+          },
+          {
+            "id": "RM-private",
+            "action": "assert.archive",
+            "status": "ok",
+            "started_at": "2026-11-10T19:01:24.216Z",
+            "duration_ms": 61,
+            "detail": "Text evidence contains no detected credential or private-account patterns"
+          },
+          {
+            "id": "RM-resource-cycle",
+            "action": "assert.resources",
             "status": "failed",
-            "started_at": "2026-11-08T17:57:47.596Z",
+            "started_at": "2026-11-10T19:01:24.277Z",
+            "duration_ms": 1937,
+            "detail": "Actual reminder/clock resource inventories and capability query are required"
+          },
+          {
+            "id": "S-failure",
+            "action": "snapshot",
+            "status": "ok",
+            "started_at": "2026-11-10T19:01:26.214Z",
             "duration_ms": 0,
-            "detail": "Live test controls unavailable: device.config; no business actions were attempted"
+            "detail": null
           }
         ],
-        "screenshots": 0,
-        "profiling_files": 0,
-        "run_id": "nightly-42504489179-1",
-        "commit": "a84d496da135ec43a9aa1734c584d790ec7db87b",
-        "generated_at": "2026-11-08T18:15:02.025Z"
+        "screenshots": 7,
+        "profiling_files": 1,
+        "run_id": "nightly-42879619259-1",
+        "commit": "5a6af3fd67ee44475e19c9b22dc9f1781b292534",
+        "generated_at": "2026-11-10T19:01:37.940Z"
       }
     },
     "DM-WF-SILENCE-01": {
