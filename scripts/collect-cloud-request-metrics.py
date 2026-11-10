@@ -14,22 +14,24 @@ Usage:
 
 Environment:
   ADX_TOKEN  bearer token for the console API (required)
-  ADX_BASE   console base URL (default https://onlineswarm.openjiuwen.com:31470)
+  ADX_BASE   console base URL (default https://onlineswarm.openjiuwen.com:31472)
   DM_UNTIL   optional ISO-8601 cut-off passed to the in-env aggregator
 """
 import base64
 import datetime
+import importlib.util
 import json
 import math
 import os
 import re
+import subprocess
 import sys
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 
-BASE = os.environ.get("ADX_BASE", "https://onlineswarm.openjiuwen.com:31470").rstrip("/")
+BASE = os.environ.get("ADX_BASE", "https://onlineswarm.openjiuwen.com:31472").rstrip("/")
 TOKEN = os.environ.get("ADX_TOKEN", "")
 TEMPLATE = os.environ.get("ADX_TEMPLATE", "digitalmate")
 REFERENCE = os.environ.get("ADX_REFERENCE", "production")
@@ -71,13 +73,28 @@ def call(path, method="GET", payload=None, timeout=60):
 
 
 def bindings():
-    query = urllib.parse.urlencode(
-        {"template": TEMPLATE, "reference": REFERENCE, "kind": KIND, "page_size": 50}
-    )
-    items = call(f"/api/bindings?{query}").get("items", [])
-    if not items:
-        raise SystemExit("no ADX bindings for the DigitalMate environment")
-    return items
+    """Read every page; an incomplete inventory must never look complete."""
+    items = []
+    token = None
+    seen_tokens = set()
+    for _ in range(1000):
+        params = {"template": TEMPLATE, "reference": REFERENCE, "kind": KIND, "page_size": 50}
+        if token:
+            params["page_token"] = token
+        data = call(f"/api/bindings?{urllib.parse.urlencode(params)}")
+        page = data.get("items") if isinstance(data, dict) else None
+        if not isinstance(page, list):
+            raise SystemExit("invalid ADX bindings page")
+        items.extend(page)
+        token = data.get("next_page_token")
+        if not token:
+            if not items:
+                raise SystemExit("no ADX bindings for the DigitalMate environment")
+            return items
+        if not isinstance(token, str) or token in seen_tokens:
+            raise SystemExit("invalid or repeated ADX pagination token")
+        seen_tokens.add(token)
+    raise SystemExit("ADX bindings pagination exceeds safety limit")
 
 
 class Terminal:
@@ -359,6 +376,22 @@ def request_rows(day):
             "react": number(sample[3]),
             "workswarm": number(sample[4]),
         }
+        # Only the four fixed fields from the in-environment allowlist may
+        # survive into public slow-request rows; never copy raw history.
+        tools = sample[6] if len(sample) > 6 and isinstance(sample[6], list) else []
+        allowed_names = {"bash", "grep", "read_file", "tool_search", "tool"}
+        cleaned = []
+        for item in tools[:200]:
+            if not isinstance(item, dict):
+                continue
+            start, duration = number(item.get("start_ms")), number(item.get("duration_ms"))
+            if start is None or duration is None or start < 0 or duration < 0 or start + duration > gateway:
+                continue
+            cleaned.append({"name": item.get("name") if item.get("name") in allowed_names else "tool",
+                            "start_ms": start, "duration_ms": duration,
+                            "status": "error" if item.get("status") == "error" else "ok"})
+        if cleaned:
+            row["tool_events"] = cleaned
         for key in ("first_token", "answer_first", "react", "workswarm"):
             # A phase cannot be longer than its request; out-of-order markers
             # are missing data, not a huge phase.
@@ -635,7 +668,10 @@ def pool(results):
 
 
 def merge(previous, fresh):
-    days = {day["date"]: day for day in previous.get("days", [])}
+    days = {day["date"]: dict(day) for day in previous.get("days", [])}
+    # Legacy retained days have no trustworthy observation timestamp. Keep it
+    # unknown instead of assigning a newer document generation time.
+    observed_at = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     today = datetime.datetime.now(CST).strftime("%Y-%m-%d")
     for day in fresh["days"]:
         if not day["n"] and not day["calls"]["total"] and not day["tool"]["n"]:
@@ -651,6 +687,7 @@ def merge(previous, fresh):
             continue
         if old is not None and day["date"] != today and old.get("partial") is False:
             day["partial"] = False
+        day["observed_at"] = observed_at
         days[day["date"]] = day
     ordered = [days[key] for key in sorted(days)]
     # The per-request rows and raw arrays are an internal collection detail;
@@ -661,7 +698,7 @@ def merge(previous, fresh):
         day.pop("_raw", None)
     merged = dict(previous)
     merged["days"] = ordered
-    merged["generated_at"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    merged["generated_at"] = observed_at
     defs = dict(previous.get("definitions") or {})
     defs["first_token"] = "请求口径：网关受理 → 首个携带文本的 chunk（chat.delta / chat.reasoning）"
     defs["answer_first"] = "请求口径：网关受理 → 首个答案文本 chunk（chat.delta）"
@@ -689,6 +726,7 @@ def collect(until=""):
     with open(AGGREGATOR, encoding="utf-8") as fh:
         script = fh.read()
     results = []
+    failed = 0
     items = bindings()
     for index, item in enumerate(items, 1):
         # A binding can outlive its environment (deleted generation); the
@@ -701,28 +739,81 @@ def collect(until=""):
             results.append(collect_environment(item, script, until))
             if os.environ.get("ADX_DEBUG"):
                 print(f"environment {index}/{len(items)} ok", file=sys.stderr)
-        except Exception as error:  # one broken environment must not sink the run
+        except Exception as error:
+            failed += 1
             print(f"environment {index}/{len(items)} failed: {error}", file=sys.stderr)
+    if failed:
+        raise SystemExit(f"{failed} active environments failed; retain previous snapshot")
     if not results:
         raise SystemExit("every environment failed to report metrics")
     return pool(results)
+
+
+def production_seed(previous):
+    """Use only a production-labelled history; repair legacy test-0 seeding.
+
+    The existing workflow has already fetched the data branch. Reading the
+    separate production snapshot from that local ref avoids network access and
+    refuses to carry test-0 rows into the production aggregate.
+    """
+    def valid(doc):
+        return (isinstance(doc, dict) and doc.get("env") == "adx-jiuwen"
+                and doc.get("schema") == "digitalmate/env-request-latency-daily@1")
+
+    if valid(previous):
+        return previous
+    try:
+        raw = subprocess.check_output(
+            ["git", "show", "origin/digitalmate:site/data/production-request-latency-daily.json"],
+            stderr=subprocess.DEVNULL,
+        )
+        candidate = json.loads(raw)
+    except (OSError, subprocess.CalledProcessError, ValueError):
+        candidate = None
+    if not valid(candidate):
+        raise SystemExit("no production-labelled seed; refusing to mix environments")
+    print("Using the production-labelled historical seed; ignoring incompatible snapshot", file=sys.stderr)
+    return candidate
+
+
+def collect_workspace_traces():
+    """Collect bounded, sanitized traces without opening or waking environments."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'collect-production-workspace-traces.py')
+    spec = importlib.util.spec_from_file_location('production_workspace_traces', path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError('workspace trace collector unavailable')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.collect()
+
+
+def with_workspace_traces(previous, traces):
+    """Preserve existing metric timestamps; trace coverage has its own clock."""
+    if not isinstance(traces, dict) or traces.get('schema') != 'digitalmate/cloud-traces@1':
+        raise ValueError('invalid workspace trace collection')
+    if not isinstance(traces.get('read_log_count'), int) or traces['read_log_count'] <= 0:
+        raise ValueError('empty workspace trace collection')
+    result = dict(previous)
+    result['cloud_trace_collection'] = traces
+    return result
 
 
 def main():
     if not TOKEN:
         raise SystemExit("ADX_TOKEN is not set")
     if len(sys.argv) >= 2 and sys.argv[1] == "--raw":
-        fresh = collect(os.environ.get("DM_UNTIL", ""))
-        json.dump(fresh, sys.stdout, ensure_ascii=False, indent=1)
+        traces = collect_workspace_traces()
+        json.dump(traces, sys.stdout, ensure_ascii=False, indent=1)
         sys.stdout.write("\n")
         return
     if len(sys.argv) != 3:
         raise SystemExit(__doc__)
     output, previous_path = sys.argv[1], sys.argv[2]
-    fresh = collect(os.environ.get("DM_UNTIL", ""))
     with open(previous_path, encoding="utf-8") as fh:
         previous = json.load(fh)
-    merged = merge(previous, fresh)
+    previous = production_seed(previous)
+    traces = collect_workspace_traces()
+    merged = with_workspace_traces(previous, traces)
     with open(output, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(merged, fh, ensure_ascii=False, indent=1)
         fh.write("\n")

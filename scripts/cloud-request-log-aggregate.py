@@ -220,6 +220,80 @@ for path in sorted(glob.glob(TOOL_GLOB)):
             if item.get("status") == "error":
                 rec["tool_failed"] += 1
 
+# Extract only allowlisted timing metadata for the slowest local requests.
+# History lines may contain conversation text and secrets: do not copy them,
+# tool arguments, results, paths, or unrecognized tool names to the output.
+# Bound reads so adding diagnostics cannot monopolize the production collector.
+def read_tool_traces(requests, timeout_ids, session_roots, max_files=24, max_bytes=512_000):
+    by_day = {}
+    for rid, spans in requests.items():
+        start, end = spans[:2]
+        if start is not None and end is not None and end >= start:
+            by_day.setdefault(day_of(start), []).append((end - start, rid))
+    targets = {rid for rows in by_day.values() for _, rid in sorted(rows, reverse=True)[:50]}
+    targets.update(timeout_ids)
+    if not targets:
+        return {}
+    files = []
+    for root in session_roots:
+        files.extend(glob.glob(os.path.join(root, '*', 'history.jsonl')))
+    # A recent append makes a session relevant even if its directory is old.
+    def modified(path):
+        try:
+            return os.path.getmtime(path)
+        except OSError:
+            return 0
+    files = sorted(set(files), key=modified, reverse=True)[:max_files]
+    pending = {}
+    traces = {}
+    for path in files:
+        try:
+            with open(path, 'rb') as fh:
+                fh.seek(0, os.SEEK_END)
+                size = fh.tell()
+                fh.seek(max(0, size - max_bytes))
+                if size > max_bytes:
+                    fh.readline()  # discard the partial first line
+                for raw in fh:
+                    try:
+                        event = json.loads(raw)
+                    except (ValueError, UnicodeDecodeError):
+                        continue
+                    rid = event.get('request_id')
+                    if rid not in targets or rid not in requests:
+                        continue
+                    start, end = requests[rid][:2]
+                    timestamp = event.get('timestamp')
+                    if not isinstance(timestamp, (int, float)) or not math.isfinite(timestamp) or start is None or end is None:
+                        continue
+                    if timestamp < start or timestamp > end or (UNTIL is not None and timestamp > UNTIL):
+                        continue
+                    if event.get('event_type') == 'chat.tool_call':
+                        call = event.get('tool_call') or {}
+                        call_id = call.get('tool_call_id')
+                        if isinstance(call_id, str) and call_id:
+                            name = call.get('name')
+                            name = name if name in ('bash', 'grep', 'read_file', 'tool_search') else 'tool'
+                            pending[(rid, call_id)] = (timestamp, name)
+                    elif event.get('event_type') == 'chat.tool_result':
+                        call_id = event.get('tool_call_id')
+                        before = pending.pop((rid, call_id), None)
+                        if before is None or timestamp < before[0]:
+                            continue
+                        items = traces.setdefault(rid, [])
+                        if len(items) < 200:
+                            items.append({'name': before[1], 'start_ms': round((before[0] - start) * 1000, 1),
+                                          'duration_ms': round((timestamp - before[0]) * 1000, 1),
+                                          'status': 'error' if event.get('success') is False else 'ok'})
+        except OSError:
+            continue
+    return traces
+
+session_roots = [os.path.join(os.path.dirname(LOG), '.jiuwenswarm', 'agent', 'sessions'),
+                 os.path.expanduser('~/.jiuwenswarm/agent/sessions')]
+timeout_ids = {rid for rec in days.values() for rid in rec['timeout_rids']}
+tool_traces = read_tool_traces(requests, timeout_ids, session_roots)
+
 # Requests belong to the day their gateway dispatch happened, so a request that
 # crosses midnight is counted once instead of being split by marker day.
 for rid, (g0, g1, w0, w1, t0, a1) in requests.items():
@@ -258,6 +332,7 @@ for rid, (g0, g1, w0, w1, t0, a1) in requests.items():
         round((a1 - t0) * 1000.0, 1) if t0 is not None and a1 is not None and a1 >= t0 else None,
         round((w1 - w0) * 1000.0, 1) if w0 is not None and w1 is not None else None,
         rid,
+        tool_traces.get(rid, []),
     ]
     if any(value is not None for value in sample[:5]):
         rec["samples"].append(sample)

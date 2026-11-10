@@ -308,8 +308,8 @@ test('cloud daily picker prefers the freshest valid document', () => {
   const c=vm.createContext({});
   vm.runInContext(extract('function newestEnvDaily', 'function renderEnv()') + ';globalThis.pick=newestEnvDaily;', c);
   const schema='digitalmate/env-request-latency-daily@1';
-  const stale={schema,generated_at:'2026-11-09T16:34:43Z',label:'stale'};
-  const fresh={schema,generated_at:'2026-11-10T05:05:21Z',label:'fresh'};
+  const stale={schema,env:'adx-jiuwen',generated_at:'2026-11-09T16:34:43Z',label:'stale'};
+  const fresh={schema,env:'adx-jiuwen',generated_at:'2026-11-10T05:05:21Z',label:'fresh'};
   assert.equal(c.pick([stale, fresh]).label, 'fresh');
   assert.equal(c.pick([fresh, stale]).label, 'fresh');
   assert.equal(c.pick([stale]).label, 'stale');

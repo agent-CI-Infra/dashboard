@@ -161,6 +161,12 @@ function modelDisplayName(name) {
   return raw.replace(/^openai\//, '') || raw || '—';
 }
 
+function todayShanghai(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-US', {timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit'}).formatToParts(now);
+  const value = (type) => parts.find((part) => part.type === type).value;
+  return `${value('year')}-${value('month')}-${value('day')}`;
+}
+
 function historyLatestDate(history) {
   let latest = '';
   for (const entry of Object.values(history?.cases || {})) {
@@ -406,8 +412,10 @@ function renderHeader() {
     : '暂无更新时间';
   const through = historyCompleteThrough(history);
   const partial = historyPartialDay(history);
-  $('updated').textContent = updated
-    + (partial ? ` · 当日（${partial}）未结束，汇总取完整日 ${through || '—'}` : '')
+  const cutoff = history.window_end || history.updated_at;
+  const stale = Number.isFinite(Date.parse(cutoff)) && Date.now() - Date.parse(cutoff) > 6 * 60 * 60 * 1000;
+  $('updated').textContent = updated + (stale ? ' · 数据超过 6 小时未更新' : '')
+    + (state.rangeDays === 1 ? ` · 当天 ${todayShanghai()} 累计（截至上次采集）` : partial ? ` · 当日（${partial}）未结束，汇总取完整日 ${through || '—'}` : '')
     + (history.excluded_missing_model ? ` · 未识别模型排除 ${fmtCount(history.excluded_missing_model)} 条` : '');
 
   const withDevice = sortedCases().find((entry) => entry.latest?.device);
@@ -1130,7 +1138,7 @@ function envAnomaly(doc) {
         <td class="num">${fmtDuration(item.gateway)}</td>
         <td class="num">${fmtDuration(item.first_token)}</td>
         <td class="num">${fmtDuration(item.react)}</td>
-        <td class="run-id" title="${esc(item.request_id || '')}">${esc(item.request_id || '—')}</td>
+        <td class="run-id" title="${esc(item.request_id || '')}">${item.request_id ? `<button class="trace-link" type="button" data-trace-id="${esc(item.request_id)}">${esc(item.request_id)}</button>` : '—'}</td>
       </tr>`;
     })
     .join('');
@@ -1175,8 +1183,8 @@ function envAnomaly(doc) {
       ? `基线为 ${esc(a.baseline.from)} 至 ${esc(a.baseline.to)} 的 ${fmtCount(a.baseline.days)} 个完整日合并样本。异常请求 = 云侧请求耗时超过基线 P95 的请求；低于基线的请求归入正常组。`
       : '当日之前还没有足够的完整日样本，基线判定暂不可用；最大时延、超时与慢请求明细仍按当日样本展示。'}</p>
     ${lead}
-    <h4 class="anomaly-subhead">超时与最慢 5% 请求</h4>
-    <div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>类型</th><th class="num">请求耗时</th><th class="num">首吐字</th><th class="num">ReAct 阶段</th><th>request_id</th></tr></thead><tbody>${detailRows || `<tr><td colspan="5" class="muted">${detailNote}</td></tr>`}</tbody></table></div>
+    <details class="slow-request-details"><summary class="anomaly-subhead">超时与最慢 5% 请求</summary>
+    <div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>类型</th><th class="num">请求耗时</th><th class="num">首吐字</th><th class="num">ReAct 阶段</th><th>request_id</th></tr></thead><tbody>${detailRows || `<tr><td colspan="5" class="muted">${detailNote}</td></tr>`}</tbody></table></div></details>
     ${categoryText ? `<p class="chart-note">当日网关失败原因：${esc(categoryText)}。</p>` : ''}
     ${a.available ? `<div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>指标</th><th>基线 P95</th><th class="num">当日样本</th><th class="num">超基线</th><th>占比</th></tr></thead><tbody>${metricRows}</tbody></table></div>` : ''}
     ${cohort ? `<h4 class="anomaly-subhead">慢请求阶段对比（均值）</h4><div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>阶段</th><th class="num">正常请求</th><th class="num">异常请求</th><th class="num">增量</th></tr></thead><tbody>${cohortRows}</tbody></table></div>` : ''}
@@ -2718,8 +2726,8 @@ function modelFailureAnalysis(days) {
     </div>
     <h4 class="anomaly-subhead">失败原因</h4>
     <div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>原因</th><th class="num">次数</th><th class="num">占有明细的失败</th><th>分布</th></tr></thead><tbody>${reasonRows}</tbody></table></div>
-    <h4 class="anomaly-subhead">超时与最慢 5% 请求</h4>
-    <div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>类型</th><th>开始时间</th><th class="num">时延</th><th>状态 / 原因</th><th>request_id</th><th>litellm_call_id</th></tr></thead><tbody>${detailRows || `<tr><td colspan="6" class="muted">${detailNote}</td></tr>`}</tbody></table></div>
+    <details class="slow-request-details"><summary class="anomaly-subhead">超时与最慢 5% 请求</summary>
+    <div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>类型</th><th>开始时间</th><th class="num">时延</th><th>状态 / 原因</th><th>request_id</th><th>litellm_call_id</th></tr></thead><tbody>${detailRows || `<tr><td colspan="6" class="muted">${detailNote}</td></tr>`}</tbody></table></div></details>
     <p class="chart-note">${detailNote} 明细只保留最近 7 个自然日（含当日），更早日期只保留失败原因计数、超时数量与最大时延。网关没有独立的 trace_id 字段，request_id 与 litellm_call_id 可直接用于 spend log 或控制台检索。</p>
   </div>`;
 }
@@ -2845,7 +2853,7 @@ function modelComparison(history, rangeDays = 0) {
   }
   // The comparison is anchored on the newest day every model could have
   // finished; the in-progress day never reaches a headline row.
-  const anchor = historyCompleteThrough(history) || historyLatestDate(history);
+  const anchor = Number(rangeDays) === 1 ? todayShanghai() : (historyCompleteThrough(history) || historyLatestDate(history));
   if (anchor) end = anchor;
   const span = Number(rangeDays);
   const start = Number.isFinite(span) && span > 0 && end ? addDays(end, -(Math.floor(span) - 1)) : '';
@@ -2981,7 +2989,7 @@ function renderDetail() {
   const chartNote =
     points.length === 1
       ? `当前只有 1 个按日数据点（${esc(points[0].date)}）；后续每天追加一个点，形成模型请求耗时曲线。`
-      : '按 Asia/Shanghai 日历日聚合；每点为当日成功调用的模型请求耗时（按调用量加权），不含端侧与网络；当天未结束的数据单独标记为部分日，汇总卡不使用该日。';
+      : '按 Asia/Shanghai 日历日聚合；每点为当日成功调用的模型请求耗时（按调用量加权），不含端侧与网络；当天数据标记为部分日；选择当天时汇总截至采集时刻的数据。';
 
   $('detail').innerHTML = `
     <div class="detail-head">
@@ -3044,6 +3052,7 @@ function syncRangeButtons(disabled = false) {
 function currentModelDays() {
   if (!state.history || !state.model) return [];
   const rows = modelSeries(state.history, state.model);
+  if (state.rangeDays === 1) return inRange(rows, 1, todayShanghai());
   const anchor = historyCompleteThrough(state.history);
   const partial = historyPartialDay(state.history);
   const completed = inRange(completeDays(rows, state.history), state.rangeDays, anchor);
@@ -3118,8 +3127,8 @@ function renderModels() {
   }
 
   const days = currentModelDays();
-  const complete = completeDays(days, history);
-  const anchor = historyCompleteThrough(history) || latestModelDate(history);
+  const complete = state.rangeDays === 1 ? days : completeDays(days, history);
+  const anchor = state.rangeDays === 1 ? todayShanghai() : (historyCompleteThrough(history) || latestModelDate(history));
   const recentCalls = recentCallsForDays(modelSeries(history, state.model), anchor);
   if (compareCurrent) {
     compareCurrent.textContent = isLowVolumeModel(state.model, recentCalls)
@@ -3432,6 +3441,191 @@ function bindRequestLookup() {
   })
 }
 
+// Only cloud-side slow or timed-out requests belong in the trajectory picker.
+// Model-call identifiers cannot establish a cloud-session relationship.
+function slowTraceCandidates(doc) {
+  const byId = new Map();
+  for (const day of Array.isArray(doc?.days) ? doc.days : []) {
+    const a = day.anomaly || {};
+    for (const item of [...(a.latency?.slow_requests || []), ...(a.timeouts?.requests || [])]) {
+      if (!item || typeof item.request_id !== 'string' || !item.request_id) continue;
+      const previous = byId.get(item.request_id);
+      if (!previous || (!Number.isFinite(previous.gateway) && Number.isFinite(item.gateway))) {
+        byId.set(item.request_id, {...item, date: day.date, scope: 'cloud'});
+      }
+    }
+  }
+  return [...byId.values()].sort((a, b) => (b.gateway ?? -1) - (a.gateway ?? -1)).slice(0, 200);
+}
+
+function traceRows(item) {
+  const total = item?.gateway;
+  if (!Number.isFinite(total) || total <= 0) return [];
+  const valid = (n) => Number.isFinite(n) && n >= 0 && n <= total;
+  const rows = [{label: '本轮运行', start: 0, duration: total, kind: 'total', detail: '云侧任务或请求的已记录时长'}];
+  if (item.scope === 'local') {
+    if (valid(item.user_event_ms)) rows.push({label: 'WorkSwarm 接收请求', start: item.user_event_ms, duration: 0, kind: 'event', detail: '用户请求进入 WorkSwarm 的事件时间点'});
+    for (const tool of Array.isArray(item.tools) ? item.tools : []) {
+      if (!valid(tool.start_ms) || !Number.isFinite(tool.duration_ms) || tool.duration_ms < 0 || tool.start_ms + tool.duration_ms > total) continue;
+      const name = ['bash', 'grep', 'read_file', 'tool_search'].includes(tool.name) ? tool.name : '工具';
+      const summary = typeof tool.summary === 'string' ? tool.summary : '';
+      rows.push({label: `${String(tool.index).padStart(2, '0')} · ${name}${summary ? ` · ${summary}` : ''}`, start: tool.start_ms, duration: tool.duration_ms, kind: tool.success === false ? 'error' : 'tool', detail: `工具调用事件到结果事件；状态：${tool.success === false ? '失败' : '成功'}${Number.isFinite(tool.result_chars) ? `；结果长度：${tool.result_chars} 字符` : ''}`});
+    }
+    for (const model of Array.isArray(item.models) ? item.models : []) {
+      if (!valid(model.time_ms)) continue;
+      const counts = [['输入 Token', model.input_tokens], ['缓存读取', model.cache_read_tokens], ['缓存未命中', model.cache_miss_tokens]].filter(([, value]) => Number.isFinite(value)).map(([key, value]) => `${key}：${value}`).join('；');
+      rows.push({label: `${String(model.index).padStart(2, '0')} · 模型用量记录`, start: model.time_ms, duration: 0, kind: 'model-point', detail: `调用后的记账时间点，无法推算模型耗时${counts ? `；${counts}` : ''}`});
+    }
+    if (valid(item.final_ms)) rows.push({label: '最终回复事件', start: item.final_ms, duration: 0, kind: 'event', detail: '最终回复事件的记录时间，不等同于首次可见文本'});
+    return [rows[0], ...rows.slice(1).sort((a, b) => a.start - b.start)];
+  }
+  const first = item.first_token;
+  const answer = item.answer_first;
+  if (valid(first)) rows.push({label: '至首个文本', start: 0, duration: first, kind: 'first', detail: '网关受理至首个可见文本事件'});
+  if (valid(first) && valid(answer) && answer >= first) rows.push({label: '思考与工具阶段', start: first, duration: answer - first, kind: 'react', detail: '首个文本至首个答案文本，包含思考和工具'});
+  if (valid(answer)) rows.push({label: '答案输出阶段', start: answer, duration: total - answer, kind: 'answer', detail: '首个答案文本至请求结束'});
+  for (const [index, tool] of (Array.isArray(item.tool_events) ? item.tool_events : []).entries()) {
+    if (!valid(tool.start_ms) || !Number.isFinite(tool.duration_ms) || tool.duration_ms < 0 || tool.start_ms + tool.duration_ms > total) continue;
+    const name = ['bash', 'grep', 'read_file', 'tool_search'].includes(tool.name) ? tool.name : '工具';
+    rows.push({label: `${String(index + 1).padStart(2, '0')} · ${name}`, start: tool.start_ms, duration: tool.duration_ms, kind: tool.status === 'error' ? 'error' : 'tool', detail: `工具调用事件到结果事件；状态：${tool.status === 'error' ? '失败' : '成功'}`});
+  }
+  return rows;
+}
+
+function traceHtml(item) {
+  if (!item) return '<p class="empty">所选范围没有可选择的慢请求或超时请求。</p>';
+  const rows = traceRows(item);
+  if (!rows.length) return '<p class="empty">该请求只记录了标识，暂无可绘制的耗时。</p>';
+  state.currentTraceRows = rows;
+  const total = item.gateway;
+  const filter = state.traceFilter || 'tools';
+  const visible = rows.map((row, index) => ({...row, index})).filter((row) => row.kind === 'total' || filter === 'all' || (filter === 'tools' && ['tool', 'error', 'event', 'first', 'react', 'answer'].includes(row.kind)) || (filter === 'models' && ['model-point', 'event'].includes(row.kind)));
+  const styleFor = (row) => `left:${(100 * row.start / total).toFixed(3)}%;width:${(100 * row.duration / total).toFixed(3)}%`;
+  const marks = rows.slice(1).map((row) => `<span class="trace-overview-mark trace-${row.kind}${row.duration === 0 ? ' trace-point' : ''}" style="${styleFor(row)}" title="${esc(row.label)}"></span>`).join('');
+  const bars = visible.filter((row) => row.kind !== 'total').map((row) => `<button type="button" class="trace-event-row" data-trace-row="${row.index}" data-trace-text="${esc(row.label.toLowerCase())}"><span class="trace-event-name">${esc(row.label)}</span><span class="trace-event-track"><span class="trace-bar trace-${row.kind}${row.duration === 0 ? ' trace-point' : ''}" style="${styleFor(row)}"></span></span><span class="trace-duration">${row.duration === 0 ? '时间点' : fmtDuration(row.duration)}</span></button>`).join('');
+  const filters = [['all', '全部事件'], ['tools', '工具调用'], ['models', '模型记账']].map(([key, label]) => `<button type="button" class="trace-filter${filter === key ? ' active' : ''}" data-trace-filter="${key}" aria-pressed="${filter === key}">${label}</button>`).join('');
+  const ticks = [0, .25, .5, .75, 1].map((fraction) => `<span>${fmtDuration(total * fraction)}</span>`).join('');
+  const hasTools = rows.some((row) => row.kind === 'tool' || row.kind === 'error');
+  const missingPhases = item.scope === 'cloud' && (!Number.isFinite(item.first_token) || !Number.isFinite(item.answer_first));
+  const note = item.scope === 'local' ? '本地云侧历史样例（不属于当前范围的慢请求榜单）：工具区间为调用事件到结果事件的间隔；模型记账只表示时间点，不能当作模型耗时。'
+    : hasTools ? '工具区间为调用事件到结果事件的间隔；采集有文件和大小上限，明细可能不完整；模型调用时间未可靠关联。'
+    : '当前快照没有逐次工具调用时间，暂无法绘制工具明细；思考与工具阶段不等于单次工具调用。';
+  const phaseNote = missingPhases ? ' 部分阶段标记未记录，无法绘制对应区间。' : '';
+  const emptyList = filter === 'models' ? '该请求没有可可靠关联的模型记账记录。' : '当前筛选没有可展示的事件。';
+  return `<div class="trajectory-head"><div><strong>执行轨迹</strong><span class="muted">${fmtDuration(total)} · ${rows.length} 条记录 · 当前 ${visible.length} 条</span></div><p>${esc(note + phaseNote)}</p></div>
+    <div class="trace-overview" aria-label="轨迹总览"><div class="trace-overview-total"></div><div class="trace-overview-events">${marks}</div></div>
+    <div class="trajectory-legend"><span><i class="legend-dot total-dot"></i>本轮运行</span><span><i class="legend-dot event-dot"></i>事件</span><span><i class="legend-dot tool-dot"></i>工具</span><span><i class="legend-dot model-dot"></i>模型记账点</span></div>
+    <div class="trajectory-toolbar"><label><span class="sr-only">搜索轨迹</span><input id="trace-search" type="search" placeholder="搜索事件或工具" autocomplete="off"></label><div class="trace-filters" aria-label="轨迹筛选">${filters}</div></div>
+    <div class="trajectory-table"><div class="trajectory-columns"><span>事件</span><span class="trajectory-ticks">${ticks}</span><span>耗时</span></div><details class="trace-group" open><summary class="trace-root-row"><span>${esc(rows[0].label)} <small>${visible.length - 1}</small></span><span class="trace-root-track"><span class="trace-bar trace-total"></span></span><span class="trace-duration">${fmtDuration(total)}</span></summary><div class="trace-event-list">${bars || `<p class="trace-empty">${esc(emptyList)}</p>`}</div></details></div>
+    <div id="trace-detail" class="trace-detail" aria-live="polite">点击一条事件查看时间和指标。</div>`;
+}
+
+function availableTraceCandidates(doc, localTrace) {
+  const cloud = slowTraceCandidates(doc);
+  return localTrace ? [...cloud, localTrace] : cloud;
+}
+
+function renderRequestTraces(doc) {
+  const picker = $('trace-picker');
+  const result = $('trace-result');
+  if (!picker || !result) return;
+  // A local, read-only collection is newer than published aggregate snapshots.
+  // Keep its coverage explicit; do not mix rows from different populations.
+  const publishedTraces = doc?.cloud_trace_collection;
+  const traceCollection = state.localCloudTraces || (publishedTraces?.schema === 'digitalmate/cloud-traces@1' ? publishedTraces : null);
+  const localDays = traceCollection?.days;
+  const source = Array.isArray(localDays) ? {...traceCollection, days: inRange(localDays, state.rangeDays, todayShanghai())} : doc;
+  const candidates = availableTraceCandidates(source, state.localTrace);
+  const cloudCount = candidates.filter((item) => item.scope === 'cloud').length;
+  state.traceCandidates = candidates;
+  const traceKey = (item) => `${item.scope}:${item.request_id}`;
+  if (!state.traceTouched || !candidates.some((item) => traceKey(item) === state.traceId)) {
+    state.traceId = candidates.length ? traceKey(candidates[0]) : '';
+  }
+  const coverage = traceCollection
+    ? `现网只读采集于 ${fmtDateTime(traceCollection.generated_at)}：${fmtCount(traceCollection.read_log_count)} / ${fmtCount(traceCollection.binding_count)} 个绑定读取到日志；排名仅覆盖已读取日志中的已结束请求，工具明细可能不完整。`
+    : '生产快照采集数据';
+  const note = cloudCount ? `${coverage} 当前范围共 ${cloudCount} 条云侧慢请求${traceCollection ? '' : '或超时请求'}。`
+    : `${coverage} 当前范围没有可用的云侧慢请求明细。${state.localTrace ? '下方历史样例不属于当前榜单。' : ''}`;
+  const cloudRows = candidates.map((item, index) => ({item, index})).filter(({item}) => item.scope === 'cloud').slice(0, 20);
+  const table = cloudRows.length ? `<details class="cloud-trace-list" open><summary>云侧慢请求列表（展示 ${cloudRows.length} 条）</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>开始时间</th><th class="num">云侧耗时</th><th class="num">已匹配工具事件</th><th>request_id</th><th>轨迹</th></tr></thead><tbody>${cloudRows.map(({item,index}) => `<tr><td>${esc(item.start_time ? fmtDateTime(item.start_time) : item.date)}</td><td class="num">${fmtDuration(item.gateway)}</td><td class="num">${Array.isArray(item.tool_events) && item.tool_events.length ? item.tool_events.length : '—'}</td><td class="run-id">${esc(item.request_id)}</td><td><button type="button" class="trace-link" data-cloud-select="${index}">查看轨迹</button></td></tr>`).join('')}</tbody></table></div></details>` : '';
+  picker.innerHTML = `<p class="data-freshness">${esc(note)}</p>` + table + (candidates.length ? `<label class="trace-select-label" for="trace-select">选择云侧请求 <select id="trace-select">${candidates.map((item, index) => `<option value="${index}"${traceKey(item) === state.traceId ? ' selected' : ''}>${item.scope === 'local' ? '本地云侧历史样例 · Issue #1031（不受时间筛选）' : '云侧慢请求'} · ${esc(item.start_time ? fmtDateTime(item.start_time) : item.date)} · ${esc(fmtDuration(item.gateway))}${item.scope === 'cloud' ? ` · ${esc(item.request_id)}` : ''}</option>`).join('')}</select></label>` : '');
+  result.innerHTML = traceHtml(candidates.find((item) => traceKey(item) === state.traceId));
+}
+
+$('request-traces').addEventListener('change', (event) => {
+  if (event.target.id !== 'trace-select') return;
+  const item = state.traceCandidates?.[Number(event.target.value)];
+  if (!item) return;
+  state.traceTouched = true;
+  state.traceId = `${item.scope}:${item.request_id}`;
+  state.traceFilter = 'tools';
+  $('trace-result').innerHTML = traceHtml(item);
+});
+
+$('request-traces').addEventListener('click', (event) => {
+  const select = event.target.closest('[data-cloud-select]');
+  if (select) {
+    const index = Number(select.dataset.cloudSelect);
+    const item = state.traceCandidates?.[index];
+    if (!item || item.scope !== 'cloud') return;
+    state.traceTouched = true;
+    state.traceId = `${item.scope}:${item.request_id}`;
+    state.traceFilter = 'tools';
+    $('trace-select').value = String(index);
+    $('trace-result').innerHTML = traceHtml(item);
+    $('trace-result').scrollIntoView({behavior:'smooth', block:'start'});
+    return;
+  }
+  const filter = event.target.closest('[data-trace-filter]');
+  if (filter) {
+    state.traceFilter = filter.dataset.traceFilter;
+    const item = state.traceCandidates?.find((row) => `${row.scope}:${row.request_id}` === state.traceId);
+    $('trace-result').innerHTML = traceHtml(item);
+    return;
+  }
+  const button = event.target.closest('[data-trace-row]');
+  if (!button) return;
+  const row = state.currentTraceRows?.[Number(button.dataset.traceRow)];
+  if (!row) return;
+  $('request-traces').querySelectorAll('[data-trace-row]').forEach((node) => node.classList.toggle('selected', node === button));
+  const detail = $('trace-detail');
+  button.insertAdjacentElement('afterend', detail);
+  detail.innerHTML = `<strong>${esc(row.label)}</strong><div>相对开始：${(row.start / 1000).toFixed(3)} 秒 · ${row.duration === 0 ? '记录类型：时间点' : `事件间隔：${(row.duration / 1000).toFixed(3)} 秒`}</div><div>${esc(row.detail || '')}</div>`;
+});
+
+$('request-traces').addEventListener('input', (event) => {
+  if (event.target.id !== 'trace-search') return;
+  const query = event.target.value.trim().toLowerCase();
+  $('request-traces').querySelectorAll('[data-trace-row]').forEach((node) => { node.hidden = !node.dataset.traceText.includes(query); });
+});
+
+// Local diagnostic artifacts never load from the published GitHub Pages site.
+async function loadLocalTrace() {
+  if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) return;
+  try {
+    const response = await fetch('../data/request-trace-local.json', {cache: 'no-store'});
+    if (!response.ok) return;
+    const data = await response.json();
+    if (!Number.isFinite(data.total_ms) || data.total_ms <= 0 || !Array.isArray(data.tools) || !Array.isArray(data.models)) return;
+    state.localTrace = {...data, request_id: 'issue-1031', date: '2026-11-09', scope: 'local', gateway: data.total_ms};
+    renderEnv();
+  } catch { /* A local diagnostic is optional. */ }
+}
+
+// Local production evidence is never loaded from the public site.
+async function loadLocalCloudTraces() {
+  if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) return;
+  try {
+    const response = await fetch('../data/request-cloud-traces-local.json', {cache: 'no-store'});
+    if (!response.ok) return;
+    const data = await response.json();
+    if (!['digitalmate/local-cloud-traces@1', 'digitalmate/cloud-traces@1'].includes(data?.schema) || !Array.isArray(data.days)) return;
+    state.localCloudTraces = data;
+    renderEnv();
+  } catch { /* A local read-only collection is optional. */ }
+}
+
 // The production snapshot is optional and may live behind a slow private data
 // path. Load it independently so it can never delay or fail the history view.
 async function loadProductionMetrics() {
@@ -3475,7 +3669,9 @@ async function loadEnvLatency() {
       // A missing file simply leaves this candidate out.
     }
   }
-  state.envDaily = newestEnvDaily(candidates);
+  const freshDaily = newestEnvDaily(candidates);
+  state.envRefreshFailed = !freshDaily;
+  state.envDaily = freshDaily || state.envDaily || null;
   // The per-environment GateWay / WorkSwarm table is parked for now; the daily
   // charts carry the same measurements in a more readable form.
   renderEnv();
@@ -3486,13 +3682,19 @@ async function loadEnvLatency() {
 // pooled collector stopped writing it; a stale file must not hide the analysis.
 function newestEnvDaily(candidates) {
   const freshness = (doc) => {
-    const stamp = Date.parse(doc?.generated_at || doc?.updated_at || '');
+    const stamp = Date.parse(doc?.cloud_trace_collection?.generated_at || doc?.generated_at || doc?.updated_at || '');
     return Number.isFinite(stamp) ? stamp : -Infinity;
   };
   let daily = null;
   for (const doc of Array.isArray(candidates) ? candidates : []) {
-    if (doc?.schema !== 'digitalmate/env-request-latency-daily@1') continue;
-    if (!daily || freshness(doc) > freshness(daily)) daily = doc;
+    if (doc?.schema !== 'digitalmate/env-request-latency-daily@1' || doc.env !== 'adx-jiuwen') continue;
+    // A recently re-published document may contain only old days. Prefer the
+    // document with the latest actual data day, then its publication time.
+    const latestDay = (candidate) => [...(Array.isArray(candidate?.days) ? candidate.days : []), ...(Array.isArray(candidate?.cloud_trace_collection?.days) ? candidate.cloud_trace_collection.days : [])]
+      .map((row) => typeof row?.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(row.date) ? row.date : '')
+      .sort().at(-1) || '';
+    if (!daily || latestDay(doc) > latestDay(daily)
+      || (latestDay(doc) === latestDay(daily) && freshness(doc) > freshness(daily))) daily = doc;
   }
   return daily;
 }
@@ -3506,6 +3708,7 @@ function renderEnv() {
   const daily = state.envDaily;
   if (!daily) {
     target.innerHTML = '';
+    renderRequestTraces(null);
     return;
   }
   const all = Array.isArray(daily.days) ? daily.days.filter((row) => row && row.date) : [];
@@ -3513,9 +3716,17 @@ function renderEnv() {
   // current day never anchors a chart. Do the same here: keep every earlier day
   // (including a first day whose log starts mid-day) and drop the partial tail.
   const through = [...all].reverse().find((row) => !row.partial)?.date;
-  const capped = through ? all.filter((row) => row.date <= through) : all;
-  const scoped = { ...daily, days: inRange(capped, state.rangeDays) };
-  target.innerHTML = `${envSummary(scoped)}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTtftTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
+  const capped = state.rangeDays === 1 ? all : (through ? all.filter((row) => row.date <= through) : all);
+  const scoped = { ...daily, days: inRange(capped, state.rangeDays, state.rangeDays === 1 ? todayShanghai() : null) };
+  renderRequestTraces(scoped);
+  const latestObserved = scoped.days.at(-1)?.observed_at;
+  const snapshotTime = daily.generated_at || daily.updated_at;
+  const ageStamp = latestObserved || snapshotTime;
+  const stale = Number.isFinite(Date.parse(ageStamp)) && Date.now() - Date.parse(ageStamp) > 6 * 60 * 60 * 1000;
+  const timeText = latestObserved ? `采集于 ${esc(fmtDateTime(latestObserved))}`
+    : snapshotTime ? `快照生成于 ${esc(fmtDateTime(snapshotTime))}，行级采集时间未知` : '采集时间未知';
+  const freshness = `<p class="data-freshness">云侧数据${timeText}${stale ? ' · 超过 6 小时未更新，请检查采集任务' : ''}${state.envRefreshFailed ? ' · 刷新失败，保留上次快照' : ''}${state.rangeDays === 1 && !scoped.days.length ? ' · 尚无当天采集数据' : ''}；定时采集，并非实时流。</p>`;
+  target.innerHTML = `${freshness}${envSummary(scoped)}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTtftTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
   refineCharts(target);
 }
 
@@ -3538,6 +3749,8 @@ async function load() {
     state.model = busiestModel(history);
     void loadProductionMetrics();
     void loadEnvLatency();
+    void loadLocalTrace();
+    void loadLocalCloudTraces();
     const cases = sortedCases();
     state.selected = cases.find((entry) => entry.id === 'DM-WF-BACK-01')?.id || cases[0]?.id || null;
     render();
@@ -3550,6 +3763,24 @@ async function load() {
     showError(`现网指标统计暂不可用：${error.message}。${hint}`);
   }
 }
+
+async function refreshProductionSnapshots() {
+  try {
+    const response = await fetch('../data/production-model-history.json', { cache: 'no-store' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const history = await response.json();
+    if (!history || typeof history !== 'object' || !history.cases) throw new Error('history missing cases');
+    requireCurrentMetricsVersion(history);
+    state.history = history;
+    renderHeader();
+    renderModels();
+    await loadEnvLatency();
+  } catch {
+    const updated = $('updated');
+    if (updated && !updated.textContent.includes('刷新失败')) updated.textContent += ' · 刷新失败，保留上次快照';
+  }
+}
+setInterval(refreshProductionSnapshots, 5 * 60 * 1000);
 
 $('case-list').addEventListener('click', (event) => {
   const button = event.target.closest('[data-case-id]');
@@ -3593,6 +3824,7 @@ $('model-controls').addEventListener('click', (event) => {
   if (!button || button.disabled) return;
   const value = Number(button.dataset.range);
   state.rangeDays = Number.isFinite(value) && value > 0 ? value : 0;
+  renderHeader();
   renderModels();
 });
 
@@ -3625,6 +3857,15 @@ $('model-trends').addEventListener('click', (event) => {
 });
 
 $('env-latency').addEventListener('click', (event) => {
+  const traceButton = event.target.closest('[data-trace-id]');
+  if (traceButton) {
+    state.traceTouched = true;
+    state.traceId = `cloud:${traceButton.dataset.traceId}`;
+    const index = state.traceCandidates?.findIndex((item) => `${item.scope}:${item.request_id}` === state.traceId) ?? -1;
+    if (index >= 0) { $('trace-select').value = String(index); $('trace-result').innerHTML = traceHtml(state.traceCandidates[index]); }
+    $('request-traces')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
   const button = event.target.closest('[data-env-layer]');
   if (!button) return;
   const key = button.dataset.envLayer;
