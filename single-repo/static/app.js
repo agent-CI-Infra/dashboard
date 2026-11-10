@@ -1352,17 +1352,33 @@
     const cases = history?.cases && typeof history.cases === 'object' ? Object.values(history.cases) : [];
     if (!cases.length) return '';
     cases.sort((a, b) => String(b.latest?.finished_at || '').localeCompare(String(a.latest?.finished_at || '')) || String(a.id).localeCompare(String(b.id)));
-    if (!STATE.perfCase || !history.cases[STATE.perfCase]) {
-      STATE.perfCase = history.cases['DM-WF-BACK-01'] ? 'DM-WF-BACK-01' : cases[0].id;
+    // `history.cases` accumulates every case id ever seen: withdrawn cases keep
+    // a frozen status and inflate the denominator forever. Report the run that
+    // produced most of the current points instead of the whole history.
+    const runCounts = new Map();
+    for (const item of cases) {
+      const runId = item.latest?.run_id;
+      if (!runId) continue;
+      const entry = runCounts.get(runId) || { runId, count: 0, at: '' };
+      entry.count += 1;
+      const at = String(item.latest?.finished_at || '');
+      if (at > entry.at) entry.at = at;
+      runCounts.set(runId, entry);
     }
-    const selected = history.cases[STATE.perfCase] || cases[0];
+    const currentRun = [...runCounts.values()].sort((a, b) => b.count - a.count || b.at.localeCompare(a.at))[0] || null;
+    const scoped = currentRun ? cases.filter((item) => item.latest?.run_id === currentRun.runId) : cases;
+    const scopedIds = new Set(scoped.map((item) => item.id));
+    if (!STATE.perfCase || !scopedIds.has(STATE.perfCase)) {
+      STATE.perfCase = scopedIds.has('DM-WF-BACK-01') ? 'DM-WF-BACK-01' : scoped[0].id;
+    }
+    const selected = history.cases[STATE.perfCase] || scoped[0];
     const latest = selected.latest || {};
     const points = (Array.isArray(selected.points) ? selected.points : []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)) || ((Date.parse(a.finished_at) || 0) - (Date.parse(b.finished_at) || 0)));
-    const statuses = cases.map((c) => c.latest?.status);
+    const statuses = scoped.map((c) => c.latest?.status);
     const completed = statuses.filter((s) => String(s).toUpperCase() === 'COMPLETED').length;
     const blocked = statuses.filter((s) => String(s).toUpperCase() === 'BLOCKED').length;
     const failed = statuses.filter((s) => ['FAILED', 'ERROR'].includes(String(s).toUpperCase())).length;
-    const latestQueries = cases.map((c) => c.latest?.query_ms).filter((v) => v != null);
+    const latestQueries = scoped.map((c) => c.latest?.query_ms).filter((v) => v != null);
     const avgQuery = latestQueries.length ? Math.round(latestQueries.reduce((sum, value) => sum + value, 0) / latestQueries.length) : null;
     const values = points.map((p) => p.query_ms).filter((v) => v != null).sort((a, b) => a - b);
     const median = values.length ? (values.length % 2 ? values[(values.length - 1) / 2] : Math.round((values[values.length / 2 - 1] + values[values.length / 2]) / 2)) : null;
@@ -1370,21 +1386,21 @@
     const activeRuns = points.length;
     const queryCount = latest.query_count ?? (Array.isArray(latest.queries) ? latest.queries.length : 0);
     const title = selected.title || latest.title || selected.id;
-    const caseButtons = cases.map((c) => {
+    const caseButtons = scoped.map((c) => {
       const active = c.id === selected.id;
       return `<button type="button" class="perf-case${active ? ' active' : ''}" data-perf-case="${esc(c.id)}" aria-pressed="${active}"><span class="perf-case-top">${perfDot(c.latest?.status)}<code>${esc(c.id)}</code><span class="perf-case-dur" title="本轮 query 平均耗时">${perfMs(c.latest?.query_ms)}</span></span><span class="perf-case-title">${esc(c.title || '')}</span>${perfSparkline(c.points)}</button>`;
     }).join('');
     const updated = history.updated_at ? shortDateTime(history.updated_at) : '—';
     return `<div class="perf-section" data-perf-section>
-      ${sectionHead('Nightly 用例性能', `真机 / 模拟器 nightly · 每用例每轮一个查询耗时点 · 从发出 query 到收到最后一条消息 · 同日重跑保留 · 数据 ${esc(updated)}`)}
+      ${sectionHead('Nightly 用例性能', `真机 / 模拟器 nightly · 每用例每轮一个查询耗时点 · 从发出 query 到收到最后一条消息 · 同日重跑保留 · 数据 ${esc(updated)}${currentRun ? ` · 口径 ${esc(currentRun.runId)}（${n(scoped.length)} 个用例）` : ''}`)}
       ${tiles([
-        { label: '用例', value: n(cases.length), sub: `最新一轮 ${n(completed)} 通过` },
-        { label: '最新通过', value: `${n(completed)}<small>/ ${n(cases.length)}</small>`, sub: `${Math.round((completed / cases.length) * 100)}%`, tone: completed === cases.length ? 'good' : '' },
+        { label: '用例', value: n(scoped.length), sub: `最新一轮 ${n(completed)} 通过` },
+        { label: '最新通过', value: `${n(completed)}<small>/ ${n(scoped.length)}</small>`, sub: `${Math.round((completed / scoped.length) * 100)}%`, tone: completed === scoped.length ? 'good' : '' },
         { label: '阻塞 / 失败', value: `${n(blocked)} / ${n(failed)}`, sub: '阻塞不等于失败', tone: blocked || failed ? 'warn' : 'good' },
         { label: '最新平均查询耗时', value: perfMs(avgQuery), sub: '各用例最近一次 · 不含 E2E 等待' },
       ])}
       <div class="perf-layout">
-        <div class="card perf-list-card"><h3>用例 <span class="sub">${n(cases.length)} 个 · 点击切换</span></h3><div class="perf-list">${caseButtons}</div></div>
+        <div class="card perf-list-card"><h3>用例 <span class="sub">${n(scoped.length)} 个 · 点击切换</span></h3><div class="perf-list">${caseButtons}</div></div>
         <div class="perf-detail">
           <div class="card perf-detail-head"><div class="perf-detail-title"><div class="perf-title-row"><h3><code>${esc(selected.id)}</code></h3>${badge(selectedLabel, selectedTone)}</div><p class="perf-case-name">${esc(title)}</p><p class="muted">完成于 ${esc(shortDateTime(latest.finished_at))} · run <code>${esc(latest.run_id || '—')}</code> · commit <span class="mono">${esc((latest.commit || '').slice(0, 7) || '—')}</span> · ${esc(perfDevice(latest.device))} · E2E 总耗时 ${perfMs(latest.duration_ms)}</p></div></div>
           <div class="perf-kpis">
