@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/test-matrix@1",
- "generatedAt": "2026-11-09T20:11:14.946Z",
+ "generatedAt": "2026-11-10T03:51:01.809Z",
  "source": {
   "repository": "openJiuwen-ai/DigitalMate",
-  "main": "4cffef4d",
+  "main": "47114a92",
   "refs": [
    {
     "label": "test/st-complete-coverage",
@@ -30,14 +30,14 @@
   "e2e": 27
  },
  "nightly": {
-  "createdAt": "2026-11-08T21:51:29Z",
-  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/42527279739",
+  "createdAt": "2026-11-10T01:20:26Z",
+  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/42735082905",
   "jobs": {
    "Update HK DigitalMate (latest main)": "failure",
    "DigitalMate ST (Windows)": "skipped",
    "Nightly report": "success",
-   "Bench (full)": "skipped",
-   "E2E (${{ (inputs.e2e_case || 'all') }})": "skipped"
+   "E2E (${{ (inputs.e2e_case || 'all') }})": "skipped",
+   "Bench (full)": "skipped"
   }
  },
  "statusLabels": {
@@ -81,7 +81,7 @@
   "layers": {
    "UT": {
     "cases": 190,
-    "tests": 2460,
+    "tests": 2465,
     "byStatus": {
      "ci_lane": 190
     },
@@ -92,7 +92,7 @@
    },
    "UT-Server": {
     "cases": 263,
-    "tests": 4425,
+    "tests": 4437,
     "byStatus": {
      "ci_lane": 263
     },
@@ -102,14 +102,14 @@
     }
    },
    "REG": {
-    "cases": 22,
+    "cases": 12,
     "tests": 0,
     "byStatus": {
-     "ci_lane": 22
+     "ci_lane": 12
     },
     "bySuite": {},
     "byImpl": {
-     "main": 22
+     "main": 12
     }
    },
    "ST": {
@@ -135,10 +135,10 @@
     }
    },
    "E2E": {
-    "cases": 58,
+    "cases": 50,
     "tests": 0,
     "byStatus": {
-     "no_result": 31,
+     "no_result": 23,
      "pass_recheck_blocked": 1,
      "pass_recorded": 6,
      "not_run": 18,
@@ -147,12 +147,13 @@
     },
     "bySuite": {
      "default": 15,
-     "explicit": 43
+     "explicit": 35
     },
     "byImpl": {
-     "main": 36,
-     "test/e2e-complete-coverage": 9,
-     "missing": 13
+     "main": 26,
+     "test/st-complete-coverage": 2,
+     "test/e2e-complete-coverage": 17,
+     "missing": 5
     }
    },
    "EVAL": {
@@ -187,9 +188,9 @@
    "artifact_fault": [
     "ST:ART-02",
     "ST:REC-01",
+    "E2E:ATT-08",
     "E2E:CTL-04",
-    "E2E:ART-03",
-    "E2E:ATT-08"
+    "E2E:ART-03"
    ],
    "identity": [
     "ST:ART-04",
@@ -204,8 +205,8 @@
     "E2E:CON-02",
     "E2E:CTL-01",
     "E2E:CTL-02",
-    "E2E:ART-06",
     "E2E:CON-03",
+    "E2E:ART-06",
     "E2E:CTL-07"
    ],
    "fixture": [
@@ -226,9 +227,9 @@
    ],
    "system_ui": [
     "E2E:UI-06",
-    "E2E:UI-03",
     "E2E:ATT-08",
     "E2E:CAP-04",
+    "E2E:UI-03",
     "E2E:CAP-05"
    ],
    "release": [
@@ -1837,7 +1838,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 8,
+   "tests": 12,
    "layer": "UT",
    "id": "device-permissions.test.mjs",
    "title": "device",
@@ -2068,7 +2069,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 24,
+   "tests": 25,
    "layer": "UT",
    "id": "digitalmate-composer-send.test.mjs",
    "title": "digitalmate",
@@ -4882,7 +4883,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 60,
+   "tests": 62,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_engine_brief.py",
    "title": "test_engine_brief",
@@ -5638,7 +5639,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 17,
+   "tests": 18,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_engine_direct.py",
    "title": "test_engine_direct",
@@ -7276,7 +7277,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 37,
+   "tests": 38,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_engine_tools_mcp.py",
    "title": "test_engine_tools_mcp",
@@ -7402,7 +7403,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 15,
+   "tests": 18,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_engine_weather.py",
    "title": "test_engine_weather",
@@ -9376,7 +9377,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 15,
+   "tests": 16,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_user_location.py",
    "title": "test_user_location",
@@ -9586,7 +9587,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 43,
+   "tests": 47,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_workswarm_adapter.py",
    "title": "test_workswarm_adapter",
@@ -9882,48 +9883,6 @@
    "note": "catalog status: todo",
    "tests": null,
    "layer": "REG",
-   "id": "DM-WF-ATTACH-01",
-   "title": "dm wf attach 01",
-   "module": "L4",
-   "file": "tests/e2e/workflow/cases/DM-WF-ATTACH-01.workflow.json",
-   "impl": "main",
-   "status": "ci_lane",
-   "lane": "pr-merge"
-  },
-  {
-   "priority": null,
-   "owner": "BESTTOOLBOX",
-   "planId": null,
-   "suite": null,
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/565",
-   "note": "catalog status: todo",
-   "tests": null,
-   "layer": "REG",
-   "id": "DM-WF-FILE-02",
-   "title": "dm wf file 02",
-   "module": "L4",
-   "file": "tests/e2e/workflow/cases/DM-WF-FILE-02.workflow.json",
-   "impl": "main",
-   "status": "ci_lane",
-   "lane": "pr-merge"
-  },
-  {
-   "priority": null,
-   "owner": "BESTTOOLBOX",
-   "planId": null,
-   "suite": null,
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/565",
-   "note": "catalog status: todo",
-   "tests": null,
-   "layer": "REG",
    "id": "DM-WF-FILE-03",
    "title": "dm wf file 03",
    "module": "L4",
@@ -9945,73 +9904,10 @@
    "note": "catalog status: todo",
    "tests": null,
    "layer": "REG",
-   "id": "DM-WF-FILE-04",
-   "title": "dm wf file 04",
-   "module": "L4",
-   "file": "tests/e2e/workflow/cases/DM-WF-FILE-04.workflow.json",
-   "impl": "main",
-   "status": "ci_lane",
-   "lane": "pr-merge"
-  },
-  {
-   "priority": null,
-   "owner": "BESTTOOLBOX",
-   "planId": null,
-   "suite": null,
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/565",
-   "note": "catalog status: todo",
-   "tests": null,
-   "layer": "REG",
    "id": "DM-WF-FILEDELETE-01",
    "title": "dm wf filedelete 01",
    "module": "L4",
    "file": "tests/e2e/workflow/cases/DM-WF-FILEDELETE-01.workflow.json",
-   "impl": "main",
-   "status": "ci_lane",
-   "lane": "pr-merge"
-  },
-  {
-   "priority": null,
-   "owner": "BESTTOOLBOX",
-   "planId": null,
-   "suite": null,
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/565",
-   "note": "catalog status: todo",
-   "tests": null,
-   "layer": "REG",
-   "id": "DM-WF-PERM-01",
-   "title": "dm wf perm 01",
-   "module": "L4",
-   "file": "tests/e2e/workflow/cases/DM-WF-PERM-01.workflow.json",
-   "impl": "main",
-   "status": "ci_lane",
-   "lane": "pr-merge"
-  },
-  {
-   "priority": null,
-   "owner": "BESTTOOLBOX",
-   "planId": null,
-   "suite": null,
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/565",
-   "note": "catalog status: todo",
-   "tests": null,
-   "layer": "REG",
-   "id": "DM-WF-REMINDER-01",
-   "title": "dm wf reminder 01",
-   "module": "L4",
-   "file": "tests/e2e/workflow/cases/DM-WF-REMINDER-01.workflow.json",
    "impl": "main",
    "status": "ci_lane",
    "lane": "pr-merge"
@@ -10102,48 +9998,6 @@
   },
   {
    "priority": null,
-   "owner": "BESTTOOLBOX",
-   "planId": null,
-   "suite": null,
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/565",
-   "note": "catalog status: todo",
-   "tests": null,
-   "layer": "REG",
-   "id": "DM-WF-SILENCE-01",
-   "title": "dm wf silence 01",
-   "module": "L4",
-   "file": "tests/e2e/workflow/cases/DM-WF-SILENCE-01.workflow.json",
-   "impl": "main",
-   "status": "ci_lane",
-   "lane": "pr-merge"
-  },
-  {
-   "priority": null,
-   "owner": "BESTTOOLBOX",
-   "planId": null,
-   "suite": null,
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/565",
-   "note": "catalog status: todo",
-   "tests": null,
-   "layer": "REG",
-   "id": "DM-WF-SWITCH-01",
-   "title": "dm wf switch 01",
-   "module": "L4",
-   "file": "tests/e2e/workflow/cases/DM-WF-SWITCH-01.workflow.json",
-   "impl": "main",
-   "status": "ci_lane",
-   "lane": "pr-merge"
-  },
-  {
-   "priority": null,
    "owner": "DigitalMate-test-maintainers",
    "planId": null,
    "suite": null,
@@ -10162,69 +10016,6 @@
    "impl": "main",
    "status": "ci_lane",
    "lane": "pr-merge"
-  },
-  {
-   "priority": null,
-   "owner": "BESTTOOLBOX",
-   "planId": null,
-   "suite": null,
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/565",
-   "note": "catalog status: todo",
-   "tests": null,
-   "layer": "REG",
-   "id": "DM-WF-TIMEOUT-01",
-   "title": "dm wf timeout 01",
-   "module": "L4",
-   "file": "tests/e2e/workflow/cases/DM-WF-TIMEOUT-01.workflow.json",
-   "impl": "main",
-   "status": "ci_lane",
-   "lane": "pr-merge"
-  },
-  {
-   "priority": null,
-   "owner": "BESTTOOLBOX",
-   "planId": null,
-   "suite": null,
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/565",
-   "note": "catalog status: todo",
-   "tests": null,
-   "layer": "REG",
-   "id": "DM-WF-PRIVACY-01",
-   "title": "dm wf privacy 01",
-   "module": "L4",
-   "file": "tests/e2e/workflow/cases/DM-WF-PRIVACY-01.workflow.json",
-   "impl": "main",
-   "status": "ci_lane",
-   "lane": "release"
-  },
-  {
-   "priority": null,
-   "owner": "BESTTOOLBOX",
-   "planId": null,
-   "suite": null,
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": "https://github.com/openJiuwen-ai/DigitalMate/issues/565",
-   "note": "catalog status: todo",
-   "tests": null,
-   "layer": "REG",
-   "id": "DM-WF-UPGRADE-01",
-   "title": "dm wf upgrade 01",
-   "module": "L4",
-   "file": "tests/e2e/workflow/cases/DM-WF-UPGRADE-01.workflow.json",
-   "impl": "main",
-   "status": "ci_lane",
-   "lane": "release"
   },
   {
    "priority": null,
@@ -11268,31 +11059,6 @@
    "scoreCriteria": 1
   },
   {
-   "priority": "P1",
-   "owner": "DigitalMate test maintainers",
-   "planId": null,
-   "suite": "explicit",
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "DM-WF-ATTACH-01",
-   "title": "上传附件时阻止切换会话",
-   "module": "ATTACH",
-   "mode": "multi-turn",
-   "file": "tests/e2e/workflow/cases/DM-WF-ATTACH-01.workflow.json",
-   "impl": "main",
-   "status": "no_result",
-   "progress": "",
-   "lane": "nightly.yml · E2E (real device)",
-   "steps": 30,
-   "scoreCriteria": 1
-  },
-  {
    "priority": "P0",
    "owner": "Jun-Eric",
    "planId": null,
@@ -11546,31 +11312,6 @@
   },
   {
    "priority": "P1",
-   "owner": "Jun-Eric",
-   "planId": null,
-   "suite": "default",
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "DM-WF-FILE-02",
-   "title": "文件覆盖发布：单一卡片、最新内容与后台恢复",
-   "module": "FILE",
-   "mode": "single-turn",
-   "file": "tests/e2e/workflow/cases/DM-WF-FILE-02.workflow.json",
-   "impl": "main",
-   "status": "no_result",
-   "progress": "",
-   "lane": "nightly.yml · E2E (real device)",
-   "steps": 42,
-   "scoreCriteria": 1
-  },
-  {
-   "priority": "P1",
    "owner": "DigitalMate test maintainers",
    "planId": null,
    "suite": "explicit",
@@ -11592,33 +11333,6 @@
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
    "steps": 25,
-   "scoreCriteria": 1
-  },
-  {
-   "priority": "P0",
-   "owner": "DigitalMate test maintainers",
-   "planId": "ART-05",
-   "suite": "explicit",
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [
-    "#530"
-   ],
-   "evidence": "https://github.com/openJiuwen-ai/DigitalMate/blob/31679cf5fa6c257ea4ca6722a076d31c2ec62aa3/tests/e2e/results/live-20261103-ART05-1793725271953/README.md",
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "DM-WF-FILE-04",
-   "title": "UI 生成下载并从文件入口读取",
-   "module": "FILE",
-   "mode": "multi-turn",
-   "file": "tests/e2e/workflow/cases/DM-WF-FILE-04.workflow.json",
-   "impl": "main",
-   "status": "pass_recorded",
-   "progress": "已有 PASS；当前版复核待完成",
-   "lane": "nightly.yml · E2E (real device)",
-   "steps": 29,
    "scoreCriteria": 1
   },
   {
@@ -11722,56 +11436,6 @@
    "scoreCriteria": 1
   },
   {
-   "priority": "P1",
-   "owner": "DigitalMate test maintainers",
-   "planId": null,
-   "suite": "explicit",
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "DM-WF-PERM-01",
-   "title": "授权撤销后的拒绝和重新授权",
-   "module": "PERM",
-   "mode": "multi-turn",
-   "file": "tests/e2e/workflow/cases/DM-WF-PERM-01.workflow.json",
-   "impl": "main",
-   "status": "no_result",
-   "progress": "",
-   "lane": "nightly.yml · E2E (real device)",
-   "steps": 28,
-   "scoreCriteria": 1
-  },
-  {
-   "priority": "P2",
-   "owner": "DigitalMate test maintainers",
-   "planId": null,
-   "suite": "explicit",
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "DM-WF-PRIVACY-01",
-   "title": "首次隐私拒绝后接受并可用",
-   "module": "PRIVACY",
-   "mode": "multi-turn",
-   "file": "tests/e2e/workflow/cases/DM-WF-PRIVACY-01.workflow.json",
-   "impl": "main",
-   "status": "no_result",
-   "progress": "",
-   "lane": "nightly.yml · E2E (real device)",
-   "steps": 25,
-   "scoreCriteria": 1
-  },
-  {
    "priority": "P0",
    "owner": "DigitalMate test maintainers",
    "planId": "CON-05",
@@ -11851,31 +11515,6 @@
    "scoreCriteria": 2
   },
   {
-   "priority": "P2",
-   "owner": "DigitalMate test maintainers",
-   "planId": null,
-   "suite": "explicit",
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "DM-WF-REMINDER-01",
-   "title": "区分应用提醒和系统闹钟能力",
-   "module": "REMINDER",
-   "mode": "multi-turn",
-   "file": "tests/e2e/workflow/cases/DM-WF-REMINDER-01.workflow.json",
-   "impl": "main",
-   "status": "no_result",
-   "progress": "",
-   "lane": "nightly.yml · E2E (real device)",
-   "steps": 27,
-   "scoreCriteria": 2
-  },
-  {
    "priority": "P0",
    "owner": "huben",
    "planId": null,
@@ -11899,31 +11538,6 @@
    "lane": "nightly.yml · E2E (real device)",
    "steps": 10,
    "scoreCriteria": 4
-  },
-  {
-   "priority": "P0",
-   "owner": "DigitalMate test maintainers",
-   "planId": null,
-   "suite": "explicit",
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "DM-WF-SILENCE-01",
-   "title": "流式中断的恢复与最终失败两条路径",
-   "module": "SILENCE",
-   "mode": "multi-turn",
-   "file": "tests/e2e/workflow/cases/DM-WF-SILENCE-01.workflow.json",
-   "impl": "main",
-   "status": "no_result",
-   "progress": "",
-   "lane": "nightly.yml · E2E (real device)",
-   "steps": 51,
-   "scoreCriteria": 1
   },
   {
    "priority": "P1",
@@ -12028,56 +11642,6 @@
    "scoreCriteria": 2
   },
   {
-   "priority": "P0",
-   "owner": "DigitalMate test maintainers",
-   "planId": null,
-   "suite": "explicit",
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "DM-WF-SWITCH-01",
-   "title": "在途切会话不串显",
-   "module": "SWITCH",
-   "mode": "multi-turn",
-   "file": "tests/e2e/workflow/cases/DM-WF-SWITCH-01.workflow.json",
-   "impl": "main",
-   "status": "no_result",
-   "progress": "",
-   "lane": "nightly.yml · E2E (real device)",
-   "steps": 34,
-   "scoreCriteria": 1
-  },
-  {
-   "priority": "P1",
-   "owner": "DigitalMate test maintainers",
-   "planId": null,
-   "suite": "explicit",
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "DM-WF-TIMEOUT-01",
-   "title": "一次超时后手动重试成功",
-   "module": "TIMEOUT",
-   "mode": "multi-turn",
-   "file": "tests/e2e/workflow/cases/DM-WF-TIMEOUT-01.workflow.json",
-   "impl": "main",
-   "status": "no_result",
-   "progress": "",
-   "lane": "nightly.yml · E2E (real device)",
-   "steps": 20,
-   "scoreCriteria": 1
-  },
-  {
    "priority": "P1",
    "owner": "huben",
    "planId": null,
@@ -12128,29 +11692,58 @@
    "scoreCriteria": 1
   },
   {
-   "priority": "P2",
-   "owner": "DigitalMate test maintainers",
+   "priority": "P1",
+   "owner": "Jun-Eric",
    "planId": null,
-   "suite": "explicit",
+   "suite": "default",
    "dependency": "",
    "dependencyTags": [],
-   "prs": [],
+   "prs": [
+    "#507"
+   ],
    "evidence": null,
    "issue": null,
    "note": "",
    "tests": null,
    "layer": "E2E",
-   "id": "DM-WF-UPGRADE-01",
-   "title": "签名旧版升级候选包保留数据",
-   "module": "UPGRADE",
-   "mode": "multi-turn",
-   "file": "tests/e2e/workflow/cases/DM-WF-UPGRADE-01.workflow.json",
-   "impl": "main",
+   "id": "DM-WF-FILE-02",
+   "title": "文件覆盖发布：单一卡片、最新内容与后台恢复",
+   "module": "FILE",
+   "mode": "single-turn",
+   "file": "tests/e2e/workflow/cases/DM-WF-FILE-02.workflow.json",
+   "impl": "test/st-complete-coverage",
    "status": "no_result",
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
    "steps": 30,
-   "scoreCriteria": 1
+   "scoreCriteria": 4
+  },
+  {
+   "priority": "P0",
+   "owner": "DigitalMate test maintainers",
+   "planId": "ART-05",
+   "suite": "explicit",
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [
+    "#530"
+   ],
+   "evidence": "https://github.com/openJiuwen-ai/DigitalMate/blob/31679cf5fa6c257ea4ca6722a076d31c2ec62aa3/tests/e2e/results/live-20261103-ART05-1793725271953/README.md",
+   "issue": null,
+   "note": "",
+   "tests": null,
+   "layer": "E2E",
+   "id": "DM-WF-FILE-04",
+   "title": "UI 生成下载并从文件入口读取",
+   "module": "FILE",
+   "mode": "multi-turn",
+   "file": "tests/e2e/workflow/cases/DM-WF-FILE-04.workflow.json",
+   "impl": "test/st-complete-coverage",
+   "status": "pass_recorded",
+   "progress": "已有 PASS；当前版复核待完成",
+   "lane": "nightly.yml · E2E (real device)",
+   "steps": 17,
+   "scoreCriteria": 2
   },
   {
    "priority": "P2",
@@ -12184,6 +11777,37 @@
   {
    "priority": "P1",
    "owner": "DigitalMate test maintainers",
+   "planId": "ATT-08",
+   "suite": "explicit",
+   "dependency": "真实系统 picker 原始夹具；可控上传延迟；第二账号与会话 UI",
+   "dependencyTags": [
+    "identity",
+    "artifact_fault",
+    "system_ui"
+   ],
+   "prs": [
+    "#510"
+   ],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": null,
+   "layer": "E2E",
+   "id": "DM-WF-ATTACH-01",
+   "title": "上传中切会话和身份不串绑附件",
+   "module": "ATTACH",
+   "mode": "multi-turn",
+   "file": "tests/e2e/workflow/cases/DM-WF-ATTACH-01.workflow.json",
+   "impl": "test/e2e-complete-coverage",
+   "status": "not_run",
+   "progress": "未真实执行；真实系统 picker 原始夹具；可控上传延迟；第二账号与会话 UI",
+   "lane": "nightly.yml · E2E (real device)",
+   "steps": 19,
+   "scoreCriteria": 2
+  },
+  {
+   "priority": "P1",
+   "owner": "DigitalMate test maintainers",
    "planId": "UI-01",
    "suite": "explicit",
    "dependency": "",
@@ -12206,6 +11830,64 @@
    "progress": "实测 FAIL",
    "lane": "nightly.yml · E2E (real device)",
    "steps": 16,
+   "scoreCriteria": 2
+  },
+  {
+   "priority": "P1",
+   "owner": "DigitalMate test maintainers",
+   "planId": "CAP-04",
+   "suite": "explicit",
+   "dependency": "受控可授权文件提供方与真实 UI 撤权入口",
+   "dependencyTags": [
+    "system_ui"
+   ],
+   "prs": [
+    "#510"
+   ],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": null,
+   "layer": "E2E",
+   "id": "DM-WF-PERM-01",
+   "title": "授权撤销后的拒绝和重新授权",
+   "module": "PERM",
+   "mode": "multi-turn",
+   "file": "tests/e2e/workflow/cases/DM-WF-PERM-01.workflow.json",
+   "impl": "test/e2e-complete-coverage",
+   "status": "not_run",
+   "progress": "未真实执行；受控可授权文件提供方与真实 UI 撤权入口",
+   "lane": "nightly.yml · E2E (real device)",
+   "steps": 15,
+   "scoreCriteria": 2
+  },
+  {
+   "priority": "P2",
+   "owner": "DigitalMate test maintainers",
+   "planId": "CAP-07",
+   "suite": "explicit",
+   "dependency": "专用清洁安装；本次法律协议现场确认；正常 App 测试登录",
+   "dependencyTags": [
+    "release"
+   ],
+   "prs": [
+    "#510"
+   ],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": null,
+   "layer": "E2E",
+   "id": "DM-WF-PRIVACY-01",
+   "title": "首次隐私拒绝后接受并可用",
+   "module": "PRIVACY",
+   "mode": "multi-turn",
+   "file": "tests/e2e/workflow/cases/DM-WF-PRIVACY-01.workflow.json",
+   "impl": "test/e2e-complete-coverage",
+   "status": "not_run",
+   "progress": "未真实执行；专用清洁安装；本次法律协议现场确认；正常 App 测试登录",
+   "lane": "nightly.yml · E2E (real device)",
+   "steps": 11,
    "scoreCriteria": 2
   },
   {
@@ -12298,6 +11980,35 @@
    "scoreCriteria": 2
   },
   {
+   "priority": "P2",
+   "owner": "DigitalMate test maintainers",
+   "planId": "CAP-05",
+   "suite": "explicit",
+   "dependency": "可查询的真实提醒资源与授权通知；系统时钟本次标记资源的真实查询与失败清理控制",
+   "dependencyTags": [
+    "system_ui"
+   ],
+   "prs": [
+    "#510"
+   ],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": null,
+   "layer": "E2E",
+   "id": "DM-WF-REMINDER-01",
+   "title": "区分应用提醒和系统闹钟能力",
+   "module": "REMINDER",
+   "mode": "multi-turn",
+   "file": "tests/e2e/workflow/cases/DM-WF-REMINDER-01.workflow.json",
+   "impl": "test/e2e-complete-coverage",
+   "status": "not_run",
+   "progress": "未真实执行；可查询的真实提醒资源与授权通知；系统时钟本次标记资源的真实查询与失败清理控制",
+   "lane": "nightly.yml · E2E (real device)",
+   "steps": 30,
+   "scoreCriteria": 2
+  },
+  {
    "priority": "P0",
    "owner": "DigitalMate test maintainers",
    "planId": "CTL-04",
@@ -12324,6 +12035,35 @@
    "progress": "未真实执行；真实一次性失败注入",
    "lane": "nightly.yml · E2E (real device)",
    "steps": 11,
+   "scoreCriteria": 2
+  },
+  {
+   "priority": "P0",
+   "owner": "DigitalMate test maintainers",
+   "planId": "PRO-08",
+   "suite": "explicit",
+   "dependency": "真实模型空闲挂起/恢复/失败注入",
+   "dependencyTags": [
+    "model_fault"
+   ],
+   "prs": [
+    "#510"
+   ],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": null,
+   "layer": "E2E",
+   "id": "DM-WF-SILENCE-01",
+   "title": "流式中断的恢复与最终失败两条路径",
+   "module": "SILENCE",
+   "mode": "multi-turn",
+   "file": "tests/e2e/workflow/cases/DM-WF-SILENCE-01.workflow.json",
+   "impl": "test/e2e-complete-coverage",
+   "status": "not_run",
+   "progress": "未真实执行；真实模型空闲挂起/恢复/失败注入",
+   "lane": "nightly.yml · E2E (real device)",
+   "steps": 15,
    "scoreCriteria": 2
   },
   {
@@ -12412,6 +12152,93 @@
    "scoreCriteria": 2
   },
   {
+   "priority": "P0",
+   "owner": "DigitalMate test maintainers",
+   "planId": "CON-03",
+   "suite": "explicit",
+   "dependency": "可切换的真实 A/B 房间；真实云端延迟控制",
+   "dependencyTags": [
+    "env_control"
+   ],
+   "prs": [
+    "#510"
+   ],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": null,
+   "layer": "E2E",
+   "id": "DM-WF-SWITCH-01",
+   "title": "在途切会话不串显",
+   "module": "SWITCH",
+   "mode": "multi-turn",
+   "file": "tests/e2e/workflow/cases/DM-WF-SWITCH-01.workflow.json",
+   "impl": "test/e2e-complete-coverage",
+   "status": "not_run",
+   "progress": "未真实执行；可切换的真实 A/B 房间；真实云端延迟控制",
+   "lane": "nightly.yml · E2E (real device)",
+   "steps": 16,
+   "scoreCriteria": 2
+  },
+  {
+   "priority": "P1",
+   "owner": "DigitalMate test maintainers",
+   "planId": "REC-05",
+   "suite": "explicit",
+   "dependency": "真实模型超时一次性注入",
+   "dependencyTags": [
+    "model_fault"
+   ],
+   "prs": [
+    "#510"
+   ],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": null,
+   "layer": "E2E",
+   "id": "DM-WF-TIMEOUT-01",
+   "title": "一次超时后手动重试成功",
+   "module": "TIMEOUT",
+   "mode": "multi-turn",
+   "file": "tests/e2e/workflow/cases/DM-WF-TIMEOUT-01.workflow.json",
+   "impl": "test/e2e-complete-coverage",
+   "status": "not_run",
+   "progress": "未真实执行；真实模型超时一次性注入",
+   "lane": "nightly.yml · E2E (real device)",
+   "steps": 11,
+   "scoreCriteria": 2
+  },
+  {
+   "priority": "P2",
+   "owner": "DigitalMate test maintainers",
+   "planId": "CAP-08",
+   "suite": "explicit",
+   "dependency": "签名旧版与候选正式包；专用真机/目标发布渠道",
+   "dependencyTags": [
+    "release"
+   ],
+   "prs": [
+    "#510"
+   ],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": null,
+   "layer": "E2E",
+   "id": "DM-WF-UPGRADE-01",
+   "title": "签名旧版升级候选包保留数据",
+   "module": "UPGRADE",
+   "mode": "multi-turn",
+   "file": "tests/e2e/workflow/cases/DM-WF-UPGRADE-01.workflow.json",
+   "impl": "test/e2e-complete-coverage",
+   "status": "not_run",
+   "progress": "未真实执行；签名旧版与候选正式包；专用真机/目标发布渠道",
+   "lane": "nightly.yml · E2E (real device)",
+   "steps": 17,
+   "scoreCriteria": 2
+  },
+  {
    "priority": null,
    "owner": null,
    "planId": "ART-03",
@@ -12458,152 +12285,6 @@
    "impl": "missing",
    "status": "not_run",
    "progress": "未真实执行；可恢复的真实网络控制"
-  },
-  {
-   "priority": null,
-   "owner": null,
-   "planId": "ATT-08",
-   "suite": "explicit",
-   "dependency": "真实系统 picker 原始夹具；可控上传延迟；第二账号与会话 UI",
-   "dependencyTags": [
-    "identity",
-    "artifact_fault",
-    "system_ui"
-   ],
-   "prs": [
-    "#510"
-   ],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "ATT-08",
-   "title": "选文件上传中切会话/切账号，旧附件不绑定新会话，清理正确",
-   "module": "ATT",
-   "impl": "missing",
-   "status": "not_run",
-   "progress": "未真实执行；真实系统 picker 原始夹具；可控上传延迟；第二账号与会话 UI"
-  },
-  {
-   "priority": null,
-   "owner": null,
-   "planId": "CAP-04",
-   "suite": "explicit",
-   "dependency": "受控可授权文件提供方与真实 UI 撤权入口",
-   "dependencyTags": [
-    "system_ui"
-   ],
-   "prs": [
-    "#510"
-   ],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "CAP-04",
-   "title": "授权→成功→UI 撤权→同操作被拒→重新授权提示明确，不记录原始 Token",
-   "module": "CAP",
-   "impl": "missing",
-   "status": "not_run",
-   "progress": "未真实执行；受控可授权文件提供方与真实 UI 撤权入口"
-  },
-  {
-   "priority": null,
-   "owner": null,
-   "planId": "CAP-05",
-   "suite": "explicit",
-   "dependency": "可查询的真实提醒资源与授权通知；系统时钟本次标记资源的真实查询与失败清理控制",
-   "dependencyTags": [
-    "system_ui"
-   ],
-   "prs": [
-    "#510"
-   ],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "CAP-05",
-   "title": "应用提醒 vs 系统闹钟分别请求，说明区别/时区/在线限制，实际资源存在才报成功",
-   "module": "CAP",
-   "impl": "missing",
-   "status": "not_run",
-   "progress": "未真实执行；可查询的真实提醒资源与授权通知；系统时钟本次标记资源的真实查询与失败清理控制"
-  },
-  {
-   "priority": null,
-   "owner": null,
-   "planId": "CAP-07",
-   "suite": "explicit",
-   "dependency": "专用清洁安装；本次法律协议现场确认；正常 App 测试登录",
-   "dependencyTags": [
-    "release"
-   ],
-   "prs": [
-    "#510"
-   ],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "CAP-07",
-   "title": "首次启动拒绝隐私同意→再次接受→基础操作可用",
-   "module": "CAP",
-   "impl": "missing",
-   "status": "not_run",
-   "progress": "未真实执行；专用清洁安装；本次法律协议现场确认；正常 App 测试登录"
-  },
-  {
-   "priority": null,
-   "owner": null,
-   "planId": "CAP-08",
-   "suite": "explicit",
-   "dependency": "签名旧版与候选正式包；专用真机/目标发布渠道",
-   "dependencyTags": [
-    "release"
-   ],
-   "prs": [
-    "#510"
-   ],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "CAP-08",
-   "title": "旧版建数据→升级→保留结果、调试入口关闭、正式包不暴露测试入口",
-   "module": "CAP",
-   "impl": "missing",
-   "status": "not_run",
-   "progress": "未真实执行；签名旧版与候选正式包；专用真机/目标发布渠道"
-  },
-  {
-   "priority": null,
-   "owner": null,
-   "planId": "CON-03",
-   "suite": "explicit",
-   "dependency": "可切换的真实 A/B 房间；真实云端延迟控制",
-   "dependencyTags": [
-    "env_control"
-   ],
-   "prs": [
-    "#510"
-   ],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "CON-03",
-   "title": "A 执行中切 B，B 不显示 A 内容/忙碌；回 A 正常收到迟到结果",
-   "module": "CON",
-   "impl": "missing",
-   "status": "not_run",
-   "progress": "未真实执行；可切换的真实 A/B 房间；真实云端延迟控制"
   },
   {
    "priority": null,
@@ -12672,54 +12353,6 @@
    "impl": "missing",
    "status": "pass_recorded",
    "progress": "已有 PASS；当前版复核待完成"
-  },
-  {
-   "priority": null,
-   "owner": null,
-   "planId": "PRO-08",
-   "suite": "explicit",
-   "dependency": "真实模型空闲挂起/恢复/失败注入",
-   "dependencyTags": [
-    "model_fault"
-   ],
-   "prs": [
-    "#510"
-   ],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "PRO-08",
-   "title": "半句后暂停，验证恢复与最终失败两条路径；等待提示准确、不凭空显示百分比",
-   "module": "PRO",
-   "impl": "missing",
-   "status": "not_run",
-   "progress": "未真实执行；真实模型空闲挂起/恢复/失败注入"
-  },
-  {
-   "priority": null,
-   "owner": null,
-   "planId": "REC-05",
-   "suite": "explicit",
-   "dependency": "真实模型超时一次性注入",
-   "dependencyTags": [
-    "model_fault"
-   ],
-   "prs": [
-    "#510"
-   ],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": null,
-   "layer": "E2E",
-   "id": "REC-05",
-   "title": "首轮超时→点重试→第二次成功；用户消息不重复，只一次有效重试",
-   "module": "REC",
-   "impl": "missing",
-   "status": "not_run",
-   "progress": "未真实执行；真实模型超时一次性注入"
   },
   {
    "priority": "P1",
