@@ -668,14 +668,14 @@
  },
  "cloud_trace_collection": {
   "schema": "digitalmate/cloud-traces@1",
-  "generated_at": "2026-11-10T09:39:29.417978+00:00",
-  "binding_count": 132,
-  "read_log_count": 130,
+  "generated_at": "2026-11-10T15:23:26.412536+00:00",
+  "binding_count": 136,
+  "read_log_count": 135,
   "errors": {
-   "http_413": 2
+   "http_413": 1
   },
-  "detail_workspaces_complete": 17,
-  "detail_workspaces_partial": 1,
+  "detail_workspaces_complete": 16,
+  "detail_workspaces_partial": 3,
   "trace_request_limit": 100,
   "days": [
    {
@@ -690,14 +690,7 @@
         "date": "2026-11-04",
         "gateway": 103450.0,
         "start_time": "2026-11-03T17:05:58.963000+00:00",
-        "tool_events": [
-         {
-          "name": "tool",
-          "start_ms": 1013.6,
-          "duration_ms": 13.6,
-          "status": "ok"
-         }
-        ],
+        "tool_events": [],
         "trace_complete": false
        },
        {
@@ -1948,62 +1941,7 @@
         "gateway": 142171.0,
         "start_time": "2026-11-06T08:32:22.825000+00:00",
         "first_token": 4910.0,
-        "tool_events": [
-         {
-          "name": "tool",
-          "start_ms": 5806.7,
-          "duration_ms": 215.6,
-          "status": "ok"
-         },
-         {
-          "name": "bash",
-          "start_ms": 31278.1,
-          "duration_ms": 219.7,
-          "status": "ok"
-         },
-         {
-          "name": "bash",
-          "start_ms": 69752.1,
-          "duration_ms": 462.1,
-          "status": "ok"
-         },
-         {
-          "name": "tool",
-          "start_ms": 99861.5,
-          "duration_ms": 183.9,
-          "status": "ok"
-         },
-         {
-          "name": "bash",
-          "start_ms": 116015.8,
-          "duration_ms": 259.6,
-          "status": "ok"
-         },
-         {
-          "name": "bash",
-          "start_ms": 119623.0,
-          "duration_ms": 287.0,
-          "status": "ok"
-         },
-         {
-          "name": "bash",
-          "start_ms": 130612.5,
-          "duration_ms": 645.7,
-          "status": "ok"
-         },
-         {
-          "name": "bash",
-          "start_ms": 134418.9,
-          "duration_ms": 597.3,
-          "status": "ok"
-         },
-         {
-          "name": "tool",
-          "start_ms": 137645.7,
-          "duration_ms": 215.7,
-          "status": "ok"
-         }
-        ],
+        "tool_events": [],
         "trace_complete": false
        },
        {
@@ -7003,8 +6941,8 @@
     "date": "2026-11-10",
     "anomaly": {
      "latency": {
-      "n": 114,
-      "slow_count": 6,
+      "n": 310,
+      "slow_count": 16,
       "slow_requests": [
        {
         "request_id": "digitalmate-550eea86f2954a8dae54784ef7f834db",
@@ -7275,6 +7213,386 @@
         "trace_complete": false
        },
        {
+        "request_id": "digitalmate-13f1817c503e4f828f234dc911730117",
+        "date": "2026-11-10",
+        "gateway": 392474.0,
+        "start_time": "2026-11-10T14:06:22.517000+00:00",
+        "first_token": 15921.0,
+        "tool_events": [
+         {
+          "name": "bash",
+          "start_ms": 16975.5,
+          "duration_ms": 183.2,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 22963.3,
+          "duration_ms": 384.5,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 25590.0,
+          "duration_ms": 589.7,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 29852.5,
+          "duration_ms": 182.5,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 37565.0,
+          "duration_ms": 599.6,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 40812.0,
+          "duration_ms": 709.4,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 43070.4,
+          "duration_ms": 288.4,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 66149.2,
+          "duration_ms": 647.3,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 73499.3,
+          "duration_ms": 212.9,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 117348.2,
+          "duration_ms": 5352.8,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 127810.4,
+          "duration_ms": 553.7,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 132534.2,
+          "duration_ms": 682.9,
+          "status": "error"
+         },
+         {
+          "name": "bash",
+          "start_ms": 135884.9,
+          "duration_ms": 615.0,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 183122.4,
+          "duration_ms": 218.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 209997.9,
+          "duration_ms": 208.3,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 212342.4,
+          "duration_ms": 625.7,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 240453.2,
+          "duration_ms": 234.7,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 258064.0,
+          "duration_ms": 787.1,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 278811.5,
+          "duration_ms": 369.8,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 302715.4,
+          "duration_ms": 1318.7,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 311697.0,
+          "duration_ms": 420.7,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 328020.2,
+          "duration_ms": 646.0,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 336680.7,
+          "duration_ms": 298.5,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 348381.7,
+          "duration_ms": 1720.8,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 367777.1,
+          "duration_ms": 545.1,
+          "status": "error"
+         },
+         {
+          "name": "bash",
+          "start_ms": 372501.0,
+          "duration_ms": 660.9,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 379286.7,
+          "duration_ms": 314.7,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 385561.5,
+          "duration_ms": 236.9,
+          "status": "ok"
+         }
+        ],
+        "trace_complete": false
+       },
+       {
+        "request_id": "digitalmate-932c424df18c4695aee466d264eca834",
+        "date": "2026-11-10",
+        "gateway": 365689.0,
+        "start_time": "2026-11-10T14:36:52.403000+00:00",
+        "first_token": 3998.0,
+        "tool_events": [
+         {
+          "name": "bash",
+          "start_ms": 5167.4,
+          "duration_ms": 192.1,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 7078.8,
+          "duration_ms": 223.9,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 16963.0,
+          "duration_ms": 443.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 20952.5,
+          "duration_ms": 233.2,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 23654.5,
+          "duration_ms": 708.1,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 30661.3,
+          "duration_ms": 257.0,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 38928.2,
+          "duration_ms": 819.1,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 41589.9,
+          "duration_ms": 235.4,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 54199.7,
+          "duration_ms": 231.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 60855.6,
+          "duration_ms": 265.4,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 64089.2,
+          "duration_ms": 1169.7,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 77482.3,
+          "duration_ms": 255.0,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 83146.5,
+          "duration_ms": 306.8,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 89050.4,
+          "duration_ms": 260.1,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 114502.7,
+          "duration_ms": 1502.7,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 119754.8,
+          "duration_ms": 348.2,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 125936.6,
+          "duration_ms": 210.6,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 137352.1,
+          "duration_ms": 210.6,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 157010.9,
+          "duration_ms": 228.0,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 162864.9,
+          "duration_ms": 220.0,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 188607.1,
+          "duration_ms": 508.1,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 208476.2,
+          "duration_ms": 218.1,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 223348.6,
+          "duration_ms": 253.1,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 234642.2,
+          "duration_ms": 233.9,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 251197.4,
+          "duration_ms": 1858.2,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 274177.9,
+          "duration_ms": 310.5,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 278713.9,
+          "duration_ms": 834.7,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 287967.7,
+          "duration_ms": 308.5,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 292558.3,
+          "duration_ms": 602.9,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 330075.3,
+          "duration_ms": 306.8,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 343297.7,
+          "duration_ms": 326.9,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 351368.2,
+          "duration_ms": 239.4,
+          "status": "ok"
+         }
+        ],
+        "trace_complete": false
+       },
+       {
         "request_id": "digitalmate-1b959d5e04c949188a180f24742e6f55",
         "date": "2026-11-10",
         "gateway": 353026.0,
@@ -7519,6 +7837,208 @@
         "trace_complete": false
        },
        {
+        "request_id": "digitalmate-d80570d8a45e45bbb3c414fd434eab7c",
+        "date": "2026-11-10",
+        "gateway": 336830.0,
+        "start_time": "2026-11-10T13:45:31.519000+00:00",
+        "first_token": 11135.0,
+        "tool_events": [
+         {
+          "name": "bash",
+          "start_ms": 12420.3,
+          "duration_ms": 20218.6,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 44582.9,
+          "duration_ms": 266.3,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 44609.2,
+          "duration_ms": 340.8,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 109892.6,
+          "duration_ms": 234.0,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 122962.0,
+          "duration_ms": 3285.3,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 141440.3,
+          "duration_ms": 392.2,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 141466.6,
+          "duration_ms": 445.3,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 141491.4,
+          "duration_ms": 511.8,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 141527.7,
+          "duration_ms": 611.3,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 154545.9,
+          "duration_ms": 3265.2,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 163503.9,
+          "duration_ms": 403.7,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 163528.7,
+          "duration_ms": 458.5,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 163549.0,
+          "duration_ms": 525.0,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 163587.7,
+          "duration_ms": 591.1,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 177417.8,
+          "duration_ms": 3225.6,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 190288.7,
+          "duration_ms": 408.5,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 190310.4,
+          "duration_ms": 483.8,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 190330.8,
+          "duration_ms": 574.2,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 190360.0,
+          "duration_ms": 634.1,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 206927.3,
+          "duration_ms": 3339.3,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 218249.8,
+          "duration_ms": 621.5,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 218265.9,
+          "duration_ms": 677.4,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 218278.8,
+          "duration_ms": 732.0,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 218288.8,
+          "duration_ms": 814.7,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 218329.0,
+          "duration_ms": 870.6,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 240679.0,
+          "duration_ms": 2549.4,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 250997.9,
+          "duration_ms": 266.1,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 266285.0,
+          "duration_ms": 318.4,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 274274.9,
+          "duration_ms": 302.3,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 301336.5,
+          "duration_ms": 262.2,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 319656.6,
+          "duration_ms": 508.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 324667.9,
+          "duration_ms": 255.7,
+          "status": "ok"
+         }
+        ],
+        "trace_complete": false
+       },
+       {
         "request_id": "digitalmate-a5a9c84756e549ff80bbe2aeea7e28cc",
         "date": "2026-11-10",
         "gateway": 285909.0,
@@ -7529,6 +8049,710 @@
           "start_ms": 742.1,
           "duration_ms": 142.2,
           "status": "ok"
+         }
+        ],
+        "trace_complete": false
+       },
+       {
+        "request_id": "digitalmate-1625235cbefc46bb81c34b3e6c2fc8eb",
+        "date": "2026-11-10",
+        "gateway": 283304.0,
+        "start_time": "2026-11-10T11:24:53.973000+00:00",
+        "first_token": 13021.0,
+        "tool_events": [
+         {
+          "name": "bash",
+          "start_ms": 30197.1,
+          "duration_ms": 200.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool_search",
+          "start_ms": 37182.2,
+          "duration_ms": 239.4,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 37212.3,
+          "duration_ms": 457.1,
+          "status": "ok"
+         },
+         {
+          "name": "tool_search",
+          "start_ms": 49717.2,
+          "duration_ms": 235.4,
+          "status": "ok"
+         },
+         {
+          "name": "tool_search",
+          "start_ms": 49751.5,
+          "duration_ms": 284.1,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 92429.5,
+          "duration_ms": 243.1,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 98860.3,
+          "duration_ms": 761.2,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 115185.4,
+          "duration_ms": 1723.8,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 120209.3,
+          "duration_ms": 1072.7,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 137353.8,
+          "duration_ms": 2468.4,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 145956.2,
+          "duration_ms": 301.6,
+          "status": "error"
+         },
+         {
+          "name": "tool",
+          "start_ms": 152237.6,
+          "duration_ms": 223.4,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 155458.6,
+          "duration_ms": 1320.7,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 160290.7,
+          "duration_ms": 299.0,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 168291.9,
+          "duration_ms": 214.4,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 181119.7,
+          "duration_ms": 1341.6,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 188833.3,
+          "duration_ms": 260.3,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 210310.3,
+          "duration_ms": 210.4,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 216914.1,
+          "duration_ms": 195.9,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 222143.2,
+          "duration_ms": 239.2,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 226942.3,
+          "duration_ms": 4648.2,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 236648.9,
+          "duration_ms": 1522.5,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 243789.1,
+          "duration_ms": 2626.3,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 257687.7,
+          "duration_ms": 2136.0,
+          "status": "ok"
+         }
+        ],
+        "trace_complete": false
+       },
+       {
+        "request_id": "digitalmate-7b562384cc1a455e84eefd0b599003bf",
+        "date": "2026-11-10",
+        "gateway": 275809.0,
+        "start_time": "2026-11-10T09:31:16.956000+00:00",
+        "first_token": 3593.0,
+        "tool_events": [
+         {
+          "name": "tool_search",
+          "start_ms": 12545.3,
+          "duration_ms": 258.8,
+          "status": "ok"
+         },
+         {
+          "name": "tool_search",
+          "start_ms": 12577.1,
+          "duration_ms": 318.2,
+          "status": "ok"
+         },
+         {
+          "name": "tool_search",
+          "start_ms": 15447.5,
+          "duration_ms": 420.9,
+          "status": "ok"
+         },
+         {
+          "name": "tool_search",
+          "start_ms": 15477.6,
+          "duration_ms": 471.8,
+          "status": "ok"
+         },
+         {
+          "name": "tool_search",
+          "start_ms": 15494.9,
+          "duration_ms": 543.5,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 20689.2,
+          "duration_ms": 607.5,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 20711.2,
+          "duration_ms": 660.0,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 20740.2,
+          "duration_ms": 717.7,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 20772.1,
+          "duration_ms": 768.8,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 20797.4,
+          "duration_ms": 839.2,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 20807.9,
+          "duration_ms": 936.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool_search",
+          "start_ms": 37419.8,
+          "duration_ms": 257.5,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 37450.3,
+          "duration_ms": 449.3,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 42443.0,
+          "duration_ms": 536.7,
+          "status": "ok"
+         },
+         {
+          "name": "tool_search",
+          "start_ms": 42463.6,
+          "duration_ms": 239.0,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 51739.4,
+          "duration_ms": 289.7,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 57286.7,
+          "duration_ms": 359.0,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 61218.5,
+          "duration_ms": 297.3,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 71170.5,
+          "duration_ms": 309.4,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 76185.9,
+          "duration_ms": 223.6,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 82635.1,
+          "duration_ms": 457.9,
+          "status": "error"
+         },
+         {
+          "name": "bash",
+          "start_ms": 86649.8,
+          "duration_ms": 1990.4,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 104547.6,
+          "duration_ms": 2079.5,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 113249.8,
+          "duration_ms": 14368.6,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 143642.4,
+          "duration_ms": 202.3,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 147077.7,
+          "duration_ms": 1233.6,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 155278.1,
+          "duration_ms": 2359.5,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 162546.9,
+          "duration_ms": 2591.3,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 171801.1,
+          "duration_ms": 5654.9,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 191229.3,
+          "duration_ms": 945.5,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 235773.6,
+          "duration_ms": 1835.6,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 247189.3,
+          "duration_ms": 8956.4,
+          "status": "ok"
+         }
+        ],
+        "trace_complete": false
+       },
+       {
+        "request_id": "digitalmate-c45eaa90fd7f41e599ff5449fe4397cf",
+        "date": "2026-11-10",
+        "gateway": 273336.0,
+        "start_time": "2026-11-10T13:20:00.945000+00:00",
+        "first_token": 4833.0,
+        "tool_events": [
+         {
+          "name": "tool",
+          "start_ms": 9584.3,
+          "duration_ms": 305.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 9605.2,
+          "duration_ms": 383.5,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 16271.1,
+          "duration_ms": 422.7,
+          "status": "error"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 16289.7,
+          "duration_ms": 491.4,
+          "status": "error"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 16314.5,
+          "duration_ms": 546.7,
+          "status": "error"
+         },
+         {
+          "name": "bash",
+          "start_ms": 16358.5,
+          "duration_ms": 594.2,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 20647.7,
+          "duration_ms": 626.6,
+          "status": "error"
+         },
+         {
+          "name": "tool",
+          "start_ms": 24945.0,
+          "duration_ms": 286.2,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 24976.2,
+          "duration_ms": 362.0,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 46349.8,
+          "duration_ms": 954.4,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 46370.8,
+          "duration_ms": 858.2,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 46393.1,
+          "duration_ms": 988.3,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 46422.0,
+          "duration_ms": 609.2,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 46430.3,
+          "duration_ms": 7081.8,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 46446.1,
+          "duration_ms": 448.8,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 135779.0,
+          "duration_ms": 245.9,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 200078.2,
+          "duration_ms": 262.1,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 204028.3,
+          "duration_ms": 932.9,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 208581.8,
+          "duration_ms": 183.1,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 219280.9,
+          "duration_ms": 211.9,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 225701.6,
+          "duration_ms": 690.3,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 234559.9,
+          "duration_ms": 638.8,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 241324.7,
+          "duration_ms": 617.1,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 261996.3,
+          "duration_ms": 473.4,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 262026.9,
+          "duration_ms": 369.1,
+          "status": "ok"
+         }
+        ],
+        "trace_complete": false
+       },
+       {
+        "request_id": "digitalmate-a7ab9f199cab40dbaf3f47953414b52b",
+        "date": "2026-11-10",
+        "gateway": 268035.0,
+        "start_time": "2026-11-10T14:59:39.017000+00:00",
+        "first_token": 7583.0,
+        "tool_events": [
+         {
+          "name": "tool",
+          "start_ms": 8261.0,
+          "duration_ms": 244.2,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 11665.4,
+          "duration_ms": 223.2,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 11676.5,
+          "duration_ms": 285.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 14011.2,
+          "duration_ms": 181.4,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 14020.8,
+          "duration_ms": 263.4,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 32049.1,
+          "duration_ms": 135.9,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 35145.6,
+          "duration_ms": 172.9,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 40951.9,
+          "duration_ms": 1773.2,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 116587.4,
+          "duration_ms": 219.9,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 128591.1,
+          "duration_ms": 1495.0,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 133021.8,
+          "duration_ms": 761.1,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 166822.1,
+          "duration_ms": 216.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 203675.8,
+          "duration_ms": 268.8,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 210554.6,
+          "duration_ms": 266.3,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 230295.3,
+          "duration_ms": 1876.2,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 238912.4,
+          "duration_ms": 814.0,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 243752.0,
+          "duration_ms": 168.1,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 252631.3,
+          "duration_ms": 213.7,
+          "status": "ok"
+         }
+        ],
+        "trace_complete": false
+       },
+       {
+        "request_id": "digitalmate-7db92caaae2d4dca95b21370324fb1d9",
+        "date": "2026-11-10",
+        "gateway": 246149.0,
+        "start_time": "2026-11-10T13:20:54.279000+00:00",
+        "first_token": 4957.0,
+        "tool_events": [
+         {
+          "name": "tool",
+          "start_ms": 10902.3,
+          "duration_ms": 509.8,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 10918.1,
+          "duration_ms": 563.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 22413.5,
+          "duration_ms": 401.5,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 22427.4,
+          "duration_ms": 193.7,
+          "status": "error"
+         },
+         {
+          "name": "tool",
+          "start_ms": 32790.8,
+          "duration_ms": 928.0,
+          "status": "error"
+         },
+         {
+          "name": "tool",
+          "start_ms": 32805.3,
+          "duration_ms": 385.3,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 49987.1,
+          "duration_ms": 31684.8,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 105240.5,
+          "duration_ms": 1355.0,
+          "status": "error"
+         },
+         {
+          "name": "tool",
+          "start_ms": 105252.5,
+          "duration_ms": 464.9,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 113363.2,
+          "duration_ms": 106870.9,
+          "status": "error"
          }
         ],
         "trace_complete": false
@@ -7549,242 +8773,604 @@
         "trace_complete": false
        },
        {
-        "request_id": "digitalmate-43ac4937181142aca6651c3b5b33abf9",
+        "request_id": "digitalmate-6e1fce718bb346b18d225f0625574817",
         "date": "2026-11-10",
-        "gateway": 163431.0,
-        "start_time": "2026-11-10T02:08:44.584000+00:00",
-        "first_token": 2735.0,
+        "gateway": 207078.0,
+        "start_time": "2026-11-10T14:40:35.610000+00:00",
+        "first_token": 9551.0,
         "tool_events": [
          {
-          "name": "bash",
-          "start_ms": 5930.4,
-          "duration_ms": 331.2,
-          "status": "ok"
-         },
-         {
           "name": "tool_search",
-          "start_ms": 5960.9,
-          "duration_ms": 201.1,
-          "status": "ok"
-         },
-         {
-          "name": "tool_search",
-          "start_ms": 8785.5,
-          "duration_ms": 244.1,
-          "status": "ok"
-         },
-         {
-          "name": "read_file",
-          "start_ms": 8822.9,
-          "duration_ms": 309.2,
-          "status": "ok"
-         },
-         {
-          "name": "bash",
-          "start_ms": 21335.3,
-          "duration_ms": 227.5,
-          "status": "ok"
-         },
-         {
-          "name": "read_file",
-          "start_ms": 25438.2,
-          "duration_ms": 456.0,
+          "start_ms": 20542.3,
+          "duration_ms": 170.2,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 73779.5,
-          "duration_ms": 197.8,
-          "status": "ok"
-         },
-         {
-          "name": "bash",
-          "start_ms": 76182.0,
-          "duration_ms": 3568.3,
-          "status": "ok"
-         },
-         {
-          "name": "read_file",
-          "start_ms": 82235.7,
-          "duration_ms": 517.4,
+          "start_ms": 41598.5,
+          "duration_ms": 1231.4,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 102373.8,
-          "duration_ms": 222.0,
+          "start_ms": 41622.6,
+          "duration_ms": 1295.8,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 113745.6,
-          "duration_ms": 234.7,
-          "status": "ok"
-         },
-         {
-          "name": "bash",
-          "start_ms": 118893.6,
-          "duration_ms": 3605.4,
-          "status": "ok"
-         },
-         {
-          "name": "read_file",
-          "start_ms": 125665.6,
-          "duration_ms": 526.5,
-          "status": "ok"
-         },
-         {
-          "name": "bash",
-          "start_ms": 133752.2,
-          "duration_ms": 645.5,
-          "status": "ok"
-         },
-         {
-          "name": "read_file",
-          "start_ms": 137388.1,
-          "duration_ms": 356.8,
-          "status": "ok"
-         },
-         {
-          "name": "read_file",
-          "start_ms": 137407.8,
-          "duration_ms": 437.2,
-          "status": "ok"
-         },
-         {
-          "name": "bash",
-          "start_ms": 146717.8,
-          "duration_ms": 240.3,
+          "start_ms": 41644.7,
+          "duration_ms": 3181.4,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 154246.3,
-          "duration_ms": 219.2,
+          "start_ms": 41680.9,
+          "duration_ms": 1397.2,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 41692.8,
+          "duration_ms": 1474.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 41702.9,
+          "duration_ms": 863.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 41741.5,
+          "duration_ms": 912.4,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 41820.8,
+          "duration_ms": 2926.4,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 41898.5,
+          "duration_ms": 835.4,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 41998.1,
+          "duration_ms": 1000.9,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 53544.4,
+          "duration_ms": 1412.9,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 53571.4,
+          "duration_ms": 1441.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 53602.2,
+          "duration_ms": 1542.0,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 53620.3,
+          "duration_ms": 1583.7,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 53644.3,
+          "duration_ms": 1695.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 53673.6,
+          "duration_ms": 1587.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 53691.2,
+          "duration_ms": 954.7,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 53710.2,
+          "duration_ms": 1001.3,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 53739.7,
+          "duration_ms": 1038.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 53810.0,
+          "duration_ms": 1029.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 53897.4,
+          "duration_ms": 1177.3,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 53978.0,
+          "duration_ms": 918.4,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 60295.5,
+          "duration_ms": 907.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 60317.7,
+          "duration_ms": 1214.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 60350.0,
+          "duration_ms": 1422.9,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 60371.8,
+          "duration_ms": 1324.1,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 60390.2,
+          "duration_ms": 2291.9,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 60417.2,
+          "duration_ms": 702.3,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 60435.3,
+          "duration_ms": 919.7,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 60483.6,
+          "duration_ms": 1124.0,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 60556.7,
+          "duration_ms": 887.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 60623.1,
+          "duration_ms": 1978.2,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 69667.6,
+          "duration_ms": 420.0,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 69723.4,
+          "duration_ms": 6522.0,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 69766.4,
+          "duration_ms": 435.0,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 110853.5,
+          "duration_ms": 741.3,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 110876.1,
+          "duration_ms": 824.7,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 110908.3,
+          "duration_ms": 529.1,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 110960.5,
+          "duration_ms": 557.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 130095.2,
+          "duration_ms": 911.8,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 130114.1,
+          "duration_ms": 1005.1,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 130174.1,
+          "duration_ms": 693.3,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 130261.0,
+          "duration_ms": 665.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 152412.8,
+          "duration_ms": 590.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 152510.7,
+          "duration_ms": 416.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 156457.2,
+          "duration_ms": 3124.0,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 156482.4,
+          "duration_ms": 1362.3,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 177737.0,
+          "duration_ms": 1660.1,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 177821.8,
+          "duration_ms": 1488.8,
           "status": "ok"
          }
         ],
         "trace_complete": false
        },
        {
-        "request_id": "digitalmate-86083ab858d24cb79ce706cbbb10a528",
+        "request_id": "digitalmate-dbf0f45fbdbd4ee3bc60097c9fcdbc49",
         "date": "2026-11-10",
-        "gateway": 152115.0,
-        "start_time": "2026-11-10T02:22:48.898000+00:00",
-        "first_token": 3351.0,
+        "gateway": 201393.0,
+        "start_time": "2026-11-10T14:55:04.092000+00:00",
+        "first_token": 7429.0,
         "tool_events": [
          {
-          "name": "tool",
-          "start_ms": 4840.3,
-          "duration_ms": 398.3,
-          "status": "ok"
-         },
-         {
-          "name": "tool",
-          "start_ms": 4865.5,
-          "duration_ms": 459.3,
+          "name": "tool_search",
+          "start_ms": 9642.7,
+          "duration_ms": 180.2,
           "status": "ok"
          },
          {
           "name": "tool_search",
-          "start_ms": 7802.9,
-          "duration_ms": 200.6,
+          "start_ms": 9653.1,
+          "duration_ms": 275.6,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 15169.9,
+          "duration_ms": 170.8,
+          "status": "error"
+         },
+         {
+          "name": "bash",
+          "start_ms": 18414.2,
+          "duration_ms": 408.5,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 9793.7,
-          "duration_ms": 1486.8,
+          "start_ms": 18455.9,
+          "duration_ms": 519.8,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 22110.7,
+          "duration_ms": 35410.4,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 60420.4,
+          "duration_ms": 85055.0,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 9872.2,
-          "duration_ms": 1315.5,
+          "start_ms": 150191.9,
+          "duration_ms": 443.1,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 13807.9,
-          "duration_ms": 10957.0,
+          "start_ms": 150201.5,
+          "duration_ms": 506.0,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 13830.6,
-          "duration_ms": 3682.0,
+          "start_ms": 155135.5,
+          "duration_ms": 2454.1,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 13881.5,
-          "duration_ms": 10801.8,
+          "start_ms": 155155.2,
+          "duration_ms": 9618.3,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 30395.4,
-          "duration_ms": 5890.3,
+          "start_ms": 180145.6,
+          "duration_ms": 1185.3,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 30439.5,
-          "duration_ms": 553.9,
+          "start_ms": 180158.5,
+          "duration_ms": 1241.8,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 180168.2,
+          "duration_ms": 403.8,
+          "status": "ok"
+         }
+        ],
+        "trace_complete": false
+       },
+       {
+        "request_id": "digitalmate-a2e8d2353e16487dbe7cab9e18ddc5b4",
+        "date": "2026-11-10",
+        "gateway": 198989.0,
+        "start_time": "2026-11-10T12:50:50.494000+00:00",
+        "first_token": 3881.0,
+        "tool_events": [
+         {
+          "name": "tool",
+          "start_ms": 5859.7,
+          "duration_ms": 242.8,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 5888.9,
+          "duration_ms": 512.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 13569.7,
+          "duration_ms": 401.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 13602.4,
+          "duration_ms": 499.4,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 25288.2,
+          "duration_ms": 273.8,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 25318.5,
+          "duration_ms": 421.8,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 32525.5,
+          "duration_ms": 443.2,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 32549.7,
+          "duration_ms": 488.3,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 32578.6,
+          "duration_ms": 536.0,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 36222.3,
+          "duration_ms": 718.9,
           "status": "error"
          },
          {
           "name": "tool",
-          "start_ms": 30464.3,
-          "duration_ms": 603.5,
-          "status": "error"
-         },
-         {
-          "name": "tool",
-          "start_ms": 39402.8,
-          "duration_ms": 480.0,
+          "start_ms": 63293.2,
+          "duration_ms": 235.4,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 39436.0,
-          "duration_ms": 1260.4,
+          "start_ms": 66957.3,
+          "duration_ms": 217.8,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 56339.0,
-          "duration_ms": 7984.0,
+          "start_ms": 100279.0,
+          "duration_ms": 238.8,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 104882.1,
+          "duration_ms": 825.8,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 114550.9,
+          "duration_ms": 630.3,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 122286.9,
+          "duration_ms": 185.5,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 129015.2,
+          "duration_ms": 638.6,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 56367.5,
-          "duration_ms": 6006.1,
+          "start_ms": 148541.3,
+          "duration_ms": 239.1,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 56387.6,
-          "duration_ms": 6927.3,
+          "start_ms": 151355.7,
+          "duration_ms": 243.4,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 154834.1,
+          "duration_ms": 1319.9,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 167371.0,
+          "duration_ms": 638.2,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 122746.1,
-          "duration_ms": 9906.6,
+          "start_ms": 191596.5,
+          "duration_ms": 481.9,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 122768.9,
-          "duration_ms": 6729.4,
+          "start_ms": 191627.3,
+          "duration_ms": 341.5,
+          "status": "ok"
+         }
+        ],
+        "trace_complete": false
+       },
+       {
+        "request_id": "digitalmate-337ed31817ae4c95b908f600071cb424",
+        "date": "2026-11-10",
+        "gateway": 191754.0,
+        "start_time": "2026-11-10T13:39:37.698000+00:00",
+        "first_token": 3476.0,
+        "tool_events": [
+         {
+          "name": "bash",
+          "start_ms": 53211.1,
+          "duration_ms": 442.1,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 83621.6,
+          "duration_ms": 1591.7,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 93881.9,
+          "duration_ms": 1797.5,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 116363.8,
+          "duration_ms": 309.0,
+          "status": "ok"
+         },
+         {
+          "name": "read_file",
+          "start_ms": 123303.1,
+          "duration_ms": 182.6,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 155832.3,
+          "duration_ms": 381.1,
           "status": "ok"
          },
          {
           "name": "tool",
-          "start_ms": 122789.5,
-          "duration_ms": 6773.7,
+          "start_ms": 169453.8,
+          "duration_ms": 252.1,
           "status": "ok"
          }
         ],
