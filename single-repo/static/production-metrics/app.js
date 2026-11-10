@@ -3581,7 +3581,7 @@ function newestEnvDaily(candidates) {
   };
   let daily = null;
   for (const doc of Array.isArray(candidates) ? candidates : []) {
-    if (doc?.schema !== 'digitalmate/env-request-latency-daily@1') continue;
+    if (doc?.schema !== 'digitalmate/env-request-latency-daily@1' || doc.env !== 'adx-jiuwen') continue;
     // A recently re-published document may contain only old days. Prefer the
     // document with the latest actual data day, then its publication time.
     const latestDay = (candidate) => (Array.isArray(candidate?.days) ? candidate.days : [])

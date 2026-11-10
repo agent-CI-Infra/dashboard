@@ -23,6 +23,7 @@ import json
 import math
 import os
 import re
+import subprocess
 import sys
 import time
 import urllib.error
@@ -732,6 +733,33 @@ def collect(until=""):
     return pool(results)
 
 
+def production_seed(previous):
+    """Use only a production-labelled history; repair legacy test-0 seeding.
+
+    The existing workflow has already fetched the data branch. Reading the
+    separate production snapshot from that local ref avoids network access and
+    refuses to carry test-0 rows into the production aggregate.
+    """
+    def valid(doc):
+        return (isinstance(doc, dict) and doc.get("env") == "adx-jiuwen"
+                and doc.get("schema") == "digitalmate/env-request-latency-daily@1")
+
+    if valid(previous):
+        return previous
+    try:
+        raw = subprocess.check_output(
+            ["git", "show", "origin/digitalmate:site/data/production-request-latency-daily.json"],
+            stderr=subprocess.DEVNULL,
+        )
+        candidate = json.loads(raw)
+    except (OSError, subprocess.CalledProcessError, ValueError):
+        candidate = None
+    if not valid(candidate):
+        raise SystemExit("no production-labelled seed; refusing to mix environments")
+    print("Using the production-labelled historical seed; ignoring incompatible snapshot", file=sys.stderr)
+    return candidate
+
+
 def main():
     if not TOKEN:
         raise SystemExit("ADX_TOKEN is not set")
@@ -743,9 +771,10 @@ def main():
     if len(sys.argv) != 3:
         raise SystemExit(__doc__)
     output, previous_path = sys.argv[1], sys.argv[2]
-    fresh = collect(os.environ.get("DM_UNTIL", ""))
     with open(previous_path, encoding="utf-8") as fh:
         previous = json.load(fh)
+    previous = production_seed(previous)
+    fresh = collect(os.environ.get("DM_UNTIL", ""))
     merged = merge(previous, fresh)
     with open(output, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(merged, fh, ensure_ascii=False, indent=1)

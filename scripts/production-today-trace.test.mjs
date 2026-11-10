@@ -54,8 +54,18 @@ test('cloud picker prefers the snapshot with the latest data day over a freshly 
  const c=vm.createContext({});
  vm.runInContext(extract('function newestEnvDaily', 'function renderEnv()')+';globalThis.pick=newestEnvDaily;', c);
  const schema='digitalmate/env-request-latency-daily@1';
- const recentData={schema,generated_at:'2026-11-09T16:34:43Z',days:[{date:'2026-11-10'}],label:'has-today'};
- const newerDocument={schema,generated_at:'2026-11-10T05:05:21Z',days:[{date:'2026-11-08'}],label:'old-data'};
+ const recentData={schema,env:'adx-jiuwen',generated_at:'2026-11-09T16:34:43Z',days:[{date:'2026-11-10'}],label:'has-today'};
+ const newerDocument={schema,env:'adx-jiuwen',generated_at:'2026-11-10T05:05:21Z',days:[{date:'2026-11-08'}],label:'old-data'};
  assert.equal(c.pick([newerDocument,recentData]).label,'has-today');
  assert.equal(c.pick([recentData,newerDocument]).label,'has-today');
+});
+
+test('production cloud picker rejects test and unlabelled environments', () => {
+ const c=vm.createContext({});
+ vm.runInContext(extract('function newestEnvDaily', 'function renderEnv()')+';globalThis.pick=newestEnvDaily;', c);
+ const schema='digitalmate/env-request-latency-daily@1';
+ const prod={schema,env:'adx-jiuwen',generated_at:'2026-11-09T00:00:00Z',days:[{date:'2026-11-09'}]};
+ const testEnv={schema,env:'adx-jiuwen-test-0',generated_at:'2026-11-10T00:00:00Z',days:[{date:'2026-11-10'}]};
+ assert.equal(c.pick([testEnv,prod]),prod);
+ assert.equal(c.pick([testEnv,{schema}]),null);
 });

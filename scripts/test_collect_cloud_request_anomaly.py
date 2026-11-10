@@ -76,6 +76,23 @@ class TraceCollectionTests(unittest.TestCase):
         self.assertNotIn('observed_at', merged['days'][0])
         self.assertEqual(merged['days'][0]['n'], 20)
 
+    def test_main_rejects_a_test_environment_seed_before_collection(self):
+        with tempfile.TemporaryDirectory() as directory:
+            previous = Path(directory) / 'previous.json'
+            previous.write_text(json.dumps({'env': 'adx-jiuwen-test-0'}), encoding='utf-8')
+            with patch.object(collector, 'TOKEN', 'dummy'), \
+                 patch.object(collector.sys, 'argv', ['collector', str(Path(directory) / 'out.json'), str(previous)]), \
+                 patch.object(collector, 'collect') as collect, \
+                 patch.object(collector.subprocess, 'check_output', side_effect=FileNotFoundError):
+                with self.assertRaisesRegex(SystemExit, 'refusing to mix environments'):
+                    collector.main()
+                collect.assert_not_called()
+
+    def test_incompatible_seed_falls_back_to_production_snapshot(self):
+        prod = {'env': 'adx-jiuwen', 'schema': 'digitalmate/env-request-latency-daily@1', 'days': []}
+        with patch.object(collector.subprocess, 'check_output', return_value=json.dumps(prod).encode()):
+            self.assertEqual(collector.production_seed({'env': 'adx-jiuwen-test-0'}), prod)
+
     def test_failure_of_an_active_environment_keeps_old_snapshot(self):
         with patch.object(collector, 'bindings', return_value=[{}, {}]), \
              patch.object(collector, 'collect_environment', side_effect=[{'days': []}, RuntimeError('unavailable')]):
