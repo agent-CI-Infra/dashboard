@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/test-matrix@1",
- "generatedAt": "2026-11-10T15:15:37.281Z",
+ "generatedAt": "2026-11-10T21:27:11.727Z",
  "source": {
   "repository": "openJiuwen-ai/DigitalMate",
-  "main": "3a1db937",
+  "main": "5b2f2b03",
   "refs": [
    {
     "label": "test/st-complete-coverage",
@@ -80,25 +80,25 @@
  "summary": {
   "layers": {
    "UT": {
-    "cases": 194,
-    "tests": 2533,
+    "cases": 192,
+    "tests": 2509,
     "byStatus": {
-     "ci_lane": 194
+     "ci_lane": 192
     },
     "bySuite": {},
     "byImpl": {
-     "main": 194
+     "main": 192
     }
    },
    "UT-Server": {
-    "cases": 280,
-    "tests": 4810,
+    "cases": 282,
+    "tests": 4829,
     "byStatus": {
-     "ci_lane": 280
+     "ci_lane": 282
     },
     "bySuite": {},
     "byImpl": {
-     "main": 280
+     "main": 282
     }
    },
    "REG": {
@@ -1838,48 +1838,6 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 11,
-   "layer": "UT",
-   "id": "device-calendar-context.test.mjs",
-   "title": "device",
-   "module": "device",
-   "file": "tests/unit/device-calendar-context.test.mjs",
-   "impl": "main",
-   "status": "ci_lane",
-   "lane": "ut.yml"
-  },
-  {
-   "priority": null,
-   "owner": null,
-   "planId": null,
-   "suite": null,
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": null,
-   "note": "",
-   "tests": 10,
-   "layer": "UT",
-   "id": "device-calendar.test.mjs",
-   "title": "device",
-   "module": "device",
-   "file": "tests/unit/device-calendar.test.mjs",
-   "impl": "main",
-   "status": "ci_lane",
-   "lane": "ut.yml"
-  },
-  {
-   "priority": null,
-   "owner": null,
-   "planId": null,
-   "suite": null,
-   "dependency": "",
-   "dependencyTags": [],
-   "prs": [],
-   "evidence": null,
-   "issue": null,
-   "note": "",
    "tests": 17,
    "layer": "UT",
    "id": "device-permissions.test.mjs",
@@ -2111,7 +2069,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 28,
+   "tests": 25,
    "layer": "UT",
    "id": "digitalmate-composer-send.test.mjs",
    "title": "digitalmate",
@@ -7907,6 +7865,27 @@
    "evidence": null,
    "issue": null,
    "note": "",
+   "tests": 1,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_gateway_trajectory.py",
+   "title": "test_gateway_trajectory",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_gateway_trajectory.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
    "tests": 5,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_github_read_coverage.py",
@@ -9776,7 +9755,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 28,
+   "tests": 36,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_workspace_context_final.py",
    "title": "test_workspace_context_final",
@@ -10091,7 +10070,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 18,
+   "tests": 20,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_workswarm_flow.py",
    "title": "test_workswarm_flow",
@@ -10118,6 +10097,27 @@
    "title": "test_workswarm_launcher_skills",
    "module": "services/agent_bridge",
    "file": "harness/personal-agent/services/agent_bridge/tests/test_workswarm_launcher_skills.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 8,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_workswarm_runtime_phase.py",
+   "title": "test_workswarm_runtime_phase",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_workswarm_runtime_phase.py",
    "impl": "main",
    "status": "ci_lane",
    "lane": "server-regression.yml"
