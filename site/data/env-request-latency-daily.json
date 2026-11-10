@@ -1,6 +1,6 @@
 {
  "schema": "digitalmate/env-request-latency-daily@1",
- "generated_at": "2026-11-10T03:56:16Z",
+ "generated_at": "2026-11-10T05:05:21Z",
  "env": "adx-jiuwen-test-0",
  "label": "test-0",
  "unit": "ms",
@@ -20,7 +20,9 @@
   "uplink_send": "端侧发送口径：客户端 send → 网关收到该帧（单程，不含服务端处理）",
   "downlink_first_text": "端侧接收口径：网关发出首个文本帧 → 客户端 recv 返回（单程）",
   "downlink_terminal": "端侧接收口径：网关发出终态帧 → 客户端 recv 返回（单程）",
-  "anomaly": "基线 P95 = 该日之前最近 7 个完整日的合并样本 P95（每项至少 20 个样本）；异常 = 当日样本严格大于基线 P95；异常请求 = 请求耗时超过基线 P95 的请求"
+  "anomaly": "基线 P95 = 该日之前最近 7 个完整日的合并样本 P95（每项至少 20 个样本）；异常 = 当日样本严格大于基线 P95；异常请求 = 请求耗时超过基线 P95 的请求",
+  "timeout": "llm_call_error 中含 timeout / timed out / deadline exceeded 的失败调用",
+  "slow_requests": "按请求耗时排序的最慢 5% 请求；公开近 7 天内的 request_id、各阶段耗时与状态，用于在网关定位单条请求"
  },
  "days": [
   {
@@ -70,6 +72,8 @@
    "react": {
     "n": 0
    },
+   "error_categories": {},
+   "timeout_rids": [],
    "tool": {
     "n": 0
    },
@@ -96,7 +100,61 @@
    "failure_rate": 0.0,
    "anomaly": {
     "available": false,
-    "reason": "no_complete_baseline"
+    "reason": "no_complete_baseline",
+    "latency": {
+     "n": 64,
+     "max_ms": 124125.0,
+     "max_request": {
+      "request_id": "digitalmate-ad8ef8ee3d6142c28d023751cd540ce5",
+      "gateway": 124125.0,
+      "first_token": null,
+      "answer_first": null,
+      "react": null,
+      "workswarm": null
+     },
+     "slow_count": 4,
+     "slow_threshold_ms": 104668.0,
+     "slow_requests": [
+      {
+       "request_id": "digitalmate-ad8ef8ee3d6142c28d023751cd540ce5",
+       "gateway": 124125.0,
+       "first_token": null,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      },
+      {
+       "request_id": "digitalmate-7ccca03d39de41ea990a3554825b150a",
+       "gateway": 123289.0,
+       "first_token": null,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      },
+      {
+       "request_id": "digitalmate-c5785062c4954679b1451e6ede680461",
+       "gateway": 110295.0,
+       "first_token": null,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      },
+      {
+       "request_id": "digitalmate-fde4b88e0a81486c8dc6b8e6ee80901b",
+       "gateway": 104668.0,
+       "first_token": null,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      }
+     ]
+    },
+    "timeouts": {
+     "count": 0,
+     "records": 0,
+     "requests": []
+    },
+    "error_categories": {}
    }
   },
   {
@@ -146,6 +204,8 @@
    "react": {
     "n": 0
    },
+   "error_categories": {},
+   "timeout_rids": [],
    "tool": {
     "n": 0
    },
@@ -214,7 +274,45 @@
       "baseline_n": 0,
       "insufficient_baseline": true
      }
-    }
+    },
+    "latency": {
+     "n": 26,
+     "max_ms": 169373.0,
+     "max_request": {
+      "request_id": "digitalmate-b205159252bf4f33a7ea9a55e18edefc",
+      "gateway": 169373.0,
+      "first_token": 8262.0,
+      "answer_first": null,
+      "react": null,
+      "workswarm": 168556.0
+     },
+     "slow_count": 2,
+     "slow_threshold_ms": 154408.0,
+     "slow_requests": [
+      {
+       "request_id": "digitalmate-b205159252bf4f33a7ea9a55e18edefc",
+       "gateway": 169373.0,
+       "first_token": 8262.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 168556.0
+      },
+      {
+       "request_id": "digitalmate-7d50f55de316446b87270552c9ab2069",
+       "gateway": 154408.0,
+       "first_token": 8395.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 153595.0
+      }
+     ]
+    },
+    "timeouts": {
+     "count": 0,
+     "records": 0,
+     "requests": []
+    },
+    "error_categories": {}
    }
   },
   {
@@ -364,6 +462,8 @@
     "p50": 0.0,
     "p95": 0.0
    },
+   "error_categories": {},
+   "timeout_rids": [],
    "tool": {
     "n": 0
    },
@@ -441,6 +541,204 @@
       "insufficient_baseline": true
      }
     },
+    "latency": {
+     "n": 433,
+     "max_ms": 346933.0,
+     "max_request": {
+      "request_id": "digitalmate-2bb3c61f2c4545859a7f98cc130c7e4d",
+      "gateway": 346933.0,
+      "first_token": 7664.0,
+      "answer_first": null,
+      "react": null,
+      "workswarm": 346099.0
+     },
+     "slow_count": 22,
+     "slow_threshold_ms": 68254.0,
+     "slow_requests": [
+      {
+       "request_id": "digitalmate-2bb3c61f2c4545859a7f98cc130c7e4d",
+       "gateway": 346933.0,
+       "first_token": 7664.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 346099.0
+      },
+      {
+       "request_id": "digitalmate-d56eac86ed65492a9bd9ed9d21501c66",
+       "gateway": 202550.0,
+       "first_token": 8780.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 199623.0
+      },
+      {
+       "request_id": "digitalmate-fdd887182b554f698fd99fe7ddd7e3db",
+       "gateway": 185401.0,
+       "first_token": 24062.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 182727.0
+      },
+      {
+       "request_id": "digitalmate-7cade7a2b2d6430a91715cbda72cf913",
+       "gateway": 179156.0,
+       "first_token": null,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      },
+      {
+       "request_id": "digitalmate-a7a8134a34c04c20b5ec80d8cc1c6a76",
+       "gateway": 166188.0,
+       "first_token": 10046.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 163604.0
+      },
+      {
+       "request_id": "digitalmate-15a7759d968248618799cce6e852c333",
+       "gateway": 142453.0,
+       "first_token": 8422.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 139579.0
+      },
+      {
+       "request_id": "digitalmate-ab08ac2db51d4948b72a693769666f7e",
+       "gateway": 127384.0,
+       "first_token": 7495.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 124897.0
+      },
+      {
+       "request_id": "digitalmate-e9236c6d24ca49ba9a0858b1eb0f19e1",
+       "gateway": 126229.0,
+       "first_token": 6193.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 125394.0
+      },
+      {
+       "request_id": "digitalmate-75f33ab14fe04f0a9d99520c0e56f1e3",
+       "gateway": 123908.0,
+       "first_token": 3591.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 123068.0
+      },
+      {
+       "request_id": "digitalmate-d95a49cbb87547e0b0a6539a31c756c5",
+       "gateway": 113516.0,
+       "first_token": 8441.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 110769.0
+      },
+      {
+       "request_id": "digitalmate-0704bdd225fe44c6a635ea100fa57a0a",
+       "gateway": 101908.0,
+       "first_token": null,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 101082.0
+      },
+      {
+       "request_id": "digitalmate-c7335e4972e844a08badc037549c3e12",
+       "gateway": 97217.0,
+       "first_token": 6668.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 96397.0
+      },
+      {
+       "request_id": "digitalmate-ed2373d2a3f442d3966c702768e864fe",
+       "gateway": 85591.0,
+       "first_token": 5483.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 84760.0
+      },
+      {
+       "request_id": "digitalmate-0b5305c09fa74103a9b5d65450cac83c",
+       "gateway": 76484.0,
+       "first_token": null,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 75625.0
+      },
+      {
+       "request_id": "digitalmate-4cf5222455914d4690fcb8ff8cb8a52f",
+       "gateway": 73454.0,
+       "first_token": 5523.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 72627.0
+      },
+      {
+       "request_id": "digitalmate-f17c34222ad240c9a0cc56f15d00bb31",
+       "gateway": 72999.0,
+       "first_token": null,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 72174.0
+      },
+      {
+       "request_id": "digitalmate-605f1b4f04024c36a657afb3ecc76972",
+       "gateway": 72463.0,
+       "first_token": 7209.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 71634.0
+      },
+      {
+       "request_id": "digitalmate-a54efa7ccf7849e3b01828a99e05af32",
+       "gateway": 71389.0,
+       "first_token": 6010.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 70569.0
+      },
+      {
+       "request_id": "digitalmate-8f9b682703c14e7d8b12ffec00d733eb",
+       "gateway": 71170.0,
+       "first_token": 20930.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 68739.0
+      },
+      {
+       "request_id": "digitalmate-bf9fd527c7ab48a5908a50c8a0a999d5",
+       "gateway": 69139.0,
+       "first_token": 4786.0,
+       "answer_first": 4786.0,
+       "react": 0.0,
+       "workswarm": 68283.0
+      },
+      {
+       "request_id": "digitalmate-7d376d67288141388214f650ad4de16d",
+       "gateway": 68822.0,
+       "first_token": 6315.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 67911.0
+      },
+      {
+       "request_id": "digitalmate-d831e19b3b6a46c7957ce2ce69c30e87",
+       "gateway": 68254.0,
+       "first_token": 8332.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 65754.0
+      }
+     ]
+    },
+    "timeouts": {
+     "count": 0,
+     "records": 0,
+     "requests": []
+    },
+    "error_categories": {},
     "cohort": {
      "outliers": 7,
      "normal": 426,
@@ -572,6 +870,8 @@
     "p50": 0.0,
     "p95": 0.0
    },
+   "error_categories": {},
+   "timeout_rids": [],
    "tool": {
     "n": 0
    },
@@ -649,6 +949,132 @@
       "insufficient_baseline": true
      }
     },
+    "latency": {
+     "n": 241,
+     "max_ms": 342976.0,
+     "max_request": {
+      "request_id": "digitalmate-f8f3374e00fd4d819e525f7c3367a501",
+      "gateway": 342976.0,
+      "first_token": null,
+      "answer_first": null,
+      "react": null,
+      "workswarm": null
+     },
+     "slow_count": 13,
+     "slow_threshold_ms": 164779.0,
+     "slow_requests": [
+      {
+       "request_id": "digitalmate-f8f3374e00fd4d819e525f7c3367a501",
+       "gateway": 342976.0,
+       "first_token": null,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      },
+      {
+       "request_id": "digitalmate-bbd4aa0b76394b13a84b423c5562aadd",
+       "gateway": 333533.0,
+       "first_token": 5335.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 332674.0
+      },
+      {
+       "request_id": "digitalmate-f8056cbcab474006ad913aa33c3a5009",
+       "gateway": 237258.0,
+       "first_token": 6168.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 236422.0
+      },
+      {
+       "request_id": "digitalmate-7548dba5eff54a8491b35fed3c4a2d7d",
+       "gateway": 225747.0,
+       "first_token": 6965.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      },
+      {
+       "request_id": "digitalmate-188e6b73ef3042c9a6c64c496f4cd317",
+       "gateway": 219556.0,
+       "first_token": 6131.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 218661.0
+      },
+      {
+       "request_id": "digitalmate-38ed491847f6476f8a1e86d327f1310b",
+       "gateway": 213085.0,
+       "first_token": 6653.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 212252.0
+      },
+      {
+       "request_id": "digitalmate-41ac2c81d1fe4fbb9388d824bbce2e7d",
+       "gateway": 211480.0,
+       "first_token": 5403.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      },
+      {
+       "request_id": "digitalmate-c9a9fd01bb52461b9dcfe4b18030d309",
+       "gateway": 187140.0,
+       "first_token": 8880.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      },
+      {
+       "request_id": "digitalmate-bfd5821928e145d59d4703ba40070d65",
+       "gateway": 181012.0,
+       "first_token": 4752.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      },
+      {
+       "request_id": "digitalmate-3c5f8fa9ba8b49e7b22f61d49e3bbd71",
+       "gateway": 178151.0,
+       "first_token": 7480.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      },
+      {
+       "request_id": "digitalmate-417f31a7cfa44e19b20f80f02535908d",
+       "gateway": 168043.0,
+       "first_token": 5887.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      },
+      {
+       "request_id": "digitalmate-ec8f52dadcaf4547888cfea569463544",
+       "gateway": 167973.0,
+       "first_token": 6254.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 167128.0
+      },
+      {
+       "request_id": "digitalmate-c75fc8ed2edf4b53b8b0fc6a45d0848c",
+       "gateway": 164779.0,
+       "first_token": 7758.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      }
+     ]
+    },
+    "timeouts": {
+     "count": 0,
+     "records": 0,
+     "requests": []
+    },
+    "error_categories": {},
     "cohort": {
      "outliers": 17,
      "normal": 224,
@@ -774,6 +1200,8 @@
    "react": {
     "n": 0
    },
+   "error_categories": {},
+   "timeout_rids": [],
    "tool": {
     "n": 0
    },
@@ -851,6 +1279,44 @@
       "insufficient_baseline": true
      }
     },
+    "latency": {
+     "n": 24,
+     "max_ms": 90546.0,
+     "max_request": {
+      "request_id": "digitalmate-477b7120cdeb44aeb67cccd941073e5e",
+      "gateway": 90546.0,
+      "first_token": 6002.0,
+      "answer_first": null,
+      "react": null,
+      "workswarm": 89684.0
+     },
+     "slow_count": 2,
+     "slow_threshold_ms": 88448.0,
+     "slow_requests": [
+      {
+       "request_id": "digitalmate-477b7120cdeb44aeb67cccd941073e5e",
+       "gateway": 90546.0,
+       "first_token": 6002.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 89684.0
+      },
+      {
+       "request_id": "digitalmate-81a71a2a32d44d29ba5a7c44e2fb1f01",
+       "gateway": 88448.0,
+       "first_token": 6830.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 87599.0
+      }
+     ]
+    },
+    "timeouts": {
+     "count": 0,
+     "records": 0,
+     "requests": []
+    },
+    "error_categories": {},
     "cohort": {
      "outliers": 0,
      "normal": 24,
@@ -964,6 +1430,8 @@
    "react": {
     "n": 0
    },
+   "error_categories": {},
+   "timeout_rids": [],
    "tool": {
     "n": 0
    },
@@ -1041,6 +1509,84 @@
       "insufficient_baseline": true
      }
     },
+    "latency": {
+     "n": 130,
+     "max_ms": 882954.0,
+     "max_request": {
+      "request_id": "digitalmate-978d222a8e7146a29955b89d9e8f0343",
+      "gateway": 882954.0,
+      "first_token": 7752.0,
+      "answer_first": null,
+      "react": null,
+      "workswarm": null
+     },
+     "slow_count": 7,
+     "slow_threshold_ms": 285415.0,
+     "slow_requests": [
+      {
+       "request_id": "digitalmate-978d222a8e7146a29955b89d9e8f0343",
+       "gateway": 882954.0,
+       "first_token": 7752.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      },
+      {
+       "request_id": "digitalmate-bd4fe6c750f1410384391b8655317a55",
+       "gateway": 844097.0,
+       "first_token": null,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      },
+      {
+       "request_id": "digitalmate-c29176f482234d68a0577bd69bdd13d3",
+       "gateway": 462917.0,
+       "first_token": 6754.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 462080.0
+      },
+      {
+       "request_id": "digitalmate-45b365e240b44383b27ee6dd3975bb9e",
+       "gateway": 321135.0,
+       "first_token": 4467.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 320283.0
+      },
+      {
+       "request_id": "digitalmate-4ab7ec10fd8a4e1b86508b7e51e1b0e1",
+       "gateway": 302717.0,
+       "first_token": 5461.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": null
+      },
+      {
+       "request_id": "digitalmate-f1624d28d6d243f08c37b774763b20d6",
+       "gateway": 294692.0,
+       "first_token": 4602.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 293873.0
+      },
+      {
+       "request_id": "digitalmate-f1e1776c262048ea9352d9c7d2632bf1",
+       "gateway": 285415.0,
+       "first_token": 4582.0,
+       "answer_first": null,
+       "react": null,
+       "workswarm": 284585.0
+      }
+     ]
+    },
+    "timeouts": {
+     "count": 0,
+     "records": 0,
+     "requests": []
+    },
+    "error_categories": {},
     "cohort": {
      "outliers": 23,
      "normal": 107,
@@ -1127,5 +1673,5 @@
   "note": "TTFT/TPOT 仅取 agent_adapter 的 llm_usage 事件；另有 1033 行含该关键词的工具输出文本，非 usage 记录，已排除",
   "failure_note": "调用数 = 成功调用（llm_usage）+ 失败调用（llm_call_error）；失败率按已知终态调用计算"
  },
- "anomaly_version": 1
+ "anomaly_version": 2
 }
