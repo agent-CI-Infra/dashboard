@@ -1099,8 +1099,8 @@ function envSummary(doc) {
       <div class="stat-hint">${availability}</div>
     </div>`;
   };
-  const rangeNote = `云侧卡片汇总 ${esc(anchor.window_start)} 至 ${esc(anchor.window_end)}（${fmtCount(anchor.window_days)} 个有数据的日期）${anchor.partial ? ' · 含部分覆盖' : ''}${anchor.current_sample_days ? ` · ${fmtCount(anchor.current_sample_days)} 天使用当前可读日志样本` : ''}。均值按样本数或输出 Token 加权；多日分位数仅在可合并分布完整时显示，≈ 表示近似。`;
-  return `<p class="data-freshness">${rangeNote}</p><section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
+  const rangeNote = `${esc(anchor.window_start)} 至 ${esc(anchor.window_end)} · ${fmtCount(anchor.window_days)} 个有数据的日期${anchor.partial ? ' · 含部分覆盖' : ''}${anchor.current_sample_days ? ` · ${fmtCount(anchor.current_sample_days)} 天使用当前可读日志样本` : ''}`;
+  return `<div class="env-data-notes env-range-notes"><div><strong>统计范围</strong><span>${rangeNote}</span></div><div><strong>汇总口径</strong><span>均值按样本数或输出 Token 加权；多日分位数仅在可合并分布完整时显示，≈ 表示近似。</span></div></div><section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>${countLabel}</strong> / <strong>${rateLabel}</strong></div>
       <div class="stat-value combo">${fmtCount(countValue)} / <span class="${failureTone}">${rate}</span></div>
@@ -3892,7 +3892,14 @@ function renderEnv() {
     : snapshotTime ? `快照生成于 ${esc(fmtDateTime(snapshotTime))}，行级采集时间未知` : '采集时间未知';
   const requestOnly = scoped.days.some((row) => row.source === 'workspace_request_logs');
   const answerPartial = daily.cloud_trace_collection?.answer_workspaces_partial;
-  const freshness = `<p class="data-freshness">云侧数据${timeText}${stale ? ' · 超过 6 小时未更新，请检查采集任务' : ''}${state.envRefreshFailed ? ' · 刷新失败，保留上次快照' : ''}${state.rangeDays === 1 && !scoped.days.length ? ' · 尚无当天采集数据' : ''}${requestOnly ? ' · 模型用量及 Token 基于日志记录，可能重复；网关流异常率不代表业务请求失败率，工具耗时尚未完整采集' : ''}${answerPartial > 0 ? ` · 答案历史仅扫描近期会话，${answerPartial} 个工作区可能不完整` : ''}；* 表示部分日或日志覆盖不全；定时采集，并非实时流。</p>`;
+  const warnings = [
+    stale && '超过 6 小时未更新，请检查采集任务',
+    state.envRefreshFailed && '刷新失败，保留上次快照',
+    state.rangeDays === 1 && !scoped.days.length && '尚无当天采集数据',
+    requestOnly && '模型用量及 Token 基于日志记录，可能重复；网关流异常率不代表业务请求失败率；工具耗时尚未完整采集',
+    answerPartial > 0 && `答案历史仅扫描近期会话，${fmtCount(answerPartial)} 个工作区可能不完整`,
+  ].filter(Boolean);
+  const freshness = `<div class="env-data-notes" aria-label="数据说明"><div><strong>数据更新</strong><span>${timeText} · 定时采集，并非实时流</span></div>${warnings.length ? `<div><strong>数据限制</strong><span>${warnings.join('；')}。</span></div>` : ''}<div><strong>覆盖标记</strong><span>* 表示部分日或日志覆盖不全。</span></div></div>`;
   target.innerHTML = `${freshness}${envSummary(scoped)}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTtftTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
   refineCharts(target);
 }
