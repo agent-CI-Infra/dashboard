@@ -11,8 +11,8 @@
   const SEGMENTS = [
     ['tap_to_queued', '点击 → 入队'],
     ['queued_to_dequeued', '排队等待'],
-    ['dequeued_to_wire_send', '发送编码'],
-    ['wire_send_to_ack', '网络 → 受理'],
+    ['dequeued_to_wire_send', '本地编码与发送'],
+    ['wire_send_to_ack', '发送返回 → 确认'],
     ['ack_to_first_text', '首字等待'],
     ['first_text_to_last_text', '流式生成'],
     ['last_text_to_task_done', '任务收尾'],
@@ -44,6 +44,7 @@
   const pct = (part, whole) => (isNumber(part) && isNumber(whole) && whole > 0
     ? `${((part / whole) * 100).toFixed(1)}%` : '—');
   const block = (value) => (value && typeof value === 'object' ? value : { count: 0, avg_ms: 0 });
+  const sampleMs = (value, field = 'avg_ms') => value && value.count > 0 ? ms(value[field]) : '—';
   const modelCalls = (models) => (Array.isArray(models)
     ? models.reduce((total, model) => total + (isNumber(model?.calls) ? model.calls : 0), 0)
     : 0);
@@ -76,8 +77,8 @@
     $('summary').innerHTML = [
       statCard('端侧轮次', num(turns.total), `窗口 ${num(doc.window_days)} 天`),
       statCard('完成率', pct(turns.completed, turns.total), `完成 ${num(turns.completed)} · 失败 ${num(failures)}`),
-      statCard('客户端 TTFT 均值', ms(block(totals.client_ttft).avg_ms), `样本 ${num(block(totals.client_ttft).count)}`),
-      statCard('端到端均值', ms(block(totals.end_to_end).avg_ms), `样本 ${num(block(totals.end_to_end).count)}`),
+      statCard('客户端首文本均值', sampleMs(block(totals.client_ttft)), `样本 ${num(block(totals.client_ttft).count)} · 覆盖 ${pct(block(totals.client_ttft).count, turns.total)}`),
+      statCard('端到端均值', sampleMs(block(totals.end_to_end)), `样本 ${num(block(totals.end_to_end).count)} · 覆盖 ${pct(block(totals.end_to_end).count, turns.total)}`),
       statCard('模型调用', num(modelCalls(totals.models)), `${num(models)} 个模型`),
       statCard('环境', num(totals.environment_count), unavailable ? `${num(unavailable)} 个不可用` : '全部可用'),
     ].join('');
@@ -90,14 +91,14 @@
       const entry = block(segments?.[key]);
       const value = entry.avg_ms || 0;
       const width = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0;
-      const tip = `${label}：平均 ${ms(entry.avg_ms)}`
-        + `${isNumber(entry.p95_ms) ? ` · P95 ${ms(entry.p95_ms)}` : ''}`
+      const tip = `${label}：平均 ${sampleMs(entry)}`
+        + `${entry.count > 0 && isNumber(entry.p95_ms) ? ` · P95 ${ms(entry.p95_ms)}` : ''}`
         + ` · 样本 ${num(entry.count)}`;
       return `<div class="segment-row${entry.count ? '' : ' is-empty'}" tabindex="0"
         data-tip="${escapeHtml(tip)}" aria-label="${escapeHtml(tip)}">
         <span class="segment-label">${escapeHtml(label)}</span>
         <span class="segment-track"><span class="segment-bar" style="width:${width.toFixed(1)}%"></span></span>
-        <span class="segment-value">${ms(entry.avg_ms)}</span>
+        <span class="segment-value">${sampleMs(entry)}</span>
       </div>`;
     }).join('');
   }
@@ -132,10 +133,10 @@
             ? ' <span class="badge stale" title="本轮采集失败，展示上一次成功的数据">历史快照</span>' : ''}</td>
           <td class="num">${num(turns.total)}</td>
           <td class="num">${pct(turns.completed, turns.total)}</td>
-          <td class="num">${ms(ttft.avg_ms)}</td>
-          <td class="num">${ms(ttft.p95_ms)}</td>
-          <td class="num">${ms(total.avg_ms)}</td>
-          <td class="num">${ms(total.p95_ms)}</td>
+          <td class="num">${sampleMs(ttft)}</td>
+          <td class="num">${sampleMs(ttft, 'p95_ms')}</td>
+          <td class="num">${sampleMs(total)}</td>
+          <td class="num">${sampleMs(total, 'p95_ms')}</td>
           <td class="num">${num(modelCalls(record.models))}</td>
         </tr>`;
       }).join('');
@@ -177,9 +178,9 @@
         <td class="name"${statuses ? ` data-tip="${escapeHtml(statuses)}"` : ''}>${escapeHtml(model.model)}</td>
         <td class="num">${num(model.calls)}</td>
         <td class="num">${pct(model.succeeded, model.calls)}</td>
-        <td class="num">${ms(ttft.avg_ms)}</td>
-        <td class="num">${ms(ttft.p95_ms)}</td>
-        <td class="num">${ms(tpot.avg_ms)}</td>
+        <td class="num">${sampleMs(ttft)}</td>
+        <td class="num">${sampleMs(ttft, 'p95_ms')}</td>
+        <td class="num">${sampleMs(tpot)}</td>
         <td class="num">${num(model.input_tokens)}</td>
         <td class="num">${num(model.output_tokens)}</td>
       </tr>`;
