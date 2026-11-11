@@ -5,6 +5,13 @@ import vm from 'node:vm';
 const code = readFileSync(new URL('../single-repo/static/production-metrics/app.js', import.meta.url), 'utf8');
 function extract(a,b) { const x=code.indexOf(a), y=code.indexOf(b,x); assert(x>=0 && y>x); return code.slice(x,y); }
 
+test('cloud trace source identifies Kubernetes when present', () => {
+  const c=vm.createContext({});
+  vm.runInContext(extract('function cloudCollectionLabel(', 'function renderRequestTraces(')+';globalThis.label=cloudCollectionLabel;', c);
+  assert.equal(c.label({collection_source:'kubernetes_shared_workspace'}), 'Kubernetes 生产工作区');
+  assert.equal(c.label({}), '现网');
+});
+
 test('Shanghai calendar uses local day at the UTC day boundary', () => {
   const c=vm.createContext({});
   vm.runInContext(extract('function todayShanghai(', 'function historyLatestDate(')+'; globalThis.today=todayShanghai;',c);
