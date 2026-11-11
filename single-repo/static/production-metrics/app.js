@@ -730,14 +730,6 @@ const ENV_TOOL_SERIES = [
   { key: 'tool_p95', label: '工具调用 P95', group: 'tool', field: 'p95', style: 'env-tool-p95' },
 ];
 
-// Daily cloud TTFT (first token) series. Cloud call scope: one record per
-// model call, timed by the cloud runtime's llm_usage metadata.
-const ENV_TTFT_SERIES = [
-  { key: 'ttft_mean', label: 'TTFT 均值', group: 'ttft', field: 'mean', style: 'env-ttft-mean' },
-  { key: 'ttft_p50', label: 'TTFT P50', group: 'ttft', field: 'p50', style: 'env-ttft-p50', below: true },
-  { key: 'ttft_p95', label: 'TTFT P95', group: 'ttft', field: 'p95', style: 'env-ttft-p95' },
-];
-
 const ENV_TPOT_SERIES = [
   { key: 'tpot_mean', label: 'TPOT 加权均值', group: 'tpot', field: 'mean', style: 'env-tpot-mean' },
   { key: 'tpot_p50', label: 'TPOT P50', group: 'tpot', field: 'p50', style: 'env-tpot-p50', below: true },
@@ -909,19 +901,6 @@ function envToolTrend(doc) {
   });
 }
 
-function envTtftTrend(doc) {
-  return envTrendChart(doc, {
-    title: '模型调用 TTFT（llm_usage 计时）',
-    ariaLabel: '模型调用 TTFT 每日均值及 P50/P95',
-    series: ENV_TTFT_SERIES,
-    height: 300,
-    formatAxis: fmtAxisSeconds,
-    labelFormat: fmtAxisSeconds,
-    sample: (row) => ({ n: row?.ttft?.n, note: '次模型调用' }),
-    note: '模型调用口径（每次模型调用）：TTFT 为模型调用开始至该次调用首个 Token，由云侧 Agent 运行时计时，可能包含上游等待与网络耗时，不含路由与 Agent 唤醒，因此通常小于上方的首吐字时间；仅统计 0 < TTFT ≤ 调用总耗时的调用；P50/P95 为调用级最近排名分位，均值按有效调用数计算；* 为部分日，缺失值留空不补 0。',
-  });
-}
-
 function envTpotTrend(doc) {
   return envTrendChart(doc, {
     title: '云侧 Agent TPOT（ms/token）',
@@ -938,15 +917,6 @@ function envTpotTrend(doc) {
     note: '云侧 Agent 用量记录口径：TPOT 为日志中的每条用量记录值，均值及分位数按输出 Token 数 − 1 加权；仅统计输出 Token > 1 且 TPOT 有效的记录。记录缺少调用 ID，可能重复；* 为部分日。',
   });
 }
-
-// Client-observed one-way network samples. The keys are part of the published
-// daily document contract; until the gateway release that emits them is
-// deployed, every day reports n=0 and the cards explain they are waiting.
-const NETWORK_TILES = [
-  ['uplink_send', '上行 send 单程', '端侧 send → 网关收到'],
-  ['downlink_first_text', '下行首文本 recv 单程', '网关文本帧 → 端侧 recv'],
-  ['downlink_terminal', '下行终态 recv 单程', '网关终态帧 → 端侧 recv'],
-];
 
 // Merge daily summaries without averaging percentiles or mixing sample weights.
 function aggregateCloudMetric(rows, key) {
@@ -1072,33 +1042,6 @@ function envSummary(doc) {
   const answerTile = requestTile('answer_first', '答案首吐字', '网关受理 → 首个答案 chat.delta · 网关实测');
   const answerEstimateTile = requestTile('answer_first_history', '答案首吐字（历史估算）', '会话回答段起点估算 · 非网关转发时间，不纳入实测');
   const reactTile = requestTile('react', 'ReAct 阶段', '网关首文本 → 网关首答案 · 同一请求配对');
-  const toolCount = Number.isFinite(anchor.tool?.n) ? anchor.tool.n : 0;
-  const toolHint = toolCount > 0
-    ? `${fmtCount(toolCount)} 次工具调用 · tool_call → tool_result`
-    : anchor.source === 'workspace_request_logs' ? '当前日志采集未提供工具耗时'
-    : '当日无已观测样本 · 覆盖率未知 · tool_call → tool_result';
-  const toolTile = `<div class="stat-card">
-      <div class="stat-label">云侧 Agent<strong>工具调用</strong> 平均 / P50 / P95</div>
-      <div class="stat-value combo">${formatted(anchor.tool, 'mean', fmtDuration)} / ${formatted(anchor.tool, 'p50', fmtDuration)} / ${formatted(anchor.tool, 'p95', fmtDuration)}</div>
-      <div class="stat-hint">${toolHint}</div>
-    </div>`;
-  // One-way network latency is sampled on the client by the next gateway
-  // release. The cards stay on the board before that so a missing metric is
-  // visible as "not instrumented yet", not as a card that silently disappears.
-  const networkSeen = rows.some((row) => NETWORK_TILES.some(([key]) => Number.isFinite(row?.[key]?.n) && row[key].n > 0));
-  const networkTile = (key, label, hint) => {
-    const count = Number.isFinite(anchor[key]?.n) ? anchor[key].n : 0;
-    const availability = count > 0
-      ? `${fmtCount(count)} 个样本 · ${hint}`
-      : networkSeen
-        ? '0 个样本 · 当日无样本'
-        : '不可用：缺少可验证的帧配对和时钟误差';
-    return `<div class="stat-card">
-      <div class="stat-label">云侧 Agent<strong>${label}</strong> 平均 / P50 / P95</div>
-      <div class="stat-value combo">${formatted(anchor[key], 'mean', fmtDuration)} / ${formatted(anchor[key], 'p50', fmtDuration)} / ${formatted(anchor[key], 'p95', fmtDuration)}</div>
-      <div class="stat-hint">${availability}</div>
-    </div>`;
-  };
   const rangeNote = `${esc(anchor.window_start)} 至 ${esc(anchor.window_end)} · ${fmtCount(anchor.window_days)} 个有数据的日期${anchor.partial ? ' · 含部分覆盖' : ''}${anchor.current_sample_days ? ` · ${fmtCount(anchor.current_sample_days)} 天使用当前可读日志样本` : ''}`;
   return `<div class="env-data-notes env-range-notes"><div><strong>统计范围</strong><span>${rangeNote}</span></div><div><strong>汇总口径</strong><span>均值按样本数或输出 Token 加权；多日分位数仅在可合并分布完整时显示，≈ 表示近似。</span></div></div><section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
     <div class="stat-card">
@@ -1115,8 +1058,6 @@ function envSummary(doc) {
     ${answerTile}
     ${answerEstimateTile}
     ${reactTile}
-    ${toolTile}
-    ${NETWORK_TILES.map(([key, label, hint]) => networkTile(key, label, hint)).join('')}
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>TPOT</strong> 平均 / P50 / P95（ms/token）</div>
       <div class="stat-value combo">${formatted(anchor.tpot, 'mean', fmtTpotBare)} / ${formatted(anchor.tpot, 'p50', fmtTpotBare)} / ${formatted(anchor.tpot, 'p95', fmtTpotBare)}</div>
@@ -3929,7 +3870,7 @@ function renderEnv() {
     answerPartial > 0 && `答案历史仅扫描近期会话，${fmtCount(answerPartial)} 个工作区可能不完整`,
   ].filter(Boolean);
   const freshness = `<div class="env-data-notes" aria-label="数据说明"><div><strong>数据更新</strong><span>${timeText} · 定时采集，并非实时流</span></div>${warnings.length ? `<div><strong>数据限制</strong><span>${warnings.join('；')}。</span></div>` : ''}<div><strong>覆盖标记</strong><span>* 表示部分日或日志覆盖不全。</span></div></div>`;
-  target.innerHTML = `${freshness}${envSummary(scoped)}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTtftTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
+  target.innerHTML = `${freshness}${envSummary(scoped)}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
   refineCharts(target);
 }
 
