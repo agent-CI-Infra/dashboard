@@ -668,13 +668,13 @@
  },
  "cloud_trace_collection": {
   "schema": "digitalmate/cloud-traces@1",
-  "generated_at": "2026-11-10T21:35:54.829189+00:00",
-  "binding_count": 137,
-  "read_log_count": 136,
+  "generated_at": "2026-11-11T01:27:40.160814+00:00",
+  "binding_count": 138,
+  "read_log_count": 137,
   "errors": {
    "http_413": 1
   },
-  "detail_workspaces_complete": 14,
+  "detail_workspaces_complete": 16,
   "detail_workspaces_partial": 3,
   "trace_request_limit": 100,
   "days": [
@@ -9782,57 +9782,380 @@
     "date": "2026-11-11",
     "anomaly": {
      "latency": {
-      "n": 42,
-      "slow_count": 3,
+      "n": 80,
+      "slow_count": 4,
       "slow_requests": [
        {
-        "request_id": "digitalmate-7836f8c7e2144b4ab9e85eff19f8f106",
+        "request_id": "digitalmate-3ba644010e714fe39bc8cd175accd672",
         "date": "2026-11-11",
-        "gateway": 73962.0,
-        "start_time": "2026-11-10T16:27:48.589000+00:00",
-        "first_token": 12817.0,
-        "tool_events": [
-         {
-          "name": "tool_search",
-          "start_ms": 48870.4,
-          "duration_ms": 170.9,
-          "status": "ok"
-         }
-        ],
-        "trace_complete": false
-       },
-       {
-        "request_id": "digitalmate-b2d8ff8d9c8648d0afa50beb95abd00b",
-        "date": "2026-11-11",
-        "gateway": 60491.0,
-        "start_time": "2026-11-10T16:11:12.231000+00:00",
+        "gateway": 184151.0,
+        "start_time": "2026-11-10T23:24:59.818000+00:00",
+        "first_token": 10934.0,
         "tool_events": [
          {
           "name": "tool",
-          "start_ms": 679.2,
-          "duration_ms": 40.7,
+          "start_ms": 36325.5,
+          "duration_ms": 1282.2,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 52619.3,
+          "duration_ms": 631.1,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 66392.7,
+          "duration_ms": 156.4,
+          "status": "error"
+         },
+         {
+          "name": "tool",
+          "start_ms": 74471.1,
+          "duration_ms": 291.1,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 77144.9,
+          "duration_ms": 2645.4,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 118865.7,
+          "duration_ms": 220.8,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 127952.9,
+          "duration_ms": 340.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 132338.9,
+          "duration_ms": 509.2,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 132889.5,
+          "duration_ms": 186.8,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 133104.8,
+          "duration_ms": 220.1,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 133342.3,
+          "duration_ms": 231.2,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 138392.5,
+          "duration_ms": 881.4,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 147309.7,
+          "duration_ms": 836.4,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 147331.7,
+          "duration_ms": 891.8,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 152113.4,
+          "duration_ms": 732.9,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 165578.5,
+          "duration_ms": 374.1,
+          "status": "error"
+         },
+         {
+          "name": "tool",
+          "start_ms": 174616.8,
+          "duration_ms": 194.9,
           "status": "ok"
          }
         ],
         "trace_complete": false
        },
        {
-        "request_id": "digitalmate-7ceb176f27ff4bce9160876a8a5b5d10",
+        "request_id": "digitalmate-fae43ae465824d81ac5d6bcea97130c1",
         "date": "2026-11-11",
-        "gateway": 60005.0,
-        "start_time": "2026-11-10T16:21:56.079000+00:00",
-        "first_token": 16616.0,
+        "gateway": 116571.0,
+        "start_time": "2026-11-10T23:49:28.981000+00:00",
+        "first_token": 2781.0,
         "tool_events": [
          {
-          "name": "tool_search",
-          "start_ms": 27669.0,
-          "duration_ms": 171.5,
+          "name": "bash",
+          "start_ms": 4590.3,
+          "duration_ms": 199.8,
           "status": "ok"
          },
          {
-          "name": "read_file",
-          "start_ms": 31607.6,
-          "duration_ms": 305.1,
+          "name": "bash",
+          "start_ms": 11262.1,
+          "duration_ms": 237.7,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 14826.0,
+          "duration_ms": 2138.8,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 19760.5,
+          "duration_ms": 301.4,
+          "status": "error"
+         },
+         {
+          "name": "bash",
+          "start_ms": 26151.5,
+          "duration_ms": 3834.7,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 41921.6,
+          "duration_ms": 2333.0,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 56870.1,
+          "duration_ms": 7967.5,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 74899.9,
+          "duration_ms": 819.2,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 90068.1,
+          "duration_ms": 249.2,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 93406.3,
+          "duration_ms": 2443.0,
+          "status": "ok"
+         },
+         {
+          "name": "bash",
+          "start_ms": 98844.0,
+          "duration_ms": 817.2,
+          "status": "ok"
+         }
+        ],
+        "trace_complete": false
+       },
+       {
+        "request_id": "digitalmate-bbb225d07f4b42feac09fe900c752659",
+        "date": "2026-11-11",
+        "gateway": 115301.0,
+        "start_time": "2026-11-11T01:10:38.177000+00:00",
+        "first_token": 3492.0,
+        "tool_events": [
+         {
+          "name": "tool",
+          "start_ms": 4907.3,
+          "duration_ms": 432.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 4954.8,
+          "duration_ms": 460.7,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 11106.0,
+          "duration_ms": 529.7,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 11134.9,
+          "duration_ms": 418.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool_search",
+          "start_ms": 15679.6,
+          "duration_ms": 177.3,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 18739.3,
+          "duration_ms": 1433.4,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 18812.6,
+          "duration_ms": 1251.8,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 26883.2,
+          "duration_ms": 702.2,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 26909.9,
+          "duration_ms": 807.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 26958.8,
+          "duration_ms": 493.2,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 27041.2,
+          "duration_ms": 482.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 34611.7,
+          "duration_ms": 1032.9,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 34638.1,
+          "duration_ms": 418.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 39661.7,
+          "duration_ms": 250.4,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 39684.3,
+          "duration_ms": 447.3,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 44051.8,
+          "duration_ms": 1315.3,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 44078.1,
+          "duration_ms": 4682.9,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 53859.2,
+          "duration_ms": 344.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 53902.1,
+          "duration_ms": 3839.9,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 61938.6,
+          "duration_ms": 5869.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 61985.5,
+          "duration_ms": 4731.3,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 74095.1,
+          "duration_ms": 4460.6,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 74120.0,
+          "duration_ms": 5928.7,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 86058.6,
+          "duration_ms": 4424.5,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 86092.1,
+          "duration_ms": 4960.7,
+          "status": "ok"
+         }
+        ],
+        "trace_complete": false
+       },
+       {
+        "request_id": "digitalmate-f6277ee1c8df4a4c8783cb8e79674fe8",
+        "date": "2026-11-11",
+        "gateway": 106454.0,
+        "start_time": "2026-11-10T22:42:28.144000+00:00",
+        "first_token": 3164.0,
+        "tool_events": [
+         {
+          "name": "tool_search",
+          "start_ms": 8734.6,
+          "duration_ms": 267.4,
+          "status": "ok"
+         },
+         {
+          "name": "tool_search",
+          "start_ms": 8770.0,
+          "duration_ms": 311.9,
+          "status": "ok"
+         },
+         {
+          "name": "tool",
+          "start_ms": 58505.2,
+          "duration_ms": 425.7,
           "status": "ok"
          }
         ],
