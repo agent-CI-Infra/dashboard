@@ -3537,8 +3537,8 @@ function slowTraceCandidates(doc) {
   return [...byId.values()].sort((a, b) => (b.gateway ?? -1) - (a.gateway ?? -1)).slice(0, 200);
 }
 
-function traceRows(item) {
-  const native = item?.scope === 'cloud' && Number.isFinite(item?.native_trajectory?.duration_ms)
+function traceRows(item, display = 'native') {
+  const native = display !== 'events' && item?.scope === 'cloud' && Number.isFinite(item?.native_trajectory?.duration_ms)
     && item.native_trajectory.duration_ms > 0 && Array.isArray(item.native_trajectory.spans)
     ? item.native_trajectory : null;
   const total = native ? native.duration_ms : item?.gateway;
@@ -3548,7 +3548,7 @@ function traceRows(item) {
   if (native) {
     rows[0].detail = 'WorkSwarm 原生根跨度，不包含完整网关耗时';
     const spans = native.spans.filter((span) => typeof span?.span_id === 'string' && valid(span?.start_ms)
-      && Number.isFinite(span?.duration_ms) && span.duration_ms >= 0 && span.start_ms + span.duration_ms <= total
+      && Number.isFinite(span?.duration_ms) && span.duration_ms >= 0 && span.start_ms + span.duration_ms <= total + 0.0015
       && ['phase','agent','model','tool','event'].includes(span.kind));
     const children = new Map(), visited = new Set();
     for (const span of spans) {
@@ -3560,7 +3560,7 @@ function traceRows(item) {
       if (visited.has(span.span_id)) return;
       visited.add(span.span_id);
       rows.push({label: typeof span.label === 'string' ? span.label : '其他阶段', start: span.start_ms,
-        duration: span.duration_ms, kind: span.error ? 'error' : span.kind, depth,
+        duration: Math.min(span.duration_ms, total - span.start_ms), kind: span.error ? 'error' : span.kind, category: span.kind, depth,
         detail: `原生跨度；状态：${span.error ? '失败' : '已结束'}；可与其他阶段重叠${orphan ? '；上级跨度未采集' : ''}`});
       for (const child of children.get(span.span_id) || []) append(child, Math.min(depth + 1, 8), orphan);
     };
@@ -3599,14 +3599,15 @@ function traceRows(item) {
 
 function traceHtml(item) {
   if (!item) return '<p class="empty">所选范围没有可选择的慢请求或超时请求。</p>';
-  const rows = traceRows(item);
+  const rows = traceRows(item, state.traceDisplay);
   if (!rows.length) return '<p class="empty">该请求只记录了标识，暂无可绘制的耗时。</p>';
   state.currentTraceRows = rows;
   const total = rows[0].duration;
-  const native = item.scope === 'cloud' && Number.isFinite(item.native_trajectory?.duration_ms)
+  const hasNative = item.scope === 'cloud' && Number.isFinite(item.native_trajectory?.duration_ms)
     && item.native_trajectory.duration_ms > 0 && Array.isArray(item.native_trajectory.spans);
+  const native = hasNative && state.traceDisplay !== 'events';
   const filter = state.traceFilter || (native ? 'all' : 'tools');
-  const visible = rows.map((row, index) => ({...row, index})).filter((row) => row.kind === 'total' || filter === 'all' || (filter === 'tools' && ['tool', 'error', 'event', 'first', 'react', 'answer'].includes(row.kind)) || (filter === 'models' && ['model', 'model-point', 'event'].includes(row.kind)));
+  const visible = rows.map((row, index) => ({...row, index})).filter((row) => row.kind === 'total' || filter === 'all' || (filter === 'tools' && (native ? row.category === 'tool' : ['tool', 'error', 'event', 'first', 'react', 'answer'].includes(row.kind))) || (filter === 'models' && (native ? row.category === 'model' : ['model', 'model-point', 'event'].includes(row.kind))));
   const styleFor = (row) => `left:${(100 * row.start / total).toFixed(3)}%;width:${(100 * row.duration / total).toFixed(3)}%`;
   const marks = rows.slice(1).map((row) => `<span class="trace-overview-mark trace-${row.kind}${row.duration === 0 ? ' trace-point' : ''}" style="${styleFor(row)}" title="${esc(row.label)}"></span>`).join('');
   const bars = visible.filter((row) => row.kind !== 'total').map((row) => `<button type="button" class="trace-event-row" data-trace-row="${row.index}" data-trace-text="${esc(row.label.toLowerCase())}"><span class="trace-event-name" style="padding-left:${20 + Math.min(Math.max((row.depth || 1) - 1, 0), 7) * 14}px">${esc(row.label)}</span><span class="trace-event-track"><span class="trace-bar trace-${row.kind}${row.duration === 0 ? ' trace-point' : ''}" style="${styleFor(row)}"></span></span><span class="trace-duration">${row.duration === 0 ? '时间点' : fmtDuration(row.duration)}</span></button>`).join('');
@@ -3619,10 +3620,13 @@ function traceHtml(item) {
     : hasTools ? '工具区间为调用事件到结果事件的间隔；采集有文件和大小上限，明细可能不完整；模型调用时间未可靠关联。'
     : '当前快照没有逐次工具调用时间，暂无法绘制工具明细；思考与工具阶段不等于单次工具调用。';
   const phaseNote = !native && missingPhases ? ' 部分阶段标记未记录，无法绘制对应区间。' : '';
+  const retainedNote = native && typeof item.native_trace_retained_from === 'string'
+    ? ` 原生轨迹沿用 ${fmtDateTime(item.native_trace_retained_from)} 的采集结果。` : '';
   const emptyList = filter === 'models' ? '该请求没有可可靠关联的模型记账记录。' : '当前筛选没有可展示的事件。';
-  return `<div class="trajectory-head"><div><strong>执行轨迹</strong><span class="muted">${fmtDuration(total)} · ${rows.length} 条记录 · 当前 ${visible.length} 条</span></div><p>${esc(note + phaseNote)}</p></div>
+  return `<div class="trajectory-head"><div><strong>执行轨迹</strong><span class="muted">${fmtDuration(total)} · ${rows.length} 条记录 · 当前 ${visible.length} 条</span></div><p>${esc(note + phaseNote + retainedNote)}</p></div>
     <div class="trace-overview" aria-label="轨迹总览"><div class="trace-overview-total"></div><div class="trace-overview-events">${marks}</div></div>
     <div class="trajectory-legend"><span><i class="legend-dot total-dot"></i>本轮运行</span>${native ? '<span><i class="legend-dot phase-dot"></i>运行阶段</span>' : ''}<span><i class="legend-dot event-dot"></i>事件</span><span><i class="legend-dot tool-dot"></i>工具</span><span><i class="legend-dot model-dot"></i>${native ? '模型调用' : '模型记账点'}</span></div>
+    ${hasNative ? `<div class="trajectory-toolbar"><div class="trace-filters" aria-label="轨迹来源"><button type="button" class="trace-filter${native ? ' active' : ''}" data-trace-display="native" aria-pressed="${native}">原生分层轨迹</button><button type="button" class="trace-filter${!native ? ' active' : ''}" data-trace-display="events" aria-pressed="${!native}">请求阶段与工具事件</button></div></div>` : ''}
     <div class="trajectory-toolbar"><label><span class="sr-only">搜索轨迹</span><input id="trace-search" type="search" placeholder="搜索事件或工具" autocomplete="off"></label><div class="trace-filters" aria-label="轨迹筛选">${filters}</div></div>
     <div class="trajectory-table"><div class="trajectory-columns"><span>事件</span><span class="trajectory-ticks">${ticks}</span><span>耗时</span></div><details class="trace-group" open><summary class="trace-root-row"><span>${esc(rows[0].label)} <small>${visible.length - 1}</small></span><span class="trace-root-track"><span class="trace-bar trace-total"></span></span><span class="trace-duration">${fmtDuration(total)}</span></summary><div class="trace-event-list">${bars || `<p class="trace-empty">${esc(emptyList)}</p>`}</div></details></div>
     <div id="trace-detail" class="trace-detail" aria-live="polite">点击一条事件查看时间和指标。</div>`;
@@ -3671,6 +3675,7 @@ $('request-traces').addEventListener('change', (event) => {
   if (!item) return;
   state.traceTouched = true;
   state.traceId = `${item.scope}:${item.request_id}`;
+  state.traceDisplay = 'native';
   state.traceFilter = item.native_trajectory ? 'all' : 'tools';
   $('trace-result').innerHTML = traceHtml(item);
 });
@@ -3683,10 +3688,19 @@ $('request-traces').addEventListener('click', (event) => {
     if (!item || item.scope !== 'cloud') return;
     state.traceTouched = true;
     state.traceId = `${item.scope}:${item.request_id}`;
+    state.traceDisplay = 'native';
     state.traceFilter = item.native_trajectory ? 'all' : 'tools';
     $('trace-select').value = String(index);
     $('trace-result').innerHTML = traceHtml(item);
     $('trace-result').scrollIntoView({behavior:'smooth', block:'start'});
+    return;
+  }
+  const display = event.target.closest('[data-trace-display]');
+  if (display) {
+    state.traceDisplay = display.dataset.traceDisplay;
+    state.traceFilter = state.traceDisplay === 'native' ? 'all' : 'tools';
+    const item = state.traceCandidates?.find((row) => `${row.scope}:${row.request_id}` === state.traceId);
+    $('trace-result').innerHTML = traceHtml(item);
     return;
   }
   const filter = event.target.closest('[data-trace-filter]');

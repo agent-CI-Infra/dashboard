@@ -33,6 +33,33 @@ def make_day(date, values, partial=False, sample=None):
 
 
 class TraceCollectionTests(unittest.TestCase):
+    def test_console_refresh_retains_only_the_same_unique_native_profile(self):
+        def collection(rows, stamp):
+            return {'schema':'digitalmate/cloud-traces@1','read_log_count':1,'generated_at':stamp,
+                    'days':[{'anomaly':{'latency':{'slow_requests':rows}}}]}
+        profile={'duration_ms':900,'root_span_id':'a','spans':[]}
+        row={'request_id':'digitalmate-a','date':'2026-11-11','start_time':'2026-11-11T10:00:00+00:00','gateway':1000}
+        old=collection([{**row,'native_trajectory':profile}], 'old-time')
+        fresh=collection([dict(row)], 'new-time')
+        result=collector.with_workspace_traces({'days':[],'cloud_trace_collection':old}, fresh)['cloud_trace_collection']
+        carried=result['days'][0]['anomaly']['latency']['slow_requests'][0]
+        self.assertEqual(carried['native_trajectory'],profile)
+        self.assertEqual(carried['native_trace_retained_from'],'old-time')
+        self.assertEqual(result['retained_native_trace_count'],1)
+        again=collector.with_workspace_traces({'days':[],'cloud_trace_collection':result},collection([dict(row)],'later-time'))
+        self.assertEqual(again['cloud_trace_collection']['days'][0]['anomaly']['latency']['slow_requests'][0]
+                         ['native_trace_retained_from'],'old-time')
+        self.assertNotIn('native_trajectory',fresh['days'][0]['anomaly']['latency']['slow_requests'][0])
+        for changed in ({**row,'gateway':1001}, {**row,'start_time':'different'},
+                        {**row,'native_trace_state':'ambiguous'}):
+            result=collector.with_workspace_traces({'days':[],'cloud_trace_collection':old},collection([changed],'new-time'))
+            self.assertNotIn('native_trajectory',result['cloud_trace_collection']['days'][0]['anomaly']['latency']['slow_requests'][0])
+        result=collector.with_workspace_traces({'days':[],'cloud_trace_collection':old},collection([row,row],'new-time'))
+        self.assertTrue(all('native_trajectory' not in x for x in result['cloud_trace_collection']['days'][0]['anomaly']['latency']['slow_requests']))
+        duplicate=collection([{**row,'native_trajectory':profile},{**row,'native_trajectory':profile}], 'old-time')
+        result=collector.with_workspace_traces({'days':[],'cloud_trace_collection':duplicate},fresh)
+        self.assertNotIn('native_trajectory',result['cloud_trace_collection']['days'][0]['anomaly']['latency']['slow_requests'][0])
+
     def test_workspace_request_days_refresh_without_fabricating_old_metrics(self):
         old = {'date': '2026-11-10', 'n': 6, 'calls': {'total': 22}, 'tool': {'n': 3}}
         fresh = {'date': '2026-11-10', 'n': 354, 'gateway': {'n': 354},

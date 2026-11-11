@@ -243,6 +243,10 @@ def read_log(item):
                'start_time': dt.datetime.fromtimestamp(start, UTC).isoformat()}
         if correlations.get(rid):
             row['_native_correlation'] = correlations[rid]
+        elif rid in correlations:
+            # Contradictory explicit links must not be resolved by another heuristic.
+            row['_native_correlation_conflict'] = True
+            row['native_trace_state'] = 'ambiguous'
         if stream_status is not None:
             row['gateway_stream_status'] = stream_status
         for name, value in (('first_token', first), ('answer_first', answer)):
@@ -259,11 +263,19 @@ def read_native_trajectory(query, correlation):
     return None
 
 
+def read_native_by_request_ids(query, request_ids):
+    """Console collection has no access to the native stores."""
+    return {}
+
+
 def attach_native_trajectories(query, rows):
     matched = 0
+    missing = []
     for row in rows:
         correlation = row.pop('_native_correlation', None)
         if not correlation:
+            if not row.pop('_native_correlation_conflict', False):
+                missing.append(row)
             continue
         try:
             native = read_native_trajectory(query, correlation)
@@ -272,6 +284,16 @@ def attach_native_trajectories(query, rows):
         if isinstance(native, dict):
             row['native_trajectory'] = native
             matched += 1
+    if missing:
+        try:
+            fallback = read_native_by_request_ids(query, [r['request_id'] for r in missing])
+        except (OSError, ValueError, TypeError, KeyError):
+            fallback = {}
+        for row in missing:
+            native = fallback.get(row['request_id'])
+            if isinstance(native, dict):
+                row['native_trajectory'] = native
+                matched += 1
     return matched
 
 
@@ -514,6 +536,7 @@ def collect():
     for _, _, rows in snapshots:
         for row in rows:
             row.pop('_native_correlation', None)
+            row.pop('_native_correlation_conflict', None)
     output = {'schema':'digitalmate/cloud-traces@1','generated_at':generated_at,
               'request_daily_metrics':daily_metrics,
               'binding_count':len(items),'read_log_count':len(snapshots),'errors':problems,

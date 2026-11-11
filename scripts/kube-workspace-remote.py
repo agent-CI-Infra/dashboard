@@ -18,6 +18,8 @@ NAME = re.compile(r'^(?:digitalmate-)?w-[0-9a-f]{64}$')
 MAX_LOG = 200_000_000
 MAX_NATIVE_SPANS = 300
 MAX_NATIVE_PAYLOAD = 1_000_000
+MAX_NATIVE_DATABASES = 64
+SAFE_TOOL_NAMES = frozenset({'tool_search', 'tool_call', 'fetch_webpage', 'free_search'})
 NATIVE_PHASES = {
     'workswarm.input.prepare': '输入准备',
     'workswarm.input.dispatch': '输入分发',
@@ -131,11 +133,13 @@ def read_native_connection(connection, correlation):
             elif isinstance(name, str) and name.startswith('agent.main_agent.task_iteration.'):
                 kind, label = 'agent', '任务执行'
             elif isinstance(name, str) and name.startswith('agent.main_agent.react_iteration.'):
-                kind, label = 'agent', 'ReAct 轮次'
+                match = re.fullmatch(r'agent\.main_agent\.react_iteration\.([0-9]{1,4})', name)
+                kind, label = 'agent', f'ReAct 轮次 {match.group(1)}' if match else 'ReAct 轮次'
             elif isinstance(name, str) and name.startswith('chat '):
                 kind, label = 'model', '模型调用'
             elif isinstance(name, str) and name.startswith('execute_tool '):
-                kind, label = 'tool', '工具调用'
+                tool = name.removeprefix('execute_tool ')
+                kind, label = 'tool', f'工具调用 · {tool}' if tool in SAFE_TOOL_NAMES else '工具调用'
             else:
                 kind, label = 'event', '其他阶段'
             spans.append({'span_id': sid, 'parent_span_id': parent, 'kind': kind, 'label': label,
@@ -168,6 +172,65 @@ def read_native_trajectory(query, correlation):
             connection.close()
     except (OSError, ValueError, TypeError, KeyError, sqlite3.Error, UnicodeError):
         return None
+
+
+def read_native_by_request_ids(query, request_ids):
+    """Resolve only unique native roots across the complete, bounded workspace inventory.
+
+    An unreadable or oversized inventory is inconclusive, never evidence of uniqueness.
+    Nothing from a native payload other than allowlisted labels and timings is returned.
+    """
+    ids = set(request_ids)
+    if not ids or len(ids) > 100 or any(not isinstance(x, str) or not re.fullmatch(r'digitalmate-[A-Za-z0-9_-]{1,128}', x) for x in ids):
+        return {}
+    try:
+        root = path_for(query['name'], 'workswarm/.jiuwenswarm/.trace/sessions')
+        databases = []
+        with os.scandir(root) as directories:
+            for directory in directories:
+                if directory.is_symlink():
+                    return {}
+                if not directory.is_dir(follow_symlinks=False) or not re.fullmatch(r'[0-9a-f]{2}', directory.name):
+                    continue
+                with os.scandir(directory.path) as entries:
+                    for entry in entries:
+                        if not re.fullmatch(r'[0-9a-f]{64}\.sqlite3', entry.name):
+                            if entry.name.endswith('.sqlite3'):
+                                return {}
+                            continue
+                        if entry.is_symlink() or not entry.is_file(follow_symlinks=False) or not entry.name.startswith(directory.name):
+                            return {}
+                        databases.append(Path(entry.path))
+                        if len(databases) > MAX_NATIVE_DATABASES:
+                            return {}
+        candidates = {rid: [] for rid in ids}
+        placeholders = ','.join('?' for _ in ids)
+        for db in databases:
+            with contextlib.closing(sqlite3.connect(db.as_uri() + '?mode=ro', uri=True, timeout=1)) as connection:
+                connection.execute('PRAGMA query_only=ON')
+                roots = connection.execute(
+                    f"SELECT request_id,trace_id,span_id,lifecycle FROM trajectory_current_records WHERE request_id IN ({placeholders}) "
+                    "AND (parent_span_id IS NULL OR parent_span_id='') LIMIT ?",
+                    (*ids, 2 * len(ids) + 1),
+                ).fetchall()
+                if len(roots) > 2 * len(ids):
+                    return {}
+                for rid, trace, span, lifecycle in roots:
+                    candidates[rid].append((db, trace, span, lifecycle))
+        result = {}
+        for rid, roots in candidates.items():
+            if len(roots) != 1 or roots[0][3] != 'final':
+                continue
+            db, trace, span, _ = roots[0]
+            with contextlib.closing(sqlite3.connect(db.as_uri() + '?mode=ro', uri=True, timeout=1)) as connection:
+                connection.execute('PRAGMA query_only=ON')
+                native = read_native_connection(connection, {'request_id': rid, 'trace_id': trace,
+                                                               'span_id': span, 'session_id': 'request-id-only'})
+            if native:
+                result[rid] = native
+        return result
+    except (OSError, ValueError, TypeError, KeyError, sqlite3.Error):
+        return {}
 
 
 def run_collector(names, source):
@@ -218,7 +281,8 @@ def run_collector(names, source):
         return body.decode('utf-8', 'replace')
 
     namespace.update(listing=listing, download_log=download_log, fetch=fetch,
-                     read_native_trajectory=read_native_trajectory)
+                     read_native_trajectory=read_native_trajectory,
+                     read_native_by_request_ids=read_native_by_request_ids)
     with contextlib.redirect_stdout(sys.stderr):
         return namespace['collect']()
 
