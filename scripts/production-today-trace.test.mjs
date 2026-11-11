@@ -5,6 +5,19 @@ import vm from 'node:vm';
 const code = readFileSync(new URL('../single-repo/static/production-metrics/app.js', import.meta.url), 'utf8');
 function extract(a,b) { const x=code.indexOf(a), y=code.indexOf(b,x); assert(x>=0 && y>x); return code.slice(x,y); }
 
+test('Kubernetes slow requests show without inventing a baseline or timeout count', () => {
+  const c=vm.createContext({});
+  vm.runInContext(`const MODEL_FAILURE_LABELS={}; const esc=String; const fmtCount=(v)=>Number.isFinite(v)?String(v):'—';
+    const fmtDuration=(v)=>Number.isFinite(v)?String(v):'—'; const fmtTpotBare=String; const fmtPercent=String;`+
+    extract('const ANOMALY_METRICS =', '// Cloud call volume')+';globalThis.render=envAnomaly;',c);
+  const doc={days:[{date:'2026-11-10',partial:true}],cloud_trace_collection:{days:[{date:'2026-11-10',
+    anomaly:{latency:{n:100,slow_count:5,slow_requests:[{request_id:'req-1',gateway:9000}]},timeouts:{requests:[]}}}]}};
+  const html=c.render(doc);
+  assert.match(html,/req-1/); assert.match(html,/9000/); assert.match(html,/基线尚未采集/);
+  assert.match(html,/超时统计未采集/); assert.doesNotMatch(html,/等待下一次采集生成异常分析/);
+  assert.match(c.render({...doc,days:[{date:'2026-11-09'}]}),/等待下一次采集/);
+});
+
 test('older incomplete distributions use a labelled current sample, without losing other metrics', () => {
   const c=vm.createContext({});
   vm.runInContext(extract('function mergeMetricHistogram(', '// Each bucket covers')+

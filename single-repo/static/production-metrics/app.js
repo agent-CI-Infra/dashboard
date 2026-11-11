@@ -1156,7 +1156,18 @@ const ANOMALY_PHASES = [
 ];
 
 function envAnomaly(doc) {
-  const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date) : [];
+  const traceDays = new Map((doc?.cloud_trace_collection?.days || []).filter((row) => row?.date)
+    .map((row) => [row.date, row]));
+  const rows = (Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date) : []).map((row) => {
+    if (row.anomaly) return row;
+    const trace = traceDays.get(row.date)?.anomaly?.latency;
+    if (!(trace?.n > 0)) return row;
+    const slow = Array.isArray(trace.slow_requests) ? trace.slow_requests : [];
+    const maximum = slow.filter((item) => Number.isFinite(item?.gateway))
+      .reduce((best, item) => !best || item.gateway > best.gateway ? item : best, null);
+    return { ...row, anomaly: { available: false, source: 'kubernetes_slow_sample',
+      latency: { ...trace, max_ms: maximum?.gateway, max_request: maximum }, timeouts: {} } };
+  });
   const hasBaseline = (row) => row.anomaly?.available
     && Object.values(row.anomaly.metrics || {}).some((metric) => Number.isFinite(metric?.baseline_p95));
   const analysed = rows.filter(hasBaseline);
@@ -1165,13 +1176,13 @@ function envAnomaly(doc) {
   const withDetail = rows.filter((row) => row.anomaly?.latency?.n || row.anomaly?.timeouts?.count);
   const anchor = [...analysed].reverse().find((row) => !row.partial)
     || analysed[analysed.length - 1]
-    || [...withDetail].reverse().find((row) => !row.partial)
     || withDetail[withDetail.length - 1];
-  const head = (windowDays) => `<div class="trend-head"><h3>异常请求分析</h3><span class="muted">超基线 P95 · 近 ${fmtCount(windowDays)} 个完整日</span></div>`;
+  const head = (windowDays, sampled = false) => `<div class="trend-head"><h3>异常请求分析</h3><span class="muted">${sampled ? '采样慢请求 · 基线尚未采集' : `超基线 P95 · 近 ${fmtCount(windowDays)} 个完整日`}</span></div>`;
   if (!anchor) {
     return `<div class="trend-card wide env-anomaly">${head(7)}<p class="empty">等待下一次采集生成异常分析（需要按请求合并各阶段耗时）。</p><p class="chart-note">异常判定以当日之前的完整日为基线，不使用当日 P95，避免固定比例的样本被机械标为异常。</p></div>`;
   }
   const a = anchor.anomaly;
+  const sampled = a.source === 'kubernetes_slow_sample';
   const gateway = a.metrics?.gateway || {};
   const latency = a.latency || {};
   const timeouts = a.timeouts || {};
@@ -1189,7 +1200,7 @@ function envAnomaly(doc) {
     <div class="stat-card">
       <div class="stat-label">超基线请求</div>
       <div class="stat-value">${a.available ? `${fmtCount(gateway.outliers)} / ${fmtCount(gateway.n)}` : '—'}</div>
-      <div class="stat-hint">${a.available ? `${rate} · 请求耗时 &gt; 基线 P95${Number.isFinite(gateway.baseline_p95) ? ` ${fmtDuration(gateway.baseline_p95)}` : ''}` : '基线样本不足，仅展示最大时延与慢请求'}</div>
+      <div class="stat-hint">${a.available ? `${rate} · 请求耗时 &gt; 基线 P95${Number.isFinite(gateway.baseline_p95) ? ` ${fmtDuration(gateway.baseline_p95)}` : ''}` : sampled ? '基线尚未采集，仅展示可读日志中的慢请求' : '基线样本不足，仅展示最大时延与慢请求'}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">最大时延</div>
@@ -1199,7 +1210,7 @@ function envAnomaly(doc) {
     <div class="stat-card">
       <div class="stat-label">超时请求</div>
       <div class="stat-value">${fmtCount(timeouts.count)}</div>
-      <div class="stat-hint">llm_call_error 超时 · ${fmtCount(timeouts.records)} 条已记录 request_id</div>
+      <div class="stat-hint">${sampled ? '超时统计未采集' : `llm_call_error 超时 · ${fmtCount(timeouts.records)} 条已记录 request_id`}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">主要拉高阶段</div>
@@ -1273,7 +1284,7 @@ function envAnomaly(doc) {
     : '';
 
   return `<div class="trend-card wide env-anomaly" aria-label="异常请求分析">
-    ${head(a.available ? a.baseline.days : 7)}
+    ${head(a.available ? a.baseline.days : 7, sampled)}
     <p class="chart-note">${esc(anchor.date)}${anchor.partial ? ' · 部分日' : ''} · ${a.available
       ? `基线为 ${esc(a.baseline.from)} 至 ${esc(a.baseline.to)} 的 ${fmtCount(a.baseline.days)} 个完整日合并样本。异常请求 = 云侧请求耗时超过基线 P95 的请求；低于基线的请求归入正常组。`
       : '当日之前还没有足够的完整日样本，基线判定暂不可用；最大时延、超时与慢请求明细仍按当日样本展示。'}</p>
@@ -1283,7 +1294,7 @@ function envAnomaly(doc) {
     ${categoryText ? `<p class="chart-note">当日网关失败原因：${esc(categoryText)}。</p>` : ''}
     ${a.available ? `<div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>指标</th><th>基线 P95</th><th class="num">当日样本</th><th class="num">超基线</th><th>占比</th></tr></thead><tbody>${metricRows}</tbody></table></div>` : ''}
     ${cohort ? `<h4 class="anomaly-subhead">慢请求阶段对比（均值）</h4><div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>阶段</th><th class="num">正常请求</th><th class="num">异常请求</th><th class="num">增量</th></tr></thead><tbody>${cohortRows}</tbody></table></div>` : ''}
-    <p class="chart-note">${detailNote} 慢请求 = 当日请求耗时排序的最慢 5%，超时 = <code>llm_call_error</code> 文本含 timeout / timed out / deadline exceeded。公开看板只发布这些请求的不透明 request_id 与各阶段耗时，不包含消息内容、用户标识或 IP；需要继续排查时，可用下方「按请求 ID 查询」检索网关记录。</p>
+    <p class="chart-note">${detailNote} 慢请求 = 当日可读取请求耗时排序的最慢 5%。${sampled ? '当前 Kubernetes 采集未计算超时数、历史基线和超基线异常数；不能据此认定没有超时或异常。' : '超时 = <code>llm_call_error</code> 文本含 timeout / timed out / deadline exceeded。'} 公开看板只发布这些请求的不透明 request_id 与各阶段耗时，不包含消息内容、用户标识或 IP；需要继续排查时，可用下方「按请求 ID 查询」检索网关记录。</p>
     <p class="chart-note">基线取该日之前最近 7 个完整日（不含当日与部分日）的合并样本，P95 为最近排名分位，每项至少 20 个基线样本；异常 = 当日样本严格大于基线 P95；各指标单独判定，同一请求可能同时计入请求耗时与某个阶段指标。分布稳定时约 5% 的样本会自然超过基线 P95，应关注占比持续升高或集中在同一阶段的日期。阶段均值只统计该阶段有样本的请求，增量 = 异常组 − 正常组；首吐字 + ReAct 阶段 + 答案尾段构成请求耗时，因此增量最大的阶段即主要拉高项。请求耗时 / 首吐字 / 答案首吐字 / ReAct 按请求统计，TTFT / TPOT 按模型调用统计，工具调用按每次工具调用统计。基线不是当日 P95，避免固定约 5% 的样本被机械标为异常。</p>
   </div>`;
 }
