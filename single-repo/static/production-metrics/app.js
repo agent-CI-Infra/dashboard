@@ -77,9 +77,10 @@ function fmtDuration(ms) {
   const value = Number(ms);
   if (value < 1000) return `${Math.round(value)}ms`;
   const seconds = value / 1000;
-  if (seconds < 60) return `${seconds.toFixed(1)}s`;
-  const minutes = Math.floor(seconds / 60);
-  const rest = Math.round(seconds % 60);
+  if (seconds < 59.95) return `${seconds.toFixed(1)}s`;
+  const roundedSeconds = Math.round(seconds);
+  const minutes = Math.floor(roundedSeconds / 60);
+  const rest = roundedSeconds % 60;
   return `${minutes}m ${String(rest).padStart(2, '0')}s`;
 }
 

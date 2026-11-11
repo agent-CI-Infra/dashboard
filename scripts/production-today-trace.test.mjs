@@ -5,6 +5,14 @@ import vm from 'node:vm';
 const code = readFileSync(new URL('../single-repo/static/production-metrics/app.js', import.meta.url), 'utf8');
 function extract(a,b) { const x=code.indexOf(a), y=code.indexOf(b,x); assert(x>=0 && y>x); return code.slice(x,y); }
 
+test('duration rounding carries seconds into the next minute', () => {
+  const c=vm.createContext({});
+  vm.runInContext(extract('function fmtDuration(', 'function fmtAxis(')+';globalThis.format=fmtDuration;', c);
+  assert.equal(c.format(899_600), '15m 00s');
+  assert.equal(c.format(59_960), '1m 00s');
+  assert.equal(c.format(59_900), '59.9s');
+});
+
 test('Kubernetes slow requests show without inventing a baseline or timeout count', () => {
   const c=vm.createContext({});
   vm.runInContext(`const MODEL_FAILURE_LABELS={}; const esc=String; const fmtCount=(v)=>Number.isFinite(v)?String(v):'—';
