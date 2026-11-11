@@ -44,6 +44,40 @@ class ProductionTraceTests(unittest.TestCase):
         self.assertNotIn('private prompt', json.dumps(rows))
         self.assertEqual(usage, {})
 
+    def test_native_correlation_requires_unique_matching_request_and_is_not_published(self):
+        now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+        stamp = lambda t: t.strftime('%Y-%m-%d %H:%M:%S.000')
+        rid = 'digitalmate-valid'
+        corr = {'request_id':rid, 'session_id':'PRIVATE_SESSION', 'trace_id':'a'*32, 'span_id':'b'*16}
+        lines = [f'{stamp(now)} [MessageHandler] dispatch: request_id={rid}',
+                 f'{stamp(now)} [TrajectoryCorrelation] {json.dumps(corr)}',
+                 f'{stamp(now + dt.timedelta(seconds=2))} [MessageHandler] Stream done request_id={rid} total_chunks=2']
+        with patch.object(collector,'query_for',return_value={}), \
+             patch.object(collector,'listing',return_value=[{'name':'process.log','type':'file','size':100}]), \
+             patch.object(collector,'download_log',return_value=iter(lines)):
+            _, rows, _, _ = collector.read_log({})
+        self.assertEqual(rows[0]['_native_correlation'],corr)
+        with patch.object(collector,'read_native_trajectory',return_value={'duration_ms':100,'spans':[]}):
+            collector.attach_native_trajectories({},rows)
+        self.assertNotIn('PRIVATE_SESSION',json.dumps(rows))
+        self.assertIn('native_trajectory',rows[0])
+
+    def test_conflicting_native_correlations_are_not_guessed(self):
+        now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+        stamp = lambda t: t.strftime('%Y-%m-%d %H:%M:%S.000')
+        rid = 'digitalmate-valid'
+        first = {'request_id':rid,'session_id':'session','trace_id':'a'*32,'span_id':'b'*16}
+        second = dict(first,trace_id='c'*32)
+        lines = [f'{stamp(now)} [MessageHandler] dispatch: request_id={rid}',
+                 f'{stamp(now)} [TrajectoryCorrelation] {json.dumps(first)}',
+                 f'{stamp(now)} [TrajectoryCorrelation] {json.dumps(second)}',
+                 f'{stamp(now + dt.timedelta(seconds=2))} [MessageHandler] Stream done request_id={rid} total_chunks=2']
+        with patch.object(collector,'query_for',return_value={}), \
+             patch.object(collector,'listing',return_value=[{'name':'process.log','type':'file','size':100}]), \
+             patch.object(collector,'download_log',return_value=iter(lines)):
+            _, rows, _, _ = collector.read_log({})
+        self.assertNotIn('_native_correlation', rows[0])
+
     def test_usage_records_and_gateway_outcomes_have_distinct_scopes(self):
         now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
         stamp = lambda t: t.strftime('%Y-%m-%d %H:%M:%S.000')

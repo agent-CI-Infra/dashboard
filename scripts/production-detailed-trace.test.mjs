@@ -7,6 +7,16 @@ const part=(start,end)=>src.slice(src.indexOf(start),src.indexOf(end,src.indexOf
 const c=vm.createContext({});
 vm.runInContext(`const state={traceFilter:'all'}; const esc=(v)=>String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'); const fmtDuration=(v)=>v+'ms';`+part('function slowTraceCandidates(doc)', 'function renderRequestTraces(doc)')+';globalThis.rows=traceRows;globalThis.html=traceHtml;globalThis.available=availableTraceCandidates;globalThis.state=state;',c);
 const incident={scope:'local',gateway:1000,user_event_ms:20,final_ms:990,tools:[{index:1,name:'bash',start_ms:100,duration_ms:500,success:false,summary:'超时',result_chars:10}],models:[{index:1,time_ms:99,input_tokens:30,cache_read_tokens:20,cache_miss_tokens:10}]};
+test('native spans render actual model and nested phase intervals on their own root clock',()=>{
+ const item={scope:'cloud',gateway:3000,native_trajectory:{duration_ms:2000,root_span_id:'a',spans:[
+  {span_id:'b',parent_span_id:'a',kind:'phase',label:'输入准备',start_ms:100,duration_ms:200},
+  {span_id:'c',parent_span_id:'b',kind:'model',label:'模型调用',start_ms:150,duration_ms:100},
+  {span_id:'d',parent_span_id:'a',kind:'tool',label:'工具调用',start_ms:500,duration_ms:300}]}};
+ c.state.traceFilter='all';const rows=c.rows(item);assert.equal(rows[0].duration,2000);assert.equal(rows[2].depth,2);
+ const html=c.html(item);assert.match(html,/WorkSwarm 原生轨迹/);assert.match(html,/模型调用/);assert.match(html,/输入准备/);
+ assert.match(html,/2000ms/);assert.doesNotMatch(html,/3000ms/);
+ c.state.traceFilter='models';assert.match(c.html(item).split('class="trace-event-list"')[1],/模型调用/);
+});
 test('records full history as intervals and point events without inferring model duration',()=>{
  const rows=c.rows(incident); assert.equal(rows.length,5); assert.equal(rows.filter(r=>r.kind==='error')[0].duration,500);
  const point=rows.find(r=>r.kind==='model-point');assert.equal(point.start,99);assert.equal(point.duration,0);assert.match(point.detail,/无法推算模型耗时/);
