@@ -203,8 +203,11 @@ def attach_tool_events(query, rows):
                    and not e['name'].startswith(('health_check_', '.'))),
                   key=lambda x: str(x.get('modified_at') or ''), reverse=True)
     truncated = len(dirs) > MAX_SESSIONS
-    pending = {}
+    completed = set()
     for directory in dirs[:MAX_SESSIONS]:
+        # Never pair a call from one session history with a result from another.
+        pending = {}
+        ambiguous = set()
         path = 'workswarm/.jiuwenswarm/agent/sessions/' + directory['name'] + '/history.jsonl'
         try:
             data = fetch('/api/workspace-files', {**query, 'path': path, 'action': 'download'}, download=True)
@@ -237,20 +240,31 @@ def attach_tool_events(query, rows):
                     continue
                 cid = call.get('tool_call_id')
                 if isinstance(cid, str) and cid:
+                    key = (row['request_id'], cid)
+                    if key in completed or key in ambiguous:
+                        continue
+                    if key in pending:
+                        pending.pop(key, None)
+                        ambiguous.add(key)
+                        truncated = True
+                        continue
                     name = call.get('name')
                     name = name if name in ('bash','grep','read_file','tool_search') else 'tool'
-                    pending[(row['request_id'], cid)] = (offset, name)
+                    pending[key] = (offset, name)
             elif event.get('event_type') == 'chat.tool_result':
                 cid = event.get('tool_call_id')
                 if not isinstance(cid, str):
                     continue
-                before = pending.pop((row['request_id'], cid), None)
+                key = (row['request_id'], cid)
+                before = pending.pop(key, None)
                 if before and offset >= before[0]:
+                    completed.add(key)
                     events = row.setdefault('tool_events', [])
                     if len(events) < 200:
                         events.append({'name': before[1], 'start_ms': round(before[0],1),
                                        'duration_ms': round(offset-before[0],1),
-                                       'status': 'error' if event.get('success') is False else 'ok'})
+                                       'status': 'error' if event.get('success') is False else
+                                                 'ok' if event.get('success') is True else 'unknown'})
                     else:
                         truncated = True
     for row in rows:
