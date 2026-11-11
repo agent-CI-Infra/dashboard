@@ -788,12 +788,25 @@ def collect_workspace_traces():
 
 
 def with_workspace_traces(previous, traces):
-    """Preserve existing metric timestamps; trace coverage has its own clock."""
+    """Publish request aggregates and slow traces from the same bounded logs."""
     if not isinstance(traces, dict) or traces.get('schema') != 'digitalmate/cloud-traces@1':
         raise ValueError('invalid workspace trace collection')
     if not isinstance(traces.get('read_log_count'), int) or traces['read_log_count'] <= 0:
         raise ValueError('empty workspace trace collection')
     result = dict(previous)
+    existing = {day['date']: dict(day) for day in previous.get('days', []) if isinstance(day, dict) and day.get('date')}
+    for day in traces.get('request_daily_metrics', []):
+        if not isinstance(day, dict) or not isinstance(day.get('date'), str) or not isinstance(day.get('n'), int):
+            raise ValueError('invalid request daily metrics')
+        old = existing.get(day['date'])
+        # Do not erase a more complete historical request population after a
+        # restart or temporary loss of workspace files.
+        if old and day['n'] < old.get('n', 0):
+            continue
+        # Unavailable model/tool/call metrics are intentionally not copied from
+        # an older snapshot into a newly timestamped request aggregate.
+        existing[day['date']] = dict(day)
+    result['days'] = [existing[key] for key in sorted(existing)]
     result['cloud_trace_collection'] = traces
     return result
 

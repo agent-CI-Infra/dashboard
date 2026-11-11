@@ -849,7 +849,7 @@ function envLatencyTrend(doc) {
     height: 300,
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
-    note: `按 ${esc(doc.label || doc.env || '环境')} 的请求逐日聚合（Asia/Shanghai）。云侧 Agent 请求耗时指请求进入云侧网关至流式响应结束（原 GateWay 口径），均值按请求数加权；P50/P95 为当日成功请求的最近排名分位；纵轴为秒；* 为部分日，窗口外数据未采集。`,
+    note: `按 ${esc(doc.label || doc.env || '环境')} 的请求逐日聚合（Asia/Shanghai）。云侧 Agent 请求耗时指请求进入云侧网关至流式响应结束（原 GateWay 口径），均值按请求数加权；P50/P95 为已结束请求的最近排名分位；纵轴为秒；* 为部分日或日志覆盖不全。`,
   });
 }
 
@@ -948,13 +948,11 @@ const NETWORK_TILES = [
   ['downlink_terminal', '下行终态 recv 单程', '网关终态帧 → 端侧 recv'],
 ];
 
-// Headline tiles for the cloud-side agent, mirroring the model summary: one
-// card per metric family, values joined by "/", anchored on the latest
-// complete day so a partial day never sets the numbers.
+// Headline tiles use the latest day in the selected window, including partial days.
 function envSummary(doc) {
   const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date && row.gateway) : [];
   if (!rows.length) return '';
-  const anchor = [...rows].reverse().find((row) => !row.partial) || rows[rows.length - 1];
+  const anchor = rows[rows.length - 1];
   const seconds = (value) => fmtSecondsBare(value);
   const rate = Number.isFinite(anchor.failure_rate) ? fmtPercent(anchor.failure_rate * 100) : '—';
   const failureTone = Number.isFinite(anchor.failure_rate) && anchor.failure_rate > 0 ? 'failed' : 'ok';
@@ -981,7 +979,8 @@ function envSummary(doc) {
   const answerTile = requestTile('answer_first', '答案首吐字', '网关受理 → 首个答案 chunk');
   const reactTile = requestTile('react', 'ReAct 阶段', '首个文本 chunk → 答案首吐字 · 思考 + 工具');
   const toolCount = Number.isFinite(anchor.tool?.n) ? anchor.tool.n : 0;
-  const toolHint = toolCount > 0
+  const toolHint = anchor.source === 'workspace_request_logs' ? '本次请求日志未采集工具耗时'
+    : toolCount > 0
     ? `${fmtCount(toolCount)} 次工具调用 · 失败 ${fmtCount(anchor.tool_failed)} · tool_call → tool_result`
     : '0 次工具调用 · 当日无样本 · tool_call → tool_result';
   const toolTile = `<div class="stat-card">
@@ -1015,7 +1014,7 @@ function envSummary(doc) {
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>请求耗时</strong>平均 / P50 / P95（s）</div>
       <div class="stat-value combo">${seconds(anchor.gateway.mean)} / ${seconds(anchor.gateway.p50)} / ${seconds(anchor.gateway.p95)}</div>
-      <div class="stat-hint">${fmtCount(anchor.gateway.n)} 个成功请求 · 不含端侧与网络</div>
+      <div class="stat-hint">${fmtCount(anchor.gateway.n)} 个已结束请求 · 不含端侧与网络</div>
     </div>
     ${firstTile}
     ${answerTile}
@@ -3702,6 +3701,10 @@ function newestEnvDaily(candidates) {
 // The cloud-side section answers to the same range control as the model side:
 // the tiles pick their anchor day and every chart is drawn from the rows of the
 // selected trailing window, so both halves of the page describe one period.
+function cloudScopedDays(days, rangeDays, today) {
+  return inRange(days, rangeDays, today);
+}
+
 function renderEnv() {
   const target = $('env-latency');
   if (!target) return;
@@ -3712,12 +3715,8 @@ function renderEnv() {
     return;
   }
   const all = Array.isArray(daily.days) ? daily.days.filter((row) => row && row.date) : [];
-  // The model side ends its window on the last complete day, so a half-collected
-  // current day never anchors a chart. Do the same here: keep every earlier day
-  // (including a first day whose log starts mid-day) and drop the partial tail.
-  const through = [...all].reverse().find((row) => !row.partial)?.date;
-  const capped = state.rangeDays === 1 ? all : (through ? all.filter((row) => row.date <= through) : all);
-  const scoped = { ...daily, days: inRange(capped, state.rangeDays, state.rangeDays === 1 ? todayShanghai() : null) };
+  // Show partial days too, anchored to the calendar instead of stale data.
+  const scoped = { ...daily, days: cloudScopedDays(all, state.rangeDays, todayShanghai()) };
   renderRequestTraces(scoped);
   const latestObserved = scoped.days.at(-1)?.observed_at;
   const snapshotTime = daily.generated_at || daily.updated_at;
@@ -3725,7 +3724,8 @@ function renderEnv() {
   const stale = Number.isFinite(Date.parse(ageStamp)) && Date.now() - Date.parse(ageStamp) > 6 * 60 * 60 * 1000;
   const timeText = latestObserved ? `采集于 ${esc(fmtDateTime(latestObserved))}`
     : snapshotTime ? `快照生成于 ${esc(fmtDateTime(snapshotTime))}，行级采集时间未知` : '采集时间未知';
-  const freshness = `<p class="data-freshness">云侧数据${timeText}${stale ? ' · 超过 6 小时未更新，请检查采集任务' : ''}${state.envRefreshFailed ? ' · 刷新失败，保留上次快照' : ''}${state.rangeDays === 1 && !scoped.days.length ? ' · 尚无当天采集数据' : ''}；定时采集，并非实时流。</p>`;
+  const requestOnly = scoped.days.some((row) => row.source === 'workspace_request_logs');
+  const freshness = `<p class="data-freshness">云侧数据${timeText}${stale ? ' · 超过 6 小时未更新，请检查采集任务' : ''}${state.envRefreshFailed ? ' · 刷新失败，保留上次快照' : ''}${state.rangeDays === 1 && !scoped.days.length ? ' · 尚无当天采集数据' : ''}${requestOnly ? ' · 新采集行仅包含已结束请求的网关及首字耗时；模型、工具和调用数等指标尚未采集' : ''}；* 表示部分日或日志覆盖不全；定时采集，并非实时流。</p>`;
   target.innerHTML = `${freshness}${envSummary(scoped)}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTtftTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
   refineCharts(target);
 }

@@ -244,6 +244,24 @@ def attach_tool_events(query, rows):
     return not truncated
 
 
+def request_daily_metrics(records, date, generated_at, incomplete):
+    """Summarize the same finished requests used for the slow-request ranking."""
+    def summary(field):
+        values = sorted(row[field] for _, _, row in records
+                        if isinstance(row.get(field), (int, float))
+                        and not isinstance(row[field], bool) and math.isfinite(row[field]))
+        if not values:
+            return {'n': 0}
+        return {'n': len(values), 'mean': round(sum(values) / len(values), 1),
+                'p50': round(values[int(round(.5 * (len(values) - 1)))], 1),
+                'p95': round(values[int(round(.95 * (len(values) - 1)))], 1)}
+
+    return {'date': date, 'n': len(records),
+            'partial': incomplete or date == dt.datetime.now(CST).date().isoformat(),
+            'observed_at': generated_at, 'source': 'workspace_request_logs',
+            **{key: summary(key) for key in ('gateway', 'first_token', 'answer_first', 'react')}}
+
+
 def collect():
     if not TOKEN:
         raise SystemExit('ADX_TOKEN required')
@@ -270,8 +288,10 @@ def collect():
     for idx, query, rows in snapshots:
         for row in rows:
             grouped.setdefault(row['date'], []).append((idx, query, row))
-    days, chosen = [], []
+    days, chosen, daily_metrics = [], [], []
+    generated_at = dt.datetime.now(UTC).isoformat()
     for date, records in sorted(grouped.items()):
+        daily_metrics.append(request_daily_metrics(records, date, generated_at, bool(problems)))
         records.sort(key=lambda item:item[2]['gateway'],reverse=True)
         slow_count = math.ceil(len(records) * .05)
         slow = records[:min(slow_count, 50)]
@@ -290,7 +310,8 @@ def collect():
         except Exception:
             details_failed += 1
         print(f'trace workspaces {index}/{len(by_binding)}',flush=True)
-    output = {'schema':'digitalmate/cloud-traces@1','generated_at':dt.datetime.now(UTC).isoformat(),
+    output = {'schema':'digitalmate/cloud-traces@1','generated_at':generated_at,
+              'request_daily_metrics':daily_metrics,
               'binding_count':len(items),'read_log_count':len(snapshots),'errors':problems,
               'detail_workspaces_complete':details_ok,'detail_workspaces_partial':details_failed,
               'trace_request_limit':MAX_TRACE_REQUESTS,'days':days}

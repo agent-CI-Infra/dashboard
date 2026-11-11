@@ -33,6 +33,19 @@ def make_day(date, values, partial=False, sample=None):
 
 
 class TraceCollectionTests(unittest.TestCase):
+    def test_workspace_request_days_refresh_without_fabricating_old_metrics(self):
+        old = {'date': '2026-11-10', 'n': 6, 'calls': {'total': 22}, 'tool': {'n': 3}}
+        fresh = {'date': '2026-11-10', 'n': 354, 'gateway': {'n': 354},
+                 'source': 'workspace_request_logs', 'partial': True}
+        traces = {'schema': 'digitalmate/cloud-traces@1', 'read_log_count': 1,
+                  'request_daily_metrics': [fresh]}
+        result = collector.with_workspace_traces({'days': [old]}, traces)
+        self.assertEqual(result['days'][0], fresh)
+        self.assertNotIn('calls', result['days'][0])
+        self.assertNotIn('tool', result['days'][0])
+        result = collector.with_workspace_traces({'days': [{**old, 'n': 400}]}, traces)
+        self.assertEqual(result['days'][0]['n'], 400)
+
     def test_exact_request_tool_events_are_paired_and_redacted(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
