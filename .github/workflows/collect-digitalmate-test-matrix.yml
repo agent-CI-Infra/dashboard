@@ -15,6 +15,11 @@ on:
   schedule:
     - cron: '50 */3 * * *'
   workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Nightly run id (empty = latest completed Nightly)'
+        type: string
+        default: ''
 
 permissions:
   contents: write
@@ -51,6 +56,7 @@ jobs:
         if: steps.token.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.DIGITALMATE_TOKEN }}
+          INPUT_RUN_ID: ${{ inputs.run_id }}
         run: |
           set -euo pipefail
           src=/tmp/digitalmate-src
@@ -67,7 +73,20 @@ jobs:
           done
           issue=$(node -p "require('./config/digitalmate-test-matrix.json').ledgerIssue")
           gh api "repos/openJiuwen-ai/DigitalMate/issues/$issue" > /tmp/test-matrix-issue.json
-          run=$(gh api 'repos/openJiuwen-ai/DigitalMate/actions/workflows/nightly.yml/runs?per_page=1&event=schedule&branch=main' --jq '.workflow_runs[0] // empty')
+          gh api 'repos/openJiuwen-ai/DigitalMate/actions/workflows/nightly.yml/runs?per_page=20&status=completed&branch=main' \
+            --jq '[.workflow_runs[] | {id, run_number, event, conclusion, created_at, html_url, head_sha}]' > /tmp/nightly-runs.json
+          run_id="$INPUT_RUN_ID"
+          if [ -z "$run_id" ]; then
+            run_id=$(jq -r '.[0].id // empty' /tmp/nightly-runs.json)
+          fi
+          run=''
+          if [ -n "$run_id" ]; then
+            run=$(gh api "repos/openJiuwen-ai/DigitalMate/actions/runs/$run_id")
+            if [ "$(jq -r .status <<<"$run")" != completed ] || [ "$(jq -r .path <<<"$run")" != .github/workflows/nightly.yml ] || [ "$(jq -r .head_branch <<<"$run")" != main ]; then
+              echo '::error::run_id must identify a completed DigitalMate Nightly run.'
+              exit 1
+            fi
+          fi
           if [ -n "$run" ]; then
             id=$(printf '%s' "$run" | jq -r .id)
             gh api "repos/openJiuwen-ai/DigitalMate/actions/runs/$id/jobs" \
@@ -90,18 +109,20 @@ jobs:
           set -euo pipefail
           git fetch origin digitalmate:refs/remotes/origin/digitalmate
           git checkout -B digitalmate origin/digitalmate
+          mkdir -p site/data
           if git cat-file -e HEAD:site/data/test-matrix.json 2>/dev/null; then
             # generatedAt changes every run; only publish when the cases changed.
-            if node -e "const fs=require('fs');const a=JSON.parse(fs.readFileSync('site/data/test-matrix.json'));const b=JSON.parse(fs.readFileSync('/tmp/test-matrix.json'));delete a.generatedAt;delete b.generatedAt;process.exit(JSON.stringify(a)===JSON.stringify(b)?0:1)"; then
+            if node -e "const fs=require('fs');const a=JSON.parse(fs.readFileSync('site/data/test-matrix.json'));const b=JSON.parse(fs.readFileSync('/tmp/test-matrix.json'));delete a.generatedAt;delete b.generatedAt;const sameMatrix=JSON.stringify(a)===JSON.stringify(b);let sameRuns=false;try{sameRuns=JSON.stringify(JSON.parse(fs.readFileSync('site/data/nightly-runs.json')))==JSON.stringify(JSON.parse(fs.readFileSync('/tmp/nightly-runs.json')))}catch{}process.exit(sameMatrix&&sameRuns?0:1)"; then
               echo 'changed=false' >> "$GITHUB_OUTPUT"
               echo 'test matrix unchanged'
               exit 0
             fi
           fi
+          cp /tmp/nightly-runs.json site/data/nightly-runs.json
           cp /tmp/test-matrix.json site/data/test-matrix.json
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add site/data/test-matrix.json
+          git add site/data/test-matrix.json site/data/nightly-runs.json
           git commit -m 'chore(digitalmate): update test matrix'
           git pull --rebase origin digitalmate
           git push origin HEAD:digitalmate
