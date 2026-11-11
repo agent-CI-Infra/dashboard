@@ -229,10 +229,6 @@ def read_log(item):
                 row[name] = round((value - start) * 1000, 1)
         if 'first_token' in row and 'answer_first' in row and row['answer_first'] >= row['first_token']:
             row['react'] = round(row['answer_first'] - row['first_token'], 1)
-            row['react_combined'] = row['react']
-        if 'answer_first' in row:
-            row['answer_first_combined'] = row['answer_first']
-            row['answer_first_source'] = 'gateway'
         result.append(row)
     return query, result, 'ok', dict(usage)
 
@@ -355,15 +351,6 @@ def attach_answer_estimates(query, rows):
             old = row.get('answer_first_history_ms')
             if old is None or offset < old:
                 row['answer_first_history_ms'] = round(offset, 1)
-    for row in rows:
-        if 'answer_first' in row:
-            row['answer_first_combined'] = row['answer_first']
-            row['answer_first_source'] = 'gateway'
-        elif 'answer_first_history_ms' in row:
-            row['answer_first_combined'] = row['answer_first_history_ms']
-            row['answer_first_source'] = 'history_estimate'
-        if 'first_token' in row and row.get('answer_first_combined', -1) >= row['first_token']:
-            row['react_combined'] = round(row['answer_first_combined'] - row['first_token'], 1)
     return complete
 
 
@@ -407,13 +394,12 @@ def request_daily_metrics(records, date, generated_at, incomplete, usage=None):
             'telemetry_partial': incomplete or date == dt.datetime.now(CST).date().isoformat(),
             'source': 'workspace_request_logs',
             'model_usage_events': usage['events'], 'tokens': tokens, 'tpot': tpot,
-            'answer_first_history_count': sum(row.get('answer_first_source') == 'history_estimate' for _, _, row in records),
             'gateway_stream': {'normal': statuses['normal'], 'exception': statuses['exception'],
                                'cancelled': statuses['cancelled'], 'unknown': statuses['unknown'],
                                'observed': observed, 'population': len(records),
                                'exception_rate': statuses['exception'] / observed if observed else None},
-            **{key: summary(key) for key in ('gateway', 'first_token', 'answer_first', 'react',
-                                             'answer_first_combined', 'react_combined')}}
+            **{key: summary(key) for key in ('gateway', 'first_token', 'answer_first', 'react')},
+            'answer_first_history': summary('answer_first_history_ms')}
 
 
 def collect():

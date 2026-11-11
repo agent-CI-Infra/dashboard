@@ -815,8 +815,7 @@ def with_workspace_traces(previous, traces):
                 old['telemetry_partial'] = True
                 old['current_request_metrics'] = {
                     key: day[key] for key in ('n', 'observed_at', 'gateway', 'first_token', 'answer_first',
-                                              'react', 'answer_first_combined', 'react_combined',
-                                              'answer_first_history_count') if key in day
+                                              'react', 'answer_first_history') if key in day
                 }
                 existing[day['date']] = old
             continue

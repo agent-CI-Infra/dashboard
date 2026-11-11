@@ -875,7 +875,7 @@ function envAnswerFirstTrend(doc) {
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.answer_first?.n, note: '个请求' }),
-    note: '优先使用网关记录的首个答案 chunk；网关未记录时，可用 Agent 历史中带明确收尾时间的回答段起始时间推算。推算值不是网关转发时间，部分对话可能缺失；不把缺失值补 0，* 为部分日。',
+    note: '网关受理到首个答案 chat.delta；仅统计网关记录的样本。旧版日志可能漏掉后续 chunk，样本覆盖有限；历史估算单独列示，不纳入本图。',
   });
 }
 
@@ -888,7 +888,7 @@ function envReactTrend(doc) {
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.react?.n, note: '个请求' }),
-    note: '首个网关文本至首个回答段的时间差；部分回答段起点来自 Agent 历史记录推算，并非精确网关转发时间。仅在两个时间点可信且顺序有效时统计；缺失值不补 0。',
+    note: '首个网关文本至首个网关答案 chat.delta 的时间差；仅在同一请求两个时间点均有记录且顺序有效时统计，不纳入历史估算；缺失值不补 0。',
   });
 }
 
@@ -995,8 +995,7 @@ function summarizeCloudWindow(rows) {
     telemetry_partial: rows.some((row) => row.telemetry_partial), window_days: rows.length,
     window_start: rows[0].date, window_end: rows[rows.length - 1].date };
   result.current_sample_days = rows.filter((row) => row.current_sample_used).length;
-  result.answer_first_history_count = rows.reduce((sum, row) => sum + (Number.isFinite(row.answer_first_history_count) ? row.answer_first_history_count : 0), 0);
-  for (const key of ['gateway', 'first_token', 'answer_first', 'react', 'tool', 'tpot', 'uplink_send', 'downlink_first_text', 'downlink_terminal']) {
+  for (const key of ['gateway', 'first_token', 'answer_first', 'answer_first_history', 'react', 'tool', 'tpot', 'uplink_send', 'downlink_first_text', 'downlink_terminal']) {
     result[key] = aggregateCloudMetric(rows, key);
   }
   const current = rows.filter((row) => Number.isFinite(row.model_usage_events));
@@ -1069,12 +1068,10 @@ function envSummary(doc) {
       <div class="stat-hint">${count} · 覆盖 ${fmtCount(anchor[key]?.days)} / ${fmtCount(anchor.window_days)} 天 · ${hint}</div>
     </div>`;
   };
-  const answerHint = anchor.answer_first_history_count
-    ? `网关受理 → 首个回答段 · ${fmtCount(anchor.answer_first_history_count)} 条由 Agent 历史时间推算`
-    : '网关受理 → 首个答案 chunk';
   const firstTile = requestTile('first_token', '首吐字', '网关受理 → 首个文本 chunk');
-  const answerTile = requestTile('answer_first', '答案首吐字', answerHint);
-  const reactTile = requestTile('react', 'ReAct 阶段', anchor.answer_first_history_count ? '含 Agent 历史推算 · 思考 + 工具' : '首个文本 chunk → 答案首吐字 · 思考 + 工具');
+  const answerTile = requestTile('answer_first', '答案首吐字', '网关受理 → 首个答案 chat.delta · 网关实测');
+  const answerEstimateTile = requestTile('answer_first_history', '答案首吐字（历史估算）', '会话回答段起点估算 · 非网关转发时间，不纳入实测');
+  const reactTile = requestTile('react', 'ReAct 阶段', '网关首文本 → 网关首答案 · 同一请求配对');
   const toolCount = Number.isFinite(anchor.tool?.n) ? anchor.tool.n : 0;
   const toolHint = toolCount > 0
     ? `${fmtCount(toolCount)} 次工具调用 · tool_call → tool_result`
@@ -1116,6 +1113,7 @@ function envSummary(doc) {
     </div>
     ${firstTile}
     ${answerTile}
+    ${answerEstimateTile}
     ${reactTile}
     ${toolTile}
     ${NETWORK_TILES.map(([key, label, hint]) => networkTile(key, label, hint)).join('')}
@@ -3847,18 +3845,11 @@ function cloudDisplayRow(row) {
       && mergeMetricHistogram(new Map(), current.gateway.histogram, current.gateway.n)) {
     result = { ...result, ...current, date: row.date, partial: true, current_sample_used: true };
   }
-  // Answer history is newly collected even when the older gateway sample is
-  // retained. Its own sample count remains independent of gateway latency.
-  const previousAnswer = result.answer_first_combined || result.answer_first;
-  if (current?.answer_first_combined?.n > 0 && (current.answer_first_combined.n > (previousAnswer?.n || 0)
-      || !mergeMetricHistogram(new Map(), previousAnswer?.histogram, previousAnswer?.n))) {
-    result.answer_first_combined = current.answer_first_combined;
-    result.answer_first_history_count = current.answer_first_history_count || 0;
-    result.react_combined = current.react_combined;
-    result.answer_current_sample_used = true;
+  // History estimates have a separate population and never replace gateway
+  // measurements. They may be newly available even when an old row is kept.
+  if (current?.answer_first_history?.n > 0 && current.answer_first_history.n > (result.answer_first_history?.n || 0)) {
+    result.answer_first_history = current.answer_first_history;
   }
-  if (result.answer_first_combined?.n > 0) result.answer_first = result.answer_first_combined;
-  if (result.react_combined?.n > 0) result.react = result.react_combined;
   return result;
 }
 

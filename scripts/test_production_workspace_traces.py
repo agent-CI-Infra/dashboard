@@ -147,9 +147,9 @@ class ProductionTraceTests(unittest.TestCase):
         with patch.object(collector, 'listing', return_value=[{'type': 'directory', 'name': 'session'}]), \
              patch.object(collector, 'fetch', return_value='\n'.join(map(json.dumps, records))):
             self.assertTrue(collector.attach_answer_estimates({}, [row]))
-        self.assertEqual(row['answer_first_combined'], 4000)
-        self.assertEqual(row['react_combined'], 3000)
-        self.assertEqual(row['answer_first_source'], 'history_estimate')
+        self.assertEqual(row['answer_first_history_ms'], 4000)
+        self.assertNotIn('answer_first', row)
+        self.assertNotIn('react', row)
         self.assertNotIn('PRIVATE', json.dumps(row))
 
     def test_direct_answer_wins_over_history_estimate(self):
@@ -161,8 +161,8 @@ class ProductionTraceTests(unittest.TestCase):
         with patch.object(collector, 'listing', return_value=[{'type': 'directory', 'name': 'session'}]), \
              patch.object(collector, 'fetch', return_value=json.dumps(record)):
             collector.attach_answer_estimates({}, [row])
-        self.assertEqual(row['answer_first_combined'], 2500)
-        self.assertEqual(row['answer_first_source'], 'gateway')
+        self.assertEqual(row['answer_first'], 2500)
+        self.assertEqual(row['answer_first_history_ms'], 4000)
 
     def test_history_does_not_pair_across_sessions_or_duplicate_starts(self):
         start = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
