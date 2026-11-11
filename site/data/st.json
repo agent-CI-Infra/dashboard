@@ -1,0 +1,221 @@
+{
+  "schema": "digitalmate/st-history@1",
+  "repository": "openJiuwen-ai/DigitalMate",
+  "updatedAt": "2026-11-11T15:07:24.083Z",
+  "runs": [
+    {
+      "runId": 43042930182,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43042930182",
+      "createdAt": "2026-11-11T14:53:54Z",
+      "headSha": "221dc3038395",
+      "conclusion": "success",
+      "st": {
+        "runId": "ST-1794409217369-aece66",
+        "status": "passed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [],
+        "cases": [
+          {
+            "name": "real_model_text_reply",
+            "key": "text",
+            "title": "文本回复",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 12823,
+            "stage": "validate-text",
+            "detail": "Reply marker verified"
+          },
+          {
+            "name": "real_model_txt_download_and_content",
+            "key": "text-file",
+            "title": "文本生成 TXT 并下载",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 27148,
+            "stage": "validate-file",
+            "detail": "Downloaded TXT exact content verified: ST-1794409217369-aece66.txt"
+          },
+          {
+            "name": "real_model_file_to_text",
+            "key": "file-text",
+            "title": "上传文件并提取文本",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 19729,
+            "stage": "validate-file-text",
+            "detail": "Uploaded source was referenced and hidden fixture values extracted"
+          },
+          {
+            "name": "real_model_file_to_file",
+            "key": "file-file",
+            "title": "上传 CSV 并生成转换文件",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 62251,
+            "stage": "validate-file",
+            "detail": "Real CSV uploaded, transformed, downloaded and both rows checked"
+          },
+          {
+            "name": "real_model_structured_choice",
+            "key": "choice",
+            "title": "结构化选项回答并继续任务",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 13485,
+            "stage": "validate-choice",
+            "detail": "Real pending question, selected B through product answer flow, same task resumed and verified"
+          }
+        ]
+      }
+    },
+    {
+      "runId": 43039010304,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43039010304",
+      "createdAt": "2026-11-11T14:29:49Z",
+      "headSha": "cdde1b3a3454",
+      "conclusion": "success",
+      "st": {
+        "runId": "ST-1794408431982-814b97",
+        "status": "passed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [],
+        "cases": [
+          {
+            "name": "real_model_text_reply",
+            "key": "text",
+            "title": "文本回复",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 6197,
+            "stage": "validate-text",
+            "detail": "Reply marker verified"
+          },
+          {
+            "name": "real_model_txt_download_and_content",
+            "key": "text-file",
+            "title": "文本生成 TXT 并下载",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 17090,
+            "stage": "validate-file",
+            "detail": "Downloaded TXT exact content verified: ST-1794408431982-814b97.txt"
+          }
+        ]
+      }
+    },
+    {
+      "runId": 43024758701,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43024758701",
+      "createdAt": "2026-11-11T12:57:04Z",
+      "headSha": "cdde1b3a3454",
+      "conclusion": "failure",
+      "st": {
+        "runId": "ST-1794401892279-6dc30a",
+        "status": "failed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-02",
+        "machine": "PC-20261103SYCB",
+        "issues": [
+          "real_model_text_reply [failed]: Product submission failed or unresolved: BAD_PARAMS: The single-host limit of 1000 task records has been reached, and none of them is closed",
+          "real_model_txt_download_and_content [failed]: Product submission failed or unresolved: BAD_PARAMS: The single-host limit of 1000 task records has been reached, and none of them is closed",
+          "real_model_file_to_text [failed]: Product submission failed or unresolved: 消息未发送，附件已保留。BAD_PARAMS: The single-host limit of 1000 task records has been reached, and none of them is closed",
+          "real_model_file_to_file [failed]: Product submission failed or unresolved: 消息未发送，附件已保留。BAD_PARAMS: The single-host limit of 1000 task records has been reached, and none of them is closed",
+          "real_model_structured_choice [failed]: Product submission failed or unresolved: BAD_PARAMS: The single-host limit of 1000 task records has been reached, and none of them is closed"
+        ],
+        "cases": [
+          {
+            "name": "real_model_text_reply",
+            "key": "text",
+            "title": "文本回复",
+            "coverageId": "",
+            "status": "failed",
+            "elapsedMs": 2482,
+            "stage": "submit",
+            "detail": "Product submission failed or unresolved: BAD_PARAMS: The single-host limit of 1000 task records has been reached, and none of them is closed"
+          },
+          {
+            "name": "real_model_txt_download_and_content",
+            "key": "text-file",
+            "title": "文本生成 TXT 并下载",
+            "coverageId": "",
+            "status": "failed",
+            "elapsedMs": 2487,
+            "stage": "submit",
+            "detail": "Product submission failed or unresolved: BAD_PARAMS: The single-host limit of 1000 task records has been reached, and none of them is closed"
+          },
+          {
+            "name": "real_model_file_to_text",
+            "key": "file-text",
+            "title": "上传文件并提取文本",
+            "coverageId": "",
+            "status": "failed",
+            "elapsedMs": 3330,
+            "stage": "submit",
+            "detail": "Product submission failed or unresolved: 消息未发送，附件已保留。BAD_PARAMS: The single-host limit of 1000 task records has been reached, and none of them is closed"
+          },
+          {
+            "name": "real_model_file_to_file",
+            "key": "file-file",
+            "title": "上传 CSV 并生成转换文件",
+            "coverageId": "",
+            "status": "failed",
+            "elapsedMs": 3374,
+            "stage": "submit",
+            "detail": "Product submission failed or unresolved: 消息未发送，附件已保留。BAD_PARAMS: The single-host limit of 1000 task records has been reached, and none of them is closed"
+          },
+          {
+            "name": "real_model_structured_choice",
+            "key": "choice",
+            "title": "结构化选项回答并继续任务",
+            "coverageId": "",
+            "status": "failed",
+            "elapsedMs": 2010,
+            "stage": "submit",
+            "detail": "Product submission failed or unresolved: BAD_PARAMS: The single-host limit of 1000 task records has been reached, and none of them is closed"
+          }
+        ]
+      }
+    },
+    {
+      "runId": 42985579483,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/42985579483",
+      "createdAt": "2026-11-11T08:15:19Z",
+      "headSha": "cdde1b3a3454",
+      "conclusion": "failure",
+      "st": {
+        "runId": "ST-1794384975067-d006ae",
+        "status": "failed",
+        "mode": "connection",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "﻿Select a connected local emulator (127.0.0.1:port); this unsigned harness is not verified on physical devices.\r\n",
+          "Missing device report or run ID mismatch; stale results are rejected.",
+          "gateway_connection: missing, duplicate, or invalid case result",
+          "Hypium counts do not match the selected device verdicts.",
+          "gateway_connection [failed]: No completed device result."
+        ],
+        "cases": [
+          {
+            "name": "gateway_connection",
+            "key": "connection",
+            "title": "Gateway 连接检查",
+            "coverageId": "",
+            "status": "failed",
+            "elapsedMs": 0,
+            "stage": "",
+            "detail": "No completed device result."
+          }
+        ]
+      }
+    }
+  ]
+}

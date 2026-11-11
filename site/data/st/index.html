@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DigitalMate ST 执行情况</title>
+<style>
+:root{color-scheme:light dark;--bg:#f6f7f9;--card:#fff;--ink:#1c2430;--dim:#61708a;--line:#dde3ec;--ok:#16a34a;--ok-bg:#dcfce7;--bad:#dc2626;--bad-bg:#fee2e2;--warn:#d97706;--warn-bg:#fef3c7;--block:#6366f1;--block-bg:#e0e7ff;--skip:#9ca3af;--skip-bg:#f3f4f6}
+@media(prefers-color-scheme:dark){:root{--bg:#111827;--card:#1c2534;--ink:#e5e9f0;--dim:#98a6bc;--line:#2d3a4f;--ok:#4ade80;--ok-bg:#14532d;--bad:#f87171;--bad-bg:#7f1d1d;--warn:#fbbf24;--warn-bg:#78350f;--block:#a5b4fc;--block-bg:#3730a3;--skip:#6b7280;--skip-bg:#374151}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif}
+main{max-width:1280px;margin:0 auto;padding:32px 20px 60px}
+a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}
+h1{font-size:26px;margin:0 0 4px}h2{font-size:17px;margin:28px 0 10px}
+p.meta{color:var(--dim);margin:0 0 20px;font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:14px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kpi .v{font-size:22px;font-weight:650}.kpi .l{color:var(--dim);font-size:12px;margin-top:2px}
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.badge.ok{background:var(--ok-bg);color:var(--ok)}.badge.failed{background:var(--bad-bg);color:var(--bad)}
+.badge.blocked{background:var(--block-bg);color:var(--block)}.badge.skipped{background:var(--skip-bg);color:var(--skip)}
+table{width:100%;border-collapse:collapse;background:var(--card);font-size:13px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{background:color-mix(in srgb,var(--card) 88%,var(--ink));font-weight:600}
+td.wrap{white-space:normal;max-width:360px}
+.matrix td,.matrix th{text-align:center;padding:6px 8px}
+.matrix td:first-child,.matrix th:first-child{text-align:left;position:sticky;left:0;background:var(--card)}
+.dot{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:middle}
+.dot.passed{background:var(--ok)}.dot.failed{background:var(--bad)}.dot.blocked{background:var(--block)}.dot.skipped{background:var(--skip)}.dot.unknown{background:var(--line)}
+.dot:hover{outline:2px solid color-mix(in srgb,var(--ink) 40%,transparent)}
+.runline{cursor:pointer}.runline:hover td{background:color-mix(in srgb,var(--card) 80%,var(--ink))}
+.runline.sel td{background:color-mix(in srgb,var(--card) 70%,var(--ink))}
+.bar{height:8px;border-radius:4px;background:color-mix(in srgb,var(--line) 60%,transparent);position:relative;min-width:90px}
+.bar>i{position:absolute;inset:0 auto 0 0;border-radius:4px;background:var(--ok)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.note{color:var(--dim);font-size:12px;margin-top:10px}
+details{margin-top:10px}summary{cursor:pointer;font-size:13px;color:var(--dim)}
+pre{background:color-mix(in srgb,var(--line) 35%,transparent);border-radius:8px;padding:10px 12px;overflow:auto;font-size:12px;max-height:280px}
+.empty{color:var(--dim);padding:30px;text-align:center}
+</style>
+</head>
+<body>
+<main>
+<a href="../../">← DigitalMate board</a>
+<h1>DigitalMate ST 执行情况</h1>
+<p class="meta" id="meta">加载中…</p>
+
+<div class="kpis" id="kpis"></div>
+
+<div class="card">
+<h2 style="margin-top:0">用例 × 运行矩阵 <span class="note" style="display:inline">（最近 <span id="matrixN"></span> 轮，点击圆点查看该轮明细）</span></h2>
+<div style="overflow-x:auto"><table class="matrix" id="matrix"><thead></thead><tbody></tbody></table></div>
+</div>
+
+<div class="card" id="runCard" style="display:none">
+<h2 style="margin-top:0" id="runTitle"></h2>
+<div id="runBody"></div>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0">运行历史</h2>
+<table id="runs"><thead><tr><th>运行</th><th>时间</th><th>结果</th><th>用例</th><th>通过</th><th>耗时中位</th><th>commit</th></tr></thead><tbody></tbody></table>
+<p class="note">数据由 <code>collect-digitalmate-st</code> workflow 从 nightly 的 <code>digitalmate-st-*</code> artifact 同步；历史最多保留 90 轮。<a href="history.json">st.json</a></p>
+</div>
+</main>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const STATUS={passed:'通过',failed:'失败',blocked:'阻塞',skipped:'跳过',unknown:'未知'};
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtMs=ms=>ms==null?'—':ms>=60000?(ms/60000).toFixed(1)+' min':(ms/1000).toFixed(1)+' s';
+const fmtDay=iso=>{const d=new Date(iso);return isNaN(d)?'—':d.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});};
+const badge=s=>`<span class="badge ${esc(s)}">${STATUS[s]||esc(s)}</span>`;
+const dot=s=>`<span class="dot ${esc(s||'unknown')}" title="${STATUS[s]||'未运行'}"></span>`;
+
+function kpi(label,value,extra){return `<div class="kpi"><div class="v">${value}</div><div class="l">${label}${extra?' · '+extra:''}</div></div>`;}
+
+function summarize(run){
+  const cases=run.st?.cases||[];
+  const by={};for(const c of cases)by[c.status]=(by[c.status]||0)+1;
+  const passed=by.passed||0;
+  const durations=cases.map(c=>c.elapsedMs).filter(v=>typeof v==='number').sort((a,b)=>a-b);
+  const median=durations.length?durations[Math.floor(durations.length/2)]:null;
+  return{cases,by,passed,median,total:cases.length};
+}
+
+async function main(){
+  let data;
+  try{data=await (await fetch('../st.json')).json();}
+  catch(e){$('meta').textContent='无法加载 history.json：'+e.message;return;}
+  const runs=(data.runs||[]).filter(r=>r&&r.st);
+  if(!runs.length){$('meta').textContent='暂无 ST 运行数据';return;}
+  const latest=runs[0];const s=summarize(latest);
+  const repo=data.repository||'openJiuwen-ai/DigitalMate';
+  $('meta').innerHTML=`${esc(repo)} · 更新于 ${esc((data.updatedAt||'').slice(0,19).replace('T',' '))} UTC · 共 ${runs.length} 轮`;
+
+  const failCount=runs.filter(r=>r.conclusion!=='success').length;
+  $('kpis').innerHTML=[
+    kpi('最新运行',`<a href="${esc(latest.url)}">#${esc(latest.runId)}</a>`,latest.conclusion==='success'?'<span class="badge ok">success</span>':'<span class="badge failed">failure</span>'),
+    kpi('最新通过',`${s.passed}<small>/${s.total}</small>`,latest.st.mode||''),
+    kpi('阻塞/失败',`${(s.by.failed||0)+(s.by.blocked||0)} 条`,badge(latest.st.status)),
+    kpi('用例耗时中位',fmtMs(s.median),`runner ${esc(latest.st.runner||'—')}`),
+    kpi('近 90 轮失败率',runs.length?Math.round(failCount/runs.length*100)+'%':'—',`${failCount}/${runs.length} 轮失败`),
+  ].join('');
+
+  // case × run matrix: collect union of cases (stable order, defaults first)
+  const MATRIX_RUNS=Math.min(15,runs.length);
+  const mRuns=runs.slice(0,MATRIX_RUNS);
+  const caseOrder=[];const seen=new Set();
+  for(const r of mRuns)for(const c of (r.st.cases||[])){if(!seen.has(c.name)){seen.add(c.name);caseOrder.push(c);}}
+  $('matrixN').textContent=MATRIX_RUNS;
+  $('matrix').querySelector('thead').innerHTML='<tr><th>用例</th>'+mRuns.map(r=>`<th title="#${esc(r.runId)} ${esc(r.createdAt)}"><a href="${esc(r.url)}">${esc(String(r.runId).slice(-6))}</a></th>`).join('')+'</tr>';
+  $('matrix').querySelector('tbody').innerHTML=caseOrder.map(c=>{
+    const cells=mRuns.map(r=>{
+      const hit=(r.st.cases||[]).find(x=>x.name===c.name);
+      const status=hit?hit.status:null;
+      return `<td data-run="${esc(r.runId)}" data-case="${esc(c.name)}">${hit?dot(status):'<span class="dot unknown"></span>'}</td>`;
+    }).join('');
+    return `<tr><td title="${esc(c.name)}">${esc(c.title||c.name)}</td>${cells}</tr>`;
+  }).join('');
+
+  $('matrix').addEventListener('click',ev=>{
+    const td=ev.target.closest('td[data-run]');if(!td)return;
+    selectRun(td.dataset.run);
+  });
+
+  $('runs').querySelector('tbody').innerHTML=runs.map(r=>{
+    const sm=summarize(r);
+    return `<tr class="runline" data-run="${esc(r.runId)}"><td><a href="${esc(r.url)}">#${esc(r.runId)}</a></td><td>${fmtDay(r.createdAt)}</td><td>${r.conclusion==='success'?'<span class="badge ok">success</span>':'<span class="badge failed">failure</span>'}</td><td class="num">${sm.total}</td><td class="num">${sm.passed}/${sm.total}</td><td class="num">${fmtMs(sm.median)}</td><td><code>${esc(r.headSha||'—')}</code></td></tr>`;
+  }).join('');
+  $('runs').addEventListener('click',ev=>{
+    const tr=ev.target.closest('tr.runline');if(!tr)return;
+    selectRun(tr.dataset.run);
+  });
+
+  function selectRun(id){
+    const run=runs.find(r=>String(r.runId)===String(id));if(!run)return;
+    document.querySelectorAll('.runline').forEach(el=>el.classList.toggle('sel',el.dataset.run===String(id)));
+    const sm=summarize(run);
+    $('runCard').style.display='';
+    $('runTitle').innerHTML=`运行 <a href="${esc(run.url)}">#${esc(run.runId)}</a> · ${fmtDay(run.createdAt)} · ${run.conclusion==='success'?'<span class="badge ok">success</span>':'<span class="badge failed">failure</span>'} <span class="note" style="display:inline">commit <code>${esc(run.headSha||'—')}</code> · ${esc(run.st.runner||'')} · ${esc(run.st.machine||'')} · ST runId <code>${esc(run.st.runId||'—')}</code></span>`;
+    const rows=(run.st.cases||[]).map(c=>{
+      const max=Math.max(1,...((run.st.cases||[]).map(x=>x.elapsedMs||0)));
+      return `<tr><td title="${esc(c.name)}">${esc(c.title||c.name)}${c.coverageId?` <span class="note">${esc(c.coverageId)}</span>`:''}</td><td>${badge(c.status)}</td><td class="num">${fmtMs(c.elapsedMs)}</td><td><div class="bar"><i style="width:${Math.round(100*(c.elapsedMs||0)/max)}%"></i></div></td><td class="wrap">${esc(c.stage||'')}</td><td class="wrap">${esc(c.detail||'')}</td></tr>`;
+    }).join('');
+    $('runBody').innerHTML=`<table><thead><tr><th>用例</th><th>结果</th><th>耗时</th><th></th><th>结束阶段</th><th>说明</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="empty">无用例数据</td></tr>'}</tbody></table>`
+      +((run.st.issues||[]).length?`<details><summary>issues (${run.st.issues.length})</summary><pre>${esc(run.st.issues.join('\n'))}</pre></details>`:'');
+    $('runCard').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+
+  selectRun(latest.runId);
+}
+
+main();
+</script>
+</body>
+</html>
