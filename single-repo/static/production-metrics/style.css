@@ -2002,6 +2002,39 @@ h1 {
 
 .data-freshness { margin: 0 0 12px; color: #64748b; font-size: 13px; }
 
+.env-metric-guide {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin: 12px 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.env-metric-guide > div { display: flex; gap: 6px; }
+.env-metric-guide dt { color: var(--text, #243247); font-weight: 600; }
+.env-metric-guide dd { margin: 0; }
+.env-data-notes {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.env-data-notes > div { display: grid; grid-template-columns: 4.5em minmax(0, 1fr); gap: 12px; }
+.env-data-notes strong { color: #334155; font-weight: 600; }
+.env-range-notes { background: #fff; }
+@media (max-width: 600px) {
+  .env-metric-guide { display: grid; gap: 4px; }
+  .env-data-notes { padding: 12px; }
+  .env-data-notes > div { grid-template-columns: 1fr; gap: 2px; }
+}
+
 /* Inspectable per-request timeline. All positions derive from recorded offsets. */
 .trajectory-head { margin-top: 22px; }
 .trajectory-head strong { font-size: 17px; margin-right: 14px; }
