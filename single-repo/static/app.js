@@ -1619,7 +1619,7 @@
   }
 
   // ------------------------------------------------------------ shell
-  const DIGITALMATE_TABS = { 'production-metrics': './production-metrics/index.html#models', 'test-matrix': './test-matrix/index.html', bench: './bench/index.html' };
+  const DIGITALMATE_TABS = { 'production-metrics': './production-metrics/index.html#models', 'client-observed': './client-observed/index.html', 'test-matrix': './test-matrix/index.html', bench: './bench/index.html' };
   const activeTab = () => {
     const requested = location.hash.slice(1);
     const known = [...document.querySelectorAll('#tabs [data-tab]')].some(tab => (!tab.hidden || (!STATE.snap && DIGITALMATE_TABS[requested])) && tab.dataset.tab === requested);
