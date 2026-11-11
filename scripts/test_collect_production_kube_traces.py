@@ -49,6 +49,7 @@ class KubeTraceTests(unittest.TestCase):
         self.assertEqual(actual['errors'], {'ambiguous_or_changed': 1, 'http_413': 1})
         self.assertEqual(actual['collection_source'], 'kubernetes_shared_workspace')
         self.assertTrue(actual['request_daily_metrics'][0]['partial'])
+        self.assertTrue(actual['request_daily_metrics'][0]['telemetry_partial'])
         self.assertEqual(operation.call_args.args[0]['names'], ['w-' + 'a' * 64])
 
     def test_inventory_and_path_validation_prevent_workspace_escape(self):
