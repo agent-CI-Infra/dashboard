@@ -195,6 +195,8 @@ def read_native_by_request_ids(query, request_ids):
                 with os.scandir(directory.path) as entries:
                     for entry in entries:
                         if not re.fullmatch(r'[0-9a-f]{64}\.sqlite3', entry.name):
+                            if entry.name.endswith('.sqlite3'):
+                                return {}
                             continue
                         if entry.is_symlink() or not entry.is_file(follow_symlinks=False) or not entry.name.startswith(directory.name):
                             return {}

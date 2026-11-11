@@ -806,22 +806,26 @@ def with_workspace_traces(previous, traces):
     old_collection = previous.get('cloud_trace_collection') or {}
     old_rows = trace_rows(old_collection) if isinstance(old_collection, dict) else []
     new_rows = trace_rows(traces)
-    old_counts = collections.Counter(row.get('request_id') for row in old_rows)
-    new_counts = collections.Counter(row.get('request_id') for row in new_rows)
+    old_counts = collections.Counter(row['request_id'] for row in old_rows if isinstance(row.get('request_id'), str))
+    new_counts = collections.Counter(row['request_id'] for row in new_rows if isinstance(row.get('request_id'), str))
     old_unique = {row['request_id']: row for row in old_rows if isinstance(row.get('request_id'), str)
                   and old_counts[row['request_id']] == 1}
     retained = 0
     for row in new_rows:
         rid = row.get('request_id')
+        if not isinstance(rid, str):
+            continue
         old = old_unique.get(rid)
+        observed = (old or {}).get('native_trace_retained_from') or old_collection.get('generated_at')
         if (not old or new_counts[rid] != 1 or row.get('native_trajectory')
                 or row.get('native_trace_state') == 'ambiguous'
+                or not isinstance(observed, str) or not observed
                 or not isinstance(row.get('start_time'), str) or not isinstance(row.get('gateway'), (int, float))
                 or any(row.get(key) != old.get(key) for key in ('date', 'start_time', 'gateway'))
                 or not isinstance(old.get('native_trajectory'), dict)):
             continue
         row['native_trajectory'] = copy.deepcopy(old['native_trajectory'])
-        row['native_trace_retained_from'] = old.get('native_trace_retained_from') or old_collection.get('generated_at')
+        row['native_trace_retained_from'] = observed
         retained += 1
     if retained:
         traces['retained_native_trace_count'] = retained
