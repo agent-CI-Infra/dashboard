@@ -66,7 +66,7 @@ class ProductionTraceTests(unittest.TestCase):
         day = collector.request_daily_metrics([(0, {}, row) for row in rows], date, now.isoformat(), False, usage[date])
         self.assertEqual(day['model_usage_events'], 1)
         self.assertEqual(day['gateway_stream'], {'normal': 1, 'exception': 1, 'cancelled': 1,
-                                                'unknown': 0, 'observed': 2, 'exception_rate': 0.5})
+                                                'unknown': 0, 'observed': 2, 'population': 3, 'exception_rate': 0.5})
         self.assertNotIn('PRIVATE', json.dumps(day))
         self.assertNotIn('failure_rate', day)
 

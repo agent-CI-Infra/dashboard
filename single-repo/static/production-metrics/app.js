@@ -954,7 +954,7 @@ function envSummary(doc) {
   if (!rows.length) return '';
   const anchor = rows[rows.length - 1];
   const seconds = (value) => fmtSecondsBare(value);
-  const workspaceMetrics = anchor.source === 'workspace_request_logs';
+  const workspaceMetrics = anchor.source === 'workspace_request_logs' || Number.isFinite(anchor.model_usage_events);
   const rateValue = workspaceMetrics ? anchor.gateway_stream?.exception_rate : anchor.failure_rate;
   const rate = Number.isFinite(rateValue) ? fmtPercent(rateValue * 100) : '—';
   const failureTone = Number.isFinite(rateValue) && rateValue > 0 ? 'failed' : 'ok';
@@ -962,7 +962,7 @@ function envSummary(doc) {
   const rateLabel = workspaceMetrics ? '网关流异常率' : '旧版模型事件失败率';
   const countValue = workspaceMetrics ? anchor.model_usage_events : anchor.calls?.total;
   const callHint = workspaceMetrics
-    ? `已识别网关流 ${fmtCount(anchor.gateway_stream?.observed)} / ${fmtCount(anchor.n)} · 取消 ${fmtCount(anchor.gateway_stream?.cancelled)} · 用量记录不可按调用 ID 去重`
+    ? `已识别网关流 ${fmtCount(anchor.gateway_stream?.observed)} / ${fmtCount(anchor.gateway_stream?.population)} · 取消 ${fmtCount(anchor.gateway_stream?.cancelled)} · 用量记录不可按调用 ID 去重${anchor.telemetry_partial ? ' · 部分覆盖' : ''}${anchor.telemetry_observed_at ? ` · 采集于 ${esc(fmtDateTime(anchor.telemetry_observed_at))}` : ''}`
     : `旧口径 · 成功事件 ${fmtCount(anchor.calls?.success)} / 失败事件 ${fmtCount(anchor.calls?.failed)}`;
   const tokenValues = [anchor.tokens?.input, anchor.tokens?.output, anchor.tokens?.total];
   const tokenMax = Math.max(...tokenValues.map((value) => (Number.isFinite(value) ? value : 0)));
@@ -1277,7 +1277,8 @@ function envCallTrend(doc) {
       const lines = [`${row.date}${row.partial ? ' · 部分日' : ''}`];
       if (Number.isFinite(row.model_usage_events)) lines.push(`模型用量记录 ${fmtCount(row.model_usage_events)}（不能按调用去重）`);
       else if (row.calls) lines.push(`旧版调用事件 ${fmtCount(row.calls.total)}（含失败事件）`);
-      if (Number.isFinite(row.gateway_stream?.exception_rate)) lines.push(`网关流异常率 ${(row.gateway_stream.exception_rate * 100).toFixed(1)}% · 已识别 ${fmtCount(row.gateway_stream.observed)} / ${fmtCount(row.n)}，取消 ${fmtCount(row.gateway_stream.cancelled)}`);
+      if (Number.isFinite(row.gateway_stream?.exception_rate)) lines.push(`网关流异常率 ${(row.gateway_stream.exception_rate * 100).toFixed(1)}% · 已识别 ${fmtCount(row.gateway_stream.observed)} / ${fmtCount(row.gateway_stream.population)}，取消 ${fmtCount(row.gateway_stream.cancelled)}${row.telemetry_partial ? ' · 部分覆盖' : ''}`);
+      if (row.telemetry_observed_at) lines.push(`事件采集于 ${fmtDateTime(row.telemetry_observed_at)}`);
       if (lines.length === 1) return '';
       const cx = x(index);
       const left = Math.max(pad.left, cx - zoneWidth / 2);

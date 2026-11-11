@@ -275,11 +275,13 @@ def request_daily_metrics(records, date, generated_at, incomplete, usage_events=
     observed = statuses['normal'] + statuses['exception']
     return {'date': date, 'n': len(records),
             'partial': incomplete or date == dt.datetime.now(CST).date().isoformat(),
-            'observed_at': generated_at, 'source': 'workspace_request_logs',
+            'observed_at': generated_at, 'telemetry_observed_at': generated_at,
+            'telemetry_partial': incomplete or date == dt.datetime.now(CST).date().isoformat(),
+            'source': 'workspace_request_logs',
             'model_usage_events': usage_events,
             'gateway_stream': {'normal': statuses['normal'], 'exception': statuses['exception'],
                                'cancelled': statuses['cancelled'], 'unknown': statuses['unknown'],
-                               'observed': observed,
+                               'observed': observed, 'population': len(records),
                                'exception_rate': statuses['exception'] / observed if observed else None},
             **{key: summary(key) for key in ('gateway', 'first_token', 'answer_first', 'react')}}
 
