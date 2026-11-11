@@ -40,6 +40,6 @@ jobs:
         run: |
           set -euo pipefail
           for workflow in collect-digitalmate-performance.yml collect-digitalmate-bench.yml collect-digitalmate-test-matrix.yml; do
-            gh workflow run "$workflow" --ref main --field "run_id=$INPUT_RUN_ID"
+            gh workflow run "$workflow" --repo "$GITHUB_REPOSITORY" --ref main --field "run_id=$INPUT_RUN_ID"
             echo "Dispatched $workflow for Nightly run $INPUT_RUN_ID"
           done
