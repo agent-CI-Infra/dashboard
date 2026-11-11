@@ -2087,3 +2087,39 @@ h1 {
 .cloud-trace-list > summary { cursor: pointer; font-weight: 600; color: #334155; padding: 7px 0; }
 
 .trace-empty { margin: 0; padding: 12px; color: #64748b; font-size: 12px; }
+
+/* Request boundaries explain the tiles without implying measured durations. */
+.metric-map { margin: 12px 0 16px; padding: 18px 20px; border: 1px solid #dbe5f2; border-radius: 12px; background: #fff; }
+.metric-map h3 { margin: 0; color: #182b46; font-size: 16px; }
+.metric-map-head p, .metric-map-note { color: #62748c; font-size: 12px; line-height: 1.6; margin: 6px 0 12px; }
+.metric-map-note { margin: 14px 0 0; }
+.metric-map-scroll { overflow-x: auto; }
+.metric-map-inner { min-width: 720px; }
+.metric-map-events, .metric-map-row { display: grid; grid-template-columns: 170px minmax(0, 1fr); column-gap: 14px; align-items: center; }
+.metric-map-events { margin-bottom: 6px; }
+.metric-map-points { display: flex; justify-content: space-between; color: #334d70; font-size: 12px; font-weight: 650; }
+.metric-map-row { min-height: 30px; color: #354761; font-size: 12px; }
+.metric-map-track { display: grid; grid-template-columns: repeat(4, 1fr); align-items: center; height: 100%; background: linear-gradient(to right, #e3eaf3 1px, transparent 1px); background-size: 25% 100%; border-right: 1px solid #e3eaf3; }
+.metric-map-bar { display: block; height: 9px; border-radius: 5px; margin: 0; }
+.metric-map-bar.admission { background: #387de0; }
+.metric-map-bar.dispatch { background: #83a8e9; }
+.metric-map-bar.react { background: #d88136; }
+@media (max-width: 700px) { .metric-map { padding: 14px; } }
+
+@media (max-width: 700px) {
+  .metric-map-inner { min-width: 0; }
+  .metric-map-events { display: block; margin-bottom: 10px; }
+  .metric-map-points { flex-wrap: wrap; justify-content: flex-start; gap: 5px 10px; }
+  .metric-map-row { grid-template-columns: minmax(0, 110px) minmax(48px, 1fr) 38px; gap: 6px; font-size: 11px; }
+  .metric-map-row::after { content: attr(data-boundary); color: #62748c; font-size: 10px; text-align: right; }
+}
+
+@media (min-width: 701px) {
+  .metric-map-points { position: relative; display: block; height: 22px; }
+  .metric-map-points span { position: absolute; top: 0; white-space: nowrap; transform: translateX(-50%); }
+  .metric-map-points span:nth-child(1) { left: 0; transform: none; }
+  .metric-map-points span:nth-child(2) { left: 25%; }
+  .metric-map-points span:nth-child(3) { left: 50%; }
+  .metric-map-points span:nth-child(4) { left: 75%; }
+  .metric-map-points span:nth-child(5) { left: 100%; transform: translateX(-100%); }
+}
