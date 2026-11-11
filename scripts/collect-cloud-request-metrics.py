@@ -808,15 +808,23 @@ def with_workspace_traces(previous, traces):
             if isinstance(day.get('model_usage_events'), int) and isinstance(day.get('gateway_stream'), dict):
                 old['model_usage_events'] = day['model_usage_events']
                 old['gateway_stream'] = dict(day['gateway_stream'])
-                for key in ('tokens', 'tpot'):
+                for key in ('tokens', 'ttft', 'tpot'):
                     if key in day:
                         old[key] = day[key]
                 old['telemetry_observed_at'] = day.get('telemetry_observed_at') or day.get('observed_at')
                 old['telemetry_partial'] = True
                 old['current_request_metrics'] = {
                     key: day[key] for key in ('n', 'observed_at', 'gateway', 'first_token', 'answer_first',
-                                              'react', 'answer_first_history') if key in day
+                                              'react', 'answer_first_history', 'gateway_admission',
+                                              'first_text_admission', 'answer_admission') if key in day
                 }
+                existing[day['date']] = old
+            # Tool calls have an independent population and timestamp. They
+            # must not inherit the retained request snapshot's observation time.
+            if isinstance(day.get('tool'), dict):
+                for key in ('tool', 'tool_failed', 'tool_coverage', 'tool_observed_at', 'tool_collection_partial'):
+                    if key in day:
+                        old[key] = day[key]
                 existing[day['date']] = old
             continue
         # Unavailable model/tool/call metrics are intentionally not copied from

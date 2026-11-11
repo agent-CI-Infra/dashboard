@@ -11,6 +11,43 @@ collector = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(collector)
 
 class ProductionTraceTests(unittest.TestCase):
+    def test_request_percentiles_use_nearest_rank(self):
+        rows = [(0, {}, {'gateway': value}) for value in (1, 2, 3, 4)]
+        result = collector.request_daily_metrics(rows, '2026-11-10', '2026-11-11T00:00:00Z', False)
+        self.assertEqual(result['gateway']['p50'], 2)
+        self.assertEqual(result['gateway']['p95'], 4)
+
+    def test_tool_records_are_aggregated_by_call_and_do_not_publish_ids(self):
+        now = dt.datetime.now(dt.timezone.utc).timestamp()
+        records = [
+            {'v': 1, 'event': 'start', 't': now, 'call_hash': 'PRIVATE'},
+            {'v': 1, 'event': 'start', 't': now, 'call_hash': 'PRIVATE'},
+            {'v': 1, 'event': 'result', 'pairing': 'matched', 't': now, 'start_t': now, 'ms': 100, 'status': 'error'},
+            {'v': 1, 'event': 'result', 'pairing': 'matched', 't': now, 'start_t': now, 'ms': 300, 'status': 'unknown'},
+            {'v': 1, 'event': 'result', 'pairing': 'unmatched', 't': now},
+        ]
+        raw = '\n'.join(map(json.dumps, records))
+        with patch.object(collector, 'listing', return_value=[{'name': 'tool-calls-2026-11-11.jsonl', 'type': 'file', 'size': len(raw)}]), \
+             patch.object(collector, 'fetch', return_value=raw):
+            days, found, complete = collector.read_tool_metrics({})
+        self.assertTrue(found and complete)
+        date = dt.datetime.fromtimestamp(now, collector.CST).date().isoformat()
+        result = collector.request_daily_metrics([], date, '2026-11-11T00:00:00Z', False, tool=days[date])
+        self.assertEqual(result['tool_coverage'], {'started': 2, 'matched': 2, 'unmatched': 1, 'unknown_status': 1})
+        self.assertEqual({key: result['tool'][key] for key in ('n', 'mean', 'p50', 'p95')},
+                         {'n': 2, 'mean': 200, 'p50': 100, 'p95': 300})
+        self.assertEqual(result['tool_failed'], 1)
+        self.assertNotIn('PRIVATE', json.dumps(result))
+
+    def test_incomplete_and_missing_tool_files_do_not_fake_coverage(self):
+        with patch.object(collector, 'listing', return_value=[]):
+            days, found, complete = collector.read_tool_metrics({})
+        self.assertEqual((days, found, complete), ({}, False, True))
+        with patch.object(collector, 'listing', return_value=[{'name': 'tool-calls-2026-11-11.jsonl', 'type': 'file', 'size': 3}]), \
+             patch.object(collector, 'fetch', return_value='{bad'):
+            days, found, complete = collector.read_tool_metrics({})
+        self.assertEqual((days, found, complete), ({}, True, False))
+
     def test_daily_metrics_use_every_finished_request_without_leaking_ids(self):
         rows = [(0, {}, {'gateway': 100.0, 'first_token': 20.0, 'request_id': 'secret-id'}),
                 (1, {}, {'gateway': 300.0, 'first_token': 40.0, 'request_id': 'other-id'})]
@@ -27,6 +64,7 @@ class ProductionTraceTests(unittest.TestCase):
         start = now - dt.timedelta(seconds=10)
         stamp = lambda t: t.strftime('%Y-%m-%d %H:%M:%S.000')
         log = '\n'.join([
+            f'{stamp(start - dt.timedelta(seconds=3))} [CloudMetrics] gateway.accept request_id=digitalmate-valid',
             f'{stamp(start)} [MessageHandler] dispatch: request_id=digitalmate-valid private prompt',
             f'{stamp(start + dt.timedelta(seconds=2))} [MessageHandler] process_stream chunk #1: request_id=digitalmate-valid event_type=chat.reasoning',
             f'{stamp(start + dt.timedelta(seconds=7))} [MessageHandler] process_stream chunk #2: request_id=digitalmate-valid event_type=chat.delta',
@@ -40,9 +78,34 @@ class ProductionTraceTests(unittest.TestCase):
         self.assertEqual(status, 'ok')
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]['gateway'], 10000)
+        self.assertEqual(rows[0]['gateway_admission'], 13000)
+        self.assertEqual(rows[0]['first_text_admission'], 5000)
+        self.assertEqual(rows[0]['answer_admission'], 10000)
         self.assertEqual(rows[0]['react'], 5000)
         self.assertNotIn('private prompt', json.dumps(rows))
         self.assertEqual(usage, {})
+
+    def test_missing_admission_and_no_text_remain_missing(self):
+        now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+        stamp = lambda t: t.strftime('%Y-%m-%d %H:%M:%S.000')
+        log = [
+            f'{stamp(now)} [CloudMetrics] gateway.accept request_id=digitalmate-empty',
+            f'{stamp(now)} [MessageHandler] dispatch: request_id=digitalmate-empty',
+            f'{stamp(now)} [MessageHandler] process_stream chunk #1: request_id=digitalmate-empty event_type=',
+            f'{stamp(now)} [MessageHandler] Stream done request_id=digitalmate-empty total_chunks=1',
+            f'{stamp(now)} [MessageHandler] dispatch: request_id=digitalmate-old',
+            f'{stamp(now)} [MessageHandler] process_stream chunk #1: request_id=digitalmate-old event_type=chat.delta',
+            f'{stamp(now)} [MessageHandler] Stream done request_id=digitalmate-old total_chunks=1',
+        ]
+        with patch.object(collector, 'query_for', return_value={}), \
+             patch.object(collector, 'listing', return_value=[{'name':'process.log','type':'file','size':100}]), \
+             patch.object(collector, 'download_log', return_value=iter(log)):
+            _, rows, _, _ = collector.read_log({})
+        by_id = {row['request_id']: row for row in rows}
+        self.assertEqual(by_id['digitalmate-empty']['gateway_admission'], 0)
+        self.assertNotIn('first_text_admission', by_id['digitalmate-empty'])
+        self.assertNotIn('gateway_admission', by_id['digitalmate-old'])
+        self.assertEqual(by_id['digitalmate-old']['first_token'], 0)
 
     def test_usage_records_and_gateway_outcomes_have_distinct_scopes(self):
         now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
@@ -89,6 +152,18 @@ class ProductionTraceTests(unittest.TestCase):
         self.assertIsNone(collector.metric_histogram([(1e-10, 1)]))
         self.assertEqual(collector.metric_histogram([(0, 1)]), [[-1001, 1]])
 
+    def test_model_ttft_uses_valid_per_call_usage_records(self):
+        usage = collector.new_usage()
+        for text in ("'ttft_ms': 20, 'total_latency_ms': 100",
+                     "'ttft_ms': 40, 'total_latency_ms': 100",
+                     "'ttft_ms': 0, 'total_latency_ms': 100",
+                     "'ttft_ms': 200, 'total_latency_ms': 100",
+                     "'ttft_ms': 10"):
+            collector.record_usage(usage, text)
+        result = collector.request_daily_metrics([], '2026-11-10', '2026-11-11T00:00:00Z', False, usage)
+        self.assertEqual({key: result['ttft'][key] for key in ('n', 'mean', 'p50', 'p95')},
+                         {'n': 2, 'mean': 30, 'p50': 20, 'p95': 40})
+
     def test_unknown_gateway_outcomes_do_not_become_zero_failure(self):
         row = {'gateway': 10, 'gateway_stream_status': 'cancelled'}
         day = collector.request_daily_metrics([(0, {}, row)], '2026-11-10', '2026-11-11T00:00:00Z', True)
@@ -110,6 +185,7 @@ class ProductionTraceTests(unittest.TestCase):
         with patch.object(collector, 'TOKEN', 'test'), \
              patch.object(collector, 'binding_list', return_value=[{}]), \
              patch.object(collector, 'read_log', return_value=({}, rows, 'ok', {})), \
+             patch.object(collector, 'read_tool_metrics', return_value=({}, False, True)), \
              patch.object(collector, 'attach_tool_events', return_value=True):
             result = collector.collect()
         self.assertIn(old, [row['date'] for row in result['request_daily_metrics']])

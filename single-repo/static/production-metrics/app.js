@@ -862,7 +862,7 @@ function envFirstTokenTrend(doc) {
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.first_token?.n, note: '个请求' }),
-    note: '云侧 Agent 请求口径（每个请求一条记录）：首吐字时间 = 网关受理请求 → 首个携带文本的流式 chunk（chat.delta / chat.reasoning），舍去仅状态、工具事件的 chunk；含路由、Agent 唤醒与调用模型前的全部耗时。网关日志记录每条流的开头 chunk 和每种事件类型的第一个 chunk（旧版本网关只记录前 3 个），日志里没有文本 chunk 的请求不计入，样本数会小于请求数；P50/P95 为请求级最近排名分位；* 为部分日，缺失值留空不补 0。',
+    note: '历史请求口径：网关派发 → 首个携带文本的流式 chunk（chat.delta / chat.reasoning），不含派发前排队和准备。旧版本只记录前 3 个 chunk，可能遗漏文本；无文本的请求不计入。P50/P95 为请求级最近排名分位；* 为部分日，缺失值留空不补 0。',
   });
 }
 
@@ -875,7 +875,7 @@ function envAnswerFirstTrend(doc) {
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.answer_first?.n, note: '个请求' }),
-    note: '网关受理到首个答案 chat.delta；仅统计网关记录的样本。旧版日志可能漏掉后续 chunk，样本覆盖有限；历史估算单独列示，不纳入本图。',
+    note: '历史口径：网关派发到首个答案 chat.delta；仅统计网关记录的样本。旧版日志可能漏掉后续 chunk；历史估算单独列示，不纳入本图。',
   });
 }
 
@@ -995,7 +995,7 @@ function summarizeCloudWindow(rows) {
     telemetry_partial: rows.some((row) => row.telemetry_partial), window_days: rows.length,
     window_start: rows[0].date, window_end: rows[rows.length - 1].date };
   result.current_sample_days = rows.filter((row) => row.current_sample_used).length;
-  for (const key of ['gateway', 'first_token', 'answer_first', 'answer_first_history', 'react', 'tool', 'tpot', 'uplink_send', 'downlink_first_text', 'downlink_terminal']) {
+  for (const key of ['gateway', 'first_token', 'answer_first', 'gateway_admission', 'first_text_admission', 'answer_admission', 'answer_first_history', 'react', 'tool', 'ttft', 'tpot', 'uplink_send', 'downlink_first_text', 'downlink_terminal']) {
     result[key] = aggregateCloudMetric(rows, key);
   }
   const current = rows.filter((row) => Number.isFinite(row.model_usage_events));
@@ -1029,6 +1029,14 @@ function summarizeCloudWindow(rows) {
     result.tokens.samples[key] = values.reduce((sum, row) => sum + (Number.isFinite(row.tokens?.samples?.[key]) ? row.tokens.samples[key] : 0), 0);
   }
   result.tool_failed = rows.reduce((sum, row) => sum + (Number.isFinite(row.tool_failed) ? row.tool_failed : 0), 0);
+  const toolRows = rows.filter((row) => row.tool_coverage && typeof row.tool_coverage === 'object');
+  if (toolRows.length) {
+    result.tool_coverage = {};
+    for (const key of ['started', 'matched', 'unmatched', 'unknown_status']) {
+      result.tool_coverage[key] = toolRows.reduce((sum, row) => sum + (Number.isFinite(row.tool_coverage[key]) ? row.tool_coverage[key] : 0), 0);
+    }
+    result.tool_collection_partial = toolRows.length < rows.length || toolRows.some((row) => row.tool_collection_partial);
+  }
   return result;
 }
 
@@ -1068,11 +1076,18 @@ function envSummary(doc) {
       <div class="stat-hint">${count} · 覆盖 ${fmtCount(anchor[key]?.days)} / ${fmtCount(anchor.window_days)} 天 · ${hint}</div>
     </div>`;
   };
-  const firstTile = requestTile('first_token', '首吐字', '网关受理 → 首个文本 chunk');
-  const answerTile = requestTile('answer_first', '答案首吐字', '网关受理 → 首个答案 chat.delta · 网关实测');
+  const firstTile = requestTile('first_token', '派发后首吐字', '网关派发 → 首个文本 chunk（历史口径）');
+  const answerTile = requestTile('answer_first', '派发后答案首吐字', '网关派发 → 首个答案 chat.delta（历史口径）');
+  const admittedDuration = requestTile('gateway_admission', '受理后请求耗时', 'WebSocket 请求解析受理 → 流结束');
+  const admittedFirst = requestTile('first_text_admission', '受理后首吐字', 'WebSocket 请求解析受理 → 首个文本 chunk');
+  const admittedAnswer = requestTile('answer_admission', '受理后答案首吐字', 'WebSocket 请求解析受理 → 首个答案 chunk');
   const answerEstimateTile = requestTile('answer_first_history', '答案首吐字（历史估算）', '会话回答段起点估算 · 非网关转发时间，不纳入实测');
   const reactTile = requestTile('react', 'ReAct 阶段', '网关首文本 → 网关首答案 · 同一请求配对');
   const toolCount = Number.isFinite(anchor.tool?.n) ? anchor.tool.n : 0;
+  const coverage = anchor.tool_coverage;
+  const pairHint = coverage && coverage.started > 0 && coverage.matched <= coverage.started
+    ? ` · 已观测调用配对 ${fmtCount(coverage.matched)} / ${fmtCount(coverage.started)} · 未配对结果 ${fmtCount(coverage.unmatched)} · 状态未知 ${fmtCount(coverage.unknown_status)}${anchor.tool_collection_partial ? ' · 环境采集不完整' : ''}`
+    : ' · 配对覆盖未知';
   const toolHint = toolCount > 0
     ? `${fmtCount(toolCount)} 次工具调用 · tool_call → tool_result`
     : anchor.source === 'workspace_request_logs' ? '当前日志采集未提供工具耗时'
@@ -1080,7 +1095,7 @@ function envSummary(doc) {
   const toolTile = `<div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>工具调用</strong> 平均 / P50 / P95</div>
       <div class="stat-value combo">${formatted(anchor.tool, 'mean', fmtDuration)} / ${formatted(anchor.tool, 'p50', fmtDuration)} / ${formatted(anchor.tool, 'p95', fmtDuration)}</div>
-      <div class="stat-hint">${toolHint}</div>
+      <div class="stat-hint">${toolHint}${pairHint} · 已知失败 ${toolCount || coverage ? fmtCount(anchor.tool_failed) : '—'}</div>
     </div>`;
   // One-way network latency is sampled on the client by the next gateway
   // release. The cards stay on the board before that so a missing metric is
@@ -1109,10 +1124,13 @@ function envSummary(doc) {
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>请求耗时</strong>平均 / P50 / P95（s）</div>
       <div class="stat-value combo">${formatted(anchor.gateway, 'mean', seconds)} / ${formatted(anchor.gateway, 'p50', seconds)} / ${formatted(anchor.gateway, 'p95', seconds)}</div>
-      <div class="stat-hint">${fmtCount(anchor.gateway.n)} 个已结束请求 · 覆盖 ${fmtCount(anchor.gateway.days)} / ${fmtCount(anchor.window_days)} 天 · 不含端侧与网络</div>
+      <div class="stat-hint">${fmtCount(anchor.gateway.n)} 个已结束请求 · 覆盖 ${fmtCount(anchor.gateway.days)} / ${fmtCount(anchor.window_days)} 天 · 网关派发 → 流结束（历史口径）</div>
     </div>
     ${firstTile}
     ${answerTile}
+    ${admittedDuration}
+    ${admittedFirst}
+    ${admittedAnswer}
     ${answerEstimateTile}
     ${reactTile}
     ${toolTile}
@@ -1445,8 +1463,8 @@ function envCallDetail(doc) {
   const groups = [hasFirst && '首吐字', hasAnswer && '答案首吐字', hasReact && 'ReAct', hasTool && '工具', 'TTFT', 'TPOT'].filter(Boolean);
   const notes = [];
   const spans = [
-    hasFirst && '首吐字 = 网关受理 → 首个文本 chunk（含思考）',
-    hasAnswer && '答案首吐字 = 网关受理 → 首个答案 chunk',
+    hasFirst && '首吐字 = 网关派发 → 首个文本 chunk（含思考，历史口径）',
+    hasAnswer && '答案首吐字 = 网关派发 → 首个答案 chunk（历史口径）',
     hasReact && 'ReAct = 两者的时间差（思考 + 工具阶段）',
   ].filter(Boolean);
   if (spans.length) notes.push(`${spans.join('，')}，均按请求统计`);
@@ -3619,7 +3637,7 @@ function traceRows(item) {
   }
   const first = item.first_token;
   const answer = item.answer_first;
-  if (valid(first)) rows.push({label: '至首个文本', start: 0, duration: first, kind: 'first', detail: '网关受理至首个可见文本事件'});
+  if (valid(first)) rows.push({label: '至首个文本', start: 0, duration: first, kind: 'first', detail: '网关派发至首个可见文本事件'});
   if (valid(first) && valid(answer) && answer >= first) rows.push({label: '思考与工具阶段', start: first, duration: answer - first, kind: 'react', detail: '首个文本至首个答案文本，包含思考和工具'});
   if (valid(answer)) rows.push({label: '答案输出阶段', start: answer, duration: total - answer, kind: 'answer', detail: '首个答案文本至请求结束'});
   for (const [index, tool] of (Array.isArray(item.tool_events) ? item.tool_events : []).entries()) {
@@ -3861,6 +3879,9 @@ function cloudDisplayRow(row) {
   if (current?.answer_first_history?.n > 0 && current.answer_first_history.n > (result.answer_first_history?.n || 0)) {
     result.answer_first_history = current.answer_first_history;
   }
+  for (const key of ['gateway_admission', 'first_text_admission', 'answer_admission']) {
+    if (current?.[key]?.n > 0 && current[key].n > (result[key]?.n || 0)) result[key] = current[key];
+  }
   return result;
 }
 
@@ -3896,7 +3917,7 @@ function renderEnv() {
     stale && '超过 6 小时未更新，请检查采集任务',
     state.envRefreshFailed && '刷新失败，保留上次快照',
     state.rangeDays === 1 && !scoped.days.length && '尚无当天采集数据',
-    requestOnly && '模型用量及 Token 基于日志记录，可能重复；网关流异常率不代表业务请求失败率；工具耗时尚未完整采集',
+    requestOnly && '模型用量及 Token 基于日志记录，可能重复；网关流异常率不代表业务请求失败率；工具耗时仅统计已观测配对',
     answerPartial > 0 && `答案历史仅扫描近期会话，${fmtCount(answerPartial)} 个工作区可能不完整`,
   ].filter(Boolean);
   const freshness = `<div class="env-data-notes" aria-label="数据说明"><div><strong>数据更新</strong><span>${timeText} · 定时采集，并非实时流</span></div>${warnings.length ? `<div><strong>数据限制</strong><span>${warnings.join('；')}。</span></div>` : ''}<div><strong>覆盖标记</strong><span>* 表示部分日或日志覆盖不全。</span></div></div>`;

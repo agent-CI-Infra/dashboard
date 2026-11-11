@@ -33,6 +33,19 @@ def make_day(date, values, partial=False, sample=None):
 
 
 class TraceCollectionTests(unittest.TestCase):
+    def test_tool_observation_is_updated_independently_of_older_request_population(self):
+        old = {'date': '2026-11-10', 'n': 400, 'gateway': {'n': 400}, 'observed_at': 'old'}
+        fresh = {'date': '2026-11-10', 'n': 300, 'tool': {'n': 2, 'mean': 200},
+                 'tool_failed': 1, 'tool_coverage': {'started': 3, 'matched': 2, 'unmatched': 0, 'unknown_status': 1},
+                 'tool_observed_at': 'new', 'tool_collection_partial': True}
+        traces = {'schema': 'digitalmate/cloud-traces@1', 'read_log_count': 1, 'request_daily_metrics': [fresh]}
+        row = collector.with_workspace_traces({'days': [old]}, traces)['days'][0]
+        self.assertEqual(row['n'], 400)
+        self.assertEqual(row['observed_at'], 'old')
+        self.assertEqual(row['tool']['n'], 2)
+        self.assertEqual(row['tool_observed_at'], 'new')
+        self.assertTrue(row['tool_collection_partial'])
+
     def test_workspace_request_days_refresh_without_fabricating_old_metrics(self):
         old = {'date': '2026-11-10', 'n': 6, 'calls': {'total': 22}, 'tool': {'n': 3}}
         fresh = {'date': '2026-11-10', 'n': 354, 'gateway': {'n': 354},

@@ -137,12 +137,12 @@
             <p class="eyebrow">云侧 Agent</p>
             <h2>云侧 Agent 调用指标</h2>
             <dl class="env-metric-guide" aria-label="指标口径">
-              <div><dt>请求耗时</dt><dd>网关受理至流结束</dd></div>
-              <div><dt>首吐字</dt><dd>网关受理至首个文本</dd></div>
-              <div><dt>答案首吐字</dt><dd>网关受理至首个答案文本</dd></div>
+              <div><dt>受理后请求耗时</dt><dd>WebSocket 请求解析受理至流结束</dd></div>
+              <div><dt>受理后首吐字</dt><dd>受理至首个文本</dd></div>
+              <div><dt>受理后答案首吐字</dt><dd>受理至首个答案文本</dd></div>
               <div><dt>ReAct 阶段</dt><dd>首文本至首答案的时间差</dd></div>
             </dl>
-            <p class="section-note">工具、网络与模型用量分别统计。慢请求和异常分析仅覆盖可读取的数据；详细口径见各图表说明。</p>
+            <p class="section-note">历史曲线以网关派发为起点，与受理口径分开。工具、网络与模型用量分别统计；慢请求和异常分析仅覆盖可读取的数据。</p>
           </div>
         </header>
 

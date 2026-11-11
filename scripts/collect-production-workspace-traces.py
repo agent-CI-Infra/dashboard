@@ -30,16 +30,19 @@ MAX_TRACE_REQUESTS = 100
 SUMMARY_DAYS = 30
 TRACE_DAYS = 7
 NAME = re.compile(r'^[A-Za-z0-9_.-]{1,160}$')
+TOOL_FILE = re.compile(r'^tool-calls-\d{4}-\d{2}-\d{2}\.jsonl$')
+MAX_TOOL_FILE = 16_000_000
+MAX_TOOL_FILES = 32
 REQ = re.compile(r'request_id=([^\s,;]+)')
 REQUEST_ID = re.compile(r'^digitalmate-[A-Za-z0-9_-]{1,128}$')
 CHUNK = re.compile(r'process_stream chunk #\d+: request_id=\S+ event_type=(\S*)')
 USAGE_FIELDS = {key: re.compile(r"['\"]" + key + r"['\"]\s*:\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)")
-                for key in ('input_tokens', 'output_tokens', 'total_tokens', 'tpot_ms')}
+                for key in ('input_tokens', 'output_tokens', 'total_tokens', 'tpot_ms', 'ttft_ms', 'total_latency_ms')}
 
 
 def new_usage():
     return {'events': 0, 'input': 0, 'output': 0, 'total': 0,
-            'input_samples': 0, 'output_samples': 0, 'total_samples': 0, 'tpot_pairs': []}
+            'input_samples': 0, 'output_samples': 0, 'total_samples': 0, 'tpot_pairs': [], 'ttft_values': []}
 
 
 def record_usage(usage, line):
@@ -57,6 +60,9 @@ def record_usage(usage, line):
     output, tpot = values['output_tokens'], values['tpot_ms']
     if output is not None and output.is_integer() and output > 1 and tpot is not None:
         usage['tpot_pairs'].append((tpot, int(output) - 1))
+    ttft, duration = values['ttft_ms'], values['total_latency_ms']
+    if ttft is not None and duration is not None and 0 < ttft <= duration:
+        usage['ttft_values'].append(ttft)
 
 
 def metric_histogram(pairs):
@@ -169,6 +175,57 @@ def download_log(query):
             raise ValueError('incomplete log response')
 
 
+def read_tool_metrics(query):
+    """Read bounded adapter observations; never export IDs or event content."""
+    files = [entry for entry in listing(query, 'workswarm')
+             if entry.get('type') == 'file' and TOOL_FILE.fullmatch(str(entry.get('name', '')))]
+    files.sort(key=lambda entry: entry['name'], reverse=True)
+    complete = len(files) <= MAX_TOOL_FILES
+    days = {}
+    for entry in files[:MAX_TOOL_FILES]:
+        if type(entry.get('size')) is not int or entry['size'] > MAX_TOOL_FILE:
+            complete = False
+            continue
+        raw = fetch('/api/workspace-files', {**query, 'path': 'workswarm/' + entry['name'], 'action': 'download'}, download=True)
+        if len(raw.encode('utf-8')) > MAX_TOOL_FILE:
+            complete = False
+            continue
+        for line in raw.splitlines():
+            try:
+                item = json.loads(line)
+                t = item['t']
+                if isinstance(t, bool) or not isinstance(t, (int, float)) or not math.isfinite(t):
+                    raise ValueError('invalid timestamp')
+                if item.get('v') == 1 and item.get('event') == 'result' and item.get('pairing') == 'matched':
+                    t = item.get('start_t', t)
+                if isinstance(t, bool) or not isinstance(t, (int, float)) or not math.isfinite(t):
+                    raise ValueError('invalid start timestamp')
+                day = dt.datetime.fromtimestamp(t, CST).date()
+                today = dt.datetime.now(CST).date()
+                if not today - dt.timedelta(days=SUMMARY_DAYS - 1) <= day <= today:
+                    continue
+                rec = days.setdefault(day.isoformat(), {'started': 0, 'matched': 0, 'unmatched': 0,
+                                                        'unknown_status': 0, 'failed': 0, 'durations': []})
+                if item.get('v') == 1 and item.get('event') == 'start':
+                    rec['started'] += 1
+                elif item.get('v') == 1 and item.get('event') == 'result' and item.get('pairing') == 'unmatched':
+                    rec['unmatched'] += 1
+                elif (item.get('v') == 1 and item.get('event') == 'result' and item.get('pairing') == 'matched') or 'v' not in item:
+                    ms = item.get('ms')
+                    if isinstance(ms, bool) or not isinstance(ms, (int, float)) or not math.isfinite(ms) or ms < 0:
+                        raise ValueError('invalid duration')
+                    rec['durations'].append(ms)
+                    if item.get('v') == 1:
+                        rec['matched'] += 1
+                        if item.get('status') not in ('ok', 'error'):
+                            rec['unknown_status'] += 1
+                    if item.get('status') == 'error':
+                        rec['failed'] += 1
+            except (ValueError, TypeError, KeyError, OverflowError, OSError):
+                complete = False
+    return days, bool(files), complete
+
+
 def read_log(item):
     query = query_for(item)
     files = listing(query, 'workswarm')
@@ -196,8 +253,10 @@ def read_log(item):
         rid = match.group(1)
         if not REQUEST_ID.fullmatch(rid):
             continue
-        span = requests.setdefault(rid, [None, None, None, None, None])
-        if '[MessageHandler] dispatch:' in line and span[0] is None:
+        span = requests.setdefault(rid, [None, None, None, None, None, None])
+        if '[CloudMetrics] gateway.accept' in line and span[5] is None:
+            span[5] = ts
+        elif '[MessageHandler] dispatch:' in line and span[0] is None:
             span[0] = ts
         elif '[MessageHandler] Stream ' in line and 'total_chunks=' in line and span[1] is None:
             span[1] = ts
@@ -213,7 +272,7 @@ def read_log(item):
         if marker and span[3] is None and marker.group(1) == 'chat.delta':
             span[3] = ts
     result = []
-    for rid, (start, end, first, answer, stream_status) in requests.items():
+    for rid, (start, end, first, answer, stream_status, accepted) in requests.items():
         if start is None or end is None or end < start:
             continue
         date = dt.datetime.fromtimestamp(start, CST).date()
@@ -227,6 +286,11 @@ def read_log(item):
         for name, value in (('first_token', first), ('answer_first', answer)):
             if value is not None and start <= value <= end:
                 row[name] = round((value - start) * 1000, 1)
+        if accepted is not None and accepted <= start:
+            row['gateway_admission'] = round((end - accepted) * 1000, 1)
+            for name, value in (('first_text_admission', first), ('answer_admission', answer)):
+                if value is not None and start <= value <= end:
+                    row[name] = round((value - accepted) * 1000, 1)
         if 'first_token' in row and 'answer_first' in row and row['answer_first'] >= row['first_token']:
             row['react'] = round(row['answer_first'] - row['first_token'], 1)
         result.append(row)
@@ -354,7 +418,7 @@ def attach_answer_estimates(query, rows):
     return complete
 
 
-def request_daily_metrics(records, date, generated_at, incomplete, usage=None):
+def request_daily_metrics(records, date, generated_at, incomplete, usage=None, tool=None):
     """Summarize the same finished requests used for the slow-request ranking."""
     def summary(field):
         values = sorted(row[field] for _, _, row in records
@@ -363,13 +427,20 @@ def request_daily_metrics(records, date, generated_at, incomplete, usage=None):
         if not values:
             return {'n': 0}
         return {'n': len(values), 'sum': sum(values), 'mean': round(sum(values) / len(values), 1),
-                'p50': round(values[int(round(.5 * (len(values) - 1)))], 1),
-                'p95': round(values[int(round(.95 * (len(values) - 1)))], 1),
+                'p50': round(values[math.ceil(.5 * len(values)) - 1], 1),
+                'p95': round(values[math.ceil(.95 * len(values)) - 1], 1),
                 'histogram': metric_histogram([(value, 1) for value in values])}
 
     statuses = collections.Counter(row.get('gateway_stream_status', 'unknown') for _, _, row in records)
     observed = statuses['normal'] + statuses['exception']
     usage = usage or new_usage()
+    ttft_values = sorted(usage['ttft_values'])
+    ttft = {'n': len(ttft_values)}
+    if ttft_values:
+        ttft.update(sum=sum(ttft_values), mean=round(sum(ttft_values) / len(ttft_values), 1),
+                    p50=round(ttft_values[math.ceil(.5 * len(ttft_values)) - 1], 1),
+                    p95=round(ttft_values[math.ceil(.95 * len(ttft_values)) - 1], 1),
+                    histogram=metric_histogram([(value, 1) for value in ttft_values]))
     pairs = sorted(usage['tpot_pairs'])
     weight = sum(w for _, w in pairs)
     safe_weight = weight if weight <= 2**53 - 1 else None
@@ -388,18 +459,31 @@ def request_daily_metrics(records, date, generated_at, incomplete, usage=None):
     tokens = {key: usage[key] if usage[key + '_samples'] and usage[key] <= 2**53 - 1 else None
               for key in ('input', 'output', 'total')}
     tokens['samples'] = {key: usage[key + '_samples'] for key in ('input', 'output', 'total')}
-    return {'date': date, 'n': len(records),
+    result = {'date': date, 'n': len(records),
             'partial': incomplete or date == dt.datetime.now(CST).date().isoformat(),
             'observed_at': generated_at, 'telemetry_observed_at': generated_at,
             'telemetry_partial': incomplete or date == dt.datetime.now(CST).date().isoformat(),
             'source': 'workspace_request_logs',
-            'model_usage_events': usage['events'], 'tokens': tokens, 'tpot': tpot,
+            'model_usage_events': usage['events'], 'tokens': tokens, 'ttft': ttft, 'tpot': tpot,
             'gateway_stream': {'normal': statuses['normal'], 'exception': statuses['exception'],
                                'cancelled': statuses['cancelled'], 'unknown': statuses['unknown'],
                                'observed': observed, 'population': len(records),
                                'exception_rate': statuses['exception'] / observed if observed else None},
-            **{key: summary(key) for key in ('gateway', 'first_token', 'answer_first', 'react')},
+            **{key: summary(key) for key in ('gateway', 'first_token', 'answer_first', 'react',
+                                             'gateway_admission', 'first_text_admission', 'answer_admission')},
             'answer_first_history': summary('answer_first_history_ms')}
+    if tool:
+        values = sorted(tool['durations'])
+        metric = {'n': len(values)}
+        if values:
+            metric.update(sum=sum(values), mean=round(sum(values) / len(values), 1),
+                          p50=round(values[math.ceil(.5 * len(values)) - 1], 1),
+                          p95=round(values[math.ceil(.95 * len(values)) - 1], 1),
+                          histogram=metric_histogram([(value, 1) for value in values]))
+        result['tool'] = metric
+        result['tool_failed'] = tool['failed']
+        result['tool_coverage'] = {key: tool[key] for key in ('started', 'matched', 'unmatched', 'unknown_status')}
+    return result
 
 
 def collect():
@@ -423,6 +507,7 @@ def collect():
                         for key in ('events', 'input', 'output', 'total', 'input_samples', 'output_samples', 'total_samples'):
                             pooled[key] += values[key]
                         pooled['tpot_pairs'].extend(values['tpot_pairs'])
+                        pooled['ttft_values'].extend(values['ttft_values'])
                 else: problems[status] = problems.get(status, 0) + 1
             except Exception as error:
                 category = 'http_' + str(error.code) if isinstance(error, urllib.error.HTTPError) else type(error).__name__
@@ -431,6 +516,21 @@ def collect():
                 print(f'bindings {count}/{len(items)}; logs read {len(snapshots)}; unavailable {sum(problems.values())}', flush=True)
     if not snapshots:
         raise SystemExit('no production logs could be read; retain previous snapshot')
+    tool_by_day = {}
+    tool_files_found = tool_incomplete = 0
+    for _, query, _ in snapshots:
+        try:
+            tool_days, found, complete = read_tool_metrics(query)
+            tool_files_found += int(found)
+            tool_incomplete += int(not complete)
+            for day, values in tool_days.items():
+                pooled = tool_by_day.setdefault(day, {'started': 0, 'matched': 0, 'unmatched': 0,
+                                                       'unknown_status': 0, 'failed': 0, 'durations': []})
+                for key in ('started', 'matched', 'unmatched', 'unknown_status', 'failed'):
+                    pooled[key] += values[key]
+                pooled['durations'].extend(values['durations'])
+        except (OSError, ValueError, KeyError, TypeError, urllib.error.HTTPError):
+            tool_incomplete += 1
     answer_coverage = collections.Counter()
     for _, query, rows in snapshots:
         try:
@@ -444,9 +544,13 @@ def collect():
     days, chosen, daily_metrics = [], [], []
     generated_at = dt.datetime.now(UTC).isoformat()
     trace_cutoff = (dt.datetime.now(CST).date() - dt.timedelta(days=TRACE_DAYS - 1)).isoformat()
-    for date in sorted(set(grouped) | set(usage_by_day)):
+    for date in sorted(set(grouped) | set(usage_by_day) | set(tool_by_day)):
         records = grouped.get(date, [])
-        daily_metrics.append(request_daily_metrics(records, date, generated_at, bool(problems), usage_by_day.get(date)))
+        day_metrics = request_daily_metrics(records, date, generated_at, bool(problems), usage_by_day.get(date), tool_by_day.get(date))
+        if 'tool' in day_metrics:
+            day_metrics['tool_observed_at'] = generated_at
+            day_metrics['tool_collection_partial'] = bool(problems) or bool(tool_incomplete) or tool_files_found < len(snapshots)
+        daily_metrics.append(day_metrics)
         if not records or date < trace_cutoff:
             continue
         records.sort(key=lambda item:item[2]['gateway'],reverse=True)
@@ -470,6 +574,7 @@ def collect():
     output = {'schema':'digitalmate/cloud-traces@1','generated_at':generated_at,
               'request_daily_metrics':daily_metrics,
               'binding_count':len(items),'read_log_count':len(snapshots),'errors':problems,
+              'tool_file_workspaces':tool_files_found, 'tool_collection_incomplete':tool_incomplete,
               'detail_workspaces_complete':details_ok,'detail_workspaces_partial':details_failed,
               'answer_workspaces_complete':answer_coverage['complete'],
               'answer_workspaces_partial':answer_coverage['partial'],
