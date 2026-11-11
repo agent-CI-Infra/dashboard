@@ -7,16 +7,22 @@ name: Collect DigitalMate E2E performance
 # the public dashboard keep working.
 on:
   schedule:
-    # DigitalMate nightly starts at 18:00 UTC; leave time for the device run.
-    - cron: '20 20 * * *'
+    # DigitalMate nightly starts at 18:00 UTC and can run past 20:00; poll every
+    # two hours so a late device run still reaches the board the same night.
+    - cron: '20 */2 * * *'
   workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Nightly run id (empty = latest completed Nightly)'
+        type: string
+        default: ''
 
 permissions:
   contents: write
   actions: write
 
 concurrency:
-  group: collect-digitalmate-performance
+  group: collect-digitalmate-data
   cancel-in-progress: false
 
 jobs:
@@ -47,14 +53,30 @@ jobs:
         if: steps.token.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.DIGITALMATE_TOKEN }}
+          INPUT_RUN_ID: ${{ inputs.run_id }}
         run: |
           set -euo pipefail
           export GH_TOKEN
-          artifact_id=$(gh api 'repos/openJiuwen-ai/DigitalMate/actions/artifacts?per_page=100' \
+          repo=openJiuwen-ai/DigitalMate
+          run_id="$INPUT_RUN_ID"
+          if [ -z "$run_id" ]; then
+            run_id=$(gh api "repos/$repo/actions/workflows/nightly.yml/runs?branch=main&status=completed&per_page=1" --jq '.workflow_runs[0].id // empty')
+          fi
+          if [ -z "$run_id" ]; then
+            echo 'found=false' >> "$GITHUB_OUTPUT"
+            echo '::notice::No completed Nightly run found.'
+            exit 0
+          fi
+          run=$(gh api "repos/$repo/actions/runs/$run_id")
+          if [ "$(jq -r .status <<<"$run")" != completed ] || [ "$(jq -r .path <<<"$run")" != .github/workflows/nightly.yml ] || [ "$(jq -r .head_branch <<<"$run")" != main ]; then
+            echo '::error::run_id must identify a completed DigitalMate Nightly run.'
+            exit 1
+          fi
+          artifact_id=$(gh api "repos/$repo/actions/runs/$run_id/artifacts?per_page=100" \
             --jq '[.artifacts[] | select(.expired == false) | select(.name | startswith("e2e-performance-"))] | sort_by(.created_at) | last | .id // empty')
           if [ -z "$artifact_id" ]; then
             echo 'found=false' >> "$GITHUB_OUTPUT"
-            echo '::notice::No unexpired e2e-performance-* artifact found.'
+            echo '::notice::No unexpired e2e-performance-* artifact found for the selected Nightly run.'
             exit 0
           fi
           rm -rf /tmp/e2e-performance-artifact

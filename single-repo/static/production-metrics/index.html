@@ -14,7 +14,7 @@
         <p class="eyebrow">DigitalMate · Nightly E2E</p>
         <h1>用例性能看板</h1>
         <p class="subtitle">
-          现网模型请求的每日网关耗时与 TTFT、TPOT、P95、Token 指标，按模型和 Asia/Shanghai 自然日聚合。
+          现网模型请求的每日模型请求耗时与 TTFT、TPOT、P95、Token 指标，按模型和 Asia/Shanghai 自然日聚合。
         </p>
       </div>
       <div class="topbar-meta">
@@ -34,8 +34,7 @@
       </nav>
 
       <section id="view-cases" class="view" role="tabpanel" aria-labelledby="tab-cases">
-        <section id="summary" class="summary" aria-label="汇总"></section>
-        <section id="perf-strip" class="perf-strip" aria-label="提问基线与失败率"></section>
+        <section id="perf-strip" class="perf-strip" aria-label="模型请求最新完整日指标"></section>
 
         <div class="layout">
           <aside class="panel case-panel">
@@ -51,66 +50,74 @@
       </section>
 
       <section id="view-models" class="view" role="tabpanel" aria-labelledby="tab-models" hidden>
-        <div id="model-insights"></div>
-
-        <section class="card" id="request-lookup">
-          <div class="card-head">
-            <h2>按请求 ID 查询</h2>
-            <span class="muted">单请求性能诊断</span>
+        <header class="view-section-head">
+          <div>
+            <p class="eyebrow">模型侧 · 现网模型请求</p>
+            <h2>模型请求指标</h2>
+            <p class="section-note single-line">按模型 × Asia/Shanghai 自然日聚合：请求数与失败率、失败原因、超时与最慢 5% 请求、请求耗时、TTFT / TPOT、Token。模型对比列出所选时间范围内的全部模型；下方汇总、曲线与明细只针对当前所选模型。</p>
           </div>
-          <form id="lookup-form" class="lookup-form">
-            <input id="lookup-id" type="text" placeholder="粘贴网关请求 ID（request_id）" autocomplete="off" spellcheck="false" required>
-            <button type="submit">查询</button>
-          </form>
-          <details class="lookup-key">
-            <summary>网关访问凭据（仅当前页面有效）</summary>
-            <input id="lookup-key" type="password" placeholder="sk-…（prod / adx-jiuwen admin key）" autocomplete="off" spellcheck="false">
-            <p class="chart-note">凭据仅保留在当前页面内，直查时发送至网关；不填时仅搜索已加载的本地快照。结果只展示性能指标，不展示消息内容。</p>
-          </details>
-          <div id="lookup-result" aria-live="polite"></div>
-        </section>
+        </header>
+
+        <div id="model-insights"></div>
 
         <section class="card">
           <div class="card-head comparison-head">
-            <h2>模型对比</h2>
+            <div class="comparison-title">
+              <h2>模型对比</h2>
+              <span id="compare-current" class="selected-model-badge">—</span>
+              <span id="model-range" class="muted">—</span>
+            </div>
             <div id="model-controls" class="comparison-controls">
-              <div class="range-picker" role="group" aria-label="时间范围（影响模型对比及下方明细）">
+              <div class="range-picker" role="group" aria-label="时间范围（影响模型对比及下方汇总、曲线与明细）">
+                <button class="range-btn" type="button" data-range="1" aria-pressed="false">当天</button>
                 <button class="range-btn" type="button" data-range="7" aria-pressed="false">近 7 天</button>
                 <button class="range-btn" type="button" data-range="30" aria-pressed="false">近 30 天</button>
                 <button class="range-btn active" type="button" data-range="0" aria-pressed="true">全部</button>
               </div>
-              <span id="model-range" class="muted">—</span>
               <span id="updated" class="muted comparison-updated">加载中…</span>
             </div>
           </div>
           <div id="model-compare"><p class="empty">加载中…</p></div>
-          <p class="chart-note">
-            所选时间范围内全部模型的汇总指标，按调用数排序；「最新 TTFT 较前日」达到 20% 升幅即标记为回退。
-            点击模型名称或对应行可切换下方明细。
-            <span id="compare-version" class="muted">—</span>
-          </p>
+          <details class="comparison-note">
+            <summary>统计口径</summary>
+            <p>
+              所选时间范围内列出全部有足量调用的模型，按调用数排序；近 7 天少于 50 次调用的模型不在此列出。
+              选择当天时展示当天截至上次采集的累计数据；其他范围的汇总按完整日统计。点击模型可切换下方汇总、曲线与明细。
+              <span id="compare-version" class="muted">—</span>
+            </p>
+          </details>
         </section>
 
-        <div id="current-model" class="current-model" aria-live="polite"></div>
         <section id="model-summary" class="summary model-summary" aria-label="模型指标汇总">
           <p class="empty">加载中…</p>
         </section>
 
-        <section class="card">
+        <section class="card" id="model-trends-card">
           <div class="card-head">
-            <h2>现网模型性能指标</h2>
+            <h2>模型请求耗时、TTFT / TPOT 与 Token 曲线</h2>
             <span class="muted">按日聚合 · Asia/Shanghai</span>
           </div>
           <div id="model-trends" class="trend-grid"><p class="empty">加载中…</p></div>
-          <p class="chart-note">
-            统计此网关的模型请求（未区分测试或其他业务）；TTFT/TPOT 为网关时间戳估算：未能确认是否流式的成功请求也计入，可能偏离真实首 token 指标；耗时 P95 至少需要 20 个成功样本。
-            三张图均可点击图例单独显示或隐藏曲线；请求失败率按所选模型统计；含未知状态的日期留空；当日数据未结束，与前日比较仅供参考；Token 按每次请求统计；缺失值留空，不补 0。
-          </p>
+          <details class="chart-note-details">
+            <summary>统计口径</summary>
+            <p class="chart-note">
+              统计此网关的模型请求（未区分测试或其他业务），耗时口径为模型请求耗时（不含端侧与网络）。
+              TTFT/TPOT 只统计 <code>stream === true</code> 的成功调用；无流式标记的样本按分桶近似单独统计 TTFT 与 TPOT；TTFT ≥ 95% 总耗时、TPOT &lt; 0.1 ms/token 视为时间戳异常并剔除。
+              P50/P95 是成功调用的请求级分位，至少需要 20 个样本；模型请求平均耗时按成功调用量加权，TPOT 按输出 Token 数减一加权；TTFT 和 TPOT 的 P50/P95 是请求级分位，基于可合并分桶近似计算（误差约 1%），每类至少 20 个样本。
+              Token 汇总卡展示所选时间范围内成功调用的累计值；当日未结束的数据标记为「部分日」，选择当天时计入汇总。
+              趋势图均可点击图例单独显示或隐藏曲线；模型请求失败率按所选模型统计；含未知状态的日期留空；缺失值留空，不补 0。
+            
+            </p>
+          </details>
+        </section>
+
+        <section class="card" id="model-failure-card">
+          <div id="model-failure"><p class="empty">加载中…</p></div>
         </section>
 
         <section class="card">
           <div class="card-head">
-            <h2>统计明细</h2>
+            <h2>模型侧统计明细</h2>
             <div class="stats-controls">
               <label class="granularity-picker" for="granularity-select">
                 <span class="muted">粒度</span>
@@ -125,12 +132,55 @@
           <div id="model-stats"><p class="empty">加载中…</p></div>
         </section>
 
+        <header class="view-section-head" id="env-section">
+          <div>
+            <p class="eyebrow">云侧 Agent</p>
+            <h2>云侧 Agent 调用指标</h2>
+            <p class="section-note">请求耗时（网关受理→响应结束）、首吐字（网关受理→首个文本 chunk）、答案首吐字（网关受理→首个答案 chunk）、ReAct 阶段（首个文本 chunk→首个答案 chunk，即思考与工具耗时）、工具调用耗时（tool_call→tool_result）、上行 send / 下行首文本 / 下行终态单程（端侧采样、依赖两侧时钟同步的网络单程）、模型调用 TTFT / TPOT、调用数与 Token；并基于近 7 个完整日的基线 P95 给出异常请求分析，记录最大时延与超时请求的数量及 request_id，便于到网关定位原始请求。首吐字 / 答案首吐字 / ReAct 与网络单程按请求或消息统计，工具耗时按工具调用统计，TTFT / TPOT 按模型调用统计，与上方模型侧口径相互独立。</p>
+          </div>
+        </header>
+
+        <section class="card" id="env-latency-card">
+          <div id="env-latency"><p class="empty">加载中…</p></div>
+        </section>
+
+        <header class="view-section-head" id="tools-section">
+          <div>
+            <p class="eyebrow">工具</p>
+            <h2>单请求诊断</h2>
+            <p class="section-note">选择云侧慢请求查看整轮执行轨迹；只展示性能指标，不展示消息内容。</p>
+          </div>
+        </header>
+
+        <section class="card" id="request-traces">
+          <div class="card-head"><h2>云侧慢请求轨迹</h2><span class="muted">云侧慢请求与超时请求 · 所选时间范围</span></div>
+          <div id="trace-picker"></div>
+          <div id="trace-result" aria-live="polite"></div>
+        </section>
+
+        <section class="card" id="request-lookup">
+          <div class="card-head">
+            <h2>按请求 ID 查询</h2>
+            <span class="muted">单请求性能诊断</span>
+          </div>
+          <form id="lookup-form" class="lookup-form">
+            <input id="lookup-id" type="text" placeholder="粘贴模型请求 ID（request_id）" autocomplete="off" spellcheck="false" required>
+            <button type="submit">查询</button>
+          </form>
+          <details class="lookup-key">
+            <summary>网关访问凭据（仅当前页面有效）</summary>
+            <input id="lookup-key" type="password" placeholder="sk-…（prod / adx-jiuwen admin key）" autocomplete="off" spellcheck="false">
+            <p class="chart-note">凭据仅保留在当前页面内，直查时发送至网关；不填时仅搜索已加载的本地快照。结果只展示性能指标，不展示消息内容。</p>
+          </details>
+          <div id="lookup-result" aria-live="polite"></div>
+        </section>
+
       </section>
     </main>
 
     <footer class="footer">
       <span>数据：现网网关日志 · 时区：Asia/Shanghai</span>
-      <span>按模型 × 自然日聚合；不含消息正文，耗时口径为网关耗时。</span>
+      <span>按模型 × 自然日聚合；不含消息正文，耗时口径为模型请求耗时，不含端侧与网络。</span>
     </footer>
 
     <div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>

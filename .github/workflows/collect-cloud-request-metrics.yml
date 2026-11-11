@@ -1,0 +1,65 @@
+name: Collect DigitalMate cloud request metrics
+on:
+  workflow_dispatch:
+  schedule:
+    # Same freshness budget as the model-side collector: GitHub delays or drops
+    # scheduled runs, so a three-hour cadence means a missed tick is replaced by
+    # the next one instead of leaving the board a day behind.
+    - cron: '45 */3 * * *'
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: collect-cloud-request-metrics
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Collect cloud-side aggregates
+        env:
+          ADX_TOKEN: ${{ secrets.ADX_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$ADX_TOKEN" ]; then
+            echo '::error::ADX_TOKEN is not configured.'
+            exit 1
+          fi
+          mkdir -p /tmp/cloud-metrics
+          git fetch origin digitalmate:refs/remotes/origin/digitalmate
+          git show origin/digitalmate:site/data/env-request-latency-daily.json \
+            > /tmp/cloud-metrics/previous.json
+          python3 scripts/collect-cloud-request-metrics.py \
+            /tmp/cloud-metrics/env-request-latency-daily.json \
+            /tmp/cloud-metrics/previous.json
+      - name: Publish aggregate to the DigitalMate data branch
+        id: update
+        run: |
+          set -euo pipefail
+          git fetch origin digitalmate:refs/remotes/origin/digitalmate
+          git checkout -B digitalmate origin/digitalmate
+          cp /tmp/cloud-metrics/env-request-latency-daily.json site/data/env-request-latency-daily.json
+          if git diff --quiet -- site/data/env-request-latency-daily.json; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site/data/env-request-latency-daily.json
+          git commit -m 'chore(digitalmate): update cloud request metrics'
+          git pull --rebase origin digitalmate
+          git push origin HEAD:digitalmate
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+      - name: Deploy dashboard
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main

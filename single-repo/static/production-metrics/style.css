@@ -442,6 +442,17 @@ h1 {
   color: var(--unknown);
 }
 
+.badge.partial,
+.badge.low {
+  background: var(--unknown-bg);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.history-table tr.is-partial td {
+  opacity: 0.72;
+}
+
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -554,6 +565,39 @@ h1 {
   font-size: 11px;
 }
 
+/* Methodology paragraphs are reference material, not headline content. */
+.chart-note-details {
+  margin-top: 8px;
+}
+
+.chart-note-details > summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 11px;
+  list-style: none;
+}
+
+.chart-note-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.chart-note-details > summary::before {
+  content: '▸ ';
+}
+
+.chart-note-details[open] > summary::before {
+  content: '▾ ';
+}
+
+.chart-note-details > summary:hover {
+  color: var(--ink);
+}
+
+.chart-note-details > .chart-note {
+  margin-top: 6px;
+  line-height: 1.6;
+}
+
 .waterfall {
   display: flex;
   max-height: 420px;
@@ -660,12 +704,46 @@ h1 {
   font-variant-numeric: tabular-nums;
 }
 
+/* Numeric metric columns read best centered; date/version columns stay left. */
+.history-table th.num,
+.history-table td.num {
+  text-align: center;
+}
+
+/* The value+chip range columns keep their left edge at the column start. */
+.history-table th.metric-column,
+.history-table td.metric-column {
+  text-align: left;
+}
+
 .history-table .run-id {
   max-width: 220px;
   overflow: hidden;
   font-family: var(--mono);
   font-size: 11px;
   text-overflow: ellipsis;
+}
+
+/* Keep the date / model column visible while the wide metric table scrolls. */
+.history-table thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+}
+
+.history-table tbody td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--panel);
+}
+
+.history-table tbody tr:hover td:first-child {
+  background: var(--panel-soft);
+}
+
+.history-table tbody tr.is-selected td:first-child {
+  background: var(--accent-soft);
 }
 
 .empty {
@@ -766,6 +844,8 @@ h1 {
 
 .wf-subhead { margin: 12px 0 4px; color: var(--muted); font-size: 12px; font-weight: 600; }
 
+/* The page is embedded in the DigitalMate board iframe: parent chrome supplies
+   the title and navigation, so the local topbar and view tabs stay hidden. */
 .tabs {
   display: flex;
   gap: 4px;
@@ -882,8 +962,51 @@ h1 {
   display: none;
 }
 
+/* One card per metric family, three per row: five tiles fill two rows on
+   both the model and cloud side, matching the chart grid below. */
 .model-summary {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .model-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Combined "a / b / c" values need a smaller face than single values. */
+.model-summary .stat-value.combo {
+  font-size: 1.35rem;
+}
+
+/* Per-point value + day-over-day glyph on trend charts. */
+.point-label {
+  font-size: 9px;
+  fill: var(--muted);
+}
+
+.point-label .bad {
+  fill: var(--failed);
+}
+
+.point-label .good {
+  fill: var(--ok);
+}
+
+.stat-value.combo .failed {
+  color: var(--failed);
+}
+
+.stat-value.combo .ok {
+  color: var(--ok);
+}
+
+@media (max-width: 620px) {
+  .model-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .perf-strip {
@@ -891,6 +1014,11 @@ h1 {
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
   margin: -8px 0 20px;
+}
+
+/* P50 / P95 share one card, so the combined value needs a smaller face. */
+.perf-strip .stat-value.combo {
+  font-size: 1.35rem;
 }
 
 .model-picker {
@@ -1125,6 +1253,21 @@ h1 {
   opacity: 0.65;
 }
 
+.legend-line.p50 {
+  border-top-color: var(--series-2);
+  border-top-style: dashed;
+}
+
+.legend-line.p50.lower {
+  opacity: 0.5;
+}
+
+.legend-line.ttft-est {
+  border-top-color: var(--series-1);
+  border-top-style: dotted;
+  opacity: 0.7;
+}
+
 .latency-layer.ttft .trend-series {
   stroke: var(--series-1);
 }
@@ -1146,6 +1289,12 @@ h1 {
   border-top-style: dashed;
 }
 
+.legend-line.tpot-est {
+  border-top-color: var(--series-3);
+  border-top-style: dotted;
+  opacity: 0.65;
+}
+
 .latency-layer.tpot .trend-series {
   stroke: var(--series-3);
   stroke-dasharray: 2 3;
@@ -1153,6 +1302,17 @@ h1 {
 
 .latency-layer.tpot .trend-dot {
   fill: var(--series-3);
+}
+
+.latency-layer.tpot-est .trend-series {
+  stroke: var(--series-3);
+  stroke-dasharray: 1 5;
+  opacity: 0.65;
+}
+
+.latency-layer.tpot-est .trend-dot {
+  fill: var(--series-3);
+  opacity: 0.65;
 }
 
 .legend-line.calls {
@@ -1189,6 +1349,32 @@ h1 {
   stroke: var(--series-2);
   stroke-dasharray: 5 4;
   opacity: 0.65;
+}
+
+.latency-layer.ttft-est .trend-series {
+  stroke: var(--series-1);
+  stroke-dasharray: 2 3;
+  opacity: 0.7;
+}
+
+.latency-layer.ttft-est .trend-dot {
+  fill: var(--series-1);
+  opacity: 0.7;
+}
+
+.latency-layer.p50-upper .trend-series {
+  stroke: var(--series-2);
+  stroke-dasharray: 2 3;
+}
+
+.latency-layer.p50-upper .trend-dot {
+  fill: var(--series-2);
+}
+
+.latency-layer.p50-lower .trend-series {
+  stroke: var(--series-2);
+  stroke-dasharray: 2 3;
+  opacity: 0.5;
 }
 
 .trend-chart .trend-all-hidden {
@@ -1312,16 +1498,106 @@ h1 {
   font-size: 12px;
 }
 
-.compare-table tbody tr {
+/* The banner names its model and links to the chart card it describes. */
+.insight-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.insight-action {
+  margin-left: auto;
+  padding: 2px 10px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
 }
 
-.compare-table tbody tr:hover td {
-  background: var(--panel-soft);
+.insight-action:hover {
+  background: rgba(207, 34, 46, 0.08);
 }
 
-.compare-table tbody tr.is-selected td {
+/* Group headers split the models view into 模型侧 / 云侧 Agent / 工具. */
+.view-section-head {
+  margin: 30px 0 14px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+#view-models > .view-section-head:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.view-section-head h2 {
+  margin: 2px 0 4px;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.view-section-head .section-note {
+  margin: 0;
+  max-width: 900px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Let the per-model caption use the full width so it stays on one line. */
+.view-section-head .section-note.single-line {
+  max-width: none;
+}
+
+#model-trends-card {
+  scroll-margin-top: 16px;
+}
+
+/* The comparison only switches the drill-down; its numbers live below. */
+.compare-models {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.model-chip {
+  appearance: none;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.model-chip:hover {
+  border-color: var(--accent);
+}
+
+.model-chip.is-selected {
+  border-color: var(--accent);
   background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.model-chip.is-idle {
+  color: var(--muted);
+}
+
+.model-chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .mono-cell {
@@ -1336,10 +1612,6 @@ h1 {
 @media (max-width: 860px) {
   .trend-grid {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .model-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .card-head {
@@ -1358,74 +1630,91 @@ h1 {
   }
 }
 
-/* Size metric columns to their contents; other columns absorb spare table width. */
-.history-table .metric-column {
-  width: 1%;
+/* Even column rhythm on the stats table: every column gets an equal share so
+   the gaps between columns stay roughly uniform. */
+.metric-table th {
+  width: 10%;
 }
 
-/* Keep sample counts close to their values while aligning change indicators. */
+.metric-table {
+  min-width: 1000px;
+}
+
+/* Keep the value and its change chip side by side: the chip follows the value
+   with a small gap instead of being pushed to the far edge of the column. */
 .metric-cell {
   display: flex;
+  width: 100%;
   align-items: baseline;
-  gap: 4px;
+  justify-content: flex-start;
+  gap: 6px;
 }
 
 .metric-change {
-  flex: 0 0 56px;
-  margin-left: auto;
+  flex: none;
+}
+
+.token-coverage {
+  margin-left: 6px;
+  color: var(--muted);
 }
 
 .history-table td .metric-change .delta {
   margin-left: 0;
 }
 
-.compare-model-button {
-  appearance: none;
-  border: 0;
-  padding: 2px 0;
-  background: transparent;
-  color: var(--accent);
-  font: inherit;
-  cursor: pointer;
-  text-align: left;
-}
-.compare-model-button:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 3px;
-}
 .selected-model-badge {
   color: var(--accent);
   font: 600 11px/1.5 system-ui, sans-serif;
   white-space: nowrap;
 }
-.current-model {
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-  margin-bottom: -6px;
-}
-.current-model:empty { display: none; }
-
 /* The time range applies to both the comparison and model details. */
 .comparison-head {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
+  gap: 10px 16px;
 }
+.comparison-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  min-width: 0;
+}
+.comparison-title h2 { margin: 0; }
 .comparison-controls {
   display: flex;
-  flex: 1 1 550px;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px 12px;
-}
-.comparison-updated {
   margin-left: auto;
 }
+.comparison-updated {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.comparison-note {
+  margin-top: 12px;
+  border-top: 1px dashed var(--line);
+  padding-top: 8px;
+}
+.comparison-note > summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+}
+.comparison-note > summary:hover { color: var(--ink); }
+.comparison-note p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
 @media (max-width: 700px) {
-  .comparison-controls { flex-basis: 100%; }
-  .comparison-updated { margin-left: 0; }
+  .comparison-controls { margin-left: 0; }
+  .comparison-updated { white-space: normal; }
 }
 
 .lookup-form {
@@ -1510,3 +1799,256 @@ h1 {
 @media (max-width: 600px) {
   .lookup-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Request-level TPOT percentiles; dotted lines indicate unknown stream state. */
+.legend-line.tpot-p50, .legend-line.tpot-est-p50 { border-color: #2563eb; }
+.legend-line.tpot-p95, .legend-line.tpot-est-p95 { border-color: #ea580c; }
+.legend-line.tpot-est-p50, .legend-line.tpot-est-p95 { border-top-style: dotted; }
+.latency-layer.tpot-p50 .trend-series, .latency-layer.tpot-est-p50 .trend-series { stroke: #2563eb; }
+.latency-layer.tpot-p95 .trend-series, .latency-layer.tpot-est-p95 .trend-series { stroke: #ea580c; }
+.latency-layer.tpot-p50 .trend-dot, .latency-layer.tpot-est-p50 .trend-dot { fill: #2563eb; }
+.latency-layer.tpot-p95 .trend-dot, .latency-layer.tpot-est-p95 .trend-dot { fill: #ea580c; }
+.latency-layer.tpot-est-p50 .trend-series, .latency-layer.tpot-est-p95 .trend-series { stroke-dasharray: 2 4; }
+
+/* Per-environment daily GateWay / WorkSwarm latency trends. */
+.env-trend + .env-trend { margin-top: 14px; }
+.env-trend { margin-bottom: 10px; }
+.legend-line.env-gw-mean, .legend-line.env-ws-mean, .legend-line.env-ov-mean { border-top-width: 3px; }
+.legend-line.env-gw-mean { border-top-color: var(--series-1); }
+.legend-line.env-gw-p50 { border-top-color: var(--series-2); border-top-style: dashed; }
+.legend-line.env-gw-p95 { border-top-color: var(--series-2); }
+.legend-line.env-ws-mean { border-top-color: #047857; }
+.legend-line.env-ws-p50 { border-top-color: #10b981; border-top-style: dotted; }
+.legend-line.env-ws-p95 { border-top-color: #065f46; border-top-style: dashed; }
+.legend-line.env-ov-mean { border-top-color: #ea580c; }
+.latency-layer.env-gw-mean .trend-series { stroke: var(--series-1); stroke-width: 2.4; }
+.latency-layer.env-gw-p50 .trend-series { stroke: var(--series-2); stroke-width: 1.8; stroke-dasharray: 2 3; }
+.latency-layer.env-gw-p95 .trend-series { stroke: var(--series-2); stroke-width: 1.8; }
+.latency-layer.env-ws-mean .trend-series { stroke: #047857; stroke-width: 2.4; }
+.latency-layer.env-ws-p50 .trend-series { stroke: #10b981; stroke-width: 1.8; stroke-dasharray: 2 4; }
+.latency-layer.env-ws-p95 .trend-series { stroke: #065f46; stroke-width: 1.8; stroke-dasharray: 7 4; }
+.latency-layer.env-ov-mean .trend-series { stroke: #ea580c; stroke-width: 2.2; }
+.latency-layer.env-gw-mean .trend-dot { fill: var(--series-1); }
+.latency-layer.env-gw-p50 .trend-dot { fill: var(--series-2); }
+.latency-layer.env-gw-p95 .trend-dot { fill: var(--series-2); }
+.latency-layer.env-ws-mean .trend-dot { fill: #047857; }
+.latency-layer.env-ws-p50 .trend-dot { fill: #10b981; }
+.latency-layer.env-ws-p95 .trend-dot { fill: #065f46; }
+.latency-layer.env-ov-mean .trend-dot { fill: #ea580c; }
+
+/* Cloud first-token latency is per request (gateway accept -> first text
+   chunk), so it gets its own solid lines to stay distinct from the dotted
+   per-model-call TTFT/TPOT trends below. */
+.legend-line.env-ft-mean { border-top-color: #7c3aed; border-top-width: 3px; }
+.legend-line.env-ft-p50 { border-top-color: #0d9488; border-top-style: dashed; }
+.legend-line.env-ft-p95 { border-top-color: #be123c; }
+.latency-layer.env-ft-mean .trend-series { stroke: #7c3aed; stroke-width: 2.4; }
+.latency-layer.env-ft-p50 .trend-series { stroke: #0d9488; stroke-width: 1.8; stroke-dasharray: 5 3; }
+.latency-layer.env-ft-p95 .trend-series { stroke: #be123c; stroke-width: 1.8; }
+.latency-layer.env-ft-mean .trend-dot { fill: #7c3aed; }
+.latency-layer.env-ft-p50 .trend-dot { fill: #0d9488; }
+.latency-layer.env-ft-p95 .trend-dot { fill: #be123c; }
+
+/* Answer first token and the ReAct phase are request scoped like the first
+   token above, but they read as a decomposition of it, so they keep the same
+   solid-line family with their own colors. */
+.legend-line.env-af-mean { border-top-color: #0891b2; border-top-width: 3px; }
+.legend-line.env-af-p50 { border-top-color: #65a30d; border-top-style: dashed; }
+.legend-line.env-af-p95 { border-top-color: #db2777; }
+.latency-layer.env-af-mean .trend-series { stroke: #0891b2; stroke-width: 2.4; }
+.latency-layer.env-af-p50 .trend-series { stroke: #65a30d; stroke-width: 1.8; stroke-dasharray: 5 3; }
+.latency-layer.env-af-p95 .trend-series { stroke: #db2777; stroke-width: 1.8; }
+.latency-layer.env-af-mean .trend-dot { fill: #0891b2; }
+.latency-layer.env-af-p50 .trend-dot { fill: #65a30d; }
+.latency-layer.env-af-p95 .trend-dot { fill: #db2777; }
+
+.legend-line.env-react-mean { border-top-color: #b45309; border-top-width: 3px; }
+.legend-line.env-react-p50 { border-top-color: #4f46e5; border-top-style: dashed; }
+.legend-line.env-react-p95 { border-top-color: #15803d; }
+.latency-layer.env-react-mean .trend-series { stroke: #b45309; stroke-width: 2.4; }
+.latency-layer.env-react-p50 .trend-series { stroke: #4f46e5; stroke-width: 1.8; stroke-dasharray: 5 3; }
+.latency-layer.env-react-p95 .trend-series { stroke: #15803d; stroke-width: 1.8; }
+.latency-layer.env-react-mean .trend-dot { fill: #b45309; }
+.latency-layer.env-react-p50 .trend-dot { fill: #4f46e5; }
+.latency-layer.env-react-p95 .trend-dot { fill: #15803d; }
+
+/* Tool timing is one sample per finished tool call, recorded by the product
+   adapter, so it also lives outside the per-model-call scope below. */
+.legend-line.env-tool-mean { border-top-color: #9333ea; border-top-width: 3px; }
+.legend-line.env-tool-p50 { border-top-color: #c2410c; border-top-style: dashed; }
+.legend-line.env-tool-p95 { border-top-color: #1e40af; }
+.latency-layer.env-tool-mean .trend-series { stroke: #9333ea; stroke-width: 2.4; }
+.latency-layer.env-tool-p50 .trend-series { stroke: #c2410c; stroke-width: 1.8; stroke-dasharray: 5 3; }
+.latency-layer.env-tool-p95 .trend-series { stroke: #1e40af; stroke-width: 1.8; }
+.latency-layer.env-tool-mean .trend-dot { fill: #9333ea; }
+.latency-layer.env-tool-p50 .trend-dot { fill: #c2410c; }
+.latency-layer.env-tool-p95 .trend-dot { fill: #1e40af; }
+
+/* Cloud TTFT / TPOT trends use the cloud-call (per model call) scope. */
+.legend-line.env-ttft-mean, .legend-line.env-tpot-mean { border-top-width: 3px; }
+.legend-line.env-ttft-mean, .legend-line.env-tpot-mean { border-top-style: dotted; }
+.legend-line.env-ttft-mean { border-top-color: var(--series-3); }
+.legend-line.env-ttft-p50 { border-top-color: #2563eb; border-top-style: dotted; }
+.legend-line.env-ttft-p95 { border-top-color: #ea580c; border-top-style: dotted; }
+.legend-line.env-tpot-mean { border-top-color: var(--series-3); }
+.legend-line.env-tpot-p50 { border-top-color: #2563eb; border-top-style: dotted; }
+.legend-line.env-tpot-p95 { border-top-color: #ea580c; border-top-style: dotted; }
+.latency-layer.env-ttft-mean .trend-series { stroke: var(--series-3); stroke-width: 2; stroke-dasharray: 2 3; }
+.latency-layer.env-ttft-p50 .trend-series { stroke: #2563eb; stroke-width: 1.8; stroke-dasharray: 2 4; }
+.latency-layer.env-ttft-p95 .trend-series { stroke: #ea580c; stroke-width: 1.8; stroke-dasharray: 2 4; }
+.latency-layer.env-tpot-mean .trend-series { stroke: var(--series-3); stroke-width: 2; stroke-dasharray: 2 3; }
+.latency-layer.env-tpot-p50 .trend-series { stroke: #2563eb; stroke-width: 1.8; stroke-dasharray: 2 4; }
+.latency-layer.env-tpot-p95 .trend-series { stroke: #ea580c; stroke-width: 1.8; stroke-dasharray: 2 4; }
+.latency-layer.env-ttft-mean .trend-dot { fill: var(--series-3); }
+.latency-layer.env-ttft-p50 .trend-dot { fill: #2563eb; }
+.latency-layer.env-ttft-p95 .trend-dot { fill: #ea580c; }
+.latency-layer.env-tpot-mean .trend-dot { fill: var(--series-3); }
+.latency-layer.env-tpot-p50 .trend-dot { fill: #2563eb; }
+.latency-layer.env-tpot-p95 .trend-dot { fill: #ea580c; }
+.env-call-detail { margin: 2px 0 12px; }
+.env-call-detail summary { cursor: pointer; color: var(--muted, #64748b); font-size: 13px; }
+.env-call-detail .table-wrap { margin-top: 8px; }
+
+/* Cloud call volume and failure rate share a dual-axis card. */
+.legend-line.env-calls { border-top-color: var(--series-1); border-top-width: 3px; }
+.legend-line.env-fail { border-top-color: var(--series-2); border-top-style: dashed; }
+.latency-layer.env-calls .trend-series { stroke: var(--series-1); stroke-width: 2.2; }
+.latency-layer.env-fail .trend-series { stroke: var(--series-2); stroke-width: 2; stroke-dasharray: 5 4; }
+.latency-layer.env-calls .trend-dot { fill: var(--series-1); }
+.latency-layer.env-fail .trend-dot { fill: var(--series-2); }
+
+/* Emphasised keywords inside stat-card labels. */
+.stat-label strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* Cloud-side headline tiles sit above the daily charts. */
+.env-summary {
+  margin-bottom: 16px;
+}
+
+/* Outlier analysis: a compact lead row, then the metric and cohort tables. */
+.env-anomaly {
+  margin-bottom: 12px;
+}
+
+.anomaly-lead {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin: 10px 0 12px;
+}
+
+.anomaly-lead .stat-card {
+  box-shadow: none;
+}
+
+.anomaly-lead .stat-value {
+  font-size: 18px;
+}
+
+.anomaly-subhead {
+  margin: 14px 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.anomaly-table td,
+.anomaly-table th {
+  vertical-align: middle;
+}
+
+.anomaly-rate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+}
+
+.anomaly-track {
+  flex: 1;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--line-soft);
+}
+
+.anomaly-fill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--failed);
+}
+
+@media (max-width: 720px) {
+  .anomaly-lead {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Request timeline uses only observed phase offsets. */
+.slow-request-details > summary { cursor: pointer; }
+.trace-link { border: 0; background: none; color: #2563eb; cursor: pointer; text-align: left; font: inherit; padding: 0; overflow-wrap: anywhere; }
+.trace-select-label { display: flex; align-items: center; gap: 12px; margin: 12px 0 18px; color: #475569; }
+.trace-select-label select { max-width: 100%; min-width: 0; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; }
+.trace-chart { display: grid; gap: 10px; padding: 12px 0; }
+.trace-row { display: grid; grid-template-columns: minmax(100px, 180px) minmax(100px, 1fr) 80px; gap: 10px; align-items: center; font-size: 13px; }
+.trace-track { position: relative; height: 18px; background: #eef2f6; border-radius: 4px; }
+.trace-bar { position: absolute; height: 100%; border-radius: 4px; min-width: 1px; }
+.trace-total { background: #64748b; } .trace-first { background: #60a5fa; } .trace-react { background: #a78bfa; } .trace-answer { background: #34d399; } .trace-tool { background: #f59e0b; } .trace-error { background: #ef4444; }
+.trace-duration { text-align: right; font-variant-numeric: tabular-nums; }
+@media (max-width: 600px) { .trace-row { grid-template-columns: 90px minmax(60px, 1fr) 65px; } .trace-select-label { display: grid; } }
+
+.data-freshness { margin: 0 0 12px; color: #64748b; font-size: 13px; }
+
+/* Inspectable per-request timeline. All positions derive from recorded offsets. */
+.trajectory-head { margin-top: 22px; }
+.trajectory-head strong { font-size: 17px; margin-right: 14px; }
+.trajectory-head p { color: #64748b; font-size: 13px; margin: 8px 0 14px; }
+.trace-overview { display: grid; gap: 5px; margin: 4px 0 12px; }
+.trace-overview-total, .trace-overview-events { position: relative; height: 10px; overflow: hidden; border-radius: 4px; background: #e8eef6; }
+.trace-overview-total { background: #aec6ed; }
+.trace-overview-mark { position: absolute; height: 100%; border-radius: 3px; min-width: 2px; }
+.trajectory-legend { display: flex; flex-wrap: wrap; gap: 16px; color: #64748b; font-size: 12px; margin: 8px 0 16px; }
+.legend-dot { width: 9px; height: 9px; display: inline-block; border-radius: 2px; margin-right: 5px; }
+.total-dot { background: #4f83d3; } .event-dot { background: #e4b831; } .tool-dot { background: #e47ab2; } .model-dot { background: #8b5cf6; }
+.trajectory-toolbar { border-top: 1px solid #e2e8f0; padding: 14px 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.trajectory-toolbar input { border: 1px solid #d5deea; border-radius: 7px; padding: 9px 12px; min-width: 220px; }
+.trace-filters { display: flex; flex-wrap: wrap; gap: 5px; }
+.trace-filter { background: transparent; border: 1px solid #d5deea; color: #475569; border-radius: 6px; padding: 7px 10px; cursor: pointer; }
+.trace-filter.active { color: #1d4ed8; border-color: #93c5fd; background: #eff6ff; }
+.trajectory-table { border: 1px solid #dce3ed; border-radius: 8px; overflow: hidden; }
+.trajectory-columns, .trace-root-row, .trace-event-row { display: grid; grid-template-columns: minmax(200px, 32%) minmax(160px, 1fr) 90px; align-items: center; gap: 12px; }
+.trajectory-columns { padding: 9px 12px; background: #f8fafc; border-bottom: 1px solid #dce3ed; color: #475569; font-size: 12px; font-weight: 600; }
+.trajectory-ticks { display: flex; justify-content: space-between; color: #94a3b8; font-size: 11px; }
+.trace-root-row { cursor: pointer; padding: 10px 12px; font-weight: 600; background: #f4f7fb; list-style: none; }
+.trace-root-row > span:first-child::before { content: '▾'; margin-right: 8px; color: #64748b; }
+.trace-group:not([open]) .trace-root-row > span:first-child::before { content: '▸'; }
+.trace-root-row small { color: #94a3b8; font-weight: 400; }
+.trace-root-track, .trace-event-track { display: block; position: relative; height: 17px; background: repeating-linear-gradient(to right, transparent 0, transparent calc(25% - 1px), #e2e8f0 calc(25% - 1px), #e2e8f0 25%); }
+.trace-root-track .trace-bar { position: absolute; left: 0; width: 100%; }
+.trace-event-row { width: 100%; padding: 6px 12px; border: 0; border-top: 1px solid #eef2f7; color: #334155; background: #fff; text-align: left; cursor: pointer; font: inherit; font-size: 12px; }
+.trace-event-row[hidden] { display: none; }
+.trace-event-row:hover, .trace-event-row.selected { background: #f1f6ff; }
+.trace-event-name { padding-left: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trace-event-track .trace-bar { height: 13px; top: 2px; }
+.trace-point { min-width: 3px; border-radius: 2px; }
+.trace-total { background: #4f83d3; } .trace-event { background: #e4b831; } .trace-tool { background: #e47ab2; } .trace-error { background: #d84560; } .trace-model-point { background: #8b5cf6; } .trace-first { background: #60a5fa; } .trace-react { background: #a78bfa; } .trace-answer { background: #34d399; }
+.trace-detail { margin-top: 12px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 7px; color: #475569; font-size: 12px; line-height: 1.7; }
+.trace-detail strong { color: #1e293b; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+@media (max-width: 700px) { .trajectory-columns, .trace-root-row, .trace-event-row { grid-template-columns: minmax(115px, 38%) minmax(80px, 1fr) 58px; gap: 5px; } .trace-event-name { padding-left: 4px; } .trajectory-ticks span:nth-child(even) { display: none; } }
+.trace-event-list { max-height: 520px; overflow-y: auto; }
+@media (max-width: 700px) { .trace-event-name { white-space: normal; overflow-wrap: anywhere; } }
+@media (max-width: 700px) {
+  .trajectory-columns, .trace-root-row, .trace-event-row { grid-template-columns: minmax(0, 45%) minmax(0, 1fr) 48px; gap: 4px; padding-left: 6px; padding-right: 6px; }
+  .trajectory-ticks { overflow: hidden; }
+}
+
+@media (max-width: 700px) { .trajectory-ticks span:nth-child(3) { display: none; } }
+
+.cloud-trace-list { margin: 12px 0; }
+.cloud-trace-list > summary { cursor: pointer; font-weight: 600; color: #334155; padding: 7px 0; }
+
+.trace-empty { margin: 0; padding: 12px; color: #64748b; font-size: 12px; }

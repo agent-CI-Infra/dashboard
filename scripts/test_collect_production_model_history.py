@@ -14,27 +14,164 @@ collector = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(collector)
 
 class CollectionTests(unittest.TestCase):
-    def test_publishes_only_aggregates_and_estimates_unknown_stream(self):
-        rows = [{'model_group': 'test', 'model': 'provider/test', 'status': 'success', 'startTime': '2026-11-03T00:00:00+00:00', 'completionStartTime': '2026-11-03T00:00:01+00:00', 'endTime': '2026-11-03T00:00:02+00:00', 'request_duration_ms': 2000, 'prompt_tokens': 10, 'completion_tokens': 4, 'request_id': 'private-id', 'messages': 'private-content'}]
+    def test_publishes_only_aggregates_and_reports_unknown_stream_as_estimate(self):
+        rows = [{'model_group': 'test', 'model': 'provider/test', 'status': 'success', 'startTime': '2026-11-03T00:00:00+00:00', 'completionStartTime': '2026-11-03T00:00:01+00:00', 'endTime': '2026-11-03T00:00:02+00:00', 'request_duration_ms': 2000, 'prompt_tokens': 10, 'completion_tokens': 4, 'messages': 'private-content'}]
         with tempfile.TemporaryDirectory() as d, patch.object(collector, 'fetch_window', return_value=rows), patch.dict(os.environ, {'PRODUCTION_GATEWAY_KEY': 'dummy'}), patch.object(sys, 'argv', ['collector', d]), contextlib.redirect_stdout(io.StringIO()):
             collector.main()
             raw = (Path(d) / 'production-model-history.json').read_text(encoding='utf-8')
             point = next(iter(json.loads(raw)['cases'].values()))['points'][0]
-            self.assertNotIn('private-id', raw)
+            metrics = point['benchmark_models'][0]
             self.assertNotIn('private-content', raw)
-            self.assertEqual(point['benchmark_models'][0]['ttft_avg_ms'], 1000)
-            self.assertEqual(point['benchmark_models'][0]['tpot_avg_ms'], 333.33)
-            self.assertEqual(point['benchmark_models'][0]['call_count'], 1)
+            # Unknown streaming is never mixed into the strict TTFT mean.
+            self.assertIsNone(metrics['ttft_avg_ms'])
+            self.assertEqual(metrics['ttft_sample_count'], 0)
+            self.assertEqual(metrics['ttft_estimated_avg_ms'], 1000)
+            self.assertEqual(metrics['ttft_estimated_sample_count'], 1)
+            self.assertIsNone(metrics['tpot_avg_ms'])
+            self.assertEqual(metrics['tpot_sample_count'], 0)
+            self.assertEqual(metrics['call_count'], 1)
+            self.assertEqual(point['duration_sum_ms'], 2000)
+            self.assertEqual(point['duration_sample_count'], 1)
+            self.assertEqual(point['success_count'], 1)
+            self.assertEqual(point['hours'][0]['duration_sum_ms'], 2000)
+            # The model row carries its own sum so the dashboard can weight it
+            # against other models without averaging daily means.
+            self.assertEqual(metrics['duration_sum_ms'], 2000)
+            self.assertEqual(metrics['duration_sample_count'], 1)
+
+    def test_strict_stream_ttft_filters_timestamp_artefacts(self):
+        base = {'model_group': 'test', 'model': 'provider/test', 'status': 'success', 'stream': True,
+                'startTime': '2026-11-03T00:00:00+00:00', 'completionStartTime': '2026-11-03T00:00:01+00:00',
+                'endTime': '2026-11-03T00:00:02+00:00', 'request_duration_ms': 2000, 'completion_tokens': 11}
+        rows = [
+            dict(base, request_id='strict'),
+            dict(base, request_id='nonstream', stream=False),
+            dict(base, request_id='failed', status='failed'),
+            # TTFT within 5% of the whole duration: a completion timestamp, not a first token.
+            dict(base, request_id='ttft-artefact', completionStartTime='2026-11-03T00:00:01.999000+00:00'),
+            # Implausibly small TPOT is a timestamp artefact too.
+            dict(base, request_id='tpot-artefact', completion_tokens=1000000),
+        ]
+        with tempfile.TemporaryDirectory() as d, patch.object(collector, 'fetch_window', return_value=rows), patch.dict(os.environ, {'PRODUCTION_GATEWAY_KEY': 'dummy'}), patch.object(sys, 'argv', ['collector', d]), contextlib.redirect_stdout(io.StringIO()):
+            collector.main()
+            point = next(iter(json.loads((Path(d) / 'production-model-history.json').read_text(encoding='utf-8'))['cases'].values()))['points'][0]
+            metrics = point['benchmark_models'][0]
+            self.assertEqual(metrics['ttft_sample_count'], 2)
+            self.assertEqual(metrics['ttft_filtered_count'], 1)
+            self.assertEqual(metrics['tpot_filtered_count'], 2)
+            self.assertEqual(metrics['tpot_sample_count'], 1)
+
+    def test_near_end_ttft_excludes_tpot_even_above_minimum(self):
+        row = {'status': 'success', 'stream': True,
+               'startTime': '2026-11-03T00:00:00Z',
+               'completionStartTime': '2026-11-03T00:00:09.9Z',
+               'endTime': '2026-11-03T00:00:10Z',
+               'request_duration_ms': 10000, 'completion_tokens': 3}
+        metrics = collector.aggregate_point([row], '2026-11-03', 'model')['benchmark_models'][0]
+        self.assertEqual(metrics['ttft_filtered_count'], 1)
+        self.assertEqual(metrics['tpot_filtered_count'], 1)
+        self.assertEqual(metrics['tpot_sample_count'], 0)
+        self.assertIsNone(metrics['tpot_avg_ms'])
+
+    def test_conflicting_stream_flags_are_unknown(self):
+        row = {'stream': True, 'metadata': {'spend_logs_metadata': {'stream': False}}}
+        self.assertIsNone(collector.stream_state(row))
+
+    def test_tpot_estimate_keeps_unknown_stream_separate_and_filters_invalid(self):
+        base = {'status': 'success', 'startTime': '2026-11-03T00:00:00Z',
+                'completionStartTime': '2026-11-03T00:00:01Z',
+                'endTime': '2026-11-03T00:00:03Z', 'completion_tokens': 11}
+        rows = [dict(base), dict(base, stream=True), dict(base, stream=False),
+                dict(base, status='failed'), dict(base, completion_tokens=1),
+                dict(base, completion_tokens=100000000),
+                dict(base, completionStartTime='2026-11-03T00:00:02.99Z')]
+        metrics = collector.aggregate_point(rows, '2026-11-03', 'model')['benchmark_models'][0]
+        self.assertEqual(metrics['tpot_estimated_sample_count'], 1)
+        self.assertEqual(metrics['tpot_estimated_avg_ms'], 200)
+        self.assertEqual(metrics['tpot_sample_count'], 1)
+        self.assertEqual(metrics['tpot_avg_ms'], 200)
+        self.assertEqual(metrics['tpot_filtered_count'], 2)
+
+    def test_tpot_uses_generated_token_weight_not_per_call_mean(self):
+        base = {'status': 'success', 'startTime': '2026-11-03T00:00:00Z',
+                'completionStartTime': '2026-11-03T00:00:01Z'}
+        rows = [dict(base, stream=True, endTime='2026-11-03T00:00:02Z', completion_tokens=11),
+                dict(base, stream=True, endTime='2026-11-03T00:00:03Z', completion_tokens=101),
+                dict(base, endTime='2026-11-03T00:00:02Z', completion_tokens=11),
+                dict(base, endTime='2026-11-03T00:00:03Z', completion_tokens=101)]
+        metrics = collector.aggregate_point(rows, '2026-11-03', 'model')['benchmark_models'][0]
+        self.assertEqual(metrics['tpot_weight_tokens'], 110)
+        self.assertEqual(metrics['tpot_decode_sum_ms'], 3000)
+        self.assertAlmostEqual(metrics['tpot_avg_ms'], 3000 / 110)
+        self.assertAlmostEqual(metrics['tpot_estimated_avg_ms'], 3000 / 110)
+        self.assertEqual(metrics['tpot_estimated_weight_tokens'], 110)
+
+    def test_tpot_histogram_preserves_request_counts_and_extremes(self):
+        samples = [(1000, 250)] * 19 + [(10000, 10)]
+        histogram = collector.metric_histogram(duration / tokens for duration, tokens in samples)
+        self.assertEqual(sum(count for _, count in histogram), 20)
+        self.assertEqual(sorted(count for _, count in histogram), [1, 19])
+        self.assertLess(abs(1.02 ** (histogram[0][0] + 0.5) / 4 - 1), 0.01)
+
+    def test_ttft_estimate_histogram_includes_zero(self):
+        hist = collector.metric_histogram([0, 1000, 1000])
+        self.assertEqual(hist[0], (-1001, 1))
+        self.assertEqual(sum(count for _, count in hist), 3)
+
+    def test_unknown_status_cannot_be_counted_as_passed(self):
+        point = collector.aggregate_point([{'status': 'unknown'}], '2026-11-03', 'model')
+        self.assertEqual(point['status'], 'UNKNOWN')
+
+    def test_tokens_count_successes_and_failed_attempts_separately(self):
+        rows = [
+            {'model_group': 'test', 'model': 'provider/test', 'status': 'success', 'request_id': 'ok',
+             'startTime': '2026-11-03T00:00:00+00:00', 'endTime': '2026-11-03T00:00:01+00:00',
+             'request_duration_ms': 1000, 'prompt_tokens': 10, 'completion_tokens': 4},
+            {'model_group': 'test', 'model': 'provider/test', 'status': 'success', 'request_id': 'partial',
+             'startTime': '2026-11-03T00:00:00+00:00', 'endTime': '2026-11-03T00:00:01+00:00',
+             'request_duration_ms': 1000, 'prompt_tokens': 7, 'completion_tokens': None},
+            {'model_group': 'test', 'model': 'provider/test', 'status': 'failed', 'request_id': 'bad',
+             'startTime': '2026-11-03T00:00:00+00:00', 'endTime': '2026-11-03T00:00:01+00:00',
+             'request_duration_ms': 1000, 'prompt_tokens': 100, 'completion_tokens': 50},
+        ]
+        with tempfile.TemporaryDirectory() as d, patch.object(collector, 'fetch_window', return_value=rows), patch.dict(os.environ, {'PRODUCTION_GATEWAY_KEY': 'dummy'}), patch.object(sys, 'argv', ['collector', d]), contextlib.redirect_stdout(io.StringIO()):
+            collector.main()
+            point = next(iter(json.loads((Path(d) / 'production-model-history.json').read_text(encoding='utf-8'))['cases'].values()))['points'][0]
+            metrics = point['benchmark_models'][0]
+            self.assertEqual(metrics['input_tokens'], 10)
+            self.assertEqual(metrics['output_tokens'], 4)
+            self.assertEqual(metrics['total_tokens'], 14)
+            self.assertEqual(metrics['token_sample_count'], 1)
+            self.assertEqual(metrics['token_coverage'], 0.5)
+            self.assertEqual(metrics['failed_input_tokens'], 100)
+            self.assertEqual(metrics['failed_total_tokens'], 150)
+            self.assertEqual(metrics['failed_token_sample_count'], 1)
+
+    def test_request_level_p50_and_p95_need_twenty_samples(self):
+        rows = []
+        for index in range(20):
+            rows.append({'model_group': 'test', 'model': 'provider/test', 'status': 'success',
+                         'request_id': f'r{index}', 'startTime': f'2026-11-03T00:00:{index:02d}+00:00',
+                         'endTime': '2026-11-03T00:10:00+00:00', 'request_duration_ms': (index + 1) * 100})
+        with tempfile.TemporaryDirectory() as d, patch.object(collector, 'fetch_window', return_value=rows), patch.dict(os.environ, {'PRODUCTION_GATEWAY_KEY': 'dummy'}), patch.object(sys, 'argv', ['collector', d]), contextlib.redirect_stdout(io.StringIO()):
+            collector.main()
+            point = next(iter(json.loads((Path(d) / 'production-model-history.json').read_text(encoding='utf-8'))['cases'].values()))['points'][0]
+            self.assertEqual(point['duration_sum_ms'], 21000)
+            self.assertEqual(point['duration_p50_ms'], 1000)
+            self.assertEqual(point['duration_p95_ms'], 1900)
 
     def test_excludes_failed_nonstreaming_and_invalid_timestamps(self):
-        base = {'model_group': 'test', 'model': 'provider/test', 'status': 'success', 'startTime': '2026-11-03T00:00:00+00:00', 'completionStartTime': '2026-11-03T00:00:01+00:00', 'endTime': '2026-11-03T00:00:02+00:00', 'completion_tokens': 4}
-        rows = [dict(base, request_id='a', stream=False), dict(base, request_id='b', status='failed'), dict(base, request_id='c', completionStartTime='2026-11-03T00:00:03+00:00'), dict(base, request_id='d', completion_tokens=1)]
+        base = {'model_group': 'test', 'model': 'provider/test', 'status': 'success', 'stream': True, 'startTime': '2026-11-03T00:00:00+00:00', 'completionStartTime': '2026-11-03T00:00:01+00:00', 'endTime': '2026-11-03T00:00:02+00:00', 'completion_tokens': 4}
+        rows = [dict(base, request_id='a'), dict(base, request_id='b', stream=False), dict(base, request_id='c', completionStartTime='2026-11-03T00:00:03+00:00'), dict(base, request_id='d', completion_tokens=1)]
+        rows.append(dict(base, request_id='e', status='failed'))
         with tempfile.TemporaryDirectory() as d, patch.object(collector, 'fetch_window', return_value=rows), patch.dict(os.environ, {'PRODUCTION_GATEWAY_KEY': 'dummy'}), patch.object(sys, 'argv', ['collector', d]), contextlib.redirect_stdout(io.StringIO()):
             collector.main()
             doc = json.loads((Path(d) / 'production-model-history.json').read_text(encoding='utf-8'))
             metrics = next(iter(doc['cases'].values()))['points'][0]['benchmark_models'][0]
-            self.assertEqual(metrics['ttft_sample_count'], 1)
-            self.assertEqual(metrics['tpot_sample_count'], 0)
+            # 'a' and 'd' have usable timestamps; 'b' is non-streaming, 'c' is
+            # out of order and 'e' failed. Only 'a' can produce a TPOT.
+            self.assertEqual(metrics['ttft_sample_count'], 2)
+            self.assertEqual(metrics['tpot_sample_count'], 1)
 
     def test_missing_tokens_and_unknown_status_are_not_zero_or_failure(self):
         rows = [{'model_group':'test','model':'provider/test','status':'unknown','startTime':'2026-11-03T00:00:00+00:00','endTime':'2026-11-03T00:00:01+00:00','prompt_tokens':None,'completion_tokens':3,'request_id':'a'}]
@@ -55,7 +192,7 @@ class CollectionTests(unittest.TestCase):
             {'total_pages':1,'total':2,'data':[{'request_id':'a'}, {'request_id':'a'}]},
         ]
         for page in pages:
-            with self.subTest(page=page), patch.object(collector, 'fetch_json', return_value=page):
+            with self.subTest(page=page), patch.object(collector, 'fetch_json', return_value=page), patch.object(collector.time, 'sleep'):
                 with self.assertRaises(ValueError): collector.fetch_rows('dummy', now, now)
 
     def test_deduplicates_overlapping_daily_boundaries(self):
@@ -78,9 +215,135 @@ class CollectionTests(unittest.TestCase):
 
     def test_rejects_changed_pagination(self):
         pages = [{'total_pages': 2, 'total': 2, 'data': [{'request_id':'a'}]}, {'total_pages': 3, 'total': 2, 'data': [{'request_id':'b'}]}]
-        with patch.object(collector, 'fetch_json', side_effect=pages), patch.object(collector.time, 'sleep'):
+        with patch.object(collector, 'fetch_json', side_effect=pages * collector.PAGINATION_ATTEMPTS), patch.object(collector.time, 'sleep'):
             with self.assertRaises(ValueError):
                 collector.fetch_rows('dummy', collector.datetime.now(collector.timezone.utc), collector.datetime.now(collector.timezone.utc))
+
+    def test_retries_the_whole_window_after_pagination_changes(self):
+        pages = [
+            {'total_pages': 2, 'total': 2, 'data': [{'request_id': 'old'}]},
+            {'total_pages': 3, 'total': 3, 'data': [{'request_id': 'unstable'}]},
+            {'total_pages': 2, 'total': 2, 'data': [{'request_id': 'new-a'}]},
+            {'total_pages': 2, 'total': 2, 'data': [{'request_id': 'new-b'}]},
+        ]
+        now = collector.datetime.now(collector.timezone.utc)
+        with patch.object(collector, 'fetch_json', side_effect=pages) as fetch, patch.object(collector.time, 'sleep'):
+            rows = collector.fetch_rows('dummy', now, now + collector.timedelta(hours=1))
+        self.assertEqual([r['request_id'] for r in rows], ['new-a', 'new-b'])
+        self.assertEqual([call.args[2]['page'] for call in fetch.call_args_list], [1, 2, 1, 2])
+
+    def test_splits_persistently_changing_windows_and_deduplicates_boundary(self):
+        start = collector.datetime(2026, 11, 4, tzinfo=collector.timezone.utc)
+        end = start + collector.timedelta(hours=2)
+        midpoint = start + collector.timedelta(hours=1)
+        boundary = {'request_id': 'boundary', 'status': 'success'}
+        def fetch(_, a, b):
+            if (a, b) == (start, end):
+                raise collector.ChangingPagination('changed')
+            if (a, b) == (start, midpoint):
+                return [{'request_id': 'first'}, boundary]
+            if (a, b) == (midpoint, end):
+                return [boundary, {'request_id': 'last'}]
+            self.fail('unexpected window')
+        with patch.object(collector, 'fetch_rows_once', side_effect=fetch), patch.object(collector.time, 'sleep'):
+            rows = collector.fetch_rows('dummy', start, end)
+        self.assertEqual([r['request_id'] for r in rows], ['first', 'boundary', 'last'])
+
+    def test_changed_split_boundary_never_returns_partial_data(self):
+        start = collector.datetime(2026, 11, 4, tzinfo=collector.timezone.utc)
+        end = start + collector.timedelta(hours=2)
+        def fetch(_, a, b):
+            if (a, b) == (start, end):
+                raise collector.ChangingPagination('changed')
+            return [{'request_id': 'boundary', 'status': 'success' if a == start else 'failed'}]
+        with patch.object(collector, 'fetch_rows_once', side_effect=fetch), patch.object(collector.time, 'sleep'):
+            with self.assertRaises(collector.ChangingPagination):
+                collector.fetch_rows('dummy', start, end)
+
+    def test_failure_reasons_timeouts_and_slowest_requests_are_published(self):
+        rows = [
+            {'request_id': 'ok-1', 'status': 'success', 'request_duration_ms': 100,
+             'startTime': '2026-11-10T01:00:00Z', 'metadata': {'litellm_call_id': 'call-ok'}},
+            {'request_id': 'blocked-1', 'status': 'failure', 'request_duration_ms': 50,
+             'startTime': '2026-11-10T01:01:00Z',
+             'metadata': {'error_information': {
+                 'error_message': 'ModelArts.81011 Input text May contain sensitive information'}}},
+            {'request_id': 'budget-1', 'status': 'failed', 'request_duration_ms': 60,
+             'startTime': '2026-11-10T01:02:00Z',
+             'metadata': {'error_information': {'normalized_error': '429_BUDGET_EXCEEDED'}}},
+            {'request_id': 'slow-1', 'status': 'failure', 'request_duration_ms': 900000,
+             'startTime': '2026-11-10T01:03:00Z',
+             'metadata': {'litellm_call_id': 'call-slow', 'error_information': {
+                 'error_class': 'Timeout', 'error_message': 'Request timed out'}}},
+        ]
+        point = collector.aggregate_point(rows, '2026-11-10', 'provider/test', include_details=True)
+        self.assertEqual(point['failure_reasons'],
+                         {'budget': 1, 'content_blocked': 1, 'timeout': 1})
+        self.assertEqual(point['timeout_count'], 1)
+        self.assertEqual(point['latency_max_ms'], 900000)
+        self.assertEqual(point['latency_max_request']['request_id'], 'slow-1')
+        # ceil(4 * 5%) = 1: only the slowest request is recorded.
+        self.assertEqual(point['slow_count'], 1)
+        self.assertEqual([item['request_id'] for item in point['slow_requests']], ['slow-1'])
+        self.assertEqual(point['slow_requests'][0]['call_id'], 'call-slow')
+        self.assertEqual(point['slow_requests'][0]['reason'], 'timeout')
+        self.assertEqual([item['request_id'] for item in point['timeout_requests']], ['slow-1'])
+        # Non-slow identifiers are not published with the detail tables.
+        self.assertNotIn('blocked-1', str(point['slow_requests']))
+        self.assertNotIn('ok-1', str(point['slow_requests']))
+
+    def test_failure_category_ignores_codes_embedded_in_identifiers(self):
+        def category(message):
+            return collector.failure_category({
+                'status': 'failure',
+                'metadata': {'error_information': {'error_message': message}},
+            })
+        self.assertEqual(category('ModelArts.81011 sensitive content'), 'content_blocked')
+        self.assertEqual(category('HTTP 429 Too Many Requests'), 'rate_limit')
+        self.assertEqual(category('request abcd429ef returned no content'), 'other')
+        self.assertNotEqual(category('trace 810011 left the region'), 'content_blocked')
+        self.assertNotEqual(category('trace 810010 left the region'), 'invalid_request')
+
+    def test_slow_tail_is_the_five_percent_cohort_with_a_publish_cap(self):
+        rows = [{'request_id': f'r{index}', 'status': 'success',
+                 'startTime': '2026-11-10T01:00:00Z', 'request_duration_ms': index}
+                for index in range(1, 101)]
+        point = collector.aggregate_point(rows, '2026-11-10', 'provider/test', include_details=True)
+        self.assertEqual(point['slow_count'], 5)
+        self.assertEqual(point['slow_threshold_ms'], 96)
+        self.assertEqual([item['duration_ms'] for item in point['slow_requests']],
+                         [100, 99, 98, 97, 96])
+        self.assertLessEqual(len(point['slow_requests']), collector.REQUEST_DETAIL_LIMIT)
+
+    def test_details_are_pruned_but_counts_survive(self):
+        cases = {'PROD-a': {'title': 'a', 'points': [
+            {'date': '2026-11-01', 'failure_reasons': {'timeout': 1}, 'timeout_count': 1,
+             'latency_max_ms': 10, 'slow_requests': [{'request_id': 'old'}],
+             'timeout_requests': [{'request_id': 'old'}]},
+            {'date': '2026-11-09', 'failure_reasons': {}, 'timeout_count': 0,
+             'latency_max_ms': 5, 'slow_requests': [{'request_id': 'new'}],
+             'timeout_requests': []},
+        ]}}
+        collector.prune_request_details(cases, '2026-11-04')
+        old, new = cases['PROD-a']['points']
+        self.assertNotIn('slow_requests', old)
+        self.assertNotIn('timeout_requests', old)
+        self.assertEqual(old['failure_reasons'], {'timeout': 1})
+        self.assertEqual(old['timeout_count'], 1)
+        self.assertEqual(new['slow_requests'], [{'request_id': 'new'}])
+
+    def test_capped_window_is_split_until_pages_fit(self):
+        start = collector.datetime(2026, 11, 4, tzinfo=collector.timezone.utc)
+        end = start + collector.timedelta(hours=4)
+        def fetch(_, a, b):
+            if (b - a) >= collector.timedelta(hours=4):
+                raise collector.CappedWindow('capped')
+            return [{'request_id': f'{a:%H%M}-{b:%H%M}'}]
+        with patch.object(collector, 'fetch_rows_once', side_effect=fetch):
+            rows = collector.fetch_rows('dummy', start, end)
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0]['request_id'], '0000-0200')
+        self.assertEqual(rows[1]['request_id'], '0200-0400')
 
     def test_merge_history_replaces_fresh_days_and_prunes_aged_points(self):
         today = collector.datetime.now(collector.SH).date()
@@ -106,7 +369,7 @@ class CollectionTests(unittest.TestCase):
                  'startTime': f'{today_text}T00:00:00+08:00', 'completionStartTime': f'{today_text}T00:00:01+08:00',
                  'endTime': f'{today_text}T00:00:02+08:00', 'request_duration_ms': 2000,
                  'prompt_tokens': 10, 'completion_tokens': 4, 'request_id': 'fresh'}]
-        previous = {'cases': {'PROD-kept': {'title': 'kept', 'points': [{'date': yesterday, 'query_count': 1}]}}}
+        previous = {'metrics_version': collector.METRICS_VERSION, 'cases': {'PROD-kept': {'title': 'kept', 'points': [{'date': yesterday, 'query_count': 1}]}}}
         with tempfile.TemporaryDirectory() as d:
             previous_path = Path(d) / 'previous.json'
             previous_path.write_text(json.dumps(previous), encoding='utf-8')
@@ -120,6 +383,26 @@ class CollectionTests(unittest.TestCase):
             self.assertEqual([p['date'] for p in doc['cases']['PROD-kept']['points']], [yesterday])
             fresh = next(case for case_id, case in doc['cases'].items() if case_id != 'PROD-kept')
             self.assertEqual([p['date'] for p in fresh['points']], [today_text])
+
+    def test_legacy_previous_snapshot_triggers_a_full_rebuild(self):
+        today = collector.datetime.now(collector.SH).replace(hour=0, minute=0, second=0, microsecond=0)
+        expected_start = (today - collector.timedelta(days=collector.HISTORY_DAYS - 1)).astimezone(collector.timezone.utc)
+        yesterday = (today - collector.timedelta(days=1)).date().isoformat()
+        previous = {'cases': {'PROD-kept': {'title': 'kept', 'points': [{'date': yesterday, 'query_count': 1}]}}}
+        with tempfile.TemporaryDirectory() as d:
+            previous_path = Path(d) / 'previous.json'
+            previous_path.write_text(json.dumps(previous), encoding='utf-8')
+            with patch.object(collector, 'fetch_window', return_value=[]) as fetch, \
+                    patch.dict(os.environ, {'PRODUCTION_GATEWAY_KEY': 'dummy'}), \
+                    patch.object(sys, 'argv', ['collector', d, '2', str(previous_path)]), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                collector.main()
+            doc = json.loads((Path(d) / 'production-model-history.json').read_text(encoding='utf-8'))
+        self.assertEqual(fetch.call_args.args[1], expected_start)
+        self.assertNotIn('PROD-kept', doc['cases'])
+        self.assertEqual(doc['metrics_version'], collector.METRICS_VERSION)
+        self.assertEqual(doc['complete_through'], (today - collector.timedelta(days=1)).date().isoformat())
+        self.assertEqual(doc['partial_day'], today.date().isoformat())
 
     def test_missing_previous_snapshot_rebuilds_the_full_window(self):
         today = collector.datetime.now(collector.SH).replace(hour=0, minute=0, second=0, microsecond=0)

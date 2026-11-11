@@ -4,8 +4,8 @@
  * `digitalmate/e2e-performance-history@1` file published by the dashboard.
  *
  * History keeps one point per case per Asia/Shanghai calendar day. A rerun on
- * the same day replaces the point only when it finished later; `latest` always
- * keeps the newest case payload (including steps) for the detail view.
+ * Every run is kept as its own point, so a same-day rerun is added instead of
+ * replacing the earlier timing record; `latest` keeps the newest payload.
  */
 import { mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -105,10 +105,11 @@ export function mergeHistory(history, performance) {
         commit: performance.commit ?? null,
         finished_at: item.finished_at ?? null,
       };
-      const existing = entry.points.find((candidate) => candidate.date === date);
-      if (!existing) entry.points.push(point);
-      else if (timestamp(item.finished_at) >= timestamp(existing.finished_at)) Object.assign(existing, point);
-      entry.points.sort((a, b) => String(a.date).localeCompare(String(b.date)));
+      const existing = entry.points.find((candidate) => candidate.run_id === performance.run_id);
+      if (existing) Object.assign(existing, point);
+      else entry.points.push(point);
+      entry.points.sort((a, b) => String(a.date).localeCompare(String(b.date))
+        || (timestamp(a.finished_at) - timestamp(b.finished_at)));
       entry.points = entry.points.slice(-MAX_POINTS);
     }
 

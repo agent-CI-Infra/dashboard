@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GitHub 状态看板</title>
 <!-- Keep the UI bundle on one cache version so GitHub Pages cannot mix old CSS with new JS. -->
-<link rel="stylesheet" href="./style.css?v=20261105.1">
+<link rel="stylesheet" href="./style.css?v=20261105.2">
 </head>
 <body>
 <header class="topbar">
@@ -24,6 +24,7 @@
     <a href="#production-metrics" data-tab="production-metrics" hidden>现网指标统计</a>
     <a href="#client-observed" data-tab="client-observed" hidden>端侧观测</a>
     <a href="#test-matrix" data-tab="test-matrix" hidden>用例矩阵</a>
+    <a href="#bench" data-tab="bench" hidden>Bench</a>
   </nav>
   <div class="topbar-status">
     <div class="meta"><span>快照更新于</span><time id="meta">载入中…</time></div>
@@ -44,13 +45,14 @@
   <section id="tab-production-metrics" class="tab"><iframe title="现网指标统计" src="about:blank" style="width:100%;height:1800px;border:0"></iframe></section>
   <section id="tab-client-observed" class="tab"><iframe title="端侧观测" src="about:blank" style="width:100%;height:1800px;border:0"></iframe></section>
   <section id="tab-test-matrix" class="tab"><iframe title="用例矩阵" src="about:blank" style="width:100%;height:1800px;border:0"></iframe></section>
+  <section id="tab-bench" class="tab"><iframe title="Bench" src="about:blank" style="width:100%;height:1800px;border:0"></iframe></section>
 </main>
 
 
 <aside id="drawer" class="drawer hidden" aria-label="卡片详情"></aside>
 <dialog id="board-settings" class="settings"></dialog>
 <div id="tooltip" class="tooltip hidden"></div>
-<script src="./board-local.js?v=20261105.1"></script><script src="./app.js?v=20261105.1"></script>
+<script src="./board-local.js?v=20261105.2"></script><script src="./app.js?v=20261111.2"></script>
 <script src="./board.js?v=20261105.1"></script>
 <script src="./gitcode-sync.js?v=20261105.1"></script>
 </body>

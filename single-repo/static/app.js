@@ -52,7 +52,7 @@
   const loadViews = () => { try { return { issues: 'table', prs: 'table', ...JSON.parse(localStorage.getItem(VIEW_KEY) || '{}') }; } catch (e) { return { issues: 'table', prs: 'table' }; } };
   const loadLine = () => { try { return localStorage.getItem(LINE_KEY); } catch (e) { return null; } };
   const loadCovSort = () => { try { return localStorage.getItem(COV_SORT_KEY) === 'lines' ? 'lines' : 'name'; } catch (e) { return 'name'; } };
-  const STATE = { snap: null, status: null, tab: 'overview', views: loadViews(), line: loadLine(), covOpen: new Set(), covSort: loadCovSort(), sort: {}, filters: { issueQ: '', issueLabel: '', issueAssignee: '', runBranch: '' }, ageFilter: { issues: null, prs: null }, coverageWeekOffset: 0, e2e: null, e2eSteps: {}, e2eFilter: { status: '', q: '' }, e2eLoading: new Set(), e2eErrors: new Set(), e2eCollapsed: new Set(), performance: null, perfCase: null, pollTimer: null };
+  const STATE = { snap: null, status: null, tab: 'overview', views: loadViews(), line: loadLine(), covOpen: new Set(), covSort: loadCovSort(), sort: {}, filters: { issueQ: '', issueLabel: '', issueAssignee: '', runBranch: '' }, ageFilter: { issues: null, prs: null }, coverageWeekOffset: 0, e2e: null, nightlyRuns: [], e2eSteps: {}, e2eFilter: { status: '', q: '' }, e2eLoading: new Set(), e2eErrors: new Set(), e2eCollapsed: new Set(), performance: null, perfCase: null, pollTimer: null };
   const returnParams = new URLSearchParams(location.search);
   const returnFocus = { line: returnParams.get('returnLine'), caseName: returnParams.get('returnCase'), pending: !!returnParams.get('returnCase'),
     e2eKey: returnParams.get('returnE2E'), e2ePending: !!returnParams.get('returnE2E') };
@@ -1116,6 +1116,11 @@
     return html;
   }
   const e2eRecordsSection = () => `<div id="e2e-records">${e2eHistoryContent()}</div>`;
+  function nightlyCollectionEntry() {
+    if (String(STATE.snap?.repo || '').toLowerCase() !== 'openjiuwen-ai/digitalmate') return '';
+    const options = STATE.nightlyRuns.map((run) => `<option value="${esc(run.id)}">${esc(`#${run.run_number} · ${run.event} · ${shortDateTime(run.created_at)} · ${run.conclusion} · run ${run.id}`)}</option>`).join('');
+    return `<section class="card" aria-label="手动采集 Nightly 数据"><h3>手动采集 Nightly 数据</h3><p class="muted">选择已完成的 Nightly，使用同一个 run ID 更新 E2E 性能、Bench 和 ST / 测试矩阵。</p><div class="filters"><label for="nightly-run-id">Nightly</label><select id="nightly-run-id" aria-label="选择已完成的 Nightly run">${options || '<option value="">暂无已发布的 Nightly 列表</option>'}</select><label for="nightly-run-id-manual">或输入 run ID</label><input id="nightly-run-id-manual" inputmode="numeric" placeholder="如 42919555343"><button class="btn" type="button" data-nightly-collect>复制 run ID</button><a class="btn primary" href="https://github.com/agent-dashboard-ai/Agent-Dashboard/actions/workflows/collect-digitalmate-nightly.yml" target="_blank" rel="noopener">打开统一采集</a></div><p class="small-note">GitHub Actions 不支持从链接预填 workflow 输入。复制后在统一采集页粘贴 run ID 并运行；需要 Agent-Dashboard 的 Actions 写权限。</p><p class="muted" data-nightly-collect-status role="status"></p></section>`;
+  }
   function renderE2EHistory() {
     const box = $('#e2e-records');
     if (!box) return;
@@ -1352,51 +1357,67 @@
     const cases = history?.cases && typeof history.cases === 'object' ? Object.values(history.cases) : [];
     if (!cases.length) return '';
     cases.sort((a, b) => String(b.latest?.finished_at || '').localeCompare(String(a.latest?.finished_at || '')) || String(a.id).localeCompare(String(b.id)));
-    if (!STATE.perfCase || !history.cases[STATE.perfCase]) {
-      STATE.perfCase = history.cases['DM-WF-BACK-01'] ? 'DM-WF-BACK-01' : cases[0].id;
+    // `history.cases` accumulates every case id ever seen: withdrawn cases keep
+    // a frozen status and inflate the denominator forever. Report the run that
+    // produced most of the current points instead of the whole history.
+    const runCounts = new Map();
+    for (const item of cases) {
+      const runId = item.latest?.run_id;
+      if (!runId) continue;
+      const entry = runCounts.get(runId) || { runId, count: 0, at: '' };
+      entry.count += 1;
+      const at = String(item.latest?.finished_at || '');
+      if (at > entry.at) entry.at = at;
+      runCounts.set(runId, entry);
     }
-    const selected = history.cases[STATE.perfCase] || cases[0];
+    const currentRun = [...runCounts.values()].sort((a, b) => b.count - a.count || b.at.localeCompare(a.at))[0] || null;
+    const scoped = currentRun ? cases.filter((item) => item.latest?.run_id === currentRun.runId) : cases;
+    const scopedIds = new Set(scoped.map((item) => item.id));
+    if (!STATE.perfCase || !scopedIds.has(STATE.perfCase)) {
+      STATE.perfCase = scopedIds.has('DM-WF-BACK-01') ? 'DM-WF-BACK-01' : scoped[0].id;
+    }
+    const selected = history.cases[STATE.perfCase] || scoped[0];
     const latest = selected.latest || {};
-    const points = (Array.isArray(selected.points) ? selected.points : []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)));
-    const statuses = cases.map((c) => c.latest?.status);
+    const points = (Array.isArray(selected.points) ? selected.points : []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)) || ((Date.parse(a.finished_at) || 0) - (Date.parse(b.finished_at) || 0)));
+    const statuses = scoped.map((c) => c.latest?.status);
     const completed = statuses.filter((s) => String(s).toUpperCase() === 'COMPLETED').length;
     const blocked = statuses.filter((s) => String(s).toUpperCase() === 'BLOCKED').length;
     const failed = statuses.filter((s) => ['FAILED', 'ERROR'].includes(String(s).toUpperCase())).length;
-    const latestQueries = cases.map((c) => c.latest?.query_ms).filter((v) => v != null);
+    const latestQueries = scoped.map((c) => c.latest?.query_ms).filter((v) => v != null);
     const avgQuery = latestQueries.length ? Math.round(latestQueries.reduce((sum, value) => sum + value, 0) / latestQueries.length) : null;
     const values = points.map((p) => p.query_ms).filter((v) => v != null).sort((a, b) => a - b);
     const median = values.length ? (values.length % 2 ? values[(values.length - 1) / 2] : Math.round((values[values.length / 2 - 1] + values[values.length / 2]) / 2)) : null;
     const [selectedLabel, selectedTone] = perfStatus(latest.status);
-    const activeDays = new Set(points.map((p) => p.date)).size;
+    const activeRuns = points.length;
     const queryCount = latest.query_count ?? (Array.isArray(latest.queries) ? latest.queries.length : 0);
     const title = selected.title || latest.title || selected.id;
-    const caseButtons = cases.map((c) => {
+    const caseButtons = scoped.map((c) => {
       const active = c.id === selected.id;
       return `<button type="button" class="perf-case${active ? ' active' : ''}" data-perf-case="${esc(c.id)}" aria-pressed="${active}"><span class="perf-case-top">${perfDot(c.latest?.status)}<code>${esc(c.id)}</code><span class="perf-case-dur" title="本轮 query 平均耗时">${perfMs(c.latest?.query_ms)}</span></span><span class="perf-case-title">${esc(c.title || '')}</span>${perfSparkline(c.points)}</button>`;
     }).join('');
     const updated = history.updated_at ? shortDateTime(history.updated_at) : '—';
     return `<div class="perf-section" data-perf-section>
-      ${sectionHead('Nightly 用例性能', `真机 / 模拟器 nightly · 每用例每天一个查询耗时点 · 从发出 query 到收到最后一条消息 · 同日重跑取最新 · 数据 ${esc(updated)}`)}
+      ${sectionHead('Nightly 用例性能', `真机 / 模拟器 nightly · 每用例每轮一个查询耗时点 · 从发出 query 到收到最后一条消息 · 同日重跑保留 · 数据 ${esc(updated)}${currentRun ? ` · 口径 ${esc(currentRun.runId)}（${n(scoped.length)} 个用例）` : ''}`)}
       ${tiles([
-        { label: '用例', value: n(cases.length), sub: `最新一轮 ${n(completed)} 通过` },
-        { label: '最新通过', value: `${n(completed)}<small>/ ${n(cases.length)}</small>`, sub: `${Math.round((completed / cases.length) * 100)}%`, tone: completed === cases.length ? 'good' : '' },
+        { label: '用例', value: n(scoped.length), sub: `最新一轮 ${n(completed)} 通过` },
+        { label: '最新通过', value: `${n(completed)}<small>/ ${n(scoped.length)}</small>`, sub: `${Math.round((completed / scoped.length) * 100)}%`, tone: completed === scoped.length ? 'good' : '' },
         { label: '阻塞 / 失败', value: `${n(blocked)} / ${n(failed)}`, sub: '阻塞不等于失败', tone: blocked || failed ? 'warn' : 'good' },
         { label: '最新平均查询耗时', value: perfMs(avgQuery), sub: '各用例最近一次 · 不含 E2E 等待' },
       ])}
       <div class="perf-layout">
-        <div class="card perf-list-card"><h3>用例 <span class="sub">${n(cases.length)} 个 · 点击切换</span></h3><div class="perf-list">${caseButtons}</div></div>
+        <div class="card perf-list-card"><h3>用例 <span class="sub">${n(scoped.length)} 个 · 点击切换</span></h3><div class="perf-list">${caseButtons}</div></div>
         <div class="perf-detail">
           <div class="card perf-detail-head"><div class="perf-detail-title"><div class="perf-title-row"><h3><code>${esc(selected.id)}</code></h3>${badge(selectedLabel, selectedTone)}</div><p class="perf-case-name">${esc(title)}</p><p class="muted">完成于 ${esc(shortDateTime(latest.finished_at))} · run <code>${esc(latest.run_id || '—')}</code> · commit <span class="mono">${esc((latest.commit || '').slice(0, 7) || '—')}</span> · ${esc(perfDevice(latest.device))} · E2E 总耗时 ${perfMs(latest.duration_ms)}</p></div></div>
           <div class="perf-kpis">
             <div><span>本轮平均查询</span><strong>${perfMs(latest.query_ms)}</strong></div>
             <div><span>历史中位数</span><strong>${perfMs(median)}</strong></div>
             <div><span>查询次数</span><strong>${n(queryCount)}</strong></div>
-            <div><span>记录天数</span><strong>${n(activeDays)}</strong></div>
+            <div><span>记录轮次</span><strong>${n(activeRuns)}</strong></div>
           </div>
           <div class="card perf-card"><h3>最近一次 Profiling · 查询耗时 <span class="sub">${n(queryCount)} 次查询 · 以最后一条消息到达计 · E2E ${perfMs(latest.duration_ms)}</span></h3>${perfQueries(latest)}</div>
           <div class="card perf-card"><h3>Orbit 云端 trace <span class="sub">model 耗时 · TTFT · TPOT · 上下文 tokens · 阶段</span></h3>${perfCloud(latest)}</div>
-          <div class="card perf-card"><h3>每日平均查询耗时 <span class="sub">一天一个点 · 从 query 到消息接收 · Asia/Shanghai</span></h3>${perfChart(points)}<p class="perf-note">当前 ${n(activeDays)} 个执行日；每点为当轮 query 平均耗时，仅 profiling，不含 E2E 步骤等待；缺失日期不补 0。</p></div>
-          <details class="card perf-card perf-history"><summary>执行历史 <span class="sub">${n(points.length)} 天</span></summary>${perfHistoryTable(points)}</details>
+          <div class="card perf-card"><h3>每轮平均查询耗时 <span class="sub">每轮一个点 · 从 query 到消息接收 · Asia/Shanghai</span></h3>${perfChart(points)}<p class="perf-note">当前 ${n(activeRuns)} 轮运行；每点为当轮 query 平均耗时，仅 profiling，不含 E2E 步骤等待；缺失值不补 0。</p></div>
+          <details class="card perf-card perf-history"><summary>执行历史 <span class="sub">${n(points.length)} 次</span></summary>${perfHistoryTable(points)}</details>
         </div>
       </div>
     </div>`;
@@ -1409,6 +1430,7 @@
     const tree = d.tree;
     const ut = d.executed.find((e) => e.artifact.startsWith('ut'));
     const e2e = d.executed.find((e) => e.layer === 'e2e' && !e.artifact.startsWith('real-e2e-results'));
+    html += nightlyCollectionEntry();
     html += tiles([
       { label: '测试文件（仓库树）', value: n(tree?.total), sub: tree ? `来源 ${esc(d.tree_source)}` : '文件树不可用' },
       { label: '有测试的包', value: tree ? `${d.inventory.filter((p) => p.tested).length}<small>/ ${d.inventory.length}</small>` : '—', tone: d.inventory.some((p) => !p.tested) ? 'warn' : 'good' },
@@ -1597,7 +1619,7 @@
   }
 
   // ------------------------------------------------------------ shell
-  const DIGITALMATE_TABS = { 'production-metrics': './production-metrics/index.html#models', 'client-observed': './client-observed/index.html', 'test-matrix': './test-matrix/index.html' };
+  const DIGITALMATE_TABS = { 'production-metrics': './production-metrics/index.html#models', 'client-observed': './client-observed/index.html', 'test-matrix': './test-matrix/index.html', bench: './bench/index.html' };
   const activeTab = () => {
     const requested = location.hash.slice(1);
     const known = [...document.querySelectorAll('#tabs [data-tab]')].some(tab => (!tab.hidden || (!STATE.snap && DIGITALMATE_TABS[requested])) && tab.dataset.tab === requested);
@@ -1757,6 +1779,8 @@
       STATE.clientError = null;
       // Run records are optional: a missing index only hides that section.
       STATE.e2e = await fetchJson('./data/e2e/index.json?ts='+Date.now()).catch(() => null);
+      const nightlyRuns = await fetchJson('./data/nightly-runs.json?ts='+Date.now()).catch(() => null);
+      STATE.nightlyRuns = Array.isArray(nightlyRuns) ? nightlyRuns : Array.isArray(nightlyRuns?.runs) ? nightlyRuns.runs : [];
       // Optional nightly performance history; a missing file hides the section on other boards.
       STATE.performance = await fetchJson('./data/e2e-performance/history.json?ts='+Date.now()).catch(() => null);
       STATE.e2eErrors.clear();
@@ -1801,6 +1825,27 @@
     renderE2EHistory();
   });
   document.addEventListener('click', (ev) => {
+    const collectNightly = ev.target.closest('[data-nightly-collect]');
+    if (collectNightly) {
+      const input = $('#nightly-run-id');
+      const manualRunId = $('#nightly-run-id-manual')?.value.trim();
+      const runId = manualRunId || input?.value;
+      const status = $('[data-nightly-collect-status]');
+      if (!runId) {
+        if (status) status.textContent = '先选择一个已完成的 Nightly。';
+        return;
+      }
+      if (!navigator.clipboard?.writeText) {
+        if (status) status.textContent = `请手动复制 run ID：${runId}`;
+        return;
+      }
+      navigator.clipboard.writeText(String(runId)).then(() => {
+        if (status) status.textContent = `已复制 run ID ${runId}。在统一采集页粘贴到 run_id 输入框。`;
+      }).catch(() => {
+        if (status) status.textContent = `请手动复制 run ID：${runId}`;
+      });
+      return;
+    }
     const perfCase = ev.target.closest('[data-perf-case]');
     if (perfCase) {
       STATE.perfCase = perfCase.dataset.perfCase;

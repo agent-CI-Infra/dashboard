@@ -1,0 +1,46 @@
+name: Collect DigitalMate Nightly data
+
+# Dispatches all Nightly-derived collectors with one selected source run id.
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Completed DigitalMate Nightly run id'
+        required: true
+        type: string
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: collect-digitalmate-nightly-${{ inputs.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate run id
+        env:
+          GH_TOKEN: ${{ secrets.DIGITALMATE_TOKEN }}
+          INPUT_RUN_ID: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+          run=$(gh api "repos/openJiuwen-ai/DigitalMate/actions/runs/$INPUT_RUN_ID")
+          if [ "$(jq -r .status <<<"$run")" != completed ] || [ "$(jq -r .path <<<"$run")" != .github/workflows/nightly.yml ] || [ "$(jq -r .head_branch <<<"$run")" != main ]; then
+            echo '::error::run_id must identify a completed DigitalMate Nightly run.'
+            exit 1
+          fi
+
+      - name: Dispatch snapshot, E2E, Bench, and ST collectors
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_RUN_ID: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+          gh workflow run collect-digitalmate-snapshot.yml --repo "$GITHUB_REPOSITORY" --ref main
+          for workflow in collect-digitalmate-performance.yml collect-digitalmate-bench.yml collect-digitalmate-test-matrix.yml; do
+            gh workflow run "$workflow" --repo "$GITHUB_REPOSITORY" --ref main --field "run_id=$INPUT_RUN_ID"
+            echo "Dispatched $workflow for Nightly run $INPUT_RUN_ID"
+          done

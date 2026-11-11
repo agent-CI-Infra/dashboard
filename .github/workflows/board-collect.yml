@@ -91,13 +91,14 @@ jobs:
           ref: ${{ matrix.branch }}
           path: board
 
-      # Kept as its own step so a failed run can be recognised (by name) as a
-      # missing dashboard secret rather than a bad source or token.
+      # Kept as its own step so a run skipped for a missing secret can be
+      # recognised (by name) as a setup problem rather than a bad source.
       - name: Check PRIVATE_SOURCE_TOKEN
+        id: secret
         env:
           PRIVATE_TOKEN: ${{ secrets.PRIVATE_SOURCE_TOKEN }}
         run: |
-          python3 - <<'PY'
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
           import json, os, sys
           from pathlib import Path
           try:
@@ -106,17 +107,19 @@ jobs:
               config = {}
           if str(config.get("visibility", "")).lower() == "private" and not os.environ.get("PRIVATE_TOKEN", "").strip():
               print(
-                  "::error title=PRIVATE_SOURCE_TOKEN missing::"
+                  "::warning title=PRIVATE_SOURCE_TOKEN missing::"
                   "This private board needs the dashboard repository secret PRIVATE_SOURCE_TOKEN "
-                  "(a read-only token for the private source). Add it once under Settings -> "
-                  "Secrets and variables -> Actions, then re-run this workflow.",
+                  "(a read-only token for the private source); skipping it in this run and keeping "
+                  "its published data. Add the secret under Settings -> Secrets and variables -> "
+                  "Actions to collect it again.",
                   file=sys.stderr,
               )
-              sys.exit(1)
+              print("skip=true")
           PY
 
       - name: Validate source repository
         id: source
+        if: steps.secret.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           PRIVATE_TOKEN: ${{ secrets.PRIVATE_SOURCE_TOKEN }}
@@ -140,6 +143,15 @@ jobs:
               print(f"::error::{message}", file=sys.stderr)
               raise SystemExit(1)
 
+          def skip(message):
+              # A private source that cannot be read (revoked token, deleted
+              # repository) is a temporary outage, not a reason to fail the whole
+              # matrix run: warn, keep the published data, and let the next run
+              # pick it up once access is restored.
+              print(f"::warning title=Private source unavailable::{message} Skipping this board in this run and keeping its published data.", file=sys.stderr)
+              print("skip=true", flush=True)
+              raise SystemExit(0)
+
           def read(token):
               env = dict(os.environ, GH_TOKEN=token, GITHUB_TOKEN=token)
               proc = subprocess.run(
@@ -155,10 +167,10 @@ jobs:
 
           if visibility == "private":
               if not private_token:
-                  fail(f"{source} is recorded as private and needs the dashboard repository secret PRIVATE_SOURCE_TOKEN")
+                  skip(f"{source} is recorded as private and needs the dashboard repository secret PRIVATE_SOURCE_TOKEN.")
               meta = read(private_token)
               if not meta:
-                  fail(f"PRIVATE_SOURCE_TOKEN cannot read private source {source}; check that the token is valid and has access")
+                  skip(f"PRIVATE_SOURCE_TOKEN cannot read private source {source}; check that the token is valid and has access.")
           elif visibility == "public":
               meta = read(public_token)
               if not meta:
@@ -174,10 +186,10 @@ jobs:
                   visibility = "public"
               else:
                   if not private_token:
-                      fail(f"{source} is not public and the dashboard repository secret PRIVATE_SOURCE_TOKEN is not set")
+                      skip(f"{source} is not public and the dashboard repository secret PRIVATE_SOURCE_TOKEN is not set.")
                   meta = read(private_token)
                   if not meta:
-                      fail(f"{source} is neither a public repository nor a private repository readable with PRIVATE_SOURCE_TOKEN")
+                      skip(f"{source} is neither a public repository nor a private repository readable with PRIVATE_SOURCE_TOKEN.")
                   visibility = "private"
 
           print(f"visibility={visibility}")
@@ -185,11 +197,13 @@ jobs:
           PY
 
       - name: Prepare collector
+        if: steps.secret.outputs.skip != 'true' && steps.source.outputs.skip != 'true'
         run: |
           set -euo pipefail
           cp -R code/single-repo/gsb code/single-repo/static code/single-repo/publish.py board/
 
       - name: Collect and publish
+        if: steps.secret.outputs.skip != 'true' && steps.source.outputs.skip != 'true'
         env:
           # Source reads: the private token for private boards, otherwise the
           # workflow token. Publishing always uses GSB_PUBLISH_TOKEN below.
