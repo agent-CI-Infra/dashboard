@@ -1,0 +1,13 @@
+name: Probe production Kubernetes network
+on:
+  pull_request:
+    paths:
+      - .github/workflows/probe-kube-network.yml
+permissions: {}
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Probe TCP access to the Kubernetes API
+        run: python3 -c 'import socket; s=socket.create_connection(("119.8.233.112", 5443), timeout=15); s.close(); print("Kubernetes TCP endpoint reachable")'
