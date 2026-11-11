@@ -19,6 +19,12 @@ publisher = load('kube_publisher', 'publish-local-kube-metrics.py')
 
 
 class KubeTraceTests(unittest.TestCase):
+    def test_collector_proxy_uses_the_selected_local_port(self):
+        self.assertEqual(publisher.proxy_url('47123'), 'socks5h://127.0.0.1:47123')
+        for value in ('0', '65536', 'example.org:22', '1;command', ''):
+            with self.assertRaises(ValueError):
+                publisher.proxy_url(value)
+
     def test_node_discovery_only_uses_ready_workspace_nodes(self):
         def pod(name, ready):
             return {'metadata': {'name': name}, 'status': {'conditions': [{'type': 'Ready', 'status': ready}]}}

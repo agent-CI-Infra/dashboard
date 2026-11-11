@@ -8,7 +8,11 @@ import tempfile
 
 HERE = Path(__file__).resolve().parent
 REPOSITORY = 'https://github.com/agent-CI-Infra/dashboard.git'
-PROXY = 'socks5h://127.0.0.1:18769'
+
+def proxy_url(port):
+    if not port.isascii() or not port.isdecimal() or not 1 <= int(port) <= 65535:
+        raise ValueError('invalid local collector proxy port')
+    return f'socks5h://127.0.0.1:{int(port)}'
 
 
 def validate_coverage(result):
@@ -34,8 +38,9 @@ def main():
     # Do not give the management credential to git or GitHub CLI.
     git_env = dict(os.environ)
     git_env.pop('ADX_TOKEN', None)
-    git_env.update(HTTPS_PROXY=PROXY, HTTP_PROXY=PROXY, ALL_PROXY=PROXY, NO_PROXY='')
-    git_prefix = ['git', '-c', f'http.proxy={PROXY}', '-c', 'credential.helper=',
+    proxy = proxy_url(os.environ.get('DIGITALMATE_KUBE_PROXY_PORT', '18769'))
+    git_env.update(HTTPS_PROXY=proxy, HTTP_PROXY=proxy, ALL_PROXY=proxy, NO_PROXY='')
+    git_prefix = ['git', '-c', f'http.proxy={proxy}', '-c', 'credential.helper=',
                   '-c', 'credential.helper=!gh auth git-credential']
 
     def git(*args):
