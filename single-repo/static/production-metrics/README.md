@@ -56,6 +56,8 @@ If the current binding sample is smaller than an existing latency row, latency k
 
 Cloud summary cards aggregate the selected calendar range. Means are weighted by samples or output-token intervals; tokens and event counts are summed over available days. Multi-day P50/P95 use mergeable 2%-wide histograms and are labelled approximate. If any contributing day's histogram is missing, the range percentile is unavailable rather than averaging daily percentiles. The cards state the date span, partial coverage and usage-record duplication limit.
 
+For Today, cloud charts, cards and the slow-request list use the current Shanghai calendar day. Other range choices use the model summary's latest complete-day anchor, while retaining historically incomplete cloud rows and marking them partial. This keeps the cloud and model summary windows aligned without dropping a historical day solely because one workspace was unavailable.
+
 The collector reads up to 30 calendar days of aggregate evidence available in the current workspaces, while per-request slow-trace identifiers remain limited to the most recent seven days. Older aggregate days do not expose request IDs or raw usage records.
 
 The production console default is `https://onlineswarm.openjiuwen.com:31472` (overridable with `ADX_BASE`). The inventory follows all `next_page_token` pages, and only a snapshot labelled `adx-jiuwen` may seed publication. `ADX_TOKEN` must be valid for the production console. A localhost-only diagnostic may load a separate local evidence file and never reaches GitHub Pages.

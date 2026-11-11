@@ -90,6 +90,9 @@ test('cloud range keeps partial days and uses the current calendar window', () =
   const rows=[{date:'2026-11-04',partial:false},{date:'2026-11-10',partial:true},{date:'2026-11-11',partial:true}];
   assert.deepEqual(Array.from(c.scope(rows,7,'2026-11-11'),r=>r.date),['2026-11-10','2026-11-11']);
   assert.deepEqual(Array.from(c.scope(rows,1,'2026-11-11'),r=>r.date),['2026-11-11']);
+  assert.deepEqual(Array.from(c.scope(rows,7,'2026-11-11','2026-11-10'),r=>r.date),['2026-11-04','2026-11-10']);
+  assert.deepEqual(Array.from(c.scope(rows,1,'2026-11-11','2026-11-10'),r=>r.date),['2026-11-11']);
+  assert.deepEqual(Array.from(c.scope(rows,0,'2026-11-11','2026-11-10'),r=>r.date),['2026-11-04','2026-11-10']);
 });
 
 test('today selection contains only that day and never falls back to yesterday', () => {

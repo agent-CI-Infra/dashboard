@@ -3637,7 +3637,7 @@ function renderRequestTraces(doc) {
   const publishedTraces = doc?.cloud_trace_collection;
   const traceCollection = state.localCloudTraces || (publishedTraces?.schema === 'digitalmate/cloud-traces@1' ? publishedTraces : null);
   const localDays = traceCollection?.days;
-  const source = Array.isArray(localDays) ? {...traceCollection, days: inRange(localDays, state.rangeDays, todayShanghai())} : doc;
+  const source = Array.isArray(localDays) ? {...traceCollection, days: cloudScopedDays(localDays, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history))} : doc;
   const candidates = availableTraceCandidates(source, state.localTrace);
   const cloudCount = candidates.filter((item) => item.scope === 'cloud').length;
   state.traceCandidates = candidates;
@@ -3805,8 +3805,10 @@ function newestEnvDaily(candidates) {
 // The cloud-side section answers to the same range control as the model side:
 // the tiles pick their anchor day and every chart is drawn from the rows of the
 // selected trailing window, so both halves of the page describe one period.
-function cloudScopedDays(days, rangeDays, today) {
-  return inRange(days, rangeDays, today);
+function cloudScopedDays(days, rangeDays, today, completeThrough = null) {
+  const end = rangeDays === 1 ? today : (completeThrough || today);
+  const eligible = (Array.isArray(days) ? days : []).filter((row) => row?.date <= end);
+  return inRange(eligible, rangeDays, end);
 }
 
 function renderEnv() {
@@ -3819,8 +3821,9 @@ function renderEnv() {
     return;
   }
   const all = Array.isArray(daily.days) ? daily.days.filter((row) => row && row.date) : [];
-  // Show partial days too, anchored to the calendar instead of stale data.
-  const scoped = { ...daily, days: cloudScopedDays(all, state.rangeDays, todayShanghai()) };
+  // Match the model summary's completed-day anchor; Today still shows today.
+  // Historical rows with incomplete coverage remain visible and labelled.
+  const scoped = { ...daily, days: cloudScopedDays(all, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history)) };
   renderRequestTraces(scoped);
   const latestObserved = scoped.days.at(-1)?.observed_at;
   const snapshotTime = daily.generated_at || daily.updated_at;
