@@ -11,6 +11,16 @@ collector = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(collector)
 
 class ProductionTraceTests(unittest.TestCase):
+    def test_daily_metrics_use_every_finished_request_without_leaking_ids(self):
+        rows = [(0, {}, {'gateway': 100.0, 'first_token': 20.0, 'request_id': 'secret-id'}),
+                (1, {}, {'gateway': 300.0, 'first_token': 40.0, 'request_id': 'other-id'})]
+        day = collector.request_daily_metrics(rows, '2026-11-10', '2026-11-11T01:00:00Z', True)
+        self.assertEqual(day['gateway'], {'n': 2, 'mean': 200.0, 'p50': 100.0, 'p95': 300.0})
+        self.assertEqual(day['first_token']['mean'], 30.0)
+        self.assertEqual(day['answer_first'], {'n': 0})
+        self.assertTrue(day['partial'])
+        self.assertNotIn('secret-id', json.dumps(day))
+
     def test_log_parser_pairs_same_request_and_limits_fields(self):
         now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
         start = now - dt.timedelta(seconds=10)

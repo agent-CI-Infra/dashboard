@@ -11,6 +11,16 @@ test('Shanghai calendar uses local day at the UTC day boundary', () => {
   assert.equal(c.today(new Date('2026-11-09T16:01:00Z')), '2026-11-10');
 });
 
+test('cloud range keeps partial days and uses the current calendar window', () => {
+  const c=vm.createContext({});
+  vm.runInContext(extract('function addDays(date, days)', 'function weekSeries(days)')+
+    extract('function inRange(days, rangeDays, endDate = null)', 'function latestModelDate(history)')+
+    extract('function cloudScopedDays(', 'function renderEnv()')+';globalThis.scope=cloudScopedDays;',c);
+  const rows=[{date:'2026-11-04',partial:false},{date:'2026-11-10',partial:true},{date:'2026-11-11',partial:true}];
+  assert.deepEqual(Array.from(c.scope(rows,7,'2026-11-11'),r=>r.date),['2026-11-10','2026-11-11']);
+  assert.deepEqual(Array.from(c.scope(rows,1,'2026-11-11'),r=>r.date),['2026-11-11']);
+});
+
 test('today selection contains only that day and never falls back to yesterday', () => {
   const c=vm.createContext({});
   vm.runInContext(`const state={history:{},model:'m',rangeDays:1}; const todayShanghai=()=> '2026-11-10';
