@@ -5,6 +5,16 @@ import vm from 'node:vm';
 const code = readFileSync(new URL('../single-repo/static/production-metrics/app.js', import.meta.url), 'utf8');
 function extract(a,b) { const x=code.indexOf(a), y=code.indexOf(b,x); assert(x>=0 && y>x); return code.slice(x,y); }
 
+test('cloud model events and stream exception rates keep separate semantics', () => {
+  const c=vm.createContext({});
+  vm.runInContext(extract('function envCallSeries(', 'function envCallTrend(')+';globalThis.series=envCallSeries;',c);
+  const rows=[{calls:{total:7},failure_rate:0.7}, {model_usage_events:5,gateway_stream:{exception_rate:0}},
+              {model_usage_events:2,gateway_stream:{exception_rate:null}}];
+  const result=c.series(rows);
+  assert.deepEqual(Array.from(result.calls),[7,5,2]);
+  assert.deepEqual(Array.from(result.rates),[null,0,null]);
+});
+
 test('cloud trace source identifies Kubernetes when present', () => {
   const c=vm.createContext({});
   vm.runInContext(extract('function cloudCollectionLabel(', 'function renderRequestTraces(')+';globalThis.label=cloudCollectionLabel;', c);
