@@ -310,6 +310,50 @@ def attach_tool_events(query, rows):
     return not truncated
 
 
+def attach_answer_estimates(query, rows):
+    """Use proven history segment-start timestamps as explicitly labelled estimates."""
+    by_id = {row['request_id']: row for row in rows}
+    if not by_id:
+        return True
+    files = listing(query, 'workswarm/.jiuwenswarm/agent/sessions')
+    dirs = sorted((entry for entry in files if entry.get('type') == 'directory'
+                   and NAME.fullmatch(entry.get('name', ''))
+                   and not entry['name'].startswith(('health_check_', '.'))),
+                  key=lambda entry: str(entry.get('modified_at') or ''), reverse=True)
+    complete = len(dirs) <= MAX_SESSIONS
+    for directory in dirs[:MAX_SESSIONS]:
+        path = 'workswarm/.jiuwenswarm/agent/sessions/' + directory['name'] + '/history.jsonl'
+        try:
+            data = fetch('/api/workspace-files', {**query, 'path': path, 'action': 'download'}, download=True)
+        except (urllib.error.HTTPError, ValueError, TimeoutError, OSError):
+            complete = False
+            continue
+        for line in data.splitlines():
+            try:
+                event = json.loads(line)
+            except (ValueError, TypeError):
+                continue
+            if not isinstance(event, dict) or event.get('event_type') != 'chat.final':
+                continue
+            rid = event.get('request_id')
+            row = by_id.get(rid) if isinstance(rid, str) else None
+            timestamp, completed = event.get('timestamp'), event.get('completed_at')
+            if not row or not isinstance(event.get('content'), str) or not event['content'].strip():
+                continue
+            if (isinstance(timestamp, bool) or isinstance(completed, bool)
+                    or not isinstance(timestamp, (int, float)) or not isinstance(completed, (int, float))
+                    or not math.isfinite(timestamp) or not math.isfinite(completed) or completed <= timestamp):
+                continue
+            start = dt.datetime.fromisoformat(row['start_time']).timestamp()
+            offset = (timestamp - start) * 1000
+            if not 0 <= offset <= row['gateway']:
+                continue
+            old = row.get('answer_first_history_ms')
+            if old is None or offset < old:
+                row['answer_first_history_ms'] = round(offset, 1)
+    return complete
+
+
 def request_daily_metrics(records, date, generated_at, incomplete, usage=None):
     """Summarize the same finished requests used for the slow-request ranking."""
     def summary(field):
@@ -354,7 +398,8 @@ def request_daily_metrics(records, date, generated_at, incomplete, usage=None):
                                'cancelled': statuses['cancelled'], 'unknown': statuses['unknown'],
                                'observed': observed, 'population': len(records),
                                'exception_rate': statuses['exception'] / observed if observed else None},
-            **{key: summary(key) for key in ('gateway', 'first_token', 'answer_first', 'react')}}
+            **{key: summary(key) for key in ('gateway', 'first_token', 'answer_first', 'react')},
+            'answer_first_history': summary('answer_first_history_ms')}
 
 
 def collect():
@@ -386,6 +431,12 @@ def collect():
                 print(f'bindings {count}/{len(items)}; logs read {len(snapshots)}; unavailable {sum(problems.values())}', flush=True)
     if not snapshots:
         raise SystemExit('no production logs could be read; retain previous snapshot')
+    answer_coverage = collections.Counter()
+    for _, query, rows in snapshots:
+        try:
+            answer_coverage['complete' if attach_answer_estimates(query, rows) else 'partial'] += 1
+        except (OSError, ValueError, KeyError, TypeError, urllib.error.HTTPError):
+            answer_coverage['partial'] += 1
     grouped = {}
     for idx, query, rows in snapshots:
         for row in rows:
@@ -420,6 +471,8 @@ def collect():
               'request_daily_metrics':daily_metrics,
               'binding_count':len(items),'read_log_count':len(snapshots),'errors':problems,
               'detail_workspaces_complete':details_ok,'detail_workspaces_partial':details_failed,
+              'answer_workspaces_complete':answer_coverage['complete'],
+              'answer_workspaces_partial':answer_coverage['partial'],
               'trace_request_limit':MAX_TRACE_REQUESTS,'days':days}
     print('output: days',len(days),'slow requests',sum(len(d['anomaly']['latency']['slow_requests']) for d in days),
           'requests with tool events',sum(bool(row.get('tool_events')) for d in days for row in d['anomaly']['latency']['slow_requests']),flush=True)

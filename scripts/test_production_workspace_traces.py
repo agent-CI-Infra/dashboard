@@ -132,6 +132,38 @@ class ProductionTraceTests(unittest.TestCase):
         self.assertNotIn('PRIVATE_',json.dumps(row))
         self.assertFalse(row['trace_complete'])
 
+    def test_answer_history_estimate_requires_segment_start_and_matching_request(self):
+        start = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+        row = {'request_id': 'digitalmate-a', 'gateway': 10000, 'first_token': 1000,
+               'start_time': start.isoformat()}
+        records = [
+            {'request_id': 'digitalmate-a', 'event_type': 'chat.final', 'timestamp': start.timestamp() + 4,
+             'completed_at': start.timestamp() + 8, 'content': 'PRIVATE ANSWER'},
+            {'request_id': 'digitalmate-a', 'event_type': 'chat.final', 'timestamp': start.timestamp() + 2,
+             'content': 'PRIVATE WITHOUT COMPLETION'},
+            {'request_id': 'digitalmate-other', 'event_type': 'chat.final', 'timestamp': start.timestamp() + 1,
+             'completed_at': start.timestamp() + 9, 'content': 'PRIVATE OTHER'},
+        ]
+        with patch.object(collector, 'listing', return_value=[{'type': 'directory', 'name': 'session'}]), \
+             patch.object(collector, 'fetch', return_value='\n'.join(map(json.dumps, records))):
+            self.assertTrue(collector.attach_answer_estimates({}, [row]))
+        self.assertEqual(row['answer_first_history_ms'], 4000)
+        self.assertNotIn('answer_first', row)
+        self.assertNotIn('react', row)
+        self.assertNotIn('PRIVATE', json.dumps(row))
+
+    def test_direct_answer_wins_over_history_estimate(self):
+        start = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+        row = {'request_id': 'digitalmate-a', 'gateway': 10000, 'first_token': 1000,
+               'answer_first': 2500, 'start_time': start.isoformat()}
+        record = {'request_id': 'digitalmate-a', 'event_type': 'chat.final',
+                  'timestamp': start.timestamp() + 4, 'completed_at': start.timestamp() + 8, 'content': 'secret'}
+        with patch.object(collector, 'listing', return_value=[{'type': 'directory', 'name': 'session'}]), \
+             patch.object(collector, 'fetch', return_value=json.dumps(record)):
+            collector.attach_answer_estimates({}, [row])
+        self.assertEqual(row['answer_first'], 2500)
+        self.assertEqual(row['answer_first_history_ms'], 4000)
+
     def test_history_does_not_pair_across_sessions_or_duplicate_starts(self):
         start = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
         row = {'request_id': 'digitalmate-a', 'gateway': 10000, 'start_time': start.isoformat()}

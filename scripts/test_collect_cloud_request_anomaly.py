@@ -50,6 +50,7 @@ class TraceCollectionTests(unittest.TestCase):
         old = {'date': '2026-11-10', 'n': 354, 'gateway': {'mean': 100}, 'observed_at': 'old'}
         fresh = {'date': '2026-11-10', 'n': 306, 'model_usage_events': 1454,
                  'gateway_stream': {'observed': 298, 'population': 306, 'exception_rate': 0},
+                 'gateway': {'n': 306, 'mean': 90, 'histogram': [[0, 306]]},
                  'tokens': {'input': 1200, 'output': 150, 'total': 1350},
                  'tpot': {'n': 2, 'tokens': 5, 'mean': 3.0},
                  'observed_at': 'new'}
@@ -61,6 +62,8 @@ class TraceCollectionTests(unittest.TestCase):
         self.assertEqual(result['observed_at'], 'old')
         self.assertEqual(result['model_usage_events'], 1454)
         self.assertEqual(result['gateway_stream']['population'], 306)
+        self.assertEqual(result['current_request_metrics']['n'], 306)
+        self.assertEqual(result['current_request_metrics']['gateway']['n'], 306)
         self.assertEqual(result['tokens']['total'], 1350)
         self.assertEqual(result['tpot']['mean'], 3.0)
         self.assertEqual(result['telemetry_observed_at'], 'new')

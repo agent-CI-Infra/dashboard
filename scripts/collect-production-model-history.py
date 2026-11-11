@@ -561,6 +561,7 @@ def aggregate_point(day_rows, date, physical, partial_day=None, include_details=
         'duration_p50_ms': percentile(durations, 0.50, P50_MIN_SAMPLES),
         'duration_p95_ms': percentile(durations, 0.95, P95_MIN_SAMPLES),
         'duration_sample_count': len(durations),
+        'duration_histogram': metric_histogram(durations),
         'input_tokens': prompt,
         'output_tokens': completion_tokens,
         'total_tokens': total,
@@ -581,6 +582,7 @@ def aggregate_point(day_rows, date, physical, partial_day=None, include_details=
         'duration_sample_count': len(durations),
         'duration_p50_ms': percentile(durations, 0.50, P50_MIN_SAMPLES),
         'duration_p95_ms': percentile(durations, 0.95, P95_MIN_SAMPLES),
+        'duration_histogram': metric_histogram(durations),
         'success_count': len(success_rows),
         'query_count': len(day_rows),
         'run_id': RUN_ID,
@@ -625,6 +627,10 @@ def main():
         # Nothing to merge into: rebuild the full window rather than publish a
         # history that only covers the freshly fetched days.
         days = HISTORY_DAYS
+    if previous is not None and not previous.get('duration_hist_backfill_done'):
+        # Backfill the recent model groups once so same-model percentiles can
+        # be pooled instead of disappearing when logical model groups overlap.
+        days = max(days, 7)
 
     end = datetime.now(timezone.utc).replace(microsecond=0)
     today = end.astimezone(SH).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -684,6 +690,7 @@ def main():
     doc = {
         'schema': SCHEMA,
         'metrics_version': METRICS_VERSION,
+        'duration_hist_backfill_done': True,
         'generated_at': generated,
         'updated_at': generated,
         'window_start': history_start.astimezone(timezone.utc).isoformat(),
