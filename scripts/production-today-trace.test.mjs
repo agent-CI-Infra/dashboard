@@ -5,6 +5,22 @@ import vm from 'node:vm';
 const code = readFileSync(new URL('../single-repo/static/production-metrics/app.js', import.meta.url), 'utf8');
 function extract(a,b) { const x=code.indexOf(a), y=code.indexOf(b,x); assert(x>=0 && y>x); return code.slice(x,y); }
 
+test('older incomplete distributions use a labelled current sample, without losing other metrics', () => {
+  const c=vm.createContext({});
+  vm.runInContext(extract('function mergeMetricHistogram(', '// Each bucket covers')+
+    extract('function cloudDisplayRow(', 'function cloudScopedDays(')+';globalThis.display=cloudDisplayRow;',c);
+  const current={n:30, gateway:{n:30,histogram:[[0,30]]},first_token:{n:25,histogram:[[0,25]]},
+    answer_first_combined:{n:22,mean:10},answer_first_history_count:21};
+  const row={date:'2026-11-08',n:100,gateway:{n:100},first_token:{n:90},tokens:{total:200},current_request_metrics:current};
+  const out=c.display(row);
+  assert.equal(out.n,30); assert.equal(out.gateway.n,30); assert.equal(out.date,row.date);
+  assert.equal(out.partial,true); assert.equal(out.current_sample_used,true);
+  assert.equal(out.tokens.total,200); assert.equal(out.answer_first.n,22); assert.equal(row.n,100);
+  const unsafe=c.display({...row,current_request_metrics:{...current,first_token:{n:0}}});
+  assert.equal(unsafe.n,100); assert.equal(unsafe.first_token.n,90);
+  assert.equal(unsafe.answer_first.n,22); assert.equal(unsafe.answer_first_history_count,21);
+});
+
 test('cloud cards aggregate the selected days using sample and token weights', () => {
   const c=vm.createContext({});
   vm.runInContext(extract('function mergeMetricHistogram(', '// Each bucket covers')+

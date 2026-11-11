@@ -118,6 +118,14 @@ class CollectionTests(unittest.TestCase):
         self.assertEqual(hist[0], (-1001, 1))
         self.assertEqual(sum(count for _, count in hist), 3)
 
+    def test_model_duration_histograms_cover_the_measured_successes(self):
+        rows = [{'status': 'success', 'request_duration_ms': value} for value in [0, 1000, 2000]]
+        rows.append({'status': 'failed', 'request_duration_ms': 5000})
+        point = collector.aggregate_point(rows, '2026-11-03', 'model')
+        for metric in [point, point['benchmark_models'][0]]:
+            self.assertEqual(metric['duration_sample_count'], 3)
+            self.assertEqual(sum(count for _, count in metric['duration_histogram']), 3)
+
     def test_unknown_status_cannot_be_counted_as_passed(self):
         point = collector.aggregate_point([{'status': 'unknown'}], '2026-11-03', 'model')
         self.assertEqual(point['status'], 'UNKNOWN')

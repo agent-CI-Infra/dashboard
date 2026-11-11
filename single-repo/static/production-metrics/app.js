@@ -875,7 +875,7 @@ function envAnswerFirstTrend(doc) {
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.answer_first?.n, note: '个请求' }),
-    note: '云侧 Agent 请求口径（每个请求一条记录）：答案首吐字时间 = 网关受理请求 → 首个答案文本 chunk（chat.delta），不把状态、思考（chat.reasoning）与工具事件的 chunk 算作答案。它总是 ≥ 首吐字时间，两者之差即下方 ReAct 阶段。网关日志记录每条流的开头 chunk 和每种事件类型的第一个 chunk（旧版本网关只记录前 3 个），日志里没有答案文本 chunk 的请求不计入，样本数会小于请求数；P50/P95 为请求级最近排名分位；* 为部分日，缺失值留空不补 0。',
+    note: '优先使用网关记录的首个答案 chunk；网关未记录时，可用 Agent 历史中带明确收尾时间的回答段起始时间推算。推算值不是网关转发时间，部分对话可能缺失；不把缺失值补 0，* 为部分日。',
   });
 }
 
@@ -888,7 +888,7 @@ function envReactTrend(doc) {
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.react?.n, note: '个请求' }),
-    note: '云侧 Agent 请求口径（每个请求一条记录）：ReAct 阶段 = 首个文本 chunk（开始思考）→ 首个答案文本 chunk，即 Agent 在给出答案前的思考与工具调用耗时，不含网关受理、路由与 Agent 唤醒；回复一开始就是答案时记为 0。它不按模型调用计时，与下方模型调用 TTFT 的样本口径不同。网关日志记录每条流的开头 chunk 和每种事件类型的第一个 chunk（旧版本网关只记录前 3 个），两个端点都出现才计入；P50/P95 为请求级最近排名分位；* 为部分日，缺失值留空不补 0。',
+    note: '首个网关文本至首个回答段的时间差；部分回答段起点来自 Agent 历史记录推算，并非精确网关转发时间。仅在两个时间点可信且顺序有效时统计；缺失值不补 0。',
   });
 }
 
@@ -994,6 +994,8 @@ function summarizeCloudWindow(rows) {
   const result = { date: rows[rows.length - 1].date, partial: rows.some((row) => row.partial),
     telemetry_partial: rows.some((row) => row.telemetry_partial), window_days: rows.length,
     window_start: rows[0].date, window_end: rows[rows.length - 1].date };
+  result.current_sample_days = rows.filter((row) => row.current_sample_used).length;
+  result.answer_first_history_count = rows.reduce((sum, row) => sum + (Number.isFinite(row.answer_first_history_count) ? row.answer_first_history_count : 0), 0);
   for (const key of ['gateway', 'first_token', 'answer_first', 'react', 'tool', 'tpot', 'uplink_send', 'downlink_first_text', 'downlink_terminal']) {
     result[key] = aggregateCloudMetric(rows, key);
   }
@@ -1067,9 +1069,12 @@ function envSummary(doc) {
       <div class="stat-hint">${count} · 覆盖 ${fmtCount(anchor[key]?.days)} / ${fmtCount(anchor.window_days)} 天 · ${hint}</div>
     </div>`;
   };
+  const answerHint = anchor.answer_first_history_count
+    ? `网关受理 → 首个回答段 · ${fmtCount(anchor.answer_first_history_count)} 条由 Agent 历史时间推算`
+    : '网关受理 → 首个答案 chunk';
   const firstTile = requestTile('first_token', '首吐字', '网关受理 → 首个文本 chunk');
-  const answerTile = requestTile('answer_first', '答案首吐字', '网关受理 → 首个答案 chunk');
-  const reactTile = requestTile('react', 'ReAct 阶段', '首个文本 chunk → 答案首吐字 · 思考 + 工具');
+  const answerTile = requestTile('answer_first', '答案首吐字', answerHint);
+  const reactTile = requestTile('react', 'ReAct 阶段', anchor.answer_first_history_count ? '含 Agent 历史推算 · 思考 + 工具' : '首个文本 chunk → 答案首吐字 · 思考 + 工具');
   const toolCount = Number.isFinite(anchor.tool?.n) ? anchor.tool.n : 0;
   const toolHint = toolCount > 0
     ? `${fmtCount(toolCount)} 次工具调用 · tool_call → tool_result`
@@ -1097,7 +1102,7 @@ function envSummary(doc) {
       <div class="stat-hint">${availability}</div>
     </div>`;
   };
-  const rangeNote = `云侧卡片汇总 ${esc(anchor.window_start)} 至 ${esc(anchor.window_end)}（${fmtCount(anchor.window_days)} 个有数据的日期）${anchor.partial ? ' · 含部分覆盖' : ''}。均值按样本数或输出 Token 加权；多日分位数仅在可合并分布完整时显示，≈ 表示近似。`;
+  const rangeNote = `云侧卡片汇总 ${esc(anchor.window_start)} 至 ${esc(anchor.window_end)}（${fmtCount(anchor.window_days)} 个有数据的日期）${anchor.partial ? ' · 含部分覆盖' : ''}${anchor.current_sample_days ? ` · ${fmtCount(anchor.current_sample_days)} 天使用当前可读日志样本` : ''}。均值按样本数或输出 Token 加权；多日分位数仅在可合并分布完整时显示，≈ 表示近似。`;
   return `<p class="data-freshness">${rangeNote}</p><section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>${countLabel}</strong> / <strong>${rateLabel}</strong></div>
@@ -1473,7 +1478,7 @@ function fmtSecondsRangeBare(row, key) {
   const upper = row?.[`${key}_ms`];
   if (!Number.isFinite(upper)) return '—';
   const lower = Number.isFinite(row?.[`${key}_lower_ms`]) ? row[`${key}_lower_ms`] : upper;
-  return lower === upper ? fmtSecondsBare(upper) : `${fmtSecondsBare(lower)} – ${fmtSecondsBare(upper)}`;
+  return lower === upper ? `${row?.duration_percentiles_approx ? '≈' : ''}${fmtSecondsBare(upper)}` : `${fmtSecondsBare(lower)} – ${fmtSecondsBare(upper)}`;
 }
 
 function fmtTpotBare(value) {
@@ -1716,6 +1721,9 @@ function newMetricAccumulator() {
     success: 0,
     duration_sum: 0,
     duration_samples: 0,
+    duration_histogram: new Map(),
+    duration_histogram_complete: true,
+    duration_groups: 0,
     ttft_sum: 0,
     ttft_samples: 0,
     ttft_est_sum: 0,
@@ -1773,6 +1781,10 @@ function mergeMetricRow(acc, row) {
   if (durationSum !== null && durationSamples > 0) {
     acc.duration_sum += durationSum;
     acc.duration_samples += durationSamples;
+    acc.duration_groups += positive(row?.duration_groups) || 1;
+    if (!mergeMetricHistogram(acc.duration_histogram, row?.duration_histogram, durationSamples)) {
+      acc.duration_histogram_complete = false;
+    }
   }
 
   for (const key of ['ttft', 'ttft_est']) {
@@ -1862,11 +1874,17 @@ function tpotPercentile(histogram, samples, complete, percentile) {
 }
 
 function finalizeMetricAccumulator(acc) {
+  const pooledDuration = acc.duration_groups > 1 && acc.duration_histogram_complete;
+  const pooledP50 = tpotPercentile(acc.duration_histogram, acc.duration_samples, pooledDuration, .5);
+  const pooledP95 = tpotPercentile(acc.duration_histogram, acc.duration_samples, pooledDuration, .95);
   const result = {
     calls: acc.calls,
     queries: acc.queries,
     success_count: acc.success,
     duration_samples: acc.duration_samples,
+    duration_groups: acc.duration_groups,
+    duration_histogram: acc.duration_histogram_complete ? [...acc.duration_histogram.entries()] : null,
+    duration_percentiles_approx: pooledP50 !== null && pooledP95 !== null,
     duration_ms: acc.duration_samples > 0 ? acc.duration_sum / acc.duration_samples : null,
     ttft_ms: acc.ttft_samples > 0 ? acc.ttft_sum / acc.ttft_samples : null,
     ttft_samples: acc.ttft_samples,
@@ -1891,10 +1909,10 @@ function finalizeMetricAccumulator(acc) {
     tpot_estimated_p50_ms: tpotPercentile(acc.tpot_est_histogram, acc.tpot_est_samples, acc.tpot_est_histogram_complete, 0.5),
     tpot_estimated_p95_ms: tpotPercentile(acc.tpot_est_histogram, acc.tpot_est_samples, acc.tpot_est_histogram_complete, 0.95),
     tpot_filtered_count: acc.tpot_filtered,
-    p50_lower_ms: acc.p50_complete ? acc.p50_min : null,
-    p50_ms: acc.p50_complete ? acc.p50_max : null,
-    p95_lower_ms: acc.p95_complete ? acc.p95_min : null,
-    p95_ms: acc.p95_complete ? acc.p95_max : null,
+    p50_lower_ms: pooledP50 ?? (acc.p50_complete ? acc.p50_min : null),
+    p50_ms: pooledP50 ?? (acc.p50_complete ? acc.p50_max : null),
+    p95_lower_ms: pooledP95 ?? (acc.p95_complete ? acc.p95_min : null),
+    p95_ms: pooledP95 ?? (acc.p95_complete ? acc.p95_max : null),
   };
   result.token_sample_count = acc.total.samples;
   result.failed_token_sample_count = acc.failed_total.samples;
@@ -1938,6 +1956,7 @@ function benchmarkRowToMetric(row, point = null) {
     success_count: Number.isFinite(row?.success_count) ? positive(row.success_count) : null,
     duration_sum_ms: durationSum,
     duration_samples: samples,
+    duration_histogram: row?.duration_histogram ?? (soleModel ? point?.duration_histogram : null),
     ttft_ms: metric(row?.ttft_avg_ms),
     ttft_samples: positive(row?.ttft_sample_count),
     ttft_sum_ms: metric(row?.ttft_sum_ms),
@@ -2272,7 +2291,7 @@ function percentileRangeText(row, key) {
   const upper = row?.[`${key}_ms`];
   if (!Number.isFinite(upper)) return '—';
   const lower = Number.isFinite(row?.[`${key}_lower_ms`]) ? row[`${key}_lower_ms`] : upper;
-  return lower === upper ? fmtDuration(upper) : `${fmtDuration(lower)} – ${fmtDuration(upper)}`;
+  return lower === upper ? `${row?.duration_percentiles_approx ? '≈' : ''}${fmtDuration(upper)}` : `${fmtDuration(lower)} – ${fmtDuration(upper)}`;
 }
 
 function p50RangeText(row) {
@@ -2373,6 +2392,15 @@ function latencyTrendChart(points, visibility = {}) {
     </g>`;
   };
 
+  const intervalLayer = (key, lows, highs, style) => {
+    const marks = highs.map((high, index) => {
+      const low = lows[index];
+      if (high === null || low === null || low >= high) return '';
+      return `<line class="trend-series" x1="${x(index).toFixed(1)}" x2="${x(index).toFixed(1)}" y1="${y(low).toFixed(1)}" y2="${y(high).toFixed(1)}"><title>${esc(`${rows[index]?.date || ''} · ${key.toUpperCase()} ${fmtDuration(low)} – ${fmtDuration(high)}`)}</title></line>`;
+    }).join('');
+    return `<g class="latency-layer ${style}${isVisible(key) ? '' : ' is-hidden'}">${marks}</g>`;
+  };
+
   const labelIndexes = new Set([0, rows.length - 1, Math.floor((rows.length - 1) / 2)]);
   const xLabels = [...labelIndexes]
     .filter((index) => index >= 0 && index < rows.length)
@@ -2403,11 +2431,13 @@ function latencyTrendChart(points, visibility = {}) {
     <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
     ${layer('duration', mean, 'ttft', true, y, { format: fmtDuration, lowerIsBetter: true, dense: rows.length > 16 })}
     ${layer('p50', p50, 'p50-upper', true, y, { format: fmtDuration, lowerIsBetter: true, below: true, dense: rows.length > 16 })}
+    ${intervalLayer('p50', p50Lower, p50Upper, 'p50-upper')}
     ${layer('p95', p95, 'p95-upper', true, y, { format: fmtDuration, lowerIsBetter: true, dense: rows.length > 16 })}
+    ${intervalLayer('p95', lower, upper, 'p95-upper')}
     ${xLabels}
     <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
     ${zones}
-  </svg><p class="chart-note">平均耗时按成功调用量加权，不含端侧与网络；P50/P95 为成功调用的请求级分位，至少 20 个样本；多个来源仅有区间时在悬浮提示中显示，不绘制单值。模型请求耗时使用毫秒轴。</p></div>`;
+  </svg><p class="chart-note">平均耗时按成功调用量加权，不含端侧与网络；P50/P95 至少 20 个成功样本。可合并分布时显示分桶近似值；只有来源区间时显示竖线范围，不将范围冒充单值。</p></div>`;
 }
 
 function ttftTrendChart(points, visibility = {}, { columns = 1 } = {}) {
@@ -3805,6 +3835,33 @@ function newestEnvDaily(candidates) {
 // The cloud-side section answers to the same range control as the model side:
 // the tiles pick their anchor day and every chart is drawn from the rows of the
 // selected trailing window, so both halves of the page describe one period.
+function cloudDisplayRow(row) {
+  if (!row || typeof row !== 'object') return row;
+  let result = { ...row };
+  const current = row.current_request_metrics;
+  const missingHistogram = ['gateway', 'first_token'].some((key) => row[key]?.n > 0
+    && !mergeMetricHistogram(new Map(), row[key]?.histogram, row[key].n));
+  const currentCanReplace = ['gateway', 'first_token'].every((key) => !(row[key]?.n > 0)
+    || (current?.[key]?.n > 0 && mergeMetricHistogram(new Map(), current[key].histogram, current[key].n)));
+  if (current?.gateway?.n > 0 && missingHistogram && currentCanReplace
+      && mergeMetricHistogram(new Map(), current.gateway.histogram, current.gateway.n)) {
+    result = { ...result, ...current, date: row.date, partial: true, current_sample_used: true };
+  }
+  // Answer history is newly collected even when the older gateway sample is
+  // retained. Its own sample count remains independent of gateway latency.
+  const previousAnswer = result.answer_first_combined || result.answer_first;
+  if (current?.answer_first_combined?.n > 0 && (current.answer_first_combined.n > (previousAnswer?.n || 0)
+      || !mergeMetricHistogram(new Map(), previousAnswer?.histogram, previousAnswer?.n))) {
+    result.answer_first_combined = current.answer_first_combined;
+    result.answer_first_history_count = current.answer_first_history_count || 0;
+    result.react_combined = current.react_combined;
+    result.answer_current_sample_used = true;
+  }
+  if (result.answer_first_combined?.n > 0) result.answer_first = result.answer_first_combined;
+  if (result.react_combined?.n > 0) result.react = result.react_combined;
+  return result;
+}
+
 function cloudScopedDays(days, rangeDays, today, completeThrough = null) {
   const end = rangeDays === 1 ? today : (completeThrough || today);
   const eligible = (Array.isArray(days) ? days : []).filter((row) => row?.date <= end);
@@ -3823,7 +3880,7 @@ function renderEnv() {
   const all = Array.isArray(daily.days) ? daily.days.filter((row) => row && row.date) : [];
   // Match the model summary's completed-day anchor; Today still shows today.
   // Historical rows with incomplete coverage remain visible and labelled.
-  const scoped = { ...daily, days: cloudScopedDays(all, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history)) };
+  const scoped = { ...daily, days: cloudScopedDays(all, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history)).map(cloudDisplayRow) };
   renderRequestTraces(scoped);
   const latestObserved = scoped.days.at(-1)?.observed_at;
   const snapshotTime = daily.generated_at || daily.updated_at;
@@ -3832,7 +3889,8 @@ function renderEnv() {
   const timeText = latestObserved ? `采集于 ${esc(fmtDateTime(latestObserved))}`
     : snapshotTime ? `快照生成于 ${esc(fmtDateTime(snapshotTime))}，行级采集时间未知` : '采集时间未知';
   const requestOnly = scoped.days.some((row) => row.source === 'workspace_request_logs');
-  const freshness = `<p class="data-freshness">云侧数据${timeText}${stale ? ' · 超过 6 小时未更新，请检查采集任务' : ''}${state.envRefreshFailed ? ' · 刷新失败，保留上次快照' : ''}${state.rangeDays === 1 && !scoped.days.length ? ' · 尚无当天采集数据' : ''}${requestOnly ? ' · 模型用量及 Token 基于日志记录，可能重复；网关流异常率不代表业务请求失败率，工具耗时尚未完整采集' : ''}；* 表示部分日或日志覆盖不全；定时采集，并非实时流。</p>`;
+  const answerPartial = daily.cloud_trace_collection?.answer_workspaces_partial;
+  const freshness = `<p class="data-freshness">云侧数据${timeText}${stale ? ' · 超过 6 小时未更新，请检查采集任务' : ''}${state.envRefreshFailed ? ' · 刷新失败，保留上次快照' : ''}${state.rangeDays === 1 && !scoped.days.length ? ' · 尚无当天采集数据' : ''}${requestOnly ? ' · 模型用量及 Token 基于日志记录，可能重复；网关流异常率不代表业务请求失败率，工具耗时尚未完整采集' : ''}${answerPartial > 0 ? ` · 答案历史仅扫描近期会话，${answerPartial} 个工作区可能不完整` : ''}；* 表示部分日或日志覆盖不全；定时采集，并非实时流。</p>`;
   target.innerHTML = `${freshness}${envSummary(scoped)}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTtftTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
   refineCharts(target);
 }

@@ -23,6 +23,30 @@ test('aggregate P95 unavailable if a contributing source lacks P95', () => {
   const a=ctx.acc();ctx.merge(a,{calls:20,duration_samples:20,p95_ms:100});ctx.merge(a,{calls:2,duration_samples:2,p95_ms:null});assert.equal(ctx.finish(a).p95_ms,null);
 });
 
+test('pooled model duration percentiles use all source histograms', () => {
+  const a = ctx.acc();
+  ctx.merge(a, {duration_samples: 20, duration_sum_ms: 20000, p50_ms: 1000, p95_ms: 1000, duration_histogram: [[349, 20]]});
+  ctx.merge(a, {duration_samples: 30, duration_sum_ms: 60000, p50_ms: 2000, p95_ms: 2000, duration_histogram: [[384, 30]]});
+  const r = ctx.finish(a);
+  assert.equal(r.duration_samples, 50);
+  assert.equal(r.duration_percentiles_approx, true);
+  assert.equal(r.p50_lower_ms, r.p50_ms);
+  assert.ok(r.p50_ms > 1900 && r.p50_ms < 2100);
+  assert.ok(r.p95_ms > 1900 && r.p95_ms < 2100);
+});
+
+test('legacy model sources retain their percentile interval without inventing a pooled percentile', () => {
+  const a = ctx.acc();
+  ctx.merge(a, {duration_samples: 20, duration_sum_ms: 20000, p50_ms: 1000, p95_ms: 1500, duration_histogram: [[349, 20]]});
+  ctx.merge(a, {duration_samples: 30, duration_sum_ms: 60000, p50_ms: 2000, p95_ms: 3000});
+  const r = ctx.finish(a);
+  assert.equal(r.duration_percentiles_approx, false);
+  assert.equal(r.p50_lower_ms, 1000);
+  assert.equal(r.p50_ms, 2000);
+  assert.equal(r.p95_lower_ms, 1500);
+  assert.equal(r.p95_ms, 3000);
+});
+
 test('range uses the same supplied latest date even when model data is stale', () => {
   const rows=[{date:'2026-10-25'},{date:'2026-10-31'}];
   assert.deepEqual(Array.from(ctx.inRange(rows,7,'2026-11-03'), x=>x.date),['2026-10-31']);
@@ -223,6 +247,7 @@ test('percentiles have one legend each and ranges are not plotted as single valu
   assert.doesNotMatch(html, /上界|下界/);
   assert.match(html, /40 – 80 · P95/);
   assert.match(html, /latency-layer p95-upper[^>]*>\s*\s*<\/g>/);
+  assert.match(html, /latency-layer p95-upper[^>]*><line class="trend-series"/);
   assert.doesNotMatch(c.chart([{date:'2026-11-04',p95_ms:80,p95_lower_ms:40}], {p95:false}), /40 – 80 · P95/);
 });
 
