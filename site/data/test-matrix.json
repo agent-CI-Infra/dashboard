@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/test-matrix@1",
- "generatedAt": "2026-11-11T11:28:54.953Z",
+ "generatedAt": "2026-11-11T19:53:23.702Z",
  "source": {
   "repository": "openJiuwen-ai/DigitalMate",
-  "main": "a2d64ea1",
+  "main": "71c5e6c3",
   "refs": [
    {
     "label": "test/st-complete-coverage",
@@ -92,14 +92,14 @@
     }
    },
    "UT-Server": {
-    "cases": 282,
-    "tests": 4893,
+    "cases": 283,
+    "tests": 4913,
     "byStatus": {
-     "ci_lane": 282
+     "ci_lane": 283
     },
     "bySuite": {},
     "byImpl": {
-     "main": 282
+     "main": 283
     }
    },
    "REG": {
@@ -8879,6 +8879,27 @@
    "title": "test_session_proximity_a01_consumer",
    "module": "services/agent_bridge",
    "file": "harness/personal-agent/services/agent_bridge/tests/test_session_proximity_a01_consumer.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 20,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_session_proximity_a04_owned_claims.py",
+   "title": "test_session_proximity_a04_owned_claims",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_session_proximity_a04_owned_claims.py",
    "impl": "main",
    "status": "ci_lane",
    "lane": "server-regression.yml"
