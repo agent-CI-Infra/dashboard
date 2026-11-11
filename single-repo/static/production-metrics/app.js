@@ -3524,6 +3524,10 @@ function availableTraceCandidates(doc, localTrace) {
   return localTrace ? [...cloud, localTrace] : cloud;
 }
 
+function cloudCollectionLabel(collection) {
+  return collection?.collection_source === 'kubernetes_shared_workspace' ? 'Kubernetes 生产工作区' : '现网';
+}
+
 function renderRequestTraces(doc) {
   const picker = $('trace-picker');
   const result = $('trace-result');
@@ -3542,7 +3546,7 @@ function renderRequestTraces(doc) {
     state.traceId = candidates.length ? traceKey(candidates[0]) : '';
   }
   const coverage = traceCollection
-    ? `现网只读采集于 ${fmtDateTime(traceCollection.generated_at)}：${fmtCount(traceCollection.read_log_count)} / ${fmtCount(traceCollection.binding_count)} 个绑定读取到日志；排名仅覆盖已读取日志中的已结束请求，工具明细可能不完整。`
+    ? `${cloudCollectionLabel(traceCollection)}只读采集于 ${fmtDateTime(traceCollection.generated_at)}：${fmtCount(traceCollection.read_log_count)} / ${fmtCount(traceCollection.binding_count)} 个绑定读取到日志；排名仅覆盖已读取日志中的已结束请求，工具明细可能不完整。`
     : '生产快照采集数据';
   const note = cloudCount ? `${coverage} 当前范围共 ${cloudCount} 条云侧慢请求${traceCollection ? '' : '或超时请求'}。`
     : `${coverage} 当前范围没有可用的云侧慢请求明细。${state.localTrace ? '下方历史样例不属于当前榜单。' : ''}`;
