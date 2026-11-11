@@ -101,6 +101,27 @@ class KubeTraceTests(unittest.TestCase):
         self.assertIsNone(remote.native_span_name(b'not-a-zlib-payload'))
         self.assertIsNone(remote.native_span_name(zlib.compress(b'{"resourceSpans":[]}')))
 
+    def test_native_reader_includes_committed_uncheckpointed_wal(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);workspace='w-'+'c'*64;session='session';digest=hashlib.sha256(session.encode()).hexdigest()
+            db=root/workspace/'workswarm'/'.jiuwenswarm'/'.trace'/'sessions'/digest[:2]/(digest+'.sqlite3')
+            db.parent.mkdir(parents=True);writer=sqlite3.connect(db)
+            try:
+                writer.execute('PRAGMA journal_mode=WAL');writer.execute('PRAGMA wal_autocheckpoint=0')
+                writer.executescript('''CREATE TABLE trajectory_current_records
+                    (trace_id TEXT,span_id TEXT,parent_span_id TEXT,request_id TEXT,lifecycle TEXT,
+                     start_time_unix_nano INTEGER,end_time_unix_nano INTEGER,has_error INTEGER,raw_json BLOB);
+                    CREATE TABLE otlp_span_records (trace_id TEXT,span_id TEXT,raw_json BLOB);''')
+                blob=zlib.compress(json.dumps({'resourceSpans':[{'scopeSpans':[{'spans':[{'name':'workswarm.input.prepare'}]}]}]}).encode())
+                writer.executemany('INSERT INTO trajectory_current_records VALUES (?,?,?,?,?,?,?,?,?)',[
+                    ('a'*32,'1'*16,None,'digitalmate-a','final',1_000_000,5_000_000,0,blob),
+                    ('a'*32,'2'*16,'1'*16,'digitalmate-a','final',2_000_000,3_000_000,0,blob),
+                ]);writer.commit()
+                with patch.object(remote,'ROOT',root):
+                    out=remote.read_native_trajectory({'name':workspace},{'session_id':session,'request_id':'digitalmate-a','trace_id':'a'*32,'span_id':'1'*16})
+                self.assertEqual(out['spans'][0]['label'],'输入准备')
+            finally:writer.close()
+
     def test_collector_proxy_uses_the_selected_local_port(self):
         self.assertEqual(publisher.proxy_url('47123'), 'socks5h://127.0.0.1:47123')
         for value in ('0', '65536', 'example.org:22', '1;command', ''):
