@@ -802,6 +802,15 @@ def with_workspace_traces(previous, traces):
         # Do not erase a more complete historical request population after a
         # restart or temporary loss of workspace files.
         if old and day['n'] < old.get('n', 0):
+            # Preserve the larger historical latency population, but do not
+            # suppress newly observed telemetry from the smaller current
+            # population. Its own timestamp and denominator remain explicit.
+            if isinstance(day.get('model_usage_events'), int) and isinstance(day.get('gateway_stream'), dict):
+                old['model_usage_events'] = day['model_usage_events']
+                old['gateway_stream'] = dict(day['gateway_stream'])
+                old['telemetry_observed_at'] = day.get('telemetry_observed_at') or day.get('observed_at')
+                old['telemetry_partial'] = True
+                existing[day['date']] = old
             continue
         # Unavailable model/tool/call metrics are intentionally not copied from
         # an older snapshot into a newly timestamped request aggregate.

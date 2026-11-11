@@ -5,6 +5,7 @@ Only sanitized request timing and tool names are written to the output. Raw logs
 history content, workspace identifiers and credentials stay in memory.
 """
 import concurrent.futures
+import collections
 import datetime as dt
 import json
 import math
@@ -139,34 +140,46 @@ def read_log(item):
     files = listing(query, 'workswarm')
     logfile = next((f for f in files if f.get('name') == 'process.log' and f.get('type') == 'file'), None)
     if not logfile:
-        return query, [], 'missing'
+        return query, [], 'missing', {}
     if not isinstance(logfile.get('size'), int) or logfile['size'] > MAX_LOG:
-        return query, [], 'oversized'
+        return query, [], 'oversized', {}
     requests = {}
+    usage = collections.Counter()
     today = dt.datetime.now(CST).date()
     cutoff = dt.datetime.combine(today - dt.timedelta(days=6), dt.time.min, CST).timestamp()
     for line in download_log(query):
         ts = stamp(line)
         if ts is None or ts < cutoff:
             continue
+        day = dt.datetime.fromtimestamp(ts, CST).date()
+        if day <= today and "[JiuWenSwarmDeepAdapter] llm_usage chunk: type='llm_usage'" in line:
+            # These events have no stable invocation ID in the deployed image.
+            # Publish their count as records, never as deduplicated calls.
+            usage[day.isoformat()] += 1
         match = REQ.search(line)
         if not match:
             continue
         rid = match.group(1)
         if not REQUEST_ID.fullmatch(rid):
             continue
-        span = requests.setdefault(rid, [None, None, None, None])
+        span = requests.setdefault(rid, [None, None, None, None, None])
         if '[MessageHandler] dispatch:' in line and span[0] is None:
             span[0] = ts
         elif '[MessageHandler] Stream ' in line and 'total_chunks=' in line and span[1] is None:
             span[1] = ts
+            if '[MessageHandler] Stream 正常完成:' in line:
+                span[4] = 'normal'
+            elif '[MessageHandler] Stream 异常:' in line:
+                span[4] = 'exception'
+            elif '[MessageHandler] Stream 被取消:' in line:
+                span[4] = 'cancelled'
         marker = CHUNK.search(line)
         if marker and span[2] is None and marker.group(1) in ('chat.delta', 'chat.reasoning'):
             span[2] = ts
         if marker and span[3] is None and marker.group(1) == 'chat.delta':
             span[3] = ts
     result = []
-    for rid, (start, end, first, answer) in requests.items():
+    for rid, (start, end, first, answer, stream_status) in requests.items():
         if start is None or end is None or end < start:
             continue
         date = dt.datetime.fromtimestamp(start, CST).date()
@@ -175,13 +188,15 @@ def read_log(item):
         gateway = round((end - start) * 1000, 1)
         row = {'request_id': rid, 'date': date.isoformat(), 'gateway': gateway,
                'start_time': dt.datetime.fromtimestamp(start, UTC).isoformat()}
+        if stream_status is not None:
+            row['gateway_stream_status'] = stream_status
         for name, value in (('first_token', first), ('answer_first', answer)):
             if value is not None and start <= value <= end:
                 row[name] = round((value - start) * 1000, 1)
         if 'first_token' in row and 'answer_first' in row and row['answer_first'] >= row['first_token']:
             row['react'] = round(row['answer_first'] - row['first_token'], 1)
         result.append(row)
-    return query, result, 'ok'
+    return query, result, 'ok', dict(usage)
 
 
 def attach_tool_events(query, rows):
@@ -342,7 +357,7 @@ def summarize_tool_metrics(records, incomplete):
     return result
 
 
-def request_daily_metrics(records, date, generated_at, incomplete):
+def request_daily_metrics(records, date, generated_at, incomplete, usage_events=0):
     """Summarize the same finished requests used for the slow-request ranking."""
     def summary(field):
         values = sorted(row[field] for _, _, row in records
@@ -354,9 +369,18 @@ def request_daily_metrics(records, date, generated_at, incomplete):
                 'p50': round(values[int(round(.5 * (len(values) - 1)))], 1),
                 'p95': round(values[int(round(.95 * (len(values) - 1)))], 1)}
 
+    statuses = collections.Counter(row.get('gateway_stream_status', 'unknown') for _, _, row in records)
+    observed = statuses['normal'] + statuses['exception']
     return {'date': date, 'n': len(records),
             'partial': incomplete or date == dt.datetime.now(CST).date().isoformat(),
-            'observed_at': generated_at, 'source': 'workspace_request_logs',
+            'observed_at': generated_at, 'telemetry_observed_at': generated_at,
+            'telemetry_partial': incomplete or date == dt.datetime.now(CST).date().isoformat(),
+            'source': 'workspace_request_logs',
+            'model_usage_events': usage_events,
+            'gateway_stream': {'normal': statuses['normal'], 'exception': statuses['exception'],
+                               'cancelled': statuses['cancelled'], 'unknown': statuses['unknown'],
+                               'observed': observed, 'population': len(records),
+                               'exception_rate': statuses['exception'] / observed if observed else None},
             **{key: summary(key) for key in ('gateway', 'first_token', 'answer_first', 'react')}}
 
 
@@ -367,13 +391,16 @@ def collect():
     if not items:
         raise SystemExit('no production bindings')
     snapshots, problems = [], {}
+    usage_by_day = collections.Counter()
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
         future_map = {pool.submit(read_log, item): idx for idx, item in enumerate(items)}
         for count, future in enumerate(concurrent.futures.as_completed(future_map), 1):
             idx = future_map[future]
             try:
-                query, rows, status = future.result()
-                if status == 'ok': snapshots.append((idx, query, rows))
+                query, rows, status, usage = future.result()
+                if status == 'ok':
+                    snapshots.append((idx, query, rows))
+                    usage_by_day.update(usage)
                 else: problems[status] = problems.get(status, 0) + 1
             except Exception as error:
                 category = 'http_' + str(error.code) if isinstance(error, urllib.error.HTTPError) else type(error).__name__
@@ -406,11 +433,16 @@ def collect():
                 tool_partial = True
     days, chosen, daily_metrics = [], [], []
     generated_at = dt.datetime.now(UTC).isoformat()
-    for date, records in sorted(grouped.items()):
-        daily = request_daily_metrics(records, date, generated_at, bool(problems))
+    today = dt.datetime.now(CST).date()
+    tool_dates = {day for day in tool_grouped if (today - dt.timedelta(days=6)).isoformat() <= day <= today.isoformat()}
+    for date in sorted(set(grouped) | set(usage_by_day) | tool_dates):
+        records = grouped.get(date, [])
+        daily = request_daily_metrics(records, date, generated_at, bool(problems), usage_by_day[date])
         if date in tool_grouped:
             daily.update(summarize_tool_metrics(tool_grouped[date], tool_partial))
         daily_metrics.append(daily)
+        if not records:
+            continue
         records.sort(key=lambda item:item[2]['gateway'],reverse=True)
         slow_count = math.ceil(len(records) * .05)
         slow = records[:min(slow_count, 50)]

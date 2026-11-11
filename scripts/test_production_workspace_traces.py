@@ -18,7 +18,7 @@ class ProductionTraceTests(unittest.TestCase):
                            'observed': 2, 'matched': 2, 'incomplete': 0}}
         with patch.object(collector, 'TOKEN', 'test'), \
              patch.object(collector, 'binding_list', return_value=[{}]), \
-             patch.object(collector, 'read_log', return_value=({}, [row], 'ok')), \
+             patch.object(collector, 'read_log', return_value=({}, [row], 'ok', {})), \
              patch.object(collector, 'read_tool_metrics', return_value=(metrics, True)), \
              patch.object(collector, 'attach_tool_events', return_value=True):
             result = collector.collect()
@@ -95,12 +95,45 @@ class ProductionTraceTests(unittest.TestCase):
         with patch.object(collector, 'query_for', return_value={}), \
              patch.object(collector, 'listing', return_value=[{'name':'process.log','type':'file','size':len(log)}]), \
              patch.object(collector, 'download_log', return_value=iter(log.splitlines())):
-            _, rows, status = collector.read_log({})
+            _, rows, status, usage = collector.read_log({})
         self.assertEqual(status, 'ok')
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]['gateway'], 10000)
         self.assertEqual(rows[0]['react'], 5000)
         self.assertNotIn('private prompt', json.dumps(rows))
+        self.assertEqual(usage, {})
+
+    def test_usage_records_and_gateway_outcomes_have_distinct_scopes(self):
+        now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+        stamp = lambda t: t.strftime('%Y-%m-%d %H:%M:%S.000')
+        log = [
+            f"{stamp(now)} [JiuWenSwarmDeepAdapter] llm_usage chunk: type='llm_usage' payload='PRIVATE'",
+            f"{stamp(now)} tool output mentions llm_usage but is not a usage event",
+            f'{stamp(now)} [MessageHandler] dispatch: request_id=digitalmate-a',
+            f'{stamp(now)} [MessageHandler] Stream 异常: request_id=digitalmate-a total_chunks=1 error=PRIVATE',
+            f'{stamp(now)} [MessageHandler] dispatch: request_id=digitalmate-b',
+            f'{stamp(now)} [MessageHandler] Stream 正常完成: request_id=digitalmate-b total_chunks=1',
+            f'{stamp(now)} [MessageHandler] dispatch: request_id=digitalmate-c',
+            f'{stamp(now)} [MessageHandler] Stream 被取消: request_id=digitalmate-c total_chunks=1',
+        ]
+        with patch.object(collector, 'query_for', return_value={}), \
+             patch.object(collector, 'listing', return_value=[{'name':'process.log','type':'file','size':100}]), \
+             patch.object(collector, 'download_log', return_value=iter(log)):
+            _, rows, status, usage = collector.read_log({})
+        self.assertEqual(status, 'ok')
+        self.assertEqual(sum(usage.values()), 1)
+        date = rows[0]['date']
+        day = collector.request_daily_metrics([(0, {}, row) for row in rows], date, now.isoformat(), False, usage[date])
+        self.assertEqual(day['model_usage_events'], 1)
+        self.assertEqual(day['gateway_stream'], {'normal': 1, 'exception': 1, 'cancelled': 1,
+                                                'unknown': 0, 'observed': 2, 'population': 3, 'exception_rate': 0.5})
+        self.assertNotIn('PRIVATE', json.dumps(day))
+        self.assertNotIn('failure_rate', day)
+
+    def test_unknown_gateway_outcomes_do_not_become_zero_failure(self):
+        row = {'gateway': 10, 'gateway_stream_status': 'cancelled'}
+        day = collector.request_daily_metrics([(0, {}, row)], '2026-11-10', '2026-11-11T00:00:00Z', True)
+        self.assertIsNone(day['gateway_stream']['exception_rate'])
 
     def test_streamed_log_must_match_advertised_length(self):
         class Response(io.BytesIO):

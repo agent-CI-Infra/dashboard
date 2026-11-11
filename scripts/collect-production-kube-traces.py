@@ -110,6 +110,7 @@ def collect():
     if result['errors']:
         for day in result.get('request_daily_metrics', []):
             day['partial'] = True
+            day['telemetry_partial'] = True
     return result
 
 

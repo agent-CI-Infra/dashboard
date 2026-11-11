@@ -46,6 +46,22 @@ class TraceCollectionTests(unittest.TestCase):
         result = collector.with_workspace_traces({'days': [{**old, 'n': 400}]}, traces)
         self.assertEqual(result['days'][0]['n'], 400)
 
+    def test_smaller_snapshot_updates_telemetry_without_shrinking_latency(self):
+        old = {'date': '2026-11-10', 'n': 354, 'gateway': {'mean': 100}, 'observed_at': 'old'}
+        fresh = {'date': '2026-11-10', 'n': 306, 'model_usage_events': 1454,
+                 'gateway_stream': {'observed': 298, 'population': 306, 'exception_rate': 0},
+                 'observed_at': 'new'}
+        traces = {'schema': 'digitalmate/cloud-traces@1', 'read_log_count': 137,
+                  'request_daily_metrics': [fresh]}
+        result = collector.with_workspace_traces({'days': [old]}, traces)['days'][0]
+        self.assertEqual(result['n'], 354)
+        self.assertEqual(result['gateway'], {'mean': 100})
+        self.assertEqual(result['observed_at'], 'old')
+        self.assertEqual(result['model_usage_events'], 1454)
+        self.assertEqual(result['gateway_stream']['population'], 306)
+        self.assertEqual(result['telemetry_observed_at'], 'new')
+        self.assertTrue(result['telemetry_partial'])
+
     def test_exact_request_tool_events_are_paired_and_redacted(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
