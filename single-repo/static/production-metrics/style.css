@@ -2046,6 +2046,7 @@ h1 {
 .trajectory-legend { display: flex; flex-wrap: wrap; gap: 16px; color: #64748b; font-size: 12px; margin: 8px 0 16px; }
 .legend-dot { width: 9px; height: 9px; display: inline-block; border-radius: 2px; margin-right: 5px; }
 .total-dot { background: #4f83d3; } .event-dot { background: #e4b831; } .tool-dot { background: #e47ab2; } .model-dot { background: #8b5cf6; }
+.phase-dot { background: #20a28c; }
 .trajectory-toolbar { border-top: 1px solid #e2e8f0; padding: 14px 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
 .trajectory-toolbar input { border: 1px solid #d5deea; border-radius: 7px; padding: 9px 12px; min-width: 220px; }
 .trace-filters { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -2068,6 +2069,7 @@ h1 {
 .trace-event-track .trace-bar { height: 13px; top: 2px; }
 .trace-point { min-width: 3px; border-radius: 2px; }
 .trace-total { background: #4f83d3; } .trace-event { background: #e4b831; } .trace-tool { background: #e47ab2; } .trace-error { background: #d84560; } .trace-model-point { background: #8b5cf6; } .trace-first { background: #60a5fa; } .trace-react { background: #a78bfa; } .trace-answer { background: #34d399; }
+.trace-phase { background: #20a28c; } .trace-agent { background: #4f83d3; } .trace-model { background: #8b5cf6; }
 .trace-detail { margin-top: 12px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 7px; color: #475569; font-size: 12px; line-height: 1.7; }
 .trace-detail strong { color: #1e293b; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }

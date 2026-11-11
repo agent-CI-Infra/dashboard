@@ -876,7 +876,7 @@ function envAnswerFirstTrend(doc) {
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.answer_first?.n, note: '个请求' }),
-    note: '历史口径：网关派发到首个答案 chat.delta；仅统计网关记录的样本。旧版日志可能漏掉后续 chunk；历史估算单独列示，不纳入本图。',
+    note: '历史口径：网关派发到首个答案 chat.delta；仅统计网关记录的样本。旧版日志可能漏掉后续 chunk。',
   });
 }
 
@@ -939,15 +939,6 @@ function envTpotTrend(doc) {
     note: '云侧 Agent 用量记录口径：TPOT 为日志中的每条用量记录值，均值及分位数按输出 Token 数 − 1 加权；仅统计输出 Token > 1 且 TPOT 有效的记录。记录缺少调用 ID，可能重复；* 为部分日。',
   });
 }
-
-// Client-observed one-way network samples. The keys are part of the published
-// daily document contract; until the gateway release that emits them is
-// deployed, every day reports n=0 and the cards explain they are waiting.
-const NETWORK_TILES = [
-  ['uplink_send', '上行 send 单程', '端侧 send → 网关收到'],
-  ['downlink_first_text', '下行首文本 recv 单程', '网关文本帧 → 端侧 recv'],
-  ['downlink_terminal', '下行终态 recv 单程', '网关终态帧 → 端侧 recv'],
-];
 
 // Merge daily summaries without averaging percentiles or mixing sample weights.
 function aggregateCloudMetric(rows, key) {
@@ -1088,39 +1079,7 @@ function envSummary(doc) {
   const admittedDuration = requestTile('gateway_admission', '受理后请求耗时', 'WebSocket 请求解析受理 → 流结束');
   const admittedFirst = requestTile('first_text_admission', '受理后首吐字', 'WebSocket 请求解析受理 → 首个文本 chunk');
   const admittedAnswer = requestTile('answer_admission', '受理后答案首吐字', 'WebSocket 请求解析受理 → 首个答案 chunk');
-  const answerEstimateTile = requestTile('answer_first_history', '答案首吐字（历史估算）', '会话回答段起点估算 · 非网关转发时间，不纳入实测');
   const reactTile = requestTile('react', 'ReAct 阶段', '网关首文本 → 网关首答案 · 同一请求配对');
-  const toolCount = Number.isFinite(anchor.tool?.n) ? anchor.tool.n : 0;
-  const coverage = anchor.tool_coverage;
-  const pairHint = coverage && coverage.started > 0 && coverage.matched <= coverage.started
-    ? ` · 已观测调用配对 ${fmtCount(coverage.matched)} / ${fmtCount(coverage.started)} · 未配对结果 ${fmtCount(coverage.unmatched)} · 状态未知 ${fmtCount(coverage.unknown_status)}${anchor.tool_collection_partial ? ' · 环境采集不完整' : ''}`
-    : ' · 配对覆盖未知';
-  const toolHint = toolCount > 0
-    ? `${fmtCount(toolCount)} 次工具调用 · tool_call → tool_result`
-    : anchor.source === 'workspace_request_logs' ? '当前日志采集未提供工具耗时'
-    : '当日无已观测样本 · 覆盖率未知 · tool_call → tool_result';
-  const toolTile = `<div class="stat-card">
-      <div class="stat-label">云侧 Agent<strong>工具调用</strong> 平均 / P50 / P95</div>
-      <div class="stat-value combo">${formatted(anchor.tool, 'mean', fmtDuration)} / ${formatted(anchor.tool, 'p50', fmtDuration)} / ${formatted(anchor.tool, 'p95', fmtDuration)}</div>
-      <div class="stat-hint">${toolHint}${pairHint} · 已知失败 ${toolCount || coverage ? fmtCount(anchor.tool_failed) : '—'}</div>
-    </div>`;
-  // One-way network latency is sampled on the client by the next gateway
-  // release. The cards stay on the board before that so a missing metric is
-  // visible as "not instrumented yet", not as a card that silently disappears.
-  const networkSeen = rows.some((row) => NETWORK_TILES.some(([key]) => Number.isFinite(row?.[key]?.n) && row[key].n > 0));
-  const networkTile = (key, label, hint) => {
-    const count = Number.isFinite(anchor[key]?.n) ? anchor[key].n : 0;
-    const availability = count > 0
-      ? `${fmtCount(count)} 个样本 · ${hint}`
-      : networkSeen
-        ? '0 个样本 · 当日无样本'
-        : '不可用：缺少可验证的帧配对和时钟误差';
-    return `<div class="stat-card">
-      <div class="stat-label">云侧 Agent<strong>${label}</strong> 平均 / P50 / P95</div>
-      <div class="stat-value combo">${formatted(anchor[key], 'mean', fmtDuration)} / ${formatted(anchor[key], 'p50', fmtDuration)} / ${formatted(anchor[key], 'p95', fmtDuration)}</div>
-      <div class="stat-hint">${availability}</div>
-    </div>`;
-  };
   const rangeNote = `${esc(anchor.window_start)} 至 ${esc(anchor.window_end)} · ${fmtCount(anchor.window_days)} 个有数据的日期${anchor.partial ? ' · 含部分覆盖' : ''}${anchor.current_sample_days ? ` · ${fmtCount(anchor.current_sample_days)} 天使用当前可读日志样本` : ''}`;
   return `<div class="env-data-notes env-range-notes"><div><strong>统计范围</strong><span>${rangeNote}</span></div><div><strong>汇总口径</strong><span>均值按样本数或输出 Token 加权；多日分位数仅在可合并分布完整时显示，≈ 表示近似。</span></div></div><section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
     <div class="stat-card">
@@ -1138,10 +1097,7 @@ function envSummary(doc) {
     ${admittedDuration}
     ${admittedFirst}
     ${admittedAnswer}
-    ${answerEstimateTile}
     ${reactTile}
-    ${toolTile}
-    ${NETWORK_TILES.map(([key, label, hint]) => networkTile(key, label, hint)).join('')}
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>TPOT</strong> 平均 / P50 / P95（ms/token）</div>
       <div class="stat-value combo">${formatted(anchor.tpot, 'mean', fmtTpotBare)} / ${formatted(anchor.tpot, 'p50', fmtTpotBare)} / ${formatted(anchor.tpot, 'p95', fmtTpotBare)}</div>
@@ -1168,7 +1124,6 @@ const ANOMALY_METRICS = [
   ['react', 'ReAct 阶段', 'duration'],
   ['ttft', '模型调用 TTFT', 'duration'],
   ['tpot', 'TPOT（ms/token）', 'tpot'],
-  ['tool', '工具调用', 'duration'],
 ];
 
 const ANOMALY_PHASES = [
@@ -1320,7 +1275,7 @@ function envAnomaly(doc) {
     ${a.available ? `<div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>指标</th><th>基线 P95</th><th class="num">当日样本</th><th class="num">超基线</th><th>占比</th></tr></thead><tbody>${metricRows}</tbody></table></div>` : ''}
     ${cohort ? `<h4 class="anomaly-subhead">慢请求阶段对比（均值）</h4><div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>阶段</th><th class="num">正常请求</th><th class="num">异常请求</th><th class="num">增量</th></tr></thead><tbody>${cohortRows}</tbody></table></div>` : ''}
     <p class="chart-note">${detailNote} 慢请求 = 当日可读取请求耗时排序的最慢 5%。${sampled ? '当前 Kubernetes 采集未计算超时数、历史基线和超基线异常数；不能据此认定没有超时或异常。' : '超时 = <code>llm_call_error</code> 文本含 timeout / timed out / deadline exceeded。'} 公开看板只发布这些请求的不透明 request_id 与各阶段耗时，不包含消息内容、用户标识或 IP；需要继续排查时，可用下方「按请求 ID 查询」检索网关记录。</p>
-    <p class="chart-note">基线取该日之前最近 7 个完整日（不含当日与部分日）的合并样本，P95 为最近排名分位，每项至少 20 个基线样本；异常 = 当日样本严格大于基线 P95；各指标单独判定，同一请求可能同时计入请求耗时与某个阶段指标。分布稳定时约 5% 的样本会自然超过基线 P95，应关注占比持续升高或集中在同一阶段的日期。阶段均值只统计该阶段有样本的请求，增量 = 异常组 − 正常组；首吐字 + ReAct 阶段 + 答案尾段构成请求耗时，因此增量最大的阶段即主要拉高项。请求耗时 / 首吐字 / 答案首吐字 / ReAct 按请求统计，TTFT / TPOT 按模型调用统计，工具调用按每次工具调用统计。基线不是当日 P95，避免固定约 5% 的样本被机械标为异常。</p>
+    <p class="chart-note">基线取该日之前最近 7 个完整日（不含当日与部分日）的合并样本，P95 为最近排名分位，每项至少 20 个基线样本；异常 = 当日样本严格大于基线 P95；各指标单独判定，同一请求可能同时计入请求耗时与某个阶段指标。分布稳定时约 5% 的样本会自然超过基线 P95，应关注占比持续升高或集中在同一阶段的日期。阶段均值只统计该阶段有样本的请求，增量 = 异常组 − 正常组；首吐字 + ReAct 阶段 + 答案尾段构成请求耗时，因此增量最大的阶段即主要拉高项。请求耗时 / 首吐字 / 答案首吐字 / ReAct 按请求统计，TTFT / TPOT 按模型调用统计。基线不是当日 P95，避免固定约 5% 的样本被机械标为异常。</p>
   </div>`;
 }
 
@@ -1435,14 +1390,11 @@ function envCallDetail(doc) {
   if (!rows.length) return '';
   // The request-scope groups follow the document schema, like the summary
   // tiles: a collector that writes these fields gets its columns on every row,
-  // and a row without samples reads as a zero count with dashes. Tool timing is
-  // written by the product adapter, so it appears once a sample exists.
+  // and a row without samples reads as a zero count with dashes.
   const hasField = (key) => rows.some((row) => row[key] && typeof row[key] === 'object');
-  const hasSamples = (key) => rows.some((row) => Number.isFinite(row[key]?.n) && row[key].n > 0);
   const hasFirst = hasField('first_token');
   const hasAnswer = hasField('answer_first');
   const hasReact = hasField('react');
-  const hasTool = hasSamples('tool');
   // Same day-over-day chip as the model-side stats table, so the two detail
   // tables read the same way.
   const cell = (value, previous, format) => {
@@ -1461,13 +1413,13 @@ function envCallDetail(doc) {
       const block = (key, enabled) => (enabled
         ? `<td>${fmtCount(row[key]?.n)}</td>${cell(row[key]?.mean, previous?.[key]?.mean, fmtDuration)}${cell(row[key]?.p50, previous?.[key]?.p50, fmtDuration)}${cell(row[key]?.p95, previous?.[key]?.p95, fmtDuration)}`
         : '');
-      return `<tr><td>${esc(row.date)}${row.partial ? '*' : ''}</td>${block('first_token', hasFirst)}${block('answer_first', hasAnswer)}${block('react', hasReact)}${block('tool', hasTool)}<td>${fmtCount(row.ttft?.n)}</td>${cell(row.ttft?.mean, previous?.ttft?.mean, fmtDuration)}${cell(row.ttft?.p50, previous?.ttft?.p50, fmtDuration)}${cell(row.ttft?.p95, previous?.ttft?.p95, fmtDuration)}<td>${fmtCount(row.tpot?.n)}</td>${cell(row.tpot?.mean, previous?.tpot?.mean, fmtTpot)}${cell(row.tpot?.p50, previous?.tpot?.p50, fmtTpot)}${cell(row.tpot?.p95, previous?.tpot?.p95, fmtTpot)}</tr>`;
+      return `<tr><td>${esc(row.date)}${row.partial ? '*' : ''}</td>${block('first_token', hasFirst)}${block('answer_first', hasAnswer)}${block('react', hasReact)}<td>${fmtCount(row.ttft?.n)}</td>${cell(row.ttft?.mean, previous?.ttft?.mean, fmtDuration)}${cell(row.ttft?.p50, previous?.ttft?.p50, fmtDuration)}${cell(row.ttft?.p95, previous?.ttft?.p95, fmtDuration)}<td>${fmtCount(row.tpot?.n)}</td>${cell(row.tpot?.mean, previous?.tpot?.mean, fmtTpot)}${cell(row.tpot?.p50, previous?.tpot?.p50, fmtTpot)}${cell(row.tpot?.p95, previous?.tpot?.p95, fmtTpot)}</tr>`;
     })
     // Newest first, like the model-side stats table; the chips were computed
     // against the previous calendar day before the rows were flipped.
     .reverse()
     .join('');
-  const groups = [hasFirst && '首吐字', hasAnswer && '答案首吐字', hasReact && 'ReAct', hasTool && '工具', 'TTFT', 'TPOT'].filter(Boolean);
+  const groups = [hasFirst && '首吐字', hasAnswer && '答案首吐字', hasReact && 'ReAct', 'TTFT', 'TPOT'].filter(Boolean);
   const notes = [];
   const spans = [
     hasFirst && '首吐字 = 网关派发 → 首个文本 chunk（含思考，历史口径）',
@@ -1475,9 +1427,8 @@ function envCallDetail(doc) {
     hasReact && 'ReAct = 两者的时间差（思考 + 工具阶段）',
   ].filter(Boolean);
   if (spans.length) notes.push(`${spans.join('，')}，均按请求统计`);
-  if (hasTool) notes.push('工具按工具调用统计（tool_call → tool_result，服务端适配器记录）');
   notes.push('TTFT 按模型调用统计（llm_usage 计时），TPOT 按输出 Token 数减一加权');
-  return `<details class="env-call-detail" open><summary>云侧 Agent ${groups.join(' / ')} 每日明细</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>日期</th>${head('首吐字', hasFirst)}${head('答案首吐字', hasAnswer)}${head('ReAct', hasReact)}${head('工具', hasTool)}<th>TTFT 样本</th><th>TTFT 均值</th><th>TTFT P50</th><th>TTFT P95</th><th>TPOT 样本</th><th>TPOT 加权均值</th><th>TPOT P50</th><th>TPOT P95</th></tr></thead><tbody>${body}</tbody></table></div><p class="chart-note">${notes.join('；')}；* 为部分日。</p></details>`;
+  return `<details class="env-call-detail" open><summary>云侧 Agent ${groups.join(' / ')} 每日明细</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>日期</th>${head('首吐字', hasFirst)}${head('答案首吐字', hasAnswer)}${head('ReAct', hasReact)}<th>TTFT 样本</th><th>TTFT 均值</th><th>TTFT P50</th><th>TTFT P95</th><th>TPOT 样本</th><th>TPOT 加权均值</th><th>TPOT P50</th><th>TPOT P95</th></tr></thead><tbody>${body}</tbody></table></div><p class="chart-note">${notes.join('；')}；* 为部分日。</p></details>`;
 }
 
 function fmtToken(value) {
@@ -3208,7 +3159,7 @@ function syncRangeButtons(disabled = false) {
     const active = Number(button.dataset.range || 0) === state.rangeDays;
     button.classList.toggle('active', active);
     button.setAttribute('aria-pressed', String(active));
-    button.disabled = disabled;
+    button.disabled = disabled && !state.envDaily;
   });
 }
 
@@ -3622,10 +3573,36 @@ function slowTraceCandidates(doc) {
 }
 
 function traceRows(item) {
-  const total = item?.gateway;
+  const native = item?.scope === 'cloud' && Number.isFinite(item?.native_trajectory?.duration_ms)
+    && item.native_trajectory.duration_ms > 0 && Array.isArray(item.native_trajectory.spans)
+    ? item.native_trajectory : null;
+  const total = native ? native.duration_ms : item?.gateway;
   if (!Number.isFinite(total) || total <= 0) return [];
   const valid = (n) => Number.isFinite(n) && n >= 0 && n <= total;
   const rows = [{label: '本轮运行', start: 0, duration: total, kind: 'total', detail: '云侧任务或请求的已记录时长'}];
+  if (native) {
+    rows[0].detail = 'WorkSwarm 原生根跨度，不包含完整网关耗时';
+    const spans = native.spans.filter((span) => typeof span?.span_id === 'string' && valid(span?.start_ms)
+      && Number.isFinite(span?.duration_ms) && span.duration_ms >= 0 && span.start_ms + span.duration_ms <= total
+      && ['phase','agent','model','tool','event'].includes(span.kind));
+    const children = new Map(), visited = new Set();
+    for (const span of spans) {
+      const parent = span.parent_span_id;
+      if (!children.has(parent)) children.set(parent, []);
+      children.get(parent).push(span);
+    }
+    const append = (span, depth, orphan = false) => {
+      if (visited.has(span.span_id)) return;
+      visited.add(span.span_id);
+      rows.push({label: typeof span.label === 'string' ? span.label : '其他阶段', start: span.start_ms,
+        duration: span.duration_ms, kind: span.error ? 'error' : span.kind, depth,
+        detail: `原生跨度；状态：${span.error ? '失败' : '已结束'}；可与其他阶段重叠${orphan ? '；上级跨度未采集' : ''}`});
+      for (const child of children.get(span.span_id) || []) append(child, Math.min(depth + 1, 8), orphan);
+    };
+    for (const span of children.get(native.root_span_id) || []) append(span, 1);
+    for (const span of spans) if (!visited.has(span.span_id)) append(span, 1, true);
+    return rows;
+  }
   if (item.scope === 'local') {
     if (valid(item.user_event_ms)) rows.push({label: 'WorkSwarm 接收请求', start: item.user_event_ms, duration: 0, kind: 'event', detail: '用户请求进入 WorkSwarm 的事件时间点'});
     for (const tool of Array.isArray(item.tools) ? item.tools : []) {
@@ -3660,24 +3637,27 @@ function traceHtml(item) {
   const rows = traceRows(item);
   if (!rows.length) return '<p class="empty">该请求只记录了标识，暂无可绘制的耗时。</p>';
   state.currentTraceRows = rows;
-  const total = item.gateway;
-  const filter = state.traceFilter || 'tools';
-  const visible = rows.map((row, index) => ({...row, index})).filter((row) => row.kind === 'total' || filter === 'all' || (filter === 'tools' && ['tool', 'error', 'event', 'first', 'react', 'answer'].includes(row.kind)) || (filter === 'models' && ['model-point', 'event'].includes(row.kind)));
+  const total = rows[0].duration;
+  const native = item.scope === 'cloud' && Number.isFinite(item.native_trajectory?.duration_ms)
+    && item.native_trajectory.duration_ms > 0 && Array.isArray(item.native_trajectory.spans);
+  const filter = state.traceFilter || (native ? 'all' : 'tools');
+  const visible = rows.map((row, index) => ({...row, index})).filter((row) => row.kind === 'total' || filter === 'all' || (filter === 'tools' && ['tool', 'error', 'event', 'first', 'react', 'answer'].includes(row.kind)) || (filter === 'models' && ['model', 'model-point', 'event'].includes(row.kind)));
   const styleFor = (row) => `left:${(100 * row.start / total).toFixed(3)}%;width:${(100 * row.duration / total).toFixed(3)}%`;
   const marks = rows.slice(1).map((row) => `<span class="trace-overview-mark trace-${row.kind}${row.duration === 0 ? ' trace-point' : ''}" style="${styleFor(row)}" title="${esc(row.label)}"></span>`).join('');
-  const bars = visible.filter((row) => row.kind !== 'total').map((row) => `<button type="button" class="trace-event-row" data-trace-row="${row.index}" data-trace-text="${esc(row.label.toLowerCase())}"><span class="trace-event-name">${esc(row.label)}</span><span class="trace-event-track"><span class="trace-bar trace-${row.kind}${row.duration === 0 ? ' trace-point' : ''}" style="${styleFor(row)}"></span></span><span class="trace-duration">${row.duration === 0 ? '时间点' : fmtDuration(row.duration)}</span></button>`).join('');
-  const filters = [['all', '全部事件'], ['tools', '工具调用'], ['models', '模型记账']].map(([key, label]) => `<button type="button" class="trace-filter${filter === key ? ' active' : ''}" data-trace-filter="${key}" aria-pressed="${filter === key}">${label}</button>`).join('');
+  const bars = visible.filter((row) => row.kind !== 'total').map((row) => `<button type="button" class="trace-event-row" data-trace-row="${row.index}" data-trace-text="${esc(row.label.toLowerCase())}"><span class="trace-event-name" style="padding-left:${20 + Math.min(Math.max((row.depth || 1) - 1, 0), 7) * 14}px">${esc(row.label)}</span><span class="trace-event-track"><span class="trace-bar trace-${row.kind}${row.duration === 0 ? ' trace-point' : ''}" style="${styleFor(row)}"></span></span><span class="trace-duration">${row.duration === 0 ? '时间点' : fmtDuration(row.duration)}</span></button>`).join('');
+  const filters = [['all', '全部事件'], ['tools', '工具调用'], ['models', native ? '模型调用' : '模型记账']].map(([key, label]) => `<button type="button" class="trace-filter${filter === key ? ' active' : ''}" data-trace-filter="${key}" aria-pressed="${filter === key}">${label}</button>`).join('');
   const ticks = [0, .25, .5, .75, 1].map((fraction) => `<span>${fmtDuration(total * fraction)}</span>`).join('');
   const hasTools = rows.some((row) => row.kind === 'tool' || row.kind === 'error');
   const missingPhases = item.scope === 'cloud' && (!Number.isFinite(item.first_token) || !Number.isFinite(item.answer_first));
-  const note = item.scope === 'local' ? '本地云侧历史样例（不属于当前范围的慢请求榜单）：工具区间为调用事件到结果事件的间隔；模型记账只表示时间点，不能当作模型耗时。'
+  const note = native ? 'WorkSwarm 原生轨迹：以根跨度为时间轴，阶段可嵌套或重叠；不包含完整网关耗时。仅展示脱敏阶段和时间。'
+    : item.scope === 'local' ? '本地云侧历史样例（不属于当前范围的慢请求榜单）：工具区间为调用事件到结果事件的间隔；模型记账只表示时间点，不能当作模型耗时。'
     : hasTools ? '工具区间为调用事件到结果事件的间隔；采集有文件和大小上限，明细可能不完整；模型调用时间未可靠关联。'
     : '当前快照没有逐次工具调用时间，暂无法绘制工具明细；思考与工具阶段不等于单次工具调用。';
-  const phaseNote = missingPhases ? ' 部分阶段标记未记录，无法绘制对应区间。' : '';
+  const phaseNote = !native && missingPhases ? ' 部分阶段标记未记录，无法绘制对应区间。' : '';
   const emptyList = filter === 'models' ? '该请求没有可可靠关联的模型记账记录。' : '当前筛选没有可展示的事件。';
   return `<div class="trajectory-head"><div><strong>执行轨迹</strong><span class="muted">${fmtDuration(total)} · ${rows.length} 条记录 · 当前 ${visible.length} 条</span></div><p>${esc(note + phaseNote)}</p></div>
     <div class="trace-overview" aria-label="轨迹总览"><div class="trace-overview-total"></div><div class="trace-overview-events">${marks}</div></div>
-    <div class="trajectory-legend"><span><i class="legend-dot total-dot"></i>本轮运行</span><span><i class="legend-dot event-dot"></i>事件</span><span><i class="legend-dot tool-dot"></i>工具</span><span><i class="legend-dot model-dot"></i>模型记账点</span></div>
+    <div class="trajectory-legend"><span><i class="legend-dot total-dot"></i>本轮运行</span>${native ? '<span><i class="legend-dot phase-dot"></i>运行阶段</span>' : ''}<span><i class="legend-dot event-dot"></i>事件</span><span><i class="legend-dot tool-dot"></i>工具</span><span><i class="legend-dot model-dot"></i>${native ? '模型调用' : '模型记账点'}</span></div>
     <div class="trajectory-toolbar"><label><span class="sr-only">搜索轨迹</span><input id="trace-search" type="search" placeholder="搜索事件或工具" autocomplete="off"></label><div class="trace-filters" aria-label="轨迹筛选">${filters}</div></div>
     <div class="trajectory-table"><div class="trajectory-columns"><span>事件</span><span class="trajectory-ticks">${ticks}</span><span>耗时</span></div><details class="trace-group" open><summary class="trace-root-row"><span>${esc(rows[0].label)} <small>${visible.length - 1}</small></span><span class="trace-root-track"><span class="trace-bar trace-total"></span></span><span class="trace-duration">${fmtDuration(total)}</span></summary><div class="trace-event-list">${bars || `<p class="trace-empty">${esc(emptyList)}</p>`}</div></details></div>
     <div id="trace-detail" class="trace-detail" aria-live="polite">点击一条事件查看时间和指标。</div>`;
@@ -3715,7 +3695,7 @@ function renderRequestTraces(doc) {
   const note = cloudCount ? `${coverage} 当前范围共 ${cloudCount} 条云侧慢请求${traceCollection ? '' : '或超时请求'}。`
     : `${coverage} 当前范围没有可用的云侧慢请求明细。${state.localTrace ? '下方历史样例不属于当前榜单。' : ''}`;
   const cloudRows = candidates.map((item, index) => ({item, index})).filter(({item}) => item.scope === 'cloud').slice(0, 20);
-  const table = cloudRows.length ? `<details class="cloud-trace-list" open><summary>云侧慢请求列表（展示 ${cloudRows.length} 条）</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>开始时间</th><th class="num">云侧耗时</th><th class="num">已匹配工具事件</th><th>request_id</th><th>轨迹</th></tr></thead><tbody>${cloudRows.map(({item,index}) => `<tr><td>${esc(item.start_time ? fmtDateTime(item.start_time) : item.date)}</td><td class="num">${fmtDuration(item.gateway)}</td><td class="num">${Array.isArray(item.tool_events) && item.tool_events.length ? item.tool_events.length : '—'}</td><td class="run-id">${esc(item.request_id)}</td><td><button type="button" class="trace-link" data-cloud-select="${index}">查看轨迹</button></td></tr>`).join('')}</tbody></table></div></details>` : '';
+  const table = cloudRows.length ? `<details class="cloud-trace-list" open><summary>云侧慢请求列表（展示 ${cloudRows.length} 条）</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>开始时间</th><th class="num">云侧耗时</th><th>轨迹数据</th><th>request_id</th><th>轨迹</th></tr></thead><tbody>${cloudRows.map(({item,index}) => `<tr><td>${esc(item.start_time ? fmtDateTime(item.start_time) : item.date)}</td><td class="num">${fmtDuration(item.gateway)}</td><td>${Array.isArray(item.native_trajectory?.spans) ? `${fmtCount(item.native_trajectory.spans.length + 1)} 个原生跨度` : Array.isArray(item.tool_events) && item.tool_events.length ? `${fmtCount(item.tool_events.length)} 个工具事件` : '—'}</td><td class="run-id">${esc(item.request_id)}</td><td><button type="button" class="trace-link" data-cloud-select="${index}">查看轨迹</button></td></tr>`).join('')}</tbody></table></div></details>` : '';
   picker.innerHTML = `<p class="data-freshness">${esc(note)}</p>` + table + (candidates.length ? `<label class="trace-select-label" for="trace-select">选择云侧请求 <select id="trace-select">${candidates.map((item, index) => `<option value="${index}"${traceKey(item) === state.traceId ? ' selected' : ''}>${item.scope === 'local' ? '本地云侧历史样例 · Issue #1031（不受时间筛选）' : '云侧慢请求'} · ${esc(item.start_time ? fmtDateTime(item.start_time) : item.date)} · ${esc(fmtDuration(item.gateway))}${item.scope === 'cloud' ? ` · ${esc(item.request_id)}` : ''}</option>`).join('')}</select></label>` : '');
   result.innerHTML = traceHtml(candidates.find((item) => traceKey(item) === state.traceId));
 }
@@ -3726,7 +3706,7 @@ $('request-traces').addEventListener('change', (event) => {
   if (!item) return;
   state.traceTouched = true;
   state.traceId = `${item.scope}:${item.request_id}`;
-  state.traceFilter = 'tools';
+  state.traceFilter = item.native_trajectory ? 'all' : 'tools';
   $('trace-result').innerHTML = traceHtml(item);
 });
 
@@ -3738,7 +3718,7 @@ $('request-traces').addEventListener('click', (event) => {
     if (!item || item.scope !== 'cloud') return;
     state.traceTouched = true;
     state.traceId = `${item.scope}:${item.request_id}`;
-    state.traceFilter = 'tools';
+    state.traceFilter = item.native_trajectory ? 'all' : 'tools';
     $('trace-select').value = String(index);
     $('trace-result').innerHTML = traceHtml(item);
     $('trace-result').scrollIntoView({behavior:'smooth', block:'start'});
@@ -3839,6 +3819,7 @@ async function loadEnvLatency() {
   const freshDaily = newestEnvDaily(candidates);
   state.envRefreshFailed = !freshDaily;
   state.envDaily = freshDaily || state.envDaily || null;
+  if (state.envDaily) syncRangeButtons(false);
   // The per-environment GateWay / WorkSwarm table is parked for now; the daily
   // charts carry the same measurements in a more readable form.
   renderEnv();
@@ -3925,11 +3906,11 @@ function renderEnv() {
     stale && '超过 6 小时未更新，请检查采集任务',
     state.envRefreshFailed && '刷新失败，保留上次快照',
     state.rangeDays === 1 && !scoped.days.length && '尚无当天采集数据',
-    requestOnly && '模型用量及 Token 基于日志记录，可能重复；网关流异常率不代表业务请求失败率；工具耗时仅统计已观测配对',
+    requestOnly && '模型用量及 Token 基于日志记录，可能重复；网关流异常率不代表业务请求失败率',
     answerPartial > 0 && `答案历史仅扫描近期会话，${fmtCount(answerPartial)} 个工作区可能不完整`,
   ].filter(Boolean);
   const freshness = `<div class="env-data-notes" aria-label="数据说明"><div><strong>数据更新</strong><span>${timeText} · 定时采集，并非实时流</span></div>${warnings.length ? `<div><strong>数据限制</strong><span>${warnings.join('；')}。</span></div>` : ''}<div><strong>覆盖标记</strong><span>* 表示部分日或日志覆盖不全。</span></div></div>`;
-  target.innerHTML = `${freshness}${envSummary(scoped)}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTtftTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
+  target.innerHTML = `${freshness}${envSummary(scoped)}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envTtftTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
   refineCharts(target);
 }
 

@@ -235,6 +235,7 @@ def read_log(item):
     if not isinstance(logfile.get('size'), int) or logfile['size'] > MAX_LOG:
         return query, [], 'oversized', {}
     requests = {}
+    correlations = {}
     usage = {}
     today = dt.datetime.now(CST).date()
     cutoff = dt.datetime.combine(today - dt.timedelta(days=SUMMARY_DAYS - 1), dt.time.min, CST).timestamp()
@@ -247,6 +248,24 @@ def read_log(item):
             # These events have no stable invocation ID in the deployed image.
             # Publish their count as records, never as deduplicated calls.
             record_usage(usage.setdefault(day.isoformat(), new_usage()), line)
+        if '[TrajectoryCorrelation] ' in line:
+            try:
+                link = json.loads(line.split('[TrajectoryCorrelation] ', 1)[1])
+                rid = link.get('request_id')
+                session = link.get('session_id')
+                trace = link.get('trace_id')
+                span = link.get('span_id')
+                if (isinstance(rid, str) and REQUEST_ID.fullmatch(rid)
+                        and isinstance(session, str) and 0 < len(session) <= 512
+                        and isinstance(trace, str) and re.fullmatch(r'[0-9a-f]{32}', trace)
+                        and isinstance(span, str) and re.fullmatch(r'[0-9a-f]{16}', span)):
+                    safe = {'request_id':rid,'session_id':session,'trace_id':trace,'span_id':span}
+                    if rid not in correlations:
+                        correlations[rid] = safe
+                    elif correlations[rid] != safe:
+                        correlations[rid] = None
+            except (ValueError, TypeError, AttributeError):
+                pass
         match = REQ.search(line)
         if not match:
             continue
@@ -281,6 +300,8 @@ def read_log(item):
         gateway = round((end - start) * 1000, 1)
         row = {'request_id': rid, 'date': date.isoformat(), 'gateway': gateway,
                'start_time': dt.datetime.fromtimestamp(start, UTC).isoformat()}
+        if correlations.get(rid):
+            row['_native_correlation'] = correlations[rid]
         if stream_status is not None:
             row['gateway_stream_status'] = stream_status
         for name, value in (('first_token', first), ('answer_first', answer)):
@@ -295,6 +316,27 @@ def read_log(item):
             row['react'] = round(row['answer_first'] - row['first_token'], 1)
         result.append(row)
     return query, result, 'ok', dict(usage)
+
+
+def read_native_trajectory(query, correlation):
+    """Console collection does not read native stores; Kubernetes injects a bounded reader."""
+    return None
+
+
+def attach_native_trajectories(query, rows):
+    matched = 0
+    for row in rows:
+        correlation = row.pop('_native_correlation', None)
+        if not correlation:
+            continue
+        try:
+            native = read_native_trajectory(query, correlation)
+        except (OSError, ValueError, TypeError, KeyError):
+            continue
+        if isinstance(native, dict):
+            row['native_trajectory'] = native
+            matched += 1
+    return matched
 
 
 def attach_tool_events(query, rows):
@@ -563,14 +605,19 @@ def collect():
     by_binding = {}
     for idx, query, row in chosen[:MAX_TRACE_REQUESTS]:
         by_binding.setdefault(idx, (query, []))[1].append(row)
-    details_ok = details_failed = 0
+    details_ok = details_failed = native_count = 0
     for index,(query, rows) in enumerate(by_binding.values(),1):
+        native_count += attach_native_trajectories(query, rows)
         try:
             if attach_tool_events(query, rows): details_ok += 1
             else: details_failed += 1
         except Exception:
             details_failed += 1
         print(f'trace workspaces {index}/{len(by_binding)}',flush=True)
+    # Session and trace correlation metadata are temporary and never published.
+    for _, _, rows in snapshots:
+        for row in rows:
+            row.pop('_native_correlation', None)
     output = {'schema':'digitalmate/cloud-traces@1','generated_at':generated_at,
               'request_daily_metrics':daily_metrics,
               'binding_count':len(items),'read_log_count':len(snapshots),'errors':problems,
@@ -578,6 +625,7 @@ def collect():
               'detail_workspaces_complete':details_ok,'detail_workspaces_partial':details_failed,
               'answer_workspaces_complete':answer_coverage['complete'],
               'answer_workspaces_partial':answer_coverage['partial'],
+              'native_trace_count':native_count,
               'trace_request_limit':MAX_TRACE_REQUESTS,'days':days}
     print('output: days',len(days),'slow requests',sum(len(d['anomaly']['latency']['slow_requests']) for d in days),
           'requests with tool events',sum(bool(row.get('tool_events')) for d in days for row in d['anomaly']['latency']['slow_requests']),flush=True)
