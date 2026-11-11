@@ -11,6 +11,66 @@ collector = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(collector)
 
 class ProductionTraceTests(unittest.TestCase):
+    def test_collection_connects_bounded_tool_samples_to_request_day(self):
+        today = dt.datetime.now(collector.CST).date().isoformat()
+        row = {'date': today, 'request_id': 'digitalmate-test', 'gateway': 100.0}
+        metrics = {today: {'values': [10.0, 30.0], 'failed': 1, 'unknown': 0,
+                           'observed': 2, 'matched': 2, 'incomplete': 0}}
+        with patch.object(collector, 'TOKEN', 'test'), \
+             patch.object(collector, 'binding_list', return_value=[{}]), \
+             patch.object(collector, 'read_log', return_value=({}, [row], 'ok')), \
+             patch.object(collector, 'read_tool_metrics', return_value=(metrics, True)), \
+             patch.object(collector, 'attach_tool_events', return_value=True):
+            result = collector.collect()
+        day = result['request_daily_metrics'][0]
+        self.assertEqual(day['tool']['mean'], 20.0)
+        self.assertEqual(day['tool_failed'], 1)
+        self.assertEqual(day['tool_coverage']['matched'], 2)
+        self.assertTrue(day['tool_coverage']['partial'])
+        self.assertNotIn('digitalmate-test', json.dumps(day))
+
+    def test_tool_files_pool_samples_without_leaking_ids_and_track_partial_coverage(self):
+        now = dt.datetime.now(dt.timezone.utc).timestamp()
+        records = [
+            {'t': now, 'request_id': 'private-request', 'call_key': 'a' * 64, 'ms': 10, 'status': 'done'},
+            {'t': now, 'request_id': 'private-request', 'call_key': 'b' * 64, 'ms': 30, 'status': 'error'},
+            {'t': now, 'type': 'coverage', 'observed_calls': 3, 'matched': 2,
+             'unmatched_events': 1, 'open_calls': 0},
+        ]
+        content = '\n'.join(map(json.dumps, records))
+        with patch.object(collector, 'listing', return_value=[{'name': 'tool-calls-2026-11-11.jsonl',
+                                                               'type': 'file', 'size': len(content)}]), \
+             patch.object(collector, 'fetch', return_value=content):
+            days, complete = collector.read_tool_metrics({})
+        self.assertTrue(complete)
+        summary = collector.summarize_tool_metrics(list(days.values()), not complete)
+        self.assertEqual(summary['tool'], {'n': 2, 'mean': 20.0, 'p50': 10.0, 'p95': 30.0})
+        self.assertEqual(summary['tool_failed'], 1)
+        self.assertEqual(summary['tool_coverage']['observed_calls'], 3)
+        self.assertTrue(summary['tool_coverage']['partial'])
+        self.assertNotIn('private-request', json.dumps(summary))
+        self.assertTrue(collector.summarize_tool_metrics(list(days.values()), True)['tool_coverage']['partial'])
+
+    def test_duplicate_call_identity_is_excluded_and_marks_incomplete(self):
+        now = dt.datetime.now(dt.timezone.utc).timestamp()
+        sample = {'t': now, 'call_key': 'c' * 64, 'ms': 10, 'status': 'done'}
+        content = '\n'.join(json.dumps(sample) for _ in range(2))
+        with patch.object(collector, 'listing', return_value=[{'name': 'tool-calls-2026-11-11.jsonl',
+                                                               'type': 'file', 'size': len(content)}]), \
+             patch.object(collector, 'fetch', return_value=content):
+            days, complete = collector.read_tool_metrics({})
+        self.assertFalse(complete)
+        self.assertEqual(collector.summarize_tool_metrics(list(days.values()), not complete)['tool']['n'], 0)
+
+    def test_absent_or_oversized_tool_files_do_not_invent_samples(self):
+        with patch.object(collector, 'listing', return_value=[]):
+            self.assertEqual(collector.read_tool_metrics({}), ({}, False))
+        with patch.object(collector, 'listing', return_value=[{'name': 'tool-calls-2026-11-11.jsonl',
+                                                               'type': 'file', 'size': collector.MAX_TOOL_FILE + 1}]), \
+             patch.object(collector, 'fetch') as fetch:
+            self.assertEqual(collector.read_tool_metrics({}), ({}, False))
+            fetch.assert_not_called()
+
     def test_daily_metrics_use_every_finished_request_without_leaking_ids(self):
         rows = [(0, {}, {'gateway': 100.0, 'first_token': 20.0, 'request_id': 'secret-id'}),
                 (1, {}, {'gateway': 300.0, 'first_token': 40.0, 'request_id': 'other-id'})]

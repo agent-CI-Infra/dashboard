@@ -26,13 +26,16 @@ MAX_LOG = 200_000_000
 MAX_HISTORY = 8_000_000
 MAX_SESSIONS = 25
 MAX_TRACE_REQUESTS = 100
+MAX_TOOL_FILE = 2_000_000
+MAX_TOOL_FILES = 10
+MAX_TOOL_WORKSPACES = 100
 NAME = re.compile(r'^[A-Za-z0-9_.-]{1,160}$')
 REQ = re.compile(r'request_id=([^\s,;]+)')
 REQUEST_ID = re.compile(r'^digitalmate-[A-Za-z0-9_-]{1,128}$')
 CHUNK = re.compile(r'process_stream chunk #\d+: request_id=\S+ event_type=(\S*)')
 
 
-def fetch(path, params, *, download=False):
+def fetch(path, params, *, download=False, max_bytes=None):
     url = BASE + path + '?' + urllib.parse.urlencode(params)
     req = urllib.request.Request(url, headers={'Authorization': 'Bearer ' + TOKEN})
     for attempt in range(3):
@@ -40,7 +43,7 @@ def fetch(path, params, *, download=False):
             with OPENER.open(req, timeout=30) as response:
                 if download:
                     length = int(response.headers.get('Content-Length', '0'))
-                    limit = MAX_HISTORY if str(params.get('path', '')).endswith('history.jsonl') else MAX_LOG
+                    limit = max_bytes or (MAX_HISTORY if str(params.get('path', '')).endswith('history.jsonl') else MAX_LOG)
                     if length > limit:
                         raise ValueError('file exceeds bound')
                     body = response.read(limit + 1)
@@ -258,6 +261,87 @@ def attach_tool_events(query, rows):
     return not truncated
 
 
+def read_tool_metrics(query):
+    """Read bounded adapter records; never export request IDs or raw lines."""
+    entries = listing(query, 'workswarm')
+    files = sorted((item for item in entries if item.get('type') == 'file'
+                    and re.fullmatch(r'tool-calls-\d{4}-\d{2}-\d{2}\.jsonl', item.get('name', ''))),
+                   key=lambda item: item['name'], reverse=True)
+    if not files:
+        return {}, False
+    incomplete = len(files) > MAX_TOOL_FILES
+    days, samples, duplicates = {}, {}, set()
+    for item in files[:MAX_TOOL_FILES]:
+        if not isinstance(item.get('size'), int) or item['size'] > MAX_TOOL_FILE:
+            incomplete = True
+            continue
+        try:
+            content = fetch('/api/workspace-files', {**query, 'path': 'workswarm/' + item['name'],
+                            'action': 'download'}, download=True, max_bytes=MAX_TOOL_FILE)
+        except (urllib.error.HTTPError, ValueError, TimeoutError, OSError):
+            incomplete = True
+            continue
+        for line in content.splitlines():
+            try:
+                record = json.loads(line)
+                stamp_value = record.get('t')
+                if isinstance(stamp_value, bool) or not isinstance(stamp_value, (int, float)) or not math.isfinite(stamp_value):
+                    raise ValueError('invalid timestamp')
+                day = dt.datetime.fromtimestamp(stamp_value, CST).date().isoformat()
+                target = days.setdefault(day, {'values': [], 'failed': 0, 'unknown': 0,
+                                                'observed': 0, 'matched': 0, 'incomplete': 0})
+                if record.get('type') == 'coverage':
+                    observed, matched = record.get('observed_calls'), record.get('matched')
+                    missing, opened = record.get('unmatched_events'), record.get('open_calls')
+                    numbers = (observed, matched, missing, opened)
+                    if any(type(value) is not int or value < 0 or value > 1000 for value in numbers) or matched > observed:
+                        raise ValueError('invalid coverage')
+                    target['observed'] += observed
+                    target['matched'] += matched
+                    target['incomplete'] += missing + opened
+                else:
+                    value = record.get('ms')
+                    status = record.get('status')
+                    key = record.get('call_key')
+                    if (isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value)
+                            or not 0 <= value <= 86400000 or status not in ('done', 'error', 'unknown')
+                            or not isinstance(key, str) or not re.fullmatch(r'[a-f0-9]{64}', key)):
+                        raise ValueError('invalid sample')
+                    if key in samples or key in duplicates:
+                        samples.pop(key, None)
+                        duplicates.add(key)
+                        incomplete = True
+                    else:
+                        samples[key] = (day, float(value), status)
+            except (ValueError, OverflowError, OSError, TypeError, AttributeError):
+                incomplete = True
+    for day, value, status in samples.values():
+        target = days[day]
+        target['values'].append(value)
+        target['failed'] += status == 'error'
+        target['unknown'] += status == 'unknown'
+    return days, not incomplete
+
+
+def summarize_tool_metrics(records, incomplete):
+    values = sorted(value for item in records for value in item['values'])
+    observed = sum(item['observed'] for item in records)
+    matched = sum(item['matched'] for item in records)
+    missing = sum(item['incomplete'] for item in records)
+    result = {'tool': {'n': len(values)}, 'tool_failed': sum(item['failed'] for item in records),
+              'tool_unknown': sum(item['unknown'] for item in records),
+              'tool_coverage': {'observed_calls': observed, 'matched': matched,
+                                'unmatched_events_or_open_calls': missing,
+                                # Queue loss and disabled producers are not observable in these files.
+                                'partial': True,
+                                'read_or_pairing_incomplete': incomplete or len(values) != matched or missing > 0}}
+    if values:
+        result['tool'].update(mean=round(sum(values) / len(values), 1),
+                              p50=round(values[math.ceil(.5 * len(values)) - 1], 1),
+                              p95=round(values[math.ceil(.95 * len(values)) - 1], 1))
+    return result
+
+
 def request_daily_metrics(records, date, generated_at, incomplete):
     """Summarize the same finished requests used for the slow-request ranking."""
     def summary(field):
@@ -298,14 +382,35 @@ def collect():
                 print(f'bindings {count}/{len(items)}; logs read {len(snapshots)}; unavailable {sum(problems.values())}', flush=True)
     if not snapshots:
         raise SystemExit('no production logs could be read; retain previous snapshot')
-    grouped = {}
+    grouped, tool_grouped = {}, {}
+    tool_partial = bool(problems)
+    tool_available = 0
     for idx, query, rows in snapshots:
         for row in rows:
             grouped.setdefault(row['date'], []).append((idx, query, row))
+    if len(snapshots) > MAX_TOOL_WORKSPACES:
+        tool_partial = True
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+        selected = sorted(snapshots, key=lambda item: item[0])[:MAX_TOOL_WORKSPACES]
+        futures = [pool.submit(read_tool_metrics, query) for _, query, _ in selected]
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                tool_days, complete = future.result()
+                if tool_days:
+                    tool_available += 1
+                if not complete:
+                    tool_partial = True
+                for day, data in tool_days.items():
+                    tool_grouped.setdefault(day, []).append(data)
+            except Exception:
+                tool_partial = True
     days, chosen, daily_metrics = [], [], []
     generated_at = dt.datetime.now(UTC).isoformat()
     for date, records in sorted(grouped.items()):
-        daily_metrics.append(request_daily_metrics(records, date, generated_at, bool(problems)))
+        daily = request_daily_metrics(records, date, generated_at, bool(problems))
+        if date in tool_grouped:
+            daily.update(summarize_tool_metrics(tool_grouped[date], tool_partial))
+        daily_metrics.append(daily)
         records.sort(key=lambda item:item[2]['gateway'],reverse=True)
         slow_count = math.ceil(len(records) * .05)
         slow = records[:min(slow_count, 50)]
@@ -327,6 +432,7 @@ def collect():
     output = {'schema':'digitalmate/cloud-traces@1','generated_at':generated_at,
               'request_daily_metrics':daily_metrics,
               'binding_count':len(items),'read_log_count':len(snapshots),'errors':problems,
+              'tool_metric_workspaces':tool_available, 'tool_metric_partial':tool_partial,
               'detail_workspaces_complete':details_ok,'detail_workspaces_partial':details_failed,
               'trace_request_limit':MAX_TRACE_REQUESTS,'days':days}
     print('output: days',len(days),'slow requests',sum(len(d['anomaly']['latency']['slow_requests']) for d in days),

@@ -905,7 +905,7 @@ function envToolTrend(doc) {
       n: row?.tool?.n,
       note: Number.isFinite(row?.tool_failed) ? `次工具调用 · 失败 ${fmtCount(row.tool_failed)}` : '次工具调用',
     }),
-    note: '工具调用口径（每次工具调用一条记录）：工具调用耗时 = 服务端适配器收到 chat.tool_call → 收到 chat.tool_result，含工具下发、执行与结果返回，不含模型思考与端侧网络。数据由产品侧适配器单独记录，不依赖网关日志级别；只有已部署该埋点的环境才有样本，缺失值留空不补 0；P50/P95 为工具调用级最近排名分位；* 为部分日。',
+    note: '每个样本是同一请求、调用 ID 上适配器收到调用到收到结果的时间，含下发、执行与结果返回；不含模型思考与端侧网络。数据来自已启用埋点的工作区记录，读取受文件大小和数量限制，覆盖未启用、写入失败或截断的情况未知；不能把样本数视为全部调用。缺失值留空；P50/P95 按工具调用计算。',
   });
 }
 
@@ -979,9 +979,9 @@ function envSummary(doc) {
   const answerTile = requestTile('answer_first', '答案首吐字', '网关受理 → 首个答案 chunk');
   const reactTile = requestTile('react', 'ReAct 阶段', '首个文本 chunk → 答案首吐字 · 思考 + 工具');
   const toolCount = Number.isFinite(anchor.tool?.n) ? anchor.tool.n : 0;
-  const toolHint = anchor.source === 'workspace_request_logs' ? '本次请求日志未采集工具耗时'
-    : toolCount > 0
-    ? `${fmtCount(toolCount)} 次工具调用 · 失败 ${fmtCount(anchor.tool_failed)} · tool_call → tool_result`
+  const coverage = anchor.tool_coverage;
+  const toolHint = toolCount > 0
+    ? `${fmtCount(toolCount)} 个样本 · 失败 ${fmtCount(anchor.tool_failed)} · 状态未知 ${fmtCount(anchor.tool_unknown)}${coverage ? ` · 已配对 ${fmtCount(coverage.matched)}/${fmtCount(coverage.observed_calls)} 个已观察调用${coverage.partial ? ' · 不完整' : ''}` : ' · 覆盖率未知'}`
     : '当日无已观测样本 · 覆盖率未知 · tool_call → tool_result';
   const toolTile = `<div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>工具调用</strong> 平均 / P50 / P95</div>
