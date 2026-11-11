@@ -5,7 +5,7 @@ import vm from 'node:vm';
 const src=readFileSync(new URL('../single-repo/static/production-metrics/app.js',import.meta.url),'utf8');
 const part=(start,end)=>src.slice(src.indexOf(start),src.indexOf(end,src.indexOf(start)));
 const c=vm.createContext({});
-vm.runInContext(`const state={traceFilter:'all'}; const esc=(v)=>String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'); const fmtDuration=(v)=>v+'ms';`+part('function slowTraceCandidates(doc)', 'function renderRequestTraces(doc)')+';globalThis.rows=traceRows;globalThis.html=traceHtml;globalThis.available=availableTraceCandidates;globalThis.state=state;',c);
+vm.runInContext(`const state={traceFilter:'all'}; const esc=(v)=>String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'); const fmtDuration=(v)=>v+'ms'; const fmtDateTime=String;`+part('function slowTraceCandidates(doc)', 'function renderRequestTraces(doc)')+';globalThis.rows=traceRows;globalThis.html=traceHtml;globalThis.available=availableTraceCandidates;globalThis.state=state;',c);
 const incident={scope:'local',gateway:1000,user_event_ms:20,final_ms:990,tools:[{index:1,name:'bash',start_ms:100,duration_ms:500,success:false,summary:'超时',result_chars:10}],models:[{index:1,time_ms:99,input_tokens:30,cache_read_tokens:20,cache_miss_tokens:10}]};
 test('native spans render actual model and nested phase intervals on their own root clock',()=>{
  const item={scope:'cloud',gateway:3000,native_trajectory:{duration_ms:2000,root_span_id:'a',spans:[
@@ -34,6 +34,10 @@ test('keeps valid native spans at a rounded root boundary',()=>{
   {span_id:'b',parent_span_id:'a',kind:'model',label:'模型调用',start_ms:0.334,duration_ms:0.667},
   {span_id:'c',parent_span_id:'a',kind:'tool',label:'工具调用',start_ms:0.5,duration_ms:0.6}]}};
  const rows=c.rows(item);assert.equal(rows.length,2);assert.ok(Math.abs(rows[1].duration-0.666)<1e-9);
+});
+test('retained native profile discloses its original collection time',()=>{
+ const item={scope:'cloud',gateway:1000,native_trace_retained_from:'2026-11-11T10:00:00Z',native_trajectory:{duration_ms:900,root_span_id:'a',spans:[]}};
+ c.state.traceDisplay='native';assert.match(c.html(item),/原生轨迹沿用 2026-11-11T10:00:00Z/);
 });
 test('records full history as intervals and point events without inferring model duration',()=>{
  const rows=c.rows(incident); assert.equal(rows.length,5); assert.equal(rows.filter(r=>r.kind==='error')[0].duration,500);

@@ -18,6 +18,7 @@ Environment:
   DM_UNTIL   optional ISO-8601 cut-off passed to the in-env aggregator
 """
 import base64
+import collections
 import datetime
 import importlib.util
 import json
@@ -793,6 +794,37 @@ def with_workspace_traces(previous, traces):
         raise ValueError('invalid workspace trace collection')
     if not isinstance(traces.get('read_log_count'), int) or traces['read_log_count'] <= 0:
         raise ValueError('empty workspace trace collection')
+    # The scheduled console reader cannot access native SQLite. Retain an
+    # already-public native profile only for the exact same unique request;
+    # never attach it to a different or explicitly ambiguous observation.
+    import copy
+    traces = copy.deepcopy(traces)
+    def trace_rows(collection):
+        return [row for day in collection.get('days', []) if isinstance(day, dict)
+                for row in ((day.get('anomaly') or {}).get('latency') or {}).get('slow_requests', [])
+                if isinstance(row, dict)]
+    old_collection = previous.get('cloud_trace_collection') or {}
+    old_rows = trace_rows(old_collection) if isinstance(old_collection, dict) else []
+    new_rows = trace_rows(traces)
+    old_counts = collections.Counter(row.get('request_id') for row in old_rows)
+    new_counts = collections.Counter(row.get('request_id') for row in new_rows)
+    old_unique = {row['request_id']: row for row in old_rows if isinstance(row.get('request_id'), str)
+                  and old_counts[row['request_id']] == 1}
+    retained = 0
+    for row in new_rows:
+        rid = row.get('request_id')
+        old = old_unique.get(rid)
+        if (not old or new_counts[rid] != 1 or row.get('native_trajectory')
+                or row.get('native_trace_state') == 'ambiguous'
+                or not isinstance(row.get('start_time'), str) or not isinstance(row.get('gateway'), (int, float))
+                or any(row.get(key) != old.get(key) for key in ('date', 'start_time', 'gateway'))
+                or not isinstance(old.get('native_trajectory'), dict)):
+            continue
+        row['native_trajectory'] = copy.deepcopy(old['native_trajectory'])
+        row['native_trace_retained_from'] = old.get('native_trace_retained_from') or old_collection.get('generated_at')
+        retained += 1
+    if retained:
+        traces['retained_native_trace_count'] = retained
     result = dict(previous)
     existing = {day['date']: dict(day) for day in previous.get('days', []) if isinstance(day, dict) and day.get('date')}
     for day in traces.get('request_daily_metrics', []):

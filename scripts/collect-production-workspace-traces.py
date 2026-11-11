@@ -246,6 +246,7 @@ def read_log(item):
         elif rid in correlations:
             # Contradictory explicit links must not be resolved by another heuristic.
             row['_native_correlation_conflict'] = True
+            row['native_trace_state'] = 'ambiguous'
         if stream_status is not None:
             row['gateway_stream_status'] = stream_status
         for name, value in (('first_token', first), ('answer_first', answer)):
