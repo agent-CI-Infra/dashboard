@@ -1,0 +1,112 @@
+name: Collect DigitalMate snapshot
+
+# Collect the private source directly into this repository's imported board.
+# The public page only receives the dashboard's existing, reduced snapshot and
+# history data; source files and credentials are never copied.
+on:
+  schedule:
+    - cron: '37 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: collect-digitalmate-data
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout collector code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: code
+          fetch-depth: 0
+
+      - name: Checkout DigitalMate data branch
+        uses: actions/checkout@v4
+        with:
+          ref: digitalmate
+          path: board
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check source token
+        env:
+          SOURCE_TOKEN: ${{ secrets.DIGITALMATE_TOKEN }}
+        run: |
+          if [ -z "$SOURCE_TOKEN" ]; then
+            echo '::error::DIGITALMATE_TOKEN is required to read the private DigitalMate source.'
+            exit 1
+          fi
+
+      - name: Point the board config at this dashboard
+        env:
+          SOURCE: openJiuwen-ai/DigitalMate
+          TARGET: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          path = Path('board/board-config.json')
+          config = json.loads(path.read_text(encoding='utf-8'))
+          deployment = (config.get('deployments') or {}).get(os.environ['SOURCE'])
+          if not deployment:
+              raise SystemExit(f'missing deployment config for {os.environ["SOURCE"]}')
+          deployment['repository'] = os.environ['TARGET']
+          path.write_text(json.dumps(config, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+          if ! git -C board diff --quiet -- board-config.json; then
+            git -C board config user.name 'github-actions[bot]'
+            git -C board config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git -C board add board-config.json
+            git -C board commit -m 'chore(digitalmate): collect snapshot in Agent-Dashboard'
+            git -C board push origin HEAD:digitalmate
+          fi
+
+      - name: Prepare collector
+        run: cp -R code/single-repo/gsb code/single-repo/static code/single-repo/publish.py board/
+
+      - name: Collect snapshot and publish data
+        id: publish
+        working-directory: board
+        env:
+          SOURCE_TOKEN: ${{ secrets.DIGITALMATE_TOKEN }}
+          GSB_PUBLISH_TOKEN: ${{ github.token }}
+          GSB_ALLOW_PRIVATE: '1'
+          SOURCE: openJiuwen-ai/DigitalMate
+          TARGET: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          PYTHONDONTWRITEBYTECODE=1 python3 publish.py \
+            --repo "$SOURCE" \
+            --settings board-config.json \
+            --output site \
+            --publish-repo "$TARGET" \
+            --branch digitalmate \
+            --incremental \
+            --publish-data-only \
+            --source-token-env SOURCE_TOKEN | tee "$RUNNER_TEMP/digitalmate-collection.json"
+          commit=$(jq -r '.commit // empty' "$RUNNER_TEMP/digitalmate-collection.json")
+          if [ -n "$commit" ]; then
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy dashboard
+        if: steps.publish.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --repo "$GITHUB_REPOSITORY" --ref main
