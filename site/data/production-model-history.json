@@ -1,10 +1,10 @@
 {
  "schema": "digitalmate/e2e-performance-history@1",
  "metrics_version": 7,
- "generated_at": "2026-11-10T21:20:13Z",
- "updated_at": "2026-11-10T21:20:13Z",
+ "generated_at": "2026-11-11T01:19:43Z",
+ "updated_at": "2026-11-11T01:19:43Z",
  "window_start": "2026-10-07T16:00:00+00:00",
- "window_end": "2026-11-10T21:19:03+00:00",
+ "window_end": "2026-11-11T01:18:05+00:00",
  "current_day_partial": true,
  "complete_through": "2026-11-10",
  "partial_day": "2026-11-11",
@@ -1295,32 +1295,32 @@
      "date": "2026-11-11",
      "status": "COMPLETED",
      "partial": true,
-     "query_ms": 258,
-     "duration_sum_ms": 21420,
-     "duration_sample_count": 83,
-     "duration_p50_ms": 251,
-     "duration_p95_ms": 320,
-     "success_count": 83,
-     "query_count": 83,
+     "query_ms": 255,
+     "duration_sum_ms": 56663,
+     "duration_sample_count": 222,
+     "duration_p50_ms": 248,
+     "duration_p95_ms": 336,
+     "success_count": 222,
+     "query_count": 222,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-10T17:05:28Z",
+     "finished_at": "2026-11-11T01:17:50Z",
      "failed_queries": 0,
      "unknown_status_count": 0,
      "blocked_queries": 0,
      "failure_reasons": {},
      "timeout_count": 0,
-     "latency_max_ms": 468,
+     "latency_max_ms": 849,
      "latency_max_request": {
-      "request_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
-      "call_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
-      "start_time": "2026-11-10T16:12:12.357+00:00",
-      "duration_ms": 468,
+      "request_id": "fa098307-693b-45eb-b24c-1317e0547442",
+      "call_id": "fa098307-693b-45eb-b24c-1317e0547442",
+      "start_time": "2026-11-10T23:51:25.024+00:00",
+      "duration_ms": 849,
       "status": "success",
       "reason": null
      },
-     "slow_count": 5,
-     "slow_threshold_ms": 320,
+     "slow_count": 12,
+     "slow_threshold_ms": 336,
      "hours": [
       {
        "hour": 0,
@@ -1337,13 +1337,53 @@
        "duration_sum_ms": 3416,
        "duration_sample_count": 14,
        "failed": 0
+      },
+      {
+       "hour": 5,
+       "calls": 27,
+       "success_count": 27,
+       "duration_sum_ms": 6145,
+       "duration_sample_count": 27,
+       "failed": 0
+      },
+      {
+       "hour": 6,
+       "calls": 25,
+       "success_count": 25,
+       "duration_sum_ms": 6130,
+       "duration_sample_count": 25,
+       "failed": 0
+      },
+      {
+       "hour": 7,
+       "calls": 41,
+       "success_count": 41,
+       "duration_sum_ms": 11111,
+       "duration_sample_count": 41,
+       "failed": 0
+      },
+      {
+       "hour": 8,
+       "calls": 12,
+       "success_count": 12,
+       "duration_sum_ms": 2768,
+       "duration_sample_count": 12,
+       "failed": 0
+      },
+      {
+       "hour": 9,
+       "calls": 34,
+       "success_count": 34,
+       "duration_sum_ms": 9089,
+       "duration_sample_count": 34,
+       "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/bge-m3",
-       "call_count": 83,
-       "success_count": 83,
+       "call_count": 222,
+       "success_count": 222,
        "failed_count": 0,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
@@ -1353,7 +1393,7 @@
        "ttft_estimated_sample_count": 0,
        "ttft_estimated_sum_ms": null,
        "ttft_estimated_histogram": [],
-       "ttft_filtered_count": 52,
+       "ttft_filtered_count": 125,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
@@ -1365,14 +1405,14 @@
        "tpot_histogram": [],
        "tpot_estimated_histogram": [],
        "tpot_filtered_count": 0,
-       "duration_sum_ms": 21420,
-       "duration_p50_ms": 251,
-       "duration_p95_ms": 320,
-       "duration_sample_count": 83,
-       "input_tokens": 14358,
+       "duration_sum_ms": 56663,
+       "duration_p50_ms": 248,
+       "duration_p95_ms": 336,
+       "duration_sample_count": 222,
+       "input_tokens": 25338,
        "output_tokens": 0,
-       "total_tokens": 14358,
-       "token_sample_count": 83,
+       "total_tokens": 25338,
+       "token_sample_count": 222,
        "token_coverage": 1.0,
        "failed_input_tokens": null,
        "failed_output_tokens": null,
@@ -1381,6 +1421,30 @@
       }
      ],
      "slow_requests": [
+      {
+       "request_id": "fa098307-693b-45eb-b24c-1317e0547442",
+       "call_id": "fa098307-693b-45eb-b24c-1317e0547442",
+       "start_time": "2026-11-10T23:51:25.024+00:00",
+       "duration_ms": 849,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "4f36134c-fd5c-45a8-9899-d66d4d35ab26",
+       "call_id": "4f36134c-fd5c-45a8-9899-d66d4d35ab26",
+       "start_time": "2026-11-11T01:09:18.477+00:00",
+       "duration_ms": 655,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "76611c4b-13c5-4371-bba4-0a1cb27d23fb",
+       "call_id": "76611c4b-13c5-4371-bba4-0a1cb27d23fb",
+       "start_time": "2026-11-11T01:11:20.815+00:00",
+       "duration_ms": 595,
+       "status": "success",
+       "reason": null
+      },
       {
        "request_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
        "call_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
@@ -1394,6 +1458,30 @@
        "call_id": "e62b762a-3be9-41fa-83ad-22d195f70a92",
        "start_time": "2026-11-10T16:01:26.650+00:00",
        "duration_ms": 466,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "d84c5dfe-7dbc-45e1-9947-fe70bd3d18f2",
+       "call_id": "d84c5dfe-7dbc-45e1-9947-fe70bd3d18f2",
+       "start_time": "2026-11-11T01:06:21.092+00:00",
+       "duration_ms": 466,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "68a65f44-b3cc-4c7b-9262-7a1e325a43b1",
+       "call_id": "68a65f44-b3cc-4c7b-9262-7a1e325a43b1",
+       "start_time": "2026-11-11T01:11:54.968+00:00",
+       "duration_ms": 457,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "987cb37e-a378-4a9c-be2f-7858370df374",
+       "call_id": "987cb37e-a378-4a9c-be2f-7858370df374",
+       "start_time": "2026-11-10T23:41:05.496+00:00",
+       "duration_ms": 427,
        "status": "success",
        "reason": null
       },
@@ -1414,10 +1502,18 @@
        "reason": null
       },
       {
-       "request_id": "cb035757-409a-4e66-9ed7-882621246f55",
-       "call_id": "cb035757-409a-4e66-9ed7-882621246f55",
-       "start_time": "2026-11-10T16:37:31.509+00:00",
-       "duration_ms": 320,
+       "request_id": "0a9d48ee-2b9f-4d3d-9bbc-95808ae5fdf2",
+       "call_id": "0a9d48ee-2b9f-4d3d-9bbc-95808ae5fdf2",
+       "start_time": "2026-11-11T00:25:27.479+00:00",
+       "duration_ms": 357,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "8ff65350-b7ae-4c2a-974c-6ca317e65566",
+       "call_id": "8ff65350-b7ae-4c2a-974c-6ca317e65566",
+       "start_time": "2026-11-10T22:59:35.963+00:00",
+       "duration_ms": 336,
        "status": "success",
        "reason": null
       }
@@ -1429,32 +1525,32 @@
     "date": "2026-11-11",
     "status": "COMPLETED",
     "partial": true,
-    "query_ms": 258,
-    "duration_sum_ms": 21420,
-    "duration_sample_count": 83,
-    "duration_p50_ms": 251,
-    "duration_p95_ms": 320,
-    "success_count": 83,
-    "query_count": 83,
+    "query_ms": 255,
+    "duration_sum_ms": 56663,
+    "duration_sample_count": 222,
+    "duration_p50_ms": 248,
+    "duration_p95_ms": 336,
+    "success_count": 222,
+    "query_count": 222,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-10T17:05:28Z",
+    "finished_at": "2026-11-11T01:17:50Z",
     "failed_queries": 0,
     "unknown_status_count": 0,
     "blocked_queries": 0,
     "failure_reasons": {},
     "timeout_count": 0,
-    "latency_max_ms": 468,
+    "latency_max_ms": 849,
     "latency_max_request": {
-     "request_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
-     "call_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
-     "start_time": "2026-11-10T16:12:12.357+00:00",
-     "duration_ms": 468,
+     "request_id": "fa098307-693b-45eb-b24c-1317e0547442",
+     "call_id": "fa098307-693b-45eb-b24c-1317e0547442",
+     "start_time": "2026-11-10T23:51:25.024+00:00",
+     "duration_ms": 849,
      "status": "success",
      "reason": null
     },
-    "slow_count": 5,
-    "slow_threshold_ms": 320,
+    "slow_count": 12,
+    "slow_threshold_ms": 336,
     "hours": [
      {
       "hour": 0,
@@ -1471,13 +1567,53 @@
       "duration_sum_ms": 3416,
       "duration_sample_count": 14,
       "failed": 0
+     },
+     {
+      "hour": 5,
+      "calls": 27,
+      "success_count": 27,
+      "duration_sum_ms": 6145,
+      "duration_sample_count": 27,
+      "failed": 0
+     },
+     {
+      "hour": 6,
+      "calls": 25,
+      "success_count": 25,
+      "duration_sum_ms": 6130,
+      "duration_sample_count": 25,
+      "failed": 0
+     },
+     {
+      "hour": 7,
+      "calls": 41,
+      "success_count": 41,
+      "duration_sum_ms": 11111,
+      "duration_sample_count": 41,
+      "failed": 0
+     },
+     {
+      "hour": 8,
+      "calls": 12,
+      "success_count": 12,
+      "duration_sum_ms": 2768,
+      "duration_sample_count": 12,
+      "failed": 0
+     },
+     {
+      "hour": 9,
+      "calls": 34,
+      "success_count": 34,
+      "duration_sum_ms": 9089,
+      "duration_sample_count": 34,
+      "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/bge-m3",
-      "call_count": 83,
-      "success_count": 83,
+      "call_count": 222,
+      "success_count": 222,
       "failed_count": 0,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
@@ -1487,7 +1623,7 @@
       "ttft_estimated_sample_count": 0,
       "ttft_estimated_sum_ms": null,
       "ttft_estimated_histogram": [],
-      "ttft_filtered_count": 52,
+      "ttft_filtered_count": 125,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
@@ -1499,14 +1635,14 @@
       "tpot_histogram": [],
       "tpot_estimated_histogram": [],
       "tpot_filtered_count": 0,
-      "duration_sum_ms": 21420,
-      "duration_p50_ms": 251,
-      "duration_p95_ms": 320,
-      "duration_sample_count": 83,
-      "input_tokens": 14358,
+      "duration_sum_ms": 56663,
+      "duration_p50_ms": 248,
+      "duration_p95_ms": 336,
+      "duration_sample_count": 222,
+      "input_tokens": 25338,
       "output_tokens": 0,
-      "total_tokens": 14358,
-      "token_sample_count": 83,
+      "total_tokens": 25338,
+      "token_sample_count": 222,
       "token_coverage": 1.0,
       "failed_input_tokens": null,
       "failed_output_tokens": null,
@@ -1515,6 +1651,30 @@
      }
     ],
     "slow_requests": [
+     {
+      "request_id": "fa098307-693b-45eb-b24c-1317e0547442",
+      "call_id": "fa098307-693b-45eb-b24c-1317e0547442",
+      "start_time": "2026-11-10T23:51:25.024+00:00",
+      "duration_ms": 849,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "4f36134c-fd5c-45a8-9899-d66d4d35ab26",
+      "call_id": "4f36134c-fd5c-45a8-9899-d66d4d35ab26",
+      "start_time": "2026-11-11T01:09:18.477+00:00",
+      "duration_ms": 655,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "76611c4b-13c5-4371-bba4-0a1cb27d23fb",
+      "call_id": "76611c4b-13c5-4371-bba4-0a1cb27d23fb",
+      "start_time": "2026-11-11T01:11:20.815+00:00",
+      "duration_ms": 595,
+      "status": "success",
+      "reason": null
+     },
      {
       "request_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
       "call_id": "3ff26ca1-d423-4449-a187-5dcbd0680c09",
@@ -1528,6 +1688,30 @@
       "call_id": "e62b762a-3be9-41fa-83ad-22d195f70a92",
       "start_time": "2026-11-10T16:01:26.650+00:00",
       "duration_ms": 466,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "d84c5dfe-7dbc-45e1-9947-fe70bd3d18f2",
+      "call_id": "d84c5dfe-7dbc-45e1-9947-fe70bd3d18f2",
+      "start_time": "2026-11-11T01:06:21.092+00:00",
+      "duration_ms": 466,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "68a65f44-b3cc-4c7b-9262-7a1e325a43b1",
+      "call_id": "68a65f44-b3cc-4c7b-9262-7a1e325a43b1",
+      "start_time": "2026-11-11T01:11:54.968+00:00",
+      "duration_ms": 457,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "987cb37e-a378-4a9c-be2f-7858370df374",
+      "call_id": "987cb37e-a378-4a9c-be2f-7858370df374",
+      "start_time": "2026-11-10T23:41:05.496+00:00",
+      "duration_ms": 427,
       "status": "success",
       "reason": null
      },
@@ -1548,10 +1732,18 @@
       "reason": null
      },
      {
-      "request_id": "cb035757-409a-4e66-9ed7-882621246f55",
-      "call_id": "cb035757-409a-4e66-9ed7-882621246f55",
-      "start_time": "2026-11-10T16:37:31.509+00:00",
-      "duration_ms": 320,
+      "request_id": "0a9d48ee-2b9f-4d3d-9bbc-95808ae5fdf2",
+      "call_id": "0a9d48ee-2b9f-4d3d-9bbc-95808ae5fdf2",
+      "start_time": "2026-11-11T00:25:27.479+00:00",
+      "duration_ms": 357,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "8ff65350-b7ae-4c2a-974c-6ca317e65566",
+      "call_id": "8ff65350-b7ae-4c2a-974c-6ca317e65566",
+      "start_time": "2026-11-10T22:59:35.963+00:00",
+      "duration_ms": 336,
       "status": "success",
       "reason": null
      }
@@ -18316,34 +18508,34 @@
      "date": "2026-11-11",
      "status": "COMPLETED",
      "partial": true,
-     "query_ms": 10849,
-     "duration_sum_ms": 2039565,
-     "duration_sample_count": 188,
-     "duration_p50_ms": 8839,
-     "duration_p95_ms": 25133,
-     "success_count": 188,
-     "query_count": 194,
+     "query_ms": 10089,
+     "duration_sum_ms": 5629501,
+     "duration_sample_count": 558,
+     "duration_p50_ms": 7664,
+     "duration_p95_ms": 26028,
+     "success_count": 558,
+     "query_count": 574,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-10T17:03:11Z",
-     "failed_queries": 6,
+     "finished_at": "2026-11-11T01:14:06Z",
+     "failed_queries": 16,
      "unknown_status_count": 0,
      "blocked_queries": 0,
      "failure_reasons": {
-      "rate_limit": 6
+      "rate_limit": 16
      },
      "timeout_count": 0,
-     "latency_max_ms": 58768,
+     "latency_max_ms": 63460,
      "latency_max_request": {
-      "request_id": "8d24366e95214b0f92998a539c696131",
-      "call_id": "03b0c38c-0603-4d7b-980a-d34b8547ad76",
-      "start_time": "2026-11-10T16:11:13.141+00:00",
-      "duration_ms": 58768,
+      "request_id": "21e83037774c4e44a9fb4d892ccdcdca",
+      "call_id": "38134b2d-18ab-44cf-bd82-017d6f92189b",
+      "start_time": "2026-11-11T00:25:58.438+00:00",
+      "duration_ms": 63460,
       "status": "success",
       "reason": null
      },
-     "slow_count": 10,
-     "slow_threshold_ms": 25133,
+     "slow_count": 29,
+     "slow_threshold_ms": 25673,
      "hours": [
       {
        "hour": 0,
@@ -18360,112 +18552,292 @@
        "duration_sum_ms": 228689,
        "duration_sample_count": 29,
        "failed": 2
+      },
+      {
+       "hour": 5,
+       "calls": 55,
+       "success_count": 55,
+       "duration_sum_ms": 553603,
+       "duration_sample_count": 55,
+       "failed": 0
+      },
+      {
+       "hour": 6,
+       "calls": 54,
+       "success_count": 54,
+       "duration_sum_ms": 645418,
+       "duration_sample_count": 54,
+       "failed": 0
+      },
+      {
+       "hour": 7,
+       "calls": 165,
+       "success_count": 155,
+       "duration_sum_ms": 1529051,
+       "duration_sample_count": 155,
+       "failed": 10
+      },
+      {
+       "hour": 8,
+       "calls": 41,
+       "success_count": 41,
+       "duration_sum_ms": 326585,
+       "duration_sample_count": 41,
+       "failed": 0
+      },
+      {
+       "hour": 9,
+       "calls": 65,
+       "success_count": 65,
+       "duration_sum_ms": 535279,
+       "duration_sample_count": 65,
+       "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 194,
-       "success_count": 188,
-       "failed_count": 6,
+       "call_count": 574,
+       "success_count": 558,
+       "failed_count": 16,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
        "ttft_sample_count": 0,
        "ttft_sum_ms": null,
-       "ttft_estimated_avg_ms": 4610,
-       "ttft_estimated_sample_count": 59,
-       "ttft_estimated_sum_ms": 271968,
+       "ttft_estimated_avg_ms": 4062,
+       "ttft_estimated_sample_count": 235,
+       "ttft_estimated_sum_ms": 954586,
        "ttft_estimated_histogram": [
         [
          316,
          1
         ],
         [
+         336,
+         1
+        ],
+        [
+         337,
+         2
+        ],
+        [
+         339,
+         1
+        ],
+        [
+         340,
+         3
+        ],
+        [
          345,
+         2
+        ],
+        [
+         346,
+         1
+        ],
+        [
+         349,
+         3
+        ],
+        [
+         350,
+         3
+        ],
+        [
+         351,
+         3
+        ],
+        [
+         352,
          1
         ],
         [
          353,
-         1
+         4
         ],
         [
          355,
+         3
+        ],
+        [
+         356,
+         6
+        ],
+        [
+         357,
          1
         ],
         [
+         358,
+         1
+        ],
+        [
+         359,
+         1
+        ],
+        [
+         360,
+         1
+        ],
+        [
+         361,
+         4
+        ],
+        [
+         362,
+         1
+        ],
+        [
+         363,
+         2
+        ],
+        [
+         364,
+         2
+        ],
+        [
          366,
+         3
+        ],
+        [
+         367,
          1
         ],
         [
          368,
-         2
+         4
         ],
         [
          369,
-         1
+         5
         ],
         [
          370,
-         1
+         2
+        ],
+        [
+         371,
+         2
         ],
         [
          372,
-         1
+         2
         ],
         [
          373,
          1
         ],
         [
+         374,
+         4
+        ],
+        [
          375,
-         1
+         3
         ],
         [
          376,
-         2
+         4
         ],
         [
          377,
-         1
+         6
         ],
         [
          379,
          1
         ],
         [
+         380,
+         2
+        ],
+        [
          381,
          3
         ],
         [
+         383,
+         4
+        ],
+        [
          384,
+         3
+        ],
+        [
+         385,
          1
+        ],
+        [
+         387,
+         2
+        ],
+        [
+         388,
+         2
         ],
         [
          389,
-         1
+         2
         ],
         [
          390,
+         2
+        ],
+        [
+         391,
          1
         ],
         [
          392,
-         1
+         2
+        ],
+        [
+         393,
+         2
         ],
         [
          395,
+         3
+        ],
+        [
+         396,
+         2
+        ],
+        [
+         397,
          1
         ],
         [
+         399,
+         3
+        ],
+        [
          400,
+         4
+        ],
+        [
+         401,
+         1
+        ],
+        [
+         402,
+         3
+        ],
+        [
+         403,
          2
         ],
         [
          404,
-         1
+         3
         ],
         [
          405,
+         1
+        ],
+        [
+         406,
          1
         ],
         [
@@ -18473,7 +18845,27 @@
          2
         ],
         [
+         408,
+         1
+        ],
+        [
+         409,
+         1
+        ],
+        [
+         410,
+         2
+        ],
+        [
          411,
+         2
+        ],
+        [
+         412,
+         1
+        ],
+        [
+         416,
          1
         ],
         [
@@ -18485,8 +18877,20 @@
          1
         ],
         [
-         425,
+         419,
+         2
+        ],
+        [
+         422,
          1
+        ],
+        [
+         423,
+         1
+        ],
+        [
+         425,
+         3
         ],
         [
          426,
@@ -18494,71 +18898,123 @@
         ],
         [
          427,
+         2
+        ],
+        [
+         428,
          1
+        ],
+        [
+         429,
+         2
         ],
         [
          430,
-         1
+         2
         ],
         [
          431,
+         2
+        ],
+        [
+         432,
          1
         ],
         [
          433,
-         1
+         2
         ],
         [
          435,
-         1
+         2
         ],
         [
          437,
-         1
+         2
         ],
         [
          438,
+         4
+        ],
+        [
+         439,
          1
         ],
         [
          440,
+         5
+        ],
+        [
+         441,
          1
+        ],
+        [
+         442,
+         2
         ],
         [
          445,
-         3
+         5
         ],
         [
          446,
-         1
+         4
         ],
         [
          448,
-         1
+         2
         ],
         [
          449,
-         1
+         5
         ],
         [
          450,
          1
         ],
         [
+         451,
+         2
+        ],
+        [
+         452,
+         2
+        ],
+        [
+         453,
+         1
+        ],
+        [
+         454,
+         2
+        ],
+        [
          455,
+         4
+        ],
+        [
+         457,
          1
         ],
         [
          458,
+         3
+        ],
+        [
+         460,
          1
         ],
         [
          462,
-         1
+         3
+        ],
+        [
+         468,
+         2
         ],
         [
          470,
-         1
+         2
         ],
         [
          471,
@@ -18569,23 +19025,35 @@
          1
         ],
         [
+         474,
+         1
+        ],
+        [
          479,
+         2
+        ],
+        [
+         484,
          1
         ],
         [
          486,
+         3
+        ],
+        [
+         506,
          1
         ]
        ],
-       "ttft_filtered_count": 65,
+       "ttft_filtered_count": 175,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
        "tpot_weight_tokens": 0,
-       "tpot_estimated_avg_ms": 5.917735404365214,
-       "tpot_estimated_sample_count": 59,
-       "tpot_estimated_decode_sum_ms": 472040.0,
-       "tpot_estimated_weight_tokens": 79767,
+       "tpot_estimated_avg_ms": 4.544345763493306,
+       "tpot_estimated_sample_count": 235,
+       "tpot_estimated_decode_sum_ms": 1498189.0,
+       "tpot_estimated_weight_tokens": 329682,
        "tpot_histogram": [],
        "tpot_estimated_histogram": [
         [
@@ -18593,80 +19061,184 @@
          1
         ],
         [
+         34,
+         1
+        ],
+        [
+         35,
+         1
+        ],
+        [
+         40,
+         1
+        ],
+        [
+         41,
+         2
+        ],
+        [
          42,
+         2
+        ],
+        [
+         43,
+         2
+        ],
+        [
+         45,
+         1
+        ],
+        [
+         46,
+         2
+        ],
+        [
+         49,
          1
         ],
         [
          50,
-         1
+         2
         ],
         [
          51,
+         2
+        ],
+        [
+         52,
          1
+        ],
+        [
+         53,
+         2
+        ],
+        [
+         54,
+         2
+        ],
+        [
+         56,
+         7
+        ],
+        [
+         57,
+         1
+        ],
+        [
+         58,
+         4
+        ],
+        [
+         59,
+         5
+        ],
+        [
+         60,
+         4
         ],
         [
          61,
-         1
+         5
         ],
         [
          62,
-         3
+         9
+        ],
+        [
+         63,
+         4
+        ],
+        [
+         64,
+         8
+        ],
+        [
+         65,
+         7
+        ],
+        [
+         66,
+         8
         ],
         [
          67,
-         1
+         8
         ],
         [
          68,
-         1
+         4
         ],
         [
          69,
-         1
+         3
         ],
         [
          70,
-         2
+         5
+        ],
+        [
+         71,
+         7
+        ],
+        [
+         72,
+         11
         ],
         [
          73,
-         1
+         7
         ],
         [
          74,
-         2
+         10
+        ],
+        [
+         75,
+         6
         ],
         [
          76,
-         1
+         6
         ],
         [
          77,
-         1
+         6
+        ],
+        [
+         78,
+         2
         ],
         [
          79,
-         1
+         9
+        ],
+        [
+         80,
+         7
         ],
         [
          81,
          1
         ],
         [
+         82,
+         3
+        ],
+        [
          83,
-         2
+         3
         ],
         [
          84,
-         2
+         5
         ],
         [
          85,
-         2
+         3
         ],
         [
          86,
-         5
+         7
         ],
         [
          87,
@@ -18682,7 +19254,7 @@
         ],
         [
          90,
-         3
+         4
         ],
         [
          91,
@@ -18694,23 +19266,27 @@
         ],
         [
          93,
-         3
+         5
         ],
         [
          94,
-         1
+         2
         ],
         [
          95,
-         1
+         2
         ],
         [
          97,
          2
         ],
         [
+         98,
+         1
+        ],
+        [
          99,
-         2
+         3
         ],
         [
          103,
@@ -18725,36 +19301,68 @@
          3
         ],
         [
+         107,
+         1
+        ],
+        [
          109,
          1
         ],
         [
          111,
          1
+        ],
+        [
+         118,
+         1
         ]
        ],
-       "tpot_filtered_count": 65,
-       "duration_sum_ms": 2039565,
-       "duration_p50_ms": 8839,
-       "duration_p95_ms": 25133,
-       "duration_sample_count": 188,
-       "input_tokens": 5536634,
-       "output_tokens": 253074,
-       "total_tokens": 5789708,
-       "token_sample_count": 188,
+       "tpot_filtered_count": 175,
+       "duration_sum_ms": 5629501,
+       "duration_p50_ms": 7664,
+       "duration_p95_ms": 26028,
+       "duration_sample_count": 558,
+       "input_tokens": 20184001,
+       "output_tokens": 805483,
+       "total_tokens": 20989484,
+       "token_sample_count": 558,
        "token_coverage": 1.0,
-       "failed_input_tokens": 1474,
+       "failed_input_tokens": 79386,
        "failed_output_tokens": 0,
-       "failed_total_tokens": 1474,
-       "failed_token_sample_count": 6
+       "failed_total_tokens": 79386,
+       "failed_token_sample_count": 16
       }
      ],
      "slow_requests": [
+      {
+       "request_id": "21e83037774c4e44a9fb4d892ccdcdca",
+       "call_id": "38134b2d-18ab-44cf-bd82-017d6f92189b",
+       "start_time": "2026-11-11T00:25:58.438+00:00",
+       "duration_ms": 63460,
+       "status": "success",
+       "reason": null
+      },
       {
        "request_id": "8d24366e95214b0f92998a539c696131",
        "call_id": "03b0c38c-0603-4d7b-980a-d34b8547ad76",
        "start_time": "2026-11-10T16:11:13.141+00:00",
        "duration_ms": 58768,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "fb4393c13fdb46c3a775ae6dca9e8fa0",
+       "call_id": "e609db36-d3dc-4a54-9b88-70fd770f9ed0",
+       "start_time": "2026-11-10T23:37:06.793+00:00",
+       "duration_ms": 50057,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "b2d8d0ccd4fc425f9b5f958ceccd8c41",
+       "call_id": "31c38a04-0b51-410e-9ad8-ce21e9f3a161",
+       "start_time": "2026-11-10T22:42:37.459+00:00",
+       "duration_ms": 49091,
        "status": "success",
        "reason": null
       },
@@ -18767,10 +19375,50 @@
        "reason": null
       },
       {
+       "request_id": "58684b0b991c44dda475c495fdbaf254",
+       "call_id": "3d73b243-e617-40d1-ac1e-097a6f23365b",
+       "start_time": "2026-11-10T22:43:27.296+00:00",
+       "duration_ms": 46260,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "b768c1cb67e84999ba4fbf5d248342d0",
+       "call_id": "9b2a935b-f30e-4737-8a45-7afb94dbb82f",
+       "start_time": "2026-11-10T22:58:14.337+00:00",
+       "duration_ms": 45154,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "8dd6d365ef5e44b8b209c7f2cf69b0b8",
+       "call_id": "0879d13e-2edb-4bb2-a070-ac6a780f5044",
+       "start_time": "2026-11-11T01:12:12.568+00:00",
+       "duration_ms": 43125,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "f9507246f6c94102974a54cfe33040f1",
        "call_id": "c1709ae1-4696-445a-aff9-7bfab94c8877",
        "start_time": "2026-11-10T16:25:10.796+00:00",
        "duration_ms": 41440,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "daf813af18cd46438fd4c5c0706b8d86",
+       "call_id": "40219795-b1c1-48d6-a92c-9aba2be5a9df",
+       "start_time": "2026-11-10T21:25:42.615+00:00",
+       "duration_ms": 41188,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "694da20ca08b4961978369f5c3ba29d4",
+       "call_id": "9520c475-cfad-48c9-9610-4d46a9816a5f",
+       "start_time": "2026-11-10T23:26:19.824+00:00",
+       "duration_ms": 38682,
        "status": "success",
        "reason": null
       },
@@ -18791,6 +19439,78 @@
        "reason": null
       },
       {
+       "request_id": "c0c1d1a5ae2a41d28e594db2f94abe0c",
+       "call_id": "5766784b-3ad5-4f3f-b8b6-c1e1acd3c572",
+       "start_time": "2026-11-10T23:25:01.266+00:00",
+       "duration_ms": 34668,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "9864ab63802445f3b4548187f490c639",
+       "call_id": "88b3fa85-f055-40db-966e-454013033136",
+       "start_time": "2026-11-10T23:41:22.682+00:00",
+       "duration_ms": 34228,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "d3cfa1cc4aa746949fbce7e8a1dc4c13",
+       "call_id": "33f0f336-a8d4-4980-b75d-02bd85b8966a",
+       "start_time": "2026-11-10T21:28:54.582+00:00",
+       "duration_ms": 33648,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "b9989bfd2a77401b8e2ebb4787c2f960",
+       "call_id": "d13f6b32-66d1-4b6a-8e1d-fad41f13614e",
+       "start_time": "2026-11-11T01:13:21.080+00:00",
+       "duration_ms": 33042,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "5ea7687ce0c14dd7b8dd9aa7759a569e",
+       "call_id": "24963088-83a7-407d-a0b7-ac58a3d2bf10",
+       "start_time": "2026-11-10T23:34:34.733+00:00",
+       "duration_ms": 32622,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "3f4d210624e842ed91d0696d90f31bb6",
+       "call_id": "38fd79dc-ffa9-4e50-8a57-d8a09c52a464",
+       "start_time": "2026-11-10T21:28:02.919+00:00",
+       "duration_ms": 32225,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "64d3fd54630043cbbeb910b6329e0309",
+       "call_id": "59a918be-efef-4f3d-ba3b-b0f5edb25b6d",
+       "start_time": "2026-11-10T23:28:06.189+00:00",
+       "duration_ms": 32151,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "4901faa346984e4389215018e6f55baa",
+       "call_id": "9059e9f3-01ca-463f-b4a6-0299f86e85f7",
+       "start_time": "2026-11-10T21:24:51.882+00:00",
+       "duration_ms": 30830,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "0db865bc4c2d44119411c2441d7d7344",
+       "call_id": "81a083d0-a7f7-4955-9070-6f2b9843d750",
+       "start_time": "2026-11-10T23:35:09.752+00:00",
+       "duration_ms": 29924,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "3c9be343f9f7415e946373a8cd01fd3b",
        "call_id": "0cf0a9ab-9e4b-4b13-8af7-a860ce0504fd",
        "start_time": "2026-11-10T16:19:50.105+00:00",
@@ -18803,6 +19523,14 @@
        "call_id": "bbd5d6c2-d410-4ddd-a92c-84fb76facd31",
        "start_time": "2026-11-10T16:19:50.642+00:00",
        "duration_ms": 27969,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "fa2d260656e14a3b9fed52679b36dda0",
+       "call_id": "4c05e8d2-ef47-465d-a5fb-7005c7de5d12",
+       "start_time": "2026-11-10T22:43:22.703+00:00",
+       "duration_ms": 27415,
        "status": "success",
        "reason": null
       },
@@ -18823,10 +19551,18 @@
        "reason": null
       },
       {
-       "request_id": "924ca30aba71468c919c32f5a15ef485",
-       "call_id": "00255c3f-7d41-4f14-bec9-90c95b0d09b6",
-       "start_time": "2026-11-10T16:23:35.386+00:00",
-       "duration_ms": 25133,
+       "request_id": "dcfc70d16a2a40ae9df47019a662635c",
+       "call_id": "17474368-cd14-47bd-8906-833e9195d877",
+       "start_time": "2026-11-10T23:37:39.681+00:00",
+       "duration_ms": 26028,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "a18ab7e376e041548eda9ae7e75511fc",
+       "call_id": "f21aab56-bd71-41db-b7cc-b5cab7208d2d",
+       "start_time": "2026-11-10T23:42:12.877+00:00",
+       "duration_ms": 25673,
        "status": "success",
        "reason": null
       }
@@ -18838,34 +19574,34 @@
     "date": "2026-11-11",
     "status": "COMPLETED",
     "partial": true,
-    "query_ms": 10849,
-    "duration_sum_ms": 2039565,
-    "duration_sample_count": 188,
-    "duration_p50_ms": 8839,
-    "duration_p95_ms": 25133,
-    "success_count": 188,
-    "query_count": 194,
+    "query_ms": 10089,
+    "duration_sum_ms": 5629501,
+    "duration_sample_count": 558,
+    "duration_p50_ms": 7664,
+    "duration_p95_ms": 26028,
+    "success_count": 558,
+    "query_count": 574,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-10T17:03:11Z",
-    "failed_queries": 6,
+    "finished_at": "2026-11-11T01:14:06Z",
+    "failed_queries": 16,
     "unknown_status_count": 0,
     "blocked_queries": 0,
     "failure_reasons": {
-     "rate_limit": 6
+     "rate_limit": 16
     },
     "timeout_count": 0,
-    "latency_max_ms": 58768,
+    "latency_max_ms": 63460,
     "latency_max_request": {
-     "request_id": "8d24366e95214b0f92998a539c696131",
-     "call_id": "03b0c38c-0603-4d7b-980a-d34b8547ad76",
-     "start_time": "2026-11-10T16:11:13.141+00:00",
-     "duration_ms": 58768,
+     "request_id": "21e83037774c4e44a9fb4d892ccdcdca",
+     "call_id": "38134b2d-18ab-44cf-bd82-017d6f92189b",
+     "start_time": "2026-11-11T00:25:58.438+00:00",
+     "duration_ms": 63460,
      "status": "success",
      "reason": null
     },
-    "slow_count": 10,
-    "slow_threshold_ms": 25133,
+    "slow_count": 29,
+    "slow_threshold_ms": 25673,
     "hours": [
      {
       "hour": 0,
@@ -18882,112 +19618,292 @@
       "duration_sum_ms": 228689,
       "duration_sample_count": 29,
       "failed": 2
+     },
+     {
+      "hour": 5,
+      "calls": 55,
+      "success_count": 55,
+      "duration_sum_ms": 553603,
+      "duration_sample_count": 55,
+      "failed": 0
+     },
+     {
+      "hour": 6,
+      "calls": 54,
+      "success_count": 54,
+      "duration_sum_ms": 645418,
+      "duration_sample_count": 54,
+      "failed": 0
+     },
+     {
+      "hour": 7,
+      "calls": 165,
+      "success_count": 155,
+      "duration_sum_ms": 1529051,
+      "duration_sample_count": 155,
+      "failed": 10
+     },
+     {
+      "hour": 8,
+      "calls": 41,
+      "success_count": 41,
+      "duration_sum_ms": 326585,
+      "duration_sample_count": 41,
+      "failed": 0
+     },
+     {
+      "hour": 9,
+      "calls": 65,
+      "success_count": 65,
+      "duration_sum_ms": 535279,
+      "duration_sample_count": 65,
+      "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 194,
-      "success_count": 188,
-      "failed_count": 6,
+      "call_count": 574,
+      "success_count": 558,
+      "failed_count": 16,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
       "ttft_sample_count": 0,
       "ttft_sum_ms": null,
-      "ttft_estimated_avg_ms": 4610,
-      "ttft_estimated_sample_count": 59,
-      "ttft_estimated_sum_ms": 271968,
+      "ttft_estimated_avg_ms": 4062,
+      "ttft_estimated_sample_count": 235,
+      "ttft_estimated_sum_ms": 954586,
       "ttft_estimated_histogram": [
        [
         316,
         1
        ],
        [
+        336,
+        1
+       ],
+       [
+        337,
+        2
+       ],
+       [
+        339,
+        1
+       ],
+       [
+        340,
+        3
+       ],
+       [
         345,
+        2
+       ],
+       [
+        346,
+        1
+       ],
+       [
+        349,
+        3
+       ],
+       [
+        350,
+        3
+       ],
+       [
+        351,
+        3
+       ],
+       [
+        352,
         1
        ],
        [
         353,
-        1
+        4
        ],
        [
         355,
+        3
+       ],
+       [
+        356,
+        6
+       ],
+       [
+        357,
         1
        ],
        [
+        358,
+        1
+       ],
+       [
+        359,
+        1
+       ],
+       [
+        360,
+        1
+       ],
+       [
+        361,
+        4
+       ],
+       [
+        362,
+        1
+       ],
+       [
+        363,
+        2
+       ],
+       [
+        364,
+        2
+       ],
+       [
         366,
+        3
+       ],
+       [
+        367,
         1
        ],
        [
         368,
-        2
+        4
        ],
        [
         369,
-        1
+        5
        ],
        [
         370,
-        1
+        2
+       ],
+       [
+        371,
+        2
        ],
        [
         372,
-        1
+        2
        ],
        [
         373,
         1
        ],
        [
+        374,
+        4
+       ],
+       [
         375,
-        1
+        3
        ],
        [
         376,
-        2
+        4
        ],
        [
         377,
-        1
+        6
        ],
        [
         379,
         1
        ],
        [
+        380,
+        2
+       ],
+       [
         381,
         3
        ],
        [
+        383,
+        4
+       ],
+       [
         384,
+        3
+       ],
+       [
+        385,
         1
+       ],
+       [
+        387,
+        2
+       ],
+       [
+        388,
+        2
        ],
        [
         389,
-        1
+        2
        ],
        [
         390,
+        2
+       ],
+       [
+        391,
         1
        ],
        [
         392,
-        1
+        2
+       ],
+       [
+        393,
+        2
        ],
        [
         395,
+        3
+       ],
+       [
+        396,
+        2
+       ],
+       [
+        397,
         1
        ],
        [
+        399,
+        3
+       ],
+       [
         400,
+        4
+       ],
+       [
+        401,
+        1
+       ],
+       [
+        402,
+        3
+       ],
+       [
+        403,
         2
        ],
        [
         404,
-        1
+        3
        ],
        [
         405,
+        1
+       ],
+       [
+        406,
         1
        ],
        [
@@ -18995,7 +19911,27 @@
         2
        ],
        [
+        408,
+        1
+       ],
+       [
+        409,
+        1
+       ],
+       [
+        410,
+        2
+       ],
+       [
         411,
+        2
+       ],
+       [
+        412,
+        1
+       ],
+       [
+        416,
         1
        ],
        [
@@ -19007,8 +19943,20 @@
         1
        ],
        [
-        425,
+        419,
+        2
+       ],
+       [
+        422,
         1
+       ],
+       [
+        423,
+        1
+       ],
+       [
+        425,
+        3
        ],
        [
         426,
@@ -19016,71 +19964,123 @@
        ],
        [
         427,
+        2
+       ],
+       [
+        428,
         1
+       ],
+       [
+        429,
+        2
        ],
        [
         430,
-        1
+        2
        ],
        [
         431,
+        2
+       ],
+       [
+        432,
         1
        ],
        [
         433,
-        1
+        2
        ],
        [
         435,
-        1
+        2
        ],
        [
         437,
-        1
+        2
        ],
        [
         438,
+        4
+       ],
+       [
+        439,
         1
        ],
        [
         440,
+        5
+       ],
+       [
+        441,
         1
+       ],
+       [
+        442,
+        2
        ],
        [
         445,
-        3
+        5
        ],
        [
         446,
-        1
+        4
        ],
        [
         448,
-        1
+        2
        ],
        [
         449,
-        1
+        5
        ],
        [
         450,
         1
        ],
        [
+        451,
+        2
+       ],
+       [
+        452,
+        2
+       ],
+       [
+        453,
+        1
+       ],
+       [
+        454,
+        2
+       ],
+       [
         455,
+        4
+       ],
+       [
+        457,
         1
        ],
        [
         458,
+        3
+       ],
+       [
+        460,
         1
        ],
        [
         462,
-        1
+        3
+       ],
+       [
+        468,
+        2
        ],
        [
         470,
-        1
+        2
        ],
        [
         471,
@@ -19091,23 +20091,35 @@
         1
        ],
        [
+        474,
+        1
+       ],
+       [
         479,
+        2
+       ],
+       [
+        484,
         1
        ],
        [
         486,
+        3
+       ],
+       [
+        506,
         1
        ]
       ],
-      "ttft_filtered_count": 65,
+      "ttft_filtered_count": 175,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
       "tpot_weight_tokens": 0,
-      "tpot_estimated_avg_ms": 5.917735404365214,
-      "tpot_estimated_sample_count": 59,
-      "tpot_estimated_decode_sum_ms": 472040.0,
-      "tpot_estimated_weight_tokens": 79767,
+      "tpot_estimated_avg_ms": 4.544345763493306,
+      "tpot_estimated_sample_count": 235,
+      "tpot_estimated_decode_sum_ms": 1498189.0,
+      "tpot_estimated_weight_tokens": 329682,
       "tpot_histogram": [],
       "tpot_estimated_histogram": [
        [
@@ -19115,80 +20127,184 @@
         1
        ],
        [
+        34,
+        1
+       ],
+       [
+        35,
+        1
+       ],
+       [
+        40,
+        1
+       ],
+       [
+        41,
+        2
+       ],
+       [
         42,
+        2
+       ],
+       [
+        43,
+        2
+       ],
+       [
+        45,
+        1
+       ],
+       [
+        46,
+        2
+       ],
+       [
+        49,
         1
        ],
        [
         50,
-        1
+        2
        ],
        [
         51,
+        2
+       ],
+       [
+        52,
         1
+       ],
+       [
+        53,
+        2
+       ],
+       [
+        54,
+        2
+       ],
+       [
+        56,
+        7
+       ],
+       [
+        57,
+        1
+       ],
+       [
+        58,
+        4
+       ],
+       [
+        59,
+        5
+       ],
+       [
+        60,
+        4
        ],
        [
         61,
-        1
+        5
        ],
        [
         62,
-        3
+        9
+       ],
+       [
+        63,
+        4
+       ],
+       [
+        64,
+        8
+       ],
+       [
+        65,
+        7
+       ],
+       [
+        66,
+        8
        ],
        [
         67,
-        1
+        8
        ],
        [
         68,
-        1
+        4
        ],
        [
         69,
-        1
+        3
        ],
        [
         70,
-        2
+        5
+       ],
+       [
+        71,
+        7
+       ],
+       [
+        72,
+        11
        ],
        [
         73,
-        1
+        7
        ],
        [
         74,
-        2
+        10
+       ],
+       [
+        75,
+        6
        ],
        [
         76,
-        1
+        6
        ],
        [
         77,
-        1
+        6
+       ],
+       [
+        78,
+        2
        ],
        [
         79,
-        1
+        9
+       ],
+       [
+        80,
+        7
        ],
        [
         81,
         1
        ],
        [
+        82,
+        3
+       ],
+       [
         83,
-        2
+        3
        ],
        [
         84,
-        2
+        5
        ],
        [
         85,
-        2
+        3
        ],
        [
         86,
-        5
+        7
        ],
        [
         87,
@@ -19204,7 +20320,7 @@
        ],
        [
         90,
-        3
+        4
        ],
        [
         91,
@@ -19216,23 +20332,27 @@
        ],
        [
         93,
-        3
+        5
        ],
        [
         94,
-        1
+        2
        ],
        [
         95,
-        1
+        2
        ],
        [
         97,
         2
        ],
        [
+        98,
+        1
+       ],
+       [
         99,
-        2
+        3
        ],
        [
         103,
@@ -19247,36 +20367,68 @@
         3
        ],
        [
+        107,
+        1
+       ],
+       [
         109,
         1
        ],
        [
         111,
         1
+       ],
+       [
+        118,
+        1
        ]
       ],
-      "tpot_filtered_count": 65,
-      "duration_sum_ms": 2039565,
-      "duration_p50_ms": 8839,
-      "duration_p95_ms": 25133,
-      "duration_sample_count": 188,
-      "input_tokens": 5536634,
-      "output_tokens": 253074,
-      "total_tokens": 5789708,
-      "token_sample_count": 188,
+      "tpot_filtered_count": 175,
+      "duration_sum_ms": 5629501,
+      "duration_p50_ms": 7664,
+      "duration_p95_ms": 26028,
+      "duration_sample_count": 558,
+      "input_tokens": 20184001,
+      "output_tokens": 805483,
+      "total_tokens": 20989484,
+      "token_sample_count": 558,
       "token_coverage": 1.0,
-      "failed_input_tokens": 1474,
+      "failed_input_tokens": 79386,
       "failed_output_tokens": 0,
-      "failed_total_tokens": 1474,
-      "failed_token_sample_count": 6
+      "failed_total_tokens": 79386,
+      "failed_token_sample_count": 16
      }
     ],
     "slow_requests": [
+     {
+      "request_id": "21e83037774c4e44a9fb4d892ccdcdca",
+      "call_id": "38134b2d-18ab-44cf-bd82-017d6f92189b",
+      "start_time": "2026-11-11T00:25:58.438+00:00",
+      "duration_ms": 63460,
+      "status": "success",
+      "reason": null
+     },
      {
       "request_id": "8d24366e95214b0f92998a539c696131",
       "call_id": "03b0c38c-0603-4d7b-980a-d34b8547ad76",
       "start_time": "2026-11-10T16:11:13.141+00:00",
       "duration_ms": 58768,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "fb4393c13fdb46c3a775ae6dca9e8fa0",
+      "call_id": "e609db36-d3dc-4a54-9b88-70fd770f9ed0",
+      "start_time": "2026-11-10T23:37:06.793+00:00",
+      "duration_ms": 50057,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "b2d8d0ccd4fc425f9b5f958ceccd8c41",
+      "call_id": "31c38a04-0b51-410e-9ad8-ce21e9f3a161",
+      "start_time": "2026-11-10T22:42:37.459+00:00",
+      "duration_ms": 49091,
       "status": "success",
       "reason": null
      },
@@ -19289,10 +20441,50 @@
       "reason": null
      },
      {
+      "request_id": "58684b0b991c44dda475c495fdbaf254",
+      "call_id": "3d73b243-e617-40d1-ac1e-097a6f23365b",
+      "start_time": "2026-11-10T22:43:27.296+00:00",
+      "duration_ms": 46260,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "b768c1cb67e84999ba4fbf5d248342d0",
+      "call_id": "9b2a935b-f30e-4737-8a45-7afb94dbb82f",
+      "start_time": "2026-11-10T22:58:14.337+00:00",
+      "duration_ms": 45154,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "8dd6d365ef5e44b8b209c7f2cf69b0b8",
+      "call_id": "0879d13e-2edb-4bb2-a070-ac6a780f5044",
+      "start_time": "2026-11-11T01:12:12.568+00:00",
+      "duration_ms": 43125,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "f9507246f6c94102974a54cfe33040f1",
       "call_id": "c1709ae1-4696-445a-aff9-7bfab94c8877",
       "start_time": "2026-11-10T16:25:10.796+00:00",
       "duration_ms": 41440,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "daf813af18cd46438fd4c5c0706b8d86",
+      "call_id": "40219795-b1c1-48d6-a92c-9aba2be5a9df",
+      "start_time": "2026-11-10T21:25:42.615+00:00",
+      "duration_ms": 41188,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "694da20ca08b4961978369f5c3ba29d4",
+      "call_id": "9520c475-cfad-48c9-9610-4d46a9816a5f",
+      "start_time": "2026-11-10T23:26:19.824+00:00",
+      "duration_ms": 38682,
       "status": "success",
       "reason": null
      },
@@ -19313,6 +20505,78 @@
       "reason": null
      },
      {
+      "request_id": "c0c1d1a5ae2a41d28e594db2f94abe0c",
+      "call_id": "5766784b-3ad5-4f3f-b8b6-c1e1acd3c572",
+      "start_time": "2026-11-10T23:25:01.266+00:00",
+      "duration_ms": 34668,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "9864ab63802445f3b4548187f490c639",
+      "call_id": "88b3fa85-f055-40db-966e-454013033136",
+      "start_time": "2026-11-10T23:41:22.682+00:00",
+      "duration_ms": 34228,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "d3cfa1cc4aa746949fbce7e8a1dc4c13",
+      "call_id": "33f0f336-a8d4-4980-b75d-02bd85b8966a",
+      "start_time": "2026-11-10T21:28:54.582+00:00",
+      "duration_ms": 33648,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "b9989bfd2a77401b8e2ebb4787c2f960",
+      "call_id": "d13f6b32-66d1-4b6a-8e1d-fad41f13614e",
+      "start_time": "2026-11-11T01:13:21.080+00:00",
+      "duration_ms": 33042,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "5ea7687ce0c14dd7b8dd9aa7759a569e",
+      "call_id": "24963088-83a7-407d-a0b7-ac58a3d2bf10",
+      "start_time": "2026-11-10T23:34:34.733+00:00",
+      "duration_ms": 32622,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "3f4d210624e842ed91d0696d90f31bb6",
+      "call_id": "38fd79dc-ffa9-4e50-8a57-d8a09c52a464",
+      "start_time": "2026-11-10T21:28:02.919+00:00",
+      "duration_ms": 32225,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "64d3fd54630043cbbeb910b6329e0309",
+      "call_id": "59a918be-efef-4f3d-ba3b-b0f5edb25b6d",
+      "start_time": "2026-11-10T23:28:06.189+00:00",
+      "duration_ms": 32151,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "4901faa346984e4389215018e6f55baa",
+      "call_id": "9059e9f3-01ca-463f-b4a6-0299f86e85f7",
+      "start_time": "2026-11-10T21:24:51.882+00:00",
+      "duration_ms": 30830,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "0db865bc4c2d44119411c2441d7d7344",
+      "call_id": "81a083d0-a7f7-4955-9070-6f2b9843d750",
+      "start_time": "2026-11-10T23:35:09.752+00:00",
+      "duration_ms": 29924,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "3c9be343f9f7415e946373a8cd01fd3b",
       "call_id": "0cf0a9ab-9e4b-4b13-8af7-a860ce0504fd",
       "start_time": "2026-11-10T16:19:50.105+00:00",
@@ -19325,6 +20589,14 @@
       "call_id": "bbd5d6c2-d410-4ddd-a92c-84fb76facd31",
       "start_time": "2026-11-10T16:19:50.642+00:00",
       "duration_ms": 27969,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "fa2d260656e14a3b9fed52679b36dda0",
+      "call_id": "4c05e8d2-ef47-465d-a5fb-7005c7de5d12",
+      "start_time": "2026-11-10T22:43:22.703+00:00",
+      "duration_ms": 27415,
       "status": "success",
       "reason": null
      },
@@ -19345,10 +20617,18 @@
       "reason": null
      },
      {
-      "request_id": "924ca30aba71468c919c32f5a15ef485",
-      "call_id": "00255c3f-7d41-4f14-bec9-90c95b0d09b6",
-      "start_time": "2026-11-10T16:23:35.386+00:00",
-      "duration_ms": 25133,
+      "request_id": "dcfc70d16a2a40ae9df47019a662635c",
+      "call_id": "17474368-cd14-47bd-8906-833e9195d877",
+      "start_time": "2026-11-10T23:37:39.681+00:00",
+      "duration_ms": 26028,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "a18ab7e376e041548eda9ae7e75511fc",
+      "call_id": "f21aab56-bd71-41db-b7cc-b5cab7208d2d",
+      "start_time": "2026-11-10T23:42:12.877+00:00",
+      "duration_ms": 25673,
       "status": "success",
       "reason": null
      }
@@ -20579,21 +21859,21 @@
      "date": "2026-11-11",
      "status": "COMPLETED",
      "partial": true,
-     "query_ms": 6720,
-     "duration_sum_ms": 4670334,
-     "duration_sample_count": 695,
-     "duration_p50_ms": 5341,
-     "duration_p95_ms": 18675,
-     "success_count": 695,
-     "query_count": 700,
+     "query_ms": 6699,
+     "duration_sum_ms": 6980818,
+     "duration_sample_count": 1042,
+     "duration_p50_ms": 5410,
+     "duration_p95_ms": 16955,
+     "success_count": 1042,
+     "query_count": 1050,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-10T19:25:08Z",
-     "failed_queries": 5,
+     "finished_at": "2026-11-11T01:18:01Z",
+     "failed_queries": 8,
      "unknown_status_count": 0,
      "blocked_queries": 0,
      "failure_reasons": {
-      "rate_limit": 5
+      "rate_limit": 8
      },
      "timeout_count": 0,
      "latency_max_ms": 53585,
@@ -20605,8 +21885,8 @@
       "status": "success",
       "reason": null
      },
-     "slow_count": 35,
-     "slow_threshold_ms": 18675,
+     "slow_count": 53,
+     "slow_threshold_ms": 16955,
      "hours": [
       {
        "hour": 0,
@@ -20639,14 +21919,54 @@
        "duration_sum_ms": 172480,
        "duration_sample_count": 46,
        "failed": 0
+      },
+      {
+       "hour": 5,
+       "calls": 57,
+       "success_count": 57,
+       "duration_sum_ms": 425693,
+       "duration_sample_count": 57,
+       "failed": 0
+      },
+      {
+       "hour": 6,
+       "calls": 51,
+       "success_count": 51,
+       "duration_sum_ms": 314770,
+       "duration_sample_count": 51,
+       "failed": 0
+      },
+      {
+       "hour": 7,
+       "calls": 166,
+       "success_count": 163,
+       "duration_sum_ms": 1144929,
+       "duration_sample_count": 163,
+       "failed": 3
+      },
+      {
+       "hour": 8,
+       "calls": 49,
+       "success_count": 49,
+       "duration_sum_ms": 300653,
+       "duration_sample_count": 49,
+       "failed": 0
+      },
+      {
+       "hour": 9,
+       "calls": 27,
+       "success_count": 27,
+       "duration_sum_ms": 124439,
+       "duration_sample_count": 27,
+       "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 700,
-       "success_count": 695,
-       "failed_count": 5,
+       "call_count": 1050,
+       "success_count": 1042,
+       "failed_count": 8,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
        "ttft_sample_count": 0,
@@ -20655,7 +21975,7 @@
        "ttft_estimated_sample_count": 0,
        "ttft_estimated_sum_ms": null,
        "ttft_estimated_histogram": [],
-       "ttft_filtered_count": 333,
+       "ttft_filtered_count": 505,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
@@ -20666,20 +21986,20 @@
        "tpot_estimated_weight_tokens": 0,
        "tpot_histogram": [],
        "tpot_estimated_histogram": [],
-       "tpot_filtered_count": 333,
-       "duration_sum_ms": 4670334,
-       "duration_p50_ms": 5341,
-       "duration_p95_ms": 18675,
-       "duration_sample_count": 695,
-       "input_tokens": 6753586,
-       "output_tokens": 461286,
-       "total_tokens": 7214872,
-       "token_sample_count": 695,
+       "tpot_filtered_count": 505,
+       "duration_sum_ms": 6980818,
+       "duration_p50_ms": 5410,
+       "duration_p95_ms": 16955,
+       "duration_sample_count": 1042,
+       "input_tokens": 11840149,
+       "output_tokens": 870582,
+       "total_tokens": 12710731,
+       "token_sample_count": 1042,
        "token_coverage": 1.0,
-       "failed_input_tokens": 127928,
+       "failed_input_tokens": 193827,
        "failed_output_tokens": 0,
-       "failed_total_tokens": 127928,
-       "failed_token_sample_count": 5
+       "failed_total_tokens": 193827,
+       "failed_token_sample_count": 8
       }
      ],
      "slow_requests": [
@@ -20884,6 +22204,14 @@
        "reason": null
       },
       {
+       "request_id": "311db991f05448868289de4fd1a6b9ac",
+       "call_id": "266fe663-f5ca-4ec4-9479-57a8e14ba530",
+       "start_time": "2026-11-10T21:28:07.385+00:00",
+       "duration_ms": 23330,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "fd3c840246fc407397e7a0989901ac0e",
        "call_id": "00ec2aa3-d0f1-495d-a50a-508f7a846e6e",
        "start_time": "2026-11-10T18:03:45.448+00:00",
@@ -20904,6 +22232,22 @@
        "call_id": "f35072c7-5f20-4fda-bfa4-24fbe17dcb2d",
        "start_time": "2026-11-10T16:39:01.707+00:00",
        "duration_ms": 20703,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "f64eafe4eef44831aadfb472ec8ff0af",
+       "call_id": "c47218ce-0238-484a-b9ca-b35c4ce44855",
+       "start_time": "2026-11-10T23:59:11.955+00:00",
+       "duration_ms": 20662,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "2529eba30ad041279b0161380fa00179",
+       "call_id": "7722de09-e5ea-4186-816f-eed9c614fe95",
+       "start_time": "2026-11-10T23:38:54.044+00:00",
+       "duration_ms": 20597,
        "status": "success",
        "reason": null
       },
@@ -20962,6 +22306,102 @@
        "duration_ms": 18675,
        "status": "success",
        "reason": null
+      },
+      {
+       "request_id": "f6cfaf27ad6746e293a3ea6e8fdab4ec",
+       "call_id": "51951b74-6f3b-4670-84bf-82b2d8f03264",
+       "start_time": "2026-11-10T16:10:41.489+00:00",
+       "duration_ms": 18544,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "0011dad1a147497ca9e7e69c749ab884",
+       "call_id": "bde07500-0c10-47e4-b749-b2c8d9d4c626",
+       "start_time": "2026-11-10T16:58:13.990+00:00",
+       "duration_ms": 18161,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "d50a57749fd54e778480bc5abe78d7f4",
+       "call_id": "8b0a13c9-d1ab-48fd-bb72-4d950c802a02",
+       "start_time": "2026-11-10T23:44:14.405+00:00",
+       "duration_ms": 18121,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "d2c3531b397541a69c182173580fadde",
+       "call_id": "f9e72083-7568-4bbe-a24f-7d95841deb82",
+       "start_time": "2026-11-10T17:14:19.335+00:00",
+       "duration_ms": 18061,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "c8513fa171fd400b83ef75601540b605",
+       "call_id": "032cdf96-5b23-483f-954e-3374f682c519",
+       "start_time": "2026-11-10T16:27:29.956+00:00",
+       "duration_ms": 18044,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "46463b3147ee406987315316d4a05d55",
+       "call_id": "63618788-2efe-4f40-8c62-4308e0c1def7",
+       "start_time": "2026-11-10T17:00:53.924+00:00",
+       "duration_ms": 18018,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "03e8283b17b8458c933b36080086e8c5",
+       "call_id": "80183da9-ab7c-435b-b75e-ded8457db869",
+       "start_time": "2026-11-10T21:30:23.024+00:00",
+       "duration_ms": 17786,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "833138c674914515946e986ba7ca2eb4",
+       "call_id": "92026d9a-9655-4b84-9eb4-481711c6bbc2",
+       "start_time": "2026-11-10T16:22:29.055+00:00",
+       "duration_ms": 17658,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "44dd80445b4146b79b052ac05f1e56c6",
+       "call_id": "32f3e6d1-86f8-4ab4-aaf3-f31f80da94df",
+       "start_time": "2026-11-10T17:09:33.166+00:00",
+       "duration_ms": 17605,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "860f52c9b4274482b021abb6d5f56240",
+       "call_id": "e3f724bc-d1ab-40d8-b6bd-49533afa29a2",
+       "start_time": "2026-11-10T16:09:53.488+00:00",
+       "duration_ms": 17579,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "2960ea30936c41a48d0e2fb6da51018e",
+       "call_id": "b966404a-c5f9-4299-b8fc-be6624e5f5c8",
+       "start_time": "2026-11-10T16:21:28.490+00:00",
+       "duration_ms": 17573,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "3549bbcf272f41aea5599fea4ddd7df5",
+       "call_id": "1982dff8-3d7b-4e8d-b8ea-650f83650e12",
+       "start_time": "2026-11-10T23:40:49.963+00:00",
+       "duration_ms": 17405,
+       "status": "success",
+       "reason": null
       }
      ],
      "timeout_requests": []
@@ -20971,21 +22411,21 @@
     "date": "2026-11-11",
     "status": "COMPLETED",
     "partial": true,
-    "query_ms": 6720,
-    "duration_sum_ms": 4670334,
-    "duration_sample_count": 695,
-    "duration_p50_ms": 5341,
-    "duration_p95_ms": 18675,
-    "success_count": 695,
-    "query_count": 700,
+    "query_ms": 6699,
+    "duration_sum_ms": 6980818,
+    "duration_sample_count": 1042,
+    "duration_p50_ms": 5410,
+    "duration_p95_ms": 16955,
+    "success_count": 1042,
+    "query_count": 1050,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-10T19:25:08Z",
-    "failed_queries": 5,
+    "finished_at": "2026-11-11T01:18:01Z",
+    "failed_queries": 8,
     "unknown_status_count": 0,
     "blocked_queries": 0,
     "failure_reasons": {
-     "rate_limit": 5
+     "rate_limit": 8
     },
     "timeout_count": 0,
     "latency_max_ms": 53585,
@@ -20997,8 +22437,8 @@
      "status": "success",
      "reason": null
     },
-    "slow_count": 35,
-    "slow_threshold_ms": 18675,
+    "slow_count": 53,
+    "slow_threshold_ms": 16955,
     "hours": [
      {
       "hour": 0,
@@ -21031,14 +22471,54 @@
       "duration_sum_ms": 172480,
       "duration_sample_count": 46,
       "failed": 0
+     },
+     {
+      "hour": 5,
+      "calls": 57,
+      "success_count": 57,
+      "duration_sum_ms": 425693,
+      "duration_sample_count": 57,
+      "failed": 0
+     },
+     {
+      "hour": 6,
+      "calls": 51,
+      "success_count": 51,
+      "duration_sum_ms": 314770,
+      "duration_sample_count": 51,
+      "failed": 0
+     },
+     {
+      "hour": 7,
+      "calls": 166,
+      "success_count": 163,
+      "duration_sum_ms": 1144929,
+      "duration_sample_count": 163,
+      "failed": 3
+     },
+     {
+      "hour": 8,
+      "calls": 49,
+      "success_count": 49,
+      "duration_sum_ms": 300653,
+      "duration_sample_count": 49,
+      "failed": 0
+     },
+     {
+      "hour": 9,
+      "calls": 27,
+      "success_count": 27,
+      "duration_sum_ms": 124439,
+      "duration_sample_count": 27,
+      "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 700,
-      "success_count": 695,
-      "failed_count": 5,
+      "call_count": 1050,
+      "success_count": 1042,
+      "failed_count": 8,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
       "ttft_sample_count": 0,
@@ -21047,7 +22527,7 @@
       "ttft_estimated_sample_count": 0,
       "ttft_estimated_sum_ms": null,
       "ttft_estimated_histogram": [],
-      "ttft_filtered_count": 333,
+      "ttft_filtered_count": 505,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
@@ -21058,20 +22538,20 @@
       "tpot_estimated_weight_tokens": 0,
       "tpot_histogram": [],
       "tpot_estimated_histogram": [],
-      "tpot_filtered_count": 333,
-      "duration_sum_ms": 4670334,
-      "duration_p50_ms": 5341,
-      "duration_p95_ms": 18675,
-      "duration_sample_count": 695,
-      "input_tokens": 6753586,
-      "output_tokens": 461286,
-      "total_tokens": 7214872,
-      "token_sample_count": 695,
+      "tpot_filtered_count": 505,
+      "duration_sum_ms": 6980818,
+      "duration_p50_ms": 5410,
+      "duration_p95_ms": 16955,
+      "duration_sample_count": 1042,
+      "input_tokens": 11840149,
+      "output_tokens": 870582,
+      "total_tokens": 12710731,
+      "token_sample_count": 1042,
       "token_coverage": 1.0,
-      "failed_input_tokens": 127928,
+      "failed_input_tokens": 193827,
       "failed_output_tokens": 0,
-      "failed_total_tokens": 127928,
-      "failed_token_sample_count": 5
+      "failed_total_tokens": 193827,
+      "failed_token_sample_count": 8
      }
     ],
     "slow_requests": [
@@ -21276,6 +22756,14 @@
       "reason": null
      },
      {
+      "request_id": "311db991f05448868289de4fd1a6b9ac",
+      "call_id": "266fe663-f5ca-4ec4-9479-57a8e14ba530",
+      "start_time": "2026-11-10T21:28:07.385+00:00",
+      "duration_ms": 23330,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "fd3c840246fc407397e7a0989901ac0e",
       "call_id": "00ec2aa3-d0f1-495d-a50a-508f7a846e6e",
       "start_time": "2026-11-10T18:03:45.448+00:00",
@@ -21296,6 +22784,22 @@
       "call_id": "f35072c7-5f20-4fda-bfa4-24fbe17dcb2d",
       "start_time": "2026-11-10T16:39:01.707+00:00",
       "duration_ms": 20703,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "f64eafe4eef44831aadfb472ec8ff0af",
+      "call_id": "c47218ce-0238-484a-b9ca-b35c4ce44855",
+      "start_time": "2026-11-10T23:59:11.955+00:00",
+      "duration_ms": 20662,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "2529eba30ad041279b0161380fa00179",
+      "call_id": "7722de09-e5ea-4186-816f-eed9c614fe95",
+      "start_time": "2026-11-10T23:38:54.044+00:00",
+      "duration_ms": 20597,
       "status": "success",
       "reason": null
      },
@@ -21352,6 +22856,102 @@
       "call_id": "76977741-eeed-4183-9214-29e44675060e",
       "start_time": "2026-11-10T16:30:47.023+00:00",
       "duration_ms": 18675,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "f6cfaf27ad6746e293a3ea6e8fdab4ec",
+      "call_id": "51951b74-6f3b-4670-84bf-82b2d8f03264",
+      "start_time": "2026-11-10T16:10:41.489+00:00",
+      "duration_ms": 18544,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "0011dad1a147497ca9e7e69c749ab884",
+      "call_id": "bde07500-0c10-47e4-b749-b2c8d9d4c626",
+      "start_time": "2026-11-10T16:58:13.990+00:00",
+      "duration_ms": 18161,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "d50a57749fd54e778480bc5abe78d7f4",
+      "call_id": "8b0a13c9-d1ab-48fd-bb72-4d950c802a02",
+      "start_time": "2026-11-10T23:44:14.405+00:00",
+      "duration_ms": 18121,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "d2c3531b397541a69c182173580fadde",
+      "call_id": "f9e72083-7568-4bbe-a24f-7d95841deb82",
+      "start_time": "2026-11-10T17:14:19.335+00:00",
+      "duration_ms": 18061,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "c8513fa171fd400b83ef75601540b605",
+      "call_id": "032cdf96-5b23-483f-954e-3374f682c519",
+      "start_time": "2026-11-10T16:27:29.956+00:00",
+      "duration_ms": 18044,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "46463b3147ee406987315316d4a05d55",
+      "call_id": "63618788-2efe-4f40-8c62-4308e0c1def7",
+      "start_time": "2026-11-10T17:00:53.924+00:00",
+      "duration_ms": 18018,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "03e8283b17b8458c933b36080086e8c5",
+      "call_id": "80183da9-ab7c-435b-b75e-ded8457db869",
+      "start_time": "2026-11-10T21:30:23.024+00:00",
+      "duration_ms": 17786,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "833138c674914515946e986ba7ca2eb4",
+      "call_id": "92026d9a-9655-4b84-9eb4-481711c6bbc2",
+      "start_time": "2026-11-10T16:22:29.055+00:00",
+      "duration_ms": 17658,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "44dd80445b4146b79b052ac05f1e56c6",
+      "call_id": "32f3e6d1-86f8-4ab4-aaf3-f31f80da94df",
+      "start_time": "2026-11-10T17:09:33.166+00:00",
+      "duration_ms": 17605,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "860f52c9b4274482b021abb6d5f56240",
+      "call_id": "e3f724bc-d1ab-40d8-b6bd-49533afa29a2",
+      "start_time": "2026-11-10T16:09:53.488+00:00",
+      "duration_ms": 17579,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "2960ea30936c41a48d0e2fb6da51018e",
+      "call_id": "b966404a-c5f9-4299-b8fc-be6624e5f5c8",
+      "start_time": "2026-11-10T16:21:28.490+00:00",
+      "duration_ms": 17573,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "3549bbcf272f41aea5599fea4ddd7df5",
+      "call_id": "1982dff8-3d7b-4e8d-b8ea-650f83650e12",
+      "start_time": "2026-11-10T23:40:49.963+00:00",
+      "duration_ms": 17405,
       "status": "success",
       "reason": null
      }
