@@ -17,6 +17,24 @@ test('native spans render actual model and nested phase intervals on their own r
  assert.match(html,/2000ms/);assert.doesNotMatch(html,/3000ms/);
  c.state.traceFilter='models';assert.match(c.html(item).split('class="trace-event-list"')[1],/模型调用/);
 });
+test('switches clocks and filters failed model spans by their original category',()=>{
+ const item={scope:'cloud',gateway:4000,first_token:400,tool_events:[{name:'tool_search',start_ms:600,duration_ms:200,status:'ok'}],native_trajectory:{duration_ms:2000,root_span_id:'a',spans:[
+  {span_id:'b',parent_span_id:'a',kind:'model',label:'模型调用',start_ms:100,duration_ms:200,error:true},
+  {span_id:'c',parent_span_id:'a',kind:'tool',label:'工具调用',start_ms:500,duration_ms:300,error:true}]}};
+ c.state.traceDisplay='native'; c.state.traceFilter='models'; let body=c.html(item).split('class="trace-event-list"')[1];
+ assert.match(body,/模型调用/); assert.doesNotMatch(body,/工具调用/);
+ c.state.traceFilter='tools'; body=c.html(item).split('class="trace-event-list"')[1];
+ assert.match(body,/工具调用/); assert.doesNotMatch(body,/模型调用/);
+ c.state.traceDisplay='events'; c.state.traceFilter='tools';const html=c.html(item);
+ assert.match(html,/4000ms/); assert.match(html,/tool_search/); assert.equal(c.rows(item, 'events')[0].duration,4000);
+ c.state.traceDisplay='native';
+});
+test('keeps valid native spans at a rounded root boundary',()=>{
+ const item={scope:'cloud',native_trajectory:{duration_ms:1.000,root_span_id:'a',spans:[
+  {span_id:'b',parent_span_id:'a',kind:'model',label:'模型调用',start_ms:0.334,duration_ms:0.667},
+  {span_id:'c',parent_span_id:'a',kind:'tool',label:'工具调用',start_ms:0.5,duration_ms:0.6}]}};
+ const rows=c.rows(item);assert.equal(rows.length,2);assert.ok(Math.abs(rows[1].duration-0.666)<1e-9);
+});
 test('records full history as intervals and point events without inferring model duration',()=>{
  const rows=c.rows(incident); assert.equal(rows.length,5); assert.equal(rows.filter(r=>r.kind==='error')[0].duration,500);
  const point=rows.find(r=>r.kind==='model-point');assert.equal(point.start,99);assert.equal(point.duration,0);assert.match(point.detail,/无法推算模型耗时/);

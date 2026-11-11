@@ -23,6 +23,51 @@ publisher = load('kube_publisher', 'publish-local-kube-metrics.py')
 
 
 class KubeTraceTests(unittest.TestCase):
+    def test_request_id_fallback_requires_unique_complete_inventory(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder); workspace = 'w-' + 'e' * 64
+            sessions = root / workspace / 'workswarm' / '.jiuwenswarm' / '.trace' / 'sessions'
+            def create_db(digest, request='digitalmate-a'):
+                db = sessions / digest[:2] / (digest + '.sqlite3')
+                db.parent.mkdir(parents=True, exist_ok=True)
+                con = sqlite3.connect(db)
+                con.executescript('''CREATE TABLE trajectory_current_records
+                    (trace_id TEXT,span_id TEXT,parent_span_id TEXT,request_id TEXT,lifecycle TEXT,
+                     start_time_unix_nano INTEGER,end_time_unix_nano INTEGER,has_error INTEGER,raw_json BLOB);
+                    CREATE TABLE otlp_span_records (trace_id TEXT,span_id TEXT,raw_json BLOB);''')
+                def payload(name):
+                    return zlib.compress(json.dumps({'resourceSpans':[{'scopeSpans':[{'spans':[{'name':name,'content':'PRIVATE'}]}]}]}).encode())
+                con.executemany('INSERT INTO trajectory_current_records VALUES (?,?,?,?,?,?,?,?,?)', [
+                    ('a'*32,'1'*16,None,request,'final',1_000_000_000,3_000_000_000,0,payload('root')),
+                    ('a'*32,'2'*16,'1'*16,request,'final',1_100_000_000,1_300_000_000,0,payload('agent.main_agent.react_iteration.3')),
+                    ('a'*32,'3'*16,'1'*16,request,'final',1_400_000_000,1_600_000_000,0,payload('execute_tool tool_search')),
+                    ('a'*32,'4'*16,'1'*16,request,'final',1_700_000_000,1_800_000_000,0,payload('execute_tool PRIVATE_TOOL')),
+                ]);con.commit();con.close()
+                return db
+            create_db('a'*64)
+            with patch.object(remote, 'ROOT', root):
+                result = remote.read_native_by_request_ids({'name':workspace}, ['digitalmate-a'])
+                self.assertEqual([x['label'] for x in result['digitalmate-a']['spans']],
+                                 ['ReAct 轮次 3', '工具调用 · tool_search', '工具调用'])
+                self.assertNotIn('PRIVATE', json.dumps(result))
+                create_db('b'*64)
+                self.assertEqual(remote.read_native_by_request_ids({'name':workspace}, ['digitalmate-a']), {})
+                with patch.object(remote, 'MAX_NATIVE_DATABASES', 1):
+                    self.assertEqual(remote.read_native_by_request_ids({'name':workspace}, ['digitalmate-a']), {})
+                # An unreadable/invalid second database makes uniqueness inconclusive.
+                bad = sessions / 'cc' / ('c'*64 + '.sqlite3'); bad.parent.mkdir(); bad.write_bytes(b'invalid')
+                self.assertEqual(remote.read_native_by_request_ids({'name':workspace}, ['digitalmate-a']), {})
+
+    def test_explicit_conflict_does_not_use_fallback(self):
+        traces = load('workspace_collector_conflict', 'collect-production-workspace-traces.py')
+        rows = [{'request_id':'digitalmate-a', '_native_correlation_conflict':True},
+                {'request_id':'digitalmate-b'}]
+        with patch.object(traces, 'read_native_by_request_ids', return_value={'digitalmate-b':{'spans':[]}}) as fallback:
+            self.assertEqual(traces.attach_native_trajectories({}, rows), 1)
+        fallback.assert_called_once_with({}, ['digitalmate-b'])
+        self.assertNotIn('native_trajectory', rows[0])
+        self.assertNotIn('_native_correlation_conflict', rows[0])
+
     def test_full_collector_attaches_native_spans_without_publishing_private_metadata(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder); workspace = 'w-' + 'b' * 64
@@ -58,6 +103,17 @@ class KubeTraceTests(unittest.TestCase):
             self.assertEqual(item['native_trajectory']['spans'][0]['label'],'输入准备')
             self.assertNotIn('PRIVATE',json.dumps(result))
             self.assertNotIn(trace,json.dumps(result))
+            # Older gateways do not emit TrajectoryCorrelation; the native root
+            # itself can still link uniquely to this request in this workspace.
+            log = work / 'process.log'
+            log.write_text('\n'.join(line for line in log.read_text(encoding='utf8').splitlines()
+                                     if '[TrajectoryCorrelation]' not in line), encoding='utf8')
+            with patch.object(remote,'ROOT',root):
+                fallback = remote.run_collector([workspace],source)
+            self.assertEqual(fallback['native_trace_count'],1)
+            self.assertEqual(fallback['days'][0]['anomaly']['latency']['slow_requests'][0]
+                             ['native_trajectory']['spans'][0]['label'], '输入准备')
+            self.assertNotIn('PRIVATE',json.dumps(fallback))
 
     def test_native_trace_reads_only_matched_timing_and_safe_labels(self):
         with tempfile.TemporaryDirectory() as folder:
