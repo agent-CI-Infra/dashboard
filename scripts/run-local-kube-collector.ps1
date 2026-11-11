@@ -17,18 +17,24 @@ try {
     $secure = (Get-Content -LiteralPath $TokenFile -Raw).Trim() | ConvertTo-SecureString
     $env:ADX_TOKEN = (New-Object System.Net.NetworkCredential('', $secure)).Password
     if (-not $env:ADX_TOKEN) { throw 'Management credential is unavailable' }
-    if (Get-NetTCPConnection -LocalAddress 127.0.0.1 -LocalPort 18769 -State Listen -ErrorAction SilentlyContinue) {
-        throw 'Collector proxy port is already in use'
-    }
+    # Reserve an available loopback port instead of colliding with another SSH
+    # tunnel. The SSH process still verifies the bind and fails closed on races.
+    $probe = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, 0)
+    try {
+        $probe.Start()
+        $proxyPort = $probe.LocalEndpoint.Port
+    } finally { $probe.Stop() }
+    $proxyAddress = "127.0.0.1:$proxyPort"
+    $env:DIGITALMATE_KUBE_PROXY_PORT = [string]$proxyPort
     $tunnel = Start-Process -FilePath 'ssh.exe' -WindowStyle Hidden -PassThru -ArgumentList @(
-        '-N', '-D', '127.0.0.1:18769', '-o', 'BatchMode=yes', '-o', 'ExitOnForwardFailure=yes',
+        '-N', '-D', $proxyAddress, '-o', 'BatchMode=yes', '-o', 'ExitOnForwardFailure=yes',
         '-o', 'ConnectTimeout=15', 'hk-leihui'
     )
     $connected = $false
     for ($attempt = 0; $attempt -lt 20; $attempt++) {
         Start-Sleep -Seconds 1
         if ($tunnel.HasExited) { throw 'Hong Kong proxy exited before connecting' }
-        & curl.exe --silent --output NUL --max-time 3 --socks5-hostname 127.0.0.1:18769 --noproxy '127.0.0.2' https://api.github.com
+        & curl.exe --silent --output NUL --max-time 3 --socks5-hostname $proxyAddress --noproxy '127.0.0.2' https://api.github.com
         if ($LASTEXITCODE -eq 0) { $connected = $true; break }
     }
     if (-not $connected) { throw 'Hong Kong proxy could not be verified' }
@@ -36,6 +42,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Kubernetes collection or publication failed' }
 } finally {
     Remove-Item Env:ADX_TOKEN -ErrorAction SilentlyContinue
+    Remove-Item Env:DIGITALMATE_KUBE_PROXY_PORT -ErrorAction SilentlyContinue
     if ($tunnel -and -not $tunnel.HasExited) { Stop-Process -Id $tunnel.Id -ErrorAction SilentlyContinue }
     Stop-Transcript | Out-Null
 }
