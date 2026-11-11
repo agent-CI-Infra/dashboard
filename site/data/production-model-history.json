@@ -1,10 +1,10 @@
 {
  "schema": "digitalmate/e2e-performance-history@1",
  "metrics_version": 7,
- "generated_at": "2026-11-11T01:19:43Z",
- "updated_at": "2026-11-11T01:19:43Z",
+ "generated_at": "2026-11-11T01:45:51Z",
+ "updated_at": "2026-11-11T01:45:51Z",
  "window_start": "2026-10-07T16:00:00+00:00",
- "window_end": "2026-11-11T01:18:05+00:00",
+ "window_end": "2026-11-11T01:44:31+00:00",
  "current_day_partial": true,
  "complete_through": "2026-11-10",
  "partial_day": "2026-11-11",
@@ -1296,15 +1296,15 @@
      "status": "COMPLETED",
      "partial": true,
      "query_ms": 255,
-     "duration_sum_ms": 56663,
-     "duration_sample_count": 222,
-     "duration_p50_ms": 248,
+     "duration_sum_ms": 57790,
+     "duration_sample_count": 227,
+     "duration_p50_ms": 247,
      "duration_p95_ms": 336,
-     "success_count": 222,
-     "query_count": 222,
+     "success_count": 227,
+     "query_count": 227,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-11T01:17:50Z",
+     "finished_at": "2026-11-11T01:39:22Z",
      "failed_queries": 0,
      "unknown_status_count": 0,
      "blocked_queries": 0,
@@ -1372,18 +1372,18 @@
       },
       {
        "hour": 9,
-       "calls": 34,
-       "success_count": 34,
-       "duration_sum_ms": 9089,
-       "duration_sample_count": 34,
+       "calls": 39,
+       "success_count": 39,
+       "duration_sum_ms": 10216,
+       "duration_sample_count": 39,
        "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/bge-m3",
-       "call_count": 222,
-       "success_count": 222,
+       "call_count": 227,
+       "success_count": 227,
        "failed_count": 0,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
@@ -1393,7 +1393,7 @@
        "ttft_estimated_sample_count": 0,
        "ttft_estimated_sum_ms": null,
        "ttft_estimated_histogram": [],
-       "ttft_filtered_count": 125,
+       "ttft_filtered_count": 128,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
@@ -1405,14 +1405,14 @@
        "tpot_histogram": [],
        "tpot_estimated_histogram": [],
        "tpot_filtered_count": 0,
-       "duration_sum_ms": 56663,
-       "duration_p50_ms": 248,
+       "duration_sum_ms": 57790,
+       "duration_p50_ms": 247,
        "duration_p95_ms": 336,
-       "duration_sample_count": 222,
-       "input_tokens": 25338,
+       "duration_sample_count": 227,
+       "input_tokens": 25505,
        "output_tokens": 0,
-       "total_tokens": 25338,
-       "token_sample_count": 222,
+       "total_tokens": 25505,
+       "token_sample_count": 227,
        "token_coverage": 1.0,
        "failed_input_tokens": null,
        "failed_output_tokens": null,
@@ -1526,15 +1526,15 @@
     "status": "COMPLETED",
     "partial": true,
     "query_ms": 255,
-    "duration_sum_ms": 56663,
-    "duration_sample_count": 222,
-    "duration_p50_ms": 248,
+    "duration_sum_ms": 57790,
+    "duration_sample_count": 227,
+    "duration_p50_ms": 247,
     "duration_p95_ms": 336,
-    "success_count": 222,
-    "query_count": 222,
+    "success_count": 227,
+    "query_count": 227,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-11T01:17:50Z",
+    "finished_at": "2026-11-11T01:39:22Z",
     "failed_queries": 0,
     "unknown_status_count": 0,
     "blocked_queries": 0,
@@ -1602,18 +1602,18 @@
      },
      {
       "hour": 9,
-      "calls": 34,
-      "success_count": 34,
-      "duration_sum_ms": 9089,
-      "duration_sample_count": 34,
+      "calls": 39,
+      "success_count": 39,
+      "duration_sum_ms": 10216,
+      "duration_sample_count": 39,
       "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/bge-m3",
-      "call_count": 222,
-      "success_count": 222,
+      "call_count": 227,
+      "success_count": 227,
       "failed_count": 0,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
@@ -1623,7 +1623,7 @@
       "ttft_estimated_sample_count": 0,
       "ttft_estimated_sum_ms": null,
       "ttft_estimated_histogram": [],
-      "ttft_filtered_count": 125,
+      "ttft_filtered_count": 128,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
@@ -1635,14 +1635,14 @@
       "tpot_histogram": [],
       "tpot_estimated_histogram": [],
       "tpot_filtered_count": 0,
-      "duration_sum_ms": 56663,
-      "duration_p50_ms": 248,
+      "duration_sum_ms": 57790,
+      "duration_p50_ms": 247,
       "duration_p95_ms": 336,
-      "duration_sample_count": 222,
-      "input_tokens": 25338,
+      "duration_sample_count": 227,
+      "input_tokens": 25505,
       "output_tokens": 0,
-      "total_tokens": 25338,
-      "token_sample_count": 222,
+      "total_tokens": 25505,
+      "token_sample_count": 227,
       "token_coverage": 1.0,
       "failed_input_tokens": null,
       "failed_output_tokens": null,
@@ -18508,16 +18508,16 @@
      "date": "2026-11-11",
      "status": "COMPLETED",
      "partial": true,
-     "query_ms": 10089,
-     "duration_sum_ms": 5629501,
-     "duration_sample_count": 558,
-     "duration_p50_ms": 7664,
-     "duration_p95_ms": 26028,
-     "success_count": 558,
-     "query_count": 574,
+     "query_ms": 9971,
+     "duration_sum_ms": 5643656,
+     "duration_sample_count": 566,
+     "duration_p50_ms": 7590,
+     "duration_p95_ms": 25673,
+     "success_count": 566,
+     "query_count": 582,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-11T01:14:06Z",
+     "finished_at": "2026-11-11T01:39:40Z",
      "failed_queries": 16,
      "unknown_status_count": 0,
      "blocked_queries": 0,
@@ -18534,8 +18534,8 @@
       "status": "success",
       "reason": null
      },
-     "slow_count": 29,
-     "slow_threshold_ms": 25673,
+     "slow_count": 30,
+     "slow_threshold_ms": 25271,
      "hours": [
       {
        "hour": 0,
@@ -18587,29 +18587,37 @@
       },
       {
        "hour": 9,
-       "calls": 65,
-       "success_count": 65,
-       "duration_sum_ms": 535279,
-       "duration_sample_count": 65,
+       "calls": 73,
+       "success_count": 73,
+       "duration_sum_ms": 549434,
+       "duration_sample_count": 73,
        "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 574,
-       "success_count": 558,
+       "call_count": 582,
+       "success_count": 566,
        "failed_count": 16,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
        "ttft_sample_count": 0,
        "ttft_sum_ms": null,
-       "ttft_estimated_avg_ms": 4062,
-       "ttft_estimated_sample_count": 235,
-       "ttft_estimated_sum_ms": 954586,
+       "ttft_estimated_avg_ms": 4033,
+       "ttft_estimated_sample_count": 237,
+       "ttft_estimated_sum_ms": 955845,
        "ttft_estimated_histogram": [
         [
          316,
+         1
+        ],
+        [
+         321,
+         1
+        ],
+        [
+         329,
          1
         ],
         [
@@ -19045,15 +19053,15 @@
          1
         ]
        ],
-       "ttft_filtered_count": 175,
+       "ttft_filtered_count": 179,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
        "tpot_weight_tokens": 0,
-       "tpot_estimated_avg_ms": 4.544345763493306,
-       "tpot_estimated_sample_count": 235,
-       "tpot_estimated_decode_sum_ms": 1498189.0,
-       "tpot_estimated_weight_tokens": 329682,
+       "tpot_estimated_avg_ms": 4.544555806583676,
+       "tpot_estimated_sample_count": 237,
+       "tpot_estimated_decode_sum_ms": 1498590.0,
+       "tpot_estimated_weight_tokens": 329755,
        "tpot_histogram": [],
        "tpot_estimated_histogram": [
         [
@@ -19214,7 +19222,7 @@
         ],
         [
          80,
-         7
+         8
         ],
         [
          81,
@@ -19286,7 +19294,7 @@
         ],
         [
          99,
-         3
+         4
         ],
         [
          103,
@@ -19317,15 +19325,15 @@
          1
         ]
        ],
-       "tpot_filtered_count": 175,
-       "duration_sum_ms": 5629501,
-       "duration_p50_ms": 7664,
-       "duration_p95_ms": 26028,
-       "duration_sample_count": 558,
-       "input_tokens": 20184001,
-       "output_tokens": 805483,
-       "total_tokens": 20989484,
-       "token_sample_count": 558,
+       "tpot_filtered_count": 179,
+       "duration_sum_ms": 5643656,
+       "duration_p50_ms": 7590,
+       "duration_p95_ms": 25673,
+       "duration_sample_count": 566,
+       "input_tokens": 20190445,
+       "output_tokens": 805694,
+       "total_tokens": 20996139,
+       "token_sample_count": 566,
        "token_coverage": 1.0,
        "failed_input_tokens": 79386,
        "failed_output_tokens": 0,
@@ -19565,6 +19573,14 @@
        "duration_ms": 25673,
        "status": "success",
        "reason": null
+      },
+      {
+       "request_id": "0e4a042990d4412cb47212d544ac79b0",
+       "call_id": "38d2b6ae-28e8-46d7-a2dd-b4d523ed131e",
+       "start_time": "2026-11-10T22:59:16.458+00:00",
+       "duration_ms": 25271,
+       "status": "success",
+       "reason": null
       }
      ],
      "timeout_requests": []
@@ -19574,16 +19590,16 @@
     "date": "2026-11-11",
     "status": "COMPLETED",
     "partial": true,
-    "query_ms": 10089,
-    "duration_sum_ms": 5629501,
-    "duration_sample_count": 558,
-    "duration_p50_ms": 7664,
-    "duration_p95_ms": 26028,
-    "success_count": 558,
-    "query_count": 574,
+    "query_ms": 9971,
+    "duration_sum_ms": 5643656,
+    "duration_sample_count": 566,
+    "duration_p50_ms": 7590,
+    "duration_p95_ms": 25673,
+    "success_count": 566,
+    "query_count": 582,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-11T01:14:06Z",
+    "finished_at": "2026-11-11T01:39:40Z",
     "failed_queries": 16,
     "unknown_status_count": 0,
     "blocked_queries": 0,
@@ -19600,8 +19616,8 @@
      "status": "success",
      "reason": null
     },
-    "slow_count": 29,
-    "slow_threshold_ms": 25673,
+    "slow_count": 30,
+    "slow_threshold_ms": 25271,
     "hours": [
      {
       "hour": 0,
@@ -19653,29 +19669,37 @@
      },
      {
       "hour": 9,
-      "calls": 65,
-      "success_count": 65,
-      "duration_sum_ms": 535279,
-      "duration_sample_count": 65,
+      "calls": 73,
+      "success_count": 73,
+      "duration_sum_ms": 549434,
+      "duration_sample_count": 73,
       "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 574,
-      "success_count": 558,
+      "call_count": 582,
+      "success_count": 566,
       "failed_count": 16,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
       "ttft_sample_count": 0,
       "ttft_sum_ms": null,
-      "ttft_estimated_avg_ms": 4062,
-      "ttft_estimated_sample_count": 235,
-      "ttft_estimated_sum_ms": 954586,
+      "ttft_estimated_avg_ms": 4033,
+      "ttft_estimated_sample_count": 237,
+      "ttft_estimated_sum_ms": 955845,
       "ttft_estimated_histogram": [
        [
         316,
+        1
+       ],
+       [
+        321,
+        1
+       ],
+       [
+        329,
         1
        ],
        [
@@ -20111,15 +20135,15 @@
         1
        ]
       ],
-      "ttft_filtered_count": 175,
+      "ttft_filtered_count": 179,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
       "tpot_weight_tokens": 0,
-      "tpot_estimated_avg_ms": 4.544345763493306,
-      "tpot_estimated_sample_count": 235,
-      "tpot_estimated_decode_sum_ms": 1498189.0,
-      "tpot_estimated_weight_tokens": 329682,
+      "tpot_estimated_avg_ms": 4.544555806583676,
+      "tpot_estimated_sample_count": 237,
+      "tpot_estimated_decode_sum_ms": 1498590.0,
+      "tpot_estimated_weight_tokens": 329755,
       "tpot_histogram": [],
       "tpot_estimated_histogram": [
        [
@@ -20280,7 +20304,7 @@
        ],
        [
         80,
-        7
+        8
        ],
        [
         81,
@@ -20352,7 +20376,7 @@
        ],
        [
         99,
-        3
+        4
        ],
        [
         103,
@@ -20383,15 +20407,15 @@
         1
        ]
       ],
-      "tpot_filtered_count": 175,
-      "duration_sum_ms": 5629501,
-      "duration_p50_ms": 7664,
-      "duration_p95_ms": 26028,
-      "duration_sample_count": 558,
-      "input_tokens": 20184001,
-      "output_tokens": 805483,
-      "total_tokens": 20989484,
-      "token_sample_count": 558,
+      "tpot_filtered_count": 179,
+      "duration_sum_ms": 5643656,
+      "duration_p50_ms": 7590,
+      "duration_p95_ms": 25673,
+      "duration_sample_count": 566,
+      "input_tokens": 20190445,
+      "output_tokens": 805694,
+      "total_tokens": 20996139,
+      "token_sample_count": 566,
       "token_coverage": 1.0,
       "failed_input_tokens": 79386,
       "failed_output_tokens": 0,
@@ -20629,6 +20653,14 @@
       "call_id": "f21aab56-bd71-41db-b7cc-b5cab7208d2d",
       "start_time": "2026-11-10T23:42:12.877+00:00",
       "duration_ms": 25673,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "0e4a042990d4412cb47212d544ac79b0",
+      "call_id": "38d2b6ae-28e8-46d7-a2dd-b4d523ed131e",
+      "start_time": "2026-11-10T22:59:16.458+00:00",
+      "duration_ms": 25271,
       "status": "success",
       "reason": null
      }
@@ -21859,16 +21891,16 @@
      "date": "2026-11-11",
      "status": "COMPLETED",
      "partial": true,
-     "query_ms": 6699,
-     "duration_sum_ms": 6980818,
-     "duration_sample_count": 1042,
-     "duration_p50_ms": 5410,
-     "duration_p95_ms": 16955,
-     "success_count": 1042,
-     "query_count": 1050,
+     "query_ms": 6866,
+     "duration_sum_ms": 7668883,
+     "duration_sample_count": 1117,
+     "duration_p50_ms": 5707,
+     "duration_p95_ms": 17003,
+     "success_count": 1117,
+     "query_count": 1125,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-11T01:18:01Z",
+     "finished_at": "2026-11-11T01:44:37Z",
      "failed_queries": 8,
      "unknown_status_count": 0,
      "blocked_queries": 0,
@@ -21885,7 +21917,7 @@
       "status": "success",
       "reason": null
      },
-     "slow_count": 53,
+     "slow_count": 57,
      "slow_threshold_ms": 16955,
      "hours": [
       {
@@ -21954,18 +21986,18 @@
       },
       {
        "hour": 9,
-       "calls": 27,
-       "success_count": 27,
-       "duration_sum_ms": 124439,
-       "duration_sample_count": 27,
+       "calls": 102,
+       "success_count": 102,
+       "duration_sum_ms": 812504,
+       "duration_sample_count": 102,
        "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 1050,
-       "success_count": 1042,
+       "call_count": 1125,
+       "success_count": 1117,
        "failed_count": 8,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
@@ -21975,7 +22007,7 @@
        "ttft_estimated_sample_count": 0,
        "ttft_estimated_sum_ms": null,
        "ttft_estimated_histogram": [],
-       "ttft_filtered_count": 505,
+       "ttft_filtered_count": 550,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
@@ -21986,15 +22018,15 @@
        "tpot_estimated_weight_tokens": 0,
        "tpot_histogram": [],
        "tpot_estimated_histogram": [],
-       "tpot_filtered_count": 505,
-       "duration_sum_ms": 6980818,
-       "duration_p50_ms": 5410,
-       "duration_p95_ms": 16955,
-       "duration_sample_count": 1042,
-       "input_tokens": 11840149,
-       "output_tokens": 870582,
-       "total_tokens": 12710731,
-       "token_sample_count": 1042,
+       "tpot_filtered_count": 550,
+       "duration_sum_ms": 7668883,
+       "duration_p50_ms": 5707,
+       "duration_p95_ms": 17003,
+       "duration_sample_count": 1117,
+       "input_tokens": 14171956,
+       "output_tokens": 971232,
+       "total_tokens": 15143188,
+       "token_sample_count": 1117,
        "token_coverage": 1.0,
        "failed_input_tokens": 193827,
        "failed_output_tokens": 0,
@@ -22068,10 +22100,26 @@
        "reason": null
       },
       {
+       "request_id": "49d19f84bb4846c2b53f0ce2969905ef",
+       "call_id": "5146cda9-62e9-4b58-89c5-6f5497768931",
+       "start_time": "2026-11-11T01:40:41.901+00:00",
+       "duration_ms": 29217,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "316fc0a014414c3ab94052f0d855d27d",
        "call_id": "78f10136-1767-4851-962a-649855c8600e",
        "start_time": "2026-11-10T17:11:15.524+00:00",
        "duration_ms": 28770,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "b82d804e22af4491ab4ef89a9195fdad",
+       "call_id": "29c0a811-a326-4718-a268-7f506eac9b20",
+       "start_time": "2026-11-11T01:34:22.257+00:00",
+       "duration_ms": 28666,
        "status": "success",
        "reason": null
       },
@@ -22208,6 +22256,14 @@
        "call_id": "266fe663-f5ca-4ec4-9479-57a8e14ba530",
        "start_time": "2026-11-10T21:28:07.385+00:00",
        "duration_ms": 23330,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "72fa38a6ae254829b8d0634ca1529da6",
+       "call_id": "af832072-3354-4db3-8c31-9a9130e61bba",
+       "start_time": "2026-11-11T01:29:52.471+00:00",
+       "duration_ms": 23150,
        "status": "success",
        "reason": null
       },
@@ -22378,30 +22434,6 @@
        "duration_ms": 17605,
        "status": "success",
        "reason": null
-      },
-      {
-       "request_id": "860f52c9b4274482b021abb6d5f56240",
-       "call_id": "e3f724bc-d1ab-40d8-b6bd-49533afa29a2",
-       "start_time": "2026-11-10T16:09:53.488+00:00",
-       "duration_ms": 17579,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "2960ea30936c41a48d0e2fb6da51018e",
-       "call_id": "b966404a-c5f9-4299-b8fc-be6624e5f5c8",
-       "start_time": "2026-11-10T16:21:28.490+00:00",
-       "duration_ms": 17573,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "3549bbcf272f41aea5599fea4ddd7df5",
-       "call_id": "1982dff8-3d7b-4e8d-b8ea-650f83650e12",
-       "start_time": "2026-11-10T23:40:49.963+00:00",
-       "duration_ms": 17405,
-       "status": "success",
-       "reason": null
       }
      ],
      "timeout_requests": []
@@ -22411,16 +22443,16 @@
     "date": "2026-11-11",
     "status": "COMPLETED",
     "partial": true,
-    "query_ms": 6699,
-    "duration_sum_ms": 6980818,
-    "duration_sample_count": 1042,
-    "duration_p50_ms": 5410,
-    "duration_p95_ms": 16955,
-    "success_count": 1042,
-    "query_count": 1050,
+    "query_ms": 6866,
+    "duration_sum_ms": 7668883,
+    "duration_sample_count": 1117,
+    "duration_p50_ms": 5707,
+    "duration_p95_ms": 17003,
+    "success_count": 1117,
+    "query_count": 1125,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-11T01:18:01Z",
+    "finished_at": "2026-11-11T01:44:37Z",
     "failed_queries": 8,
     "unknown_status_count": 0,
     "blocked_queries": 0,
@@ -22437,7 +22469,7 @@
      "status": "success",
      "reason": null
     },
-    "slow_count": 53,
+    "slow_count": 57,
     "slow_threshold_ms": 16955,
     "hours": [
      {
@@ -22506,18 +22538,18 @@
      },
      {
       "hour": 9,
-      "calls": 27,
-      "success_count": 27,
-      "duration_sum_ms": 124439,
-      "duration_sample_count": 27,
+      "calls": 102,
+      "success_count": 102,
+      "duration_sum_ms": 812504,
+      "duration_sample_count": 102,
       "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 1050,
-      "success_count": 1042,
+      "call_count": 1125,
+      "success_count": 1117,
       "failed_count": 8,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
@@ -22527,7 +22559,7 @@
       "ttft_estimated_sample_count": 0,
       "ttft_estimated_sum_ms": null,
       "ttft_estimated_histogram": [],
-      "ttft_filtered_count": 505,
+      "ttft_filtered_count": 550,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
@@ -22538,15 +22570,15 @@
       "tpot_estimated_weight_tokens": 0,
       "tpot_histogram": [],
       "tpot_estimated_histogram": [],
-      "tpot_filtered_count": 505,
-      "duration_sum_ms": 6980818,
-      "duration_p50_ms": 5410,
-      "duration_p95_ms": 16955,
-      "duration_sample_count": 1042,
-      "input_tokens": 11840149,
-      "output_tokens": 870582,
-      "total_tokens": 12710731,
-      "token_sample_count": 1042,
+      "tpot_filtered_count": 550,
+      "duration_sum_ms": 7668883,
+      "duration_p50_ms": 5707,
+      "duration_p95_ms": 17003,
+      "duration_sample_count": 1117,
+      "input_tokens": 14171956,
+      "output_tokens": 971232,
+      "total_tokens": 15143188,
+      "token_sample_count": 1117,
       "token_coverage": 1.0,
       "failed_input_tokens": 193827,
       "failed_output_tokens": 0,
@@ -22620,10 +22652,26 @@
       "reason": null
      },
      {
+      "request_id": "49d19f84bb4846c2b53f0ce2969905ef",
+      "call_id": "5146cda9-62e9-4b58-89c5-6f5497768931",
+      "start_time": "2026-11-11T01:40:41.901+00:00",
+      "duration_ms": 29217,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "316fc0a014414c3ab94052f0d855d27d",
       "call_id": "78f10136-1767-4851-962a-649855c8600e",
       "start_time": "2026-11-10T17:11:15.524+00:00",
       "duration_ms": 28770,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "b82d804e22af4491ab4ef89a9195fdad",
+      "call_id": "29c0a811-a326-4718-a268-7f506eac9b20",
+      "start_time": "2026-11-11T01:34:22.257+00:00",
+      "duration_ms": 28666,
       "status": "success",
       "reason": null
      },
@@ -22760,6 +22808,14 @@
       "call_id": "266fe663-f5ca-4ec4-9479-57a8e14ba530",
       "start_time": "2026-11-10T21:28:07.385+00:00",
       "duration_ms": 23330,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "72fa38a6ae254829b8d0634ca1529da6",
+      "call_id": "af832072-3354-4db3-8c31-9a9130e61bba",
+      "start_time": "2026-11-11T01:29:52.471+00:00",
+      "duration_ms": 23150,
       "status": "success",
       "reason": null
      },
@@ -22928,30 +22984,6 @@
       "call_id": "32f3e6d1-86f8-4ab4-aaf3-f31f80da94df",
       "start_time": "2026-11-10T17:09:33.166+00:00",
       "duration_ms": 17605,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "860f52c9b4274482b021abb6d5f56240",
-      "call_id": "e3f724bc-d1ab-40d8-b6bd-49533afa29a2",
-      "start_time": "2026-11-10T16:09:53.488+00:00",
-      "duration_ms": 17579,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "2960ea30936c41a48d0e2fb6da51018e",
-      "call_id": "b966404a-c5f9-4299-b8fc-be6624e5f5c8",
-      "start_time": "2026-11-10T16:21:28.490+00:00",
-      "duration_ms": 17573,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "3549bbcf272f41aea5599fea4ddd7df5",
-      "call_id": "1982dff8-3d7b-4e8d-b8ea-650f83650e12",
-      "start_time": "2026-11-10T23:40:49.963+00:00",
-      "duration_ms": 17405,
       "status": "success",
       "reason": null
      }
