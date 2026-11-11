@@ -278,129 +278,53 @@
   },
   {
    "date": "2026-11-05",
-   "partial": false,
    "n": 154,
+   "partial": true,
+   "observed_at": "2026-11-11T02:04:20.703014+00:00",
+   "source": "workspace_request_logs",
    "gateway": {
-    "n": 153,
-    "mean": 105134.8,
-    "p50": 15769,
-    "p95": 147016
-   },
-   "workswarm": {
-    "n": 137,
-    "mean": 104188.7,
-    "p50": 14684,
-    "p95": 145053
-   },
-   "overhead": {
-    "n": 137,
-    "mean": 704.2,
-    "p50": 831,
-    "p95": 876
-   },
-   "ttft": {
-    "n": 735,
-    "mean": 2533.7,
-    "p50": 1973.17,
-    "p95": 5306.96
-   },
-   "tpot": {
-    "n": 735,
-    "tokens": 719759,
-    "mean": 5.54,
-    "p50": 4.75,
-    "p95": 12.48
+    "n": 154,
+    "mean": 60443.7,
+    "p50": 19408.0,
+    "p95": 185741.0
    },
    "first_token": {
-    "n": 136,
-    "mean": 4743.7,
-    "p50": 3992,
-    "p95": 8051
+    "n": 135,
+    "mean": 5079.3,
+    "p50": 3992.0,
+    "p95": 9038.0
    },
    "answer_first": {
     "n": 0
    },
    "react": {
     "n": 0
-   },
-   "tool": {
-    "n": 0
-   },
-   "tool_failed": 0,
-   "tokens": {
-    "input": 52325539,
-    "output": 720494,
-    "total": 53046033
-   },
-   "calls": {
-    "total": 735,
-    "success": 735,
-    "failed": 0
-   },
-   "failure_rate": 0
+   }
   },
   {
    "date": "2026-11-06",
-   "partial": false,
-   "n": 85,
+   "n": 156,
+   "partial": true,
+   "observed_at": "2026-11-11T02:04:20.703014+00:00",
+   "source": "workspace_request_logs",
    "gateway": {
-    "n": 85,
-    "mean": 47622.3,
-    "p50": 22637,
-    "p95": 136384
-   },
-   "workswarm": {
-    "n": 81,
-    "mean": 47036.7,
-    "p50": 21374,
-    "p95": 135543
-   },
-   "overhead": {
-    "n": 81,
-    "mean": 709.8,
-    "p50": 842,
-    "p95": 878
-   },
-   "ttft": {
-    "n": 324,
-    "mean": 2096.08,
-    "p50": 1668.88,
-    "p95": 3554.52
-   },
-   "tpot": {
-    "n": 324,
-    "tokens": 362663,
-    "mean": 5.52,
-    "p50": 5.04,
-    "p95": 9.9
+    "n": 156,
+    "mean": 26099.5,
+    "p50": 11247.0,
+    "p95": 96025.0
    },
    "first_token": {
-    "n": 81,
-    "mean": 4746.2,
-    "p50": 3926,
-    "p95": 8105
+    "n": 147,
+    "mean": 5559.7,
+    "p50": 4540.0,
+    "p95": 10086.0
    },
    "answer_first": {
     "n": 0
    },
    "react": {
     "n": 0
-   },
-   "tool": {
-    "n": 0
-   },
-   "tool_failed": 0,
-   "tokens": {
-    "input": 16895070,
-    "output": 362987,
-    "total": 17258057
-   },
-   "calls": {
-    "total": 324,
-    "success": 324,
-    "failed": 0
-   },
-   "failure_rate": 0
+   }
   },
   {
    "date": "2026-11-07",
@@ -530,129 +454,90 @@
   },
   {
    "date": "2026-11-09",
-   "partial": false,
-   "n": 99,
+   "n": 289,
+   "partial": true,
+   "observed_at": "2026-11-11T02:04:20.703014+00:00",
+   "source": "workspace_request_logs",
    "gateway": {
-    "n": 98,
-    "mean": 90498.7,
-    "p50": 44813,
-    "p95": 357605
-   },
-   "workswarm": {
-    "n": 92,
-    "mean": 91582,
-    "p50": 46443,
-    "p95": 356752
-   },
-   "overhead": {
-    "n": 92,
-    "mean": 664.3,
-    "p50": 843,
-    "p95": 905
-   },
-   "ttft": {
-    "n": 858,
-    "mean": 3089.01,
-    "p50": 2060.8,
-    "p95": 7431.6
-   },
-   "tpot": {
-    "n": 858,
-    "tokens": 808591,
-    "mean": 5.15,
-    "p50": 4.62,
-    "p95": 9.03
+    "n": 289,
+    "mean": 69838.1,
+    "p50": 30402.0,
+    "p95": 263300.0
    },
    "first_token": {
-    "n": 87,
-    "mean": 4705.5,
-    "p50": 3900,
-    "p95": 8895
+    "n": 263,
+    "mean": 4671.1,
+    "p50": 3730.0,
+    "p95": 8973.0
    },
    "answer_first": {
-    "n": 0
+    "n": 1,
+    "mean": 3355.0,
+    "p50": 3355.0,
+    "p95": 3355.0
    },
    "react": {
-    "n": 0
-   },
-   "tool": {
-    "n": 0
-   },
-   "tool_failed": 0,
-   "tokens": {
-    "input": 66730057,
-    "output": 809449,
-    "total": 67539506
-   },
-   "calls": {
-    "total": 858,
-    "success": 858,
-    "failed": 0
-   },
-   "failure_rate": 0
+    "n": 1,
+    "mean": 0.0,
+    "p50": 0.0,
+    "p95": 0.0
+   }
   },
   {
    "date": "2026-11-10",
+   "n": 354,
    "partial": true,
-   "n": 6,
+   "observed_at": "2026-11-11T02:04:20.703014+00:00",
+   "source": "workspace_request_logs",
    "gateway": {
-    "n": 6,
-    "mean": 43999,
-    "p50": 49433,
-    "p95": 57173
-   },
-   "workswarm": {
-    "n": 6,
-    "mean": 43157.7,
-    "p50": 48592,
-    "p95": 56329
-   },
-   "overhead": {
-    "n": 6,
-    "mean": 841.3,
-    "p50": 842,
-    "p95": 861
-   },
-   "ttft": {
-    "n": 23,
-    "mean": 3871.96,
-    "p50": 2447.45,
-    "p95": 11868.33
-   },
-   "tpot": {
-    "n": 23,
-    "tokens": 20888,
-    "mean": 5.56,
-    "p50": 5.75,
-    "p95": 7.45
+    "n": 354,
+    "mean": 57239.2,
+    "p50": 29374.0,
+    "p95": 207078.0
    },
    "first_token": {
-    "n": 6,
-    "mean": 5920,
-    "p50": 6151,
-    "p95": 7516
+    "n": 297,
+    "mean": 6228.2,
+    "p50": 4865.0,
+    "p95": 15362.0
+   },
+   "answer_first": {
+    "n": 1,
+    "mean": 10454.0,
+    "p50": 10454.0,
+    "p95": 10454.0
+   },
+   "react": {
+    "n": 1,
+    "mean": 0.0,
+    "p50": 0.0,
+    "p95": 0.0
+   }
+  },
+  {
+   "date": "2026-11-11",
+   "n": 80,
+   "partial": true,
+   "observed_at": "2026-11-11T02:04:20.703014+00:00",
+   "source": "workspace_request_logs",
+   "gateway": {
+    "n": 80,
+    "mean": 38282.4,
+    "p50": 34628.0,
+    "p95": 101543.0
+   },
+   "first_token": {
+    "n": 75,
+    "mean": 6459.9,
+    "p50": 4803.0,
+    "p95": 14072.0
    },
    "answer_first": {
     "n": 0
    },
    "react": {
     "n": 0
-   },
-   "tool": {
-    "n": 0
-   },
-   "tool_failed": 0,
-   "tokens": {
-    "input": 1660505,
-    "output": 20911,
-    "total": 1681416
-   },
-   "calls": {
-    "total": 23,
-    "success": 23,
-    "failed": 0
-   },
-   "failure_rate": 0
+   }
   }
  ],
  "metric_scope": {
@@ -668,7 +553,202 @@
  },
  "cloud_trace_collection": {
   "schema": "digitalmate/cloud-traces@1",
-  "generated_at": "2026-11-11T01:41:27.495269+00:00",
+  "generated_at": "2026-11-11T02:04:20.703014+00:00",
+  "request_daily_metrics": [
+   {
+    "date": "2026-11-05",
+    "n": 154,
+    "partial": true,
+    "observed_at": "2026-11-11T02:04:20.703014+00:00",
+    "source": "workspace_request_logs",
+    "gateway": {
+     "n": 154,
+     "mean": 60443.7,
+     "p50": 19408.0,
+     "p95": 185741.0
+    },
+    "first_token": {
+     "n": 135,
+     "mean": 5079.3,
+     "p50": 3992.0,
+     "p95": 9038.0
+    },
+    "answer_first": {
+     "n": 0
+    },
+    "react": {
+     "n": 0
+    }
+   },
+   {
+    "date": "2026-11-06",
+    "n": 156,
+    "partial": true,
+    "observed_at": "2026-11-11T02:04:20.703014+00:00",
+    "source": "workspace_request_logs",
+    "gateway": {
+     "n": 156,
+     "mean": 26099.5,
+     "p50": 11247.0,
+     "p95": 96025.0
+    },
+    "first_token": {
+     "n": 147,
+     "mean": 5559.7,
+     "p50": 4540.0,
+     "p95": 10086.0
+    },
+    "answer_first": {
+     "n": 0
+    },
+    "react": {
+     "n": 0
+    }
+   },
+   {
+    "date": "2026-11-07",
+    "n": 36,
+    "partial": true,
+    "observed_at": "2026-11-11T02:04:20.703014+00:00",
+    "source": "workspace_request_logs",
+    "gateway": {
+     "n": 36,
+     "mean": 30159.2,
+     "p50": 9468.0,
+     "p95": 64482.0
+    },
+    "first_token": {
+     "n": 34,
+     "mean": 4226.6,
+     "p50": 3518.0,
+     "p95": 6762.0
+    },
+    "answer_first": {
+     "n": 0
+    },
+    "react": {
+     "n": 0
+    }
+   },
+   {
+    "date": "2026-11-08",
+    "n": 72,
+    "partial": true,
+    "observed_at": "2026-11-11T02:04:20.703014+00:00",
+    "source": "workspace_request_logs",
+    "gateway": {
+     "n": 72,
+     "mean": 32552.7,
+     "p50": 15323.0,
+     "p95": 109930.0
+    },
+    "first_token": {
+     "n": 69,
+     "mean": 4374.7,
+     "p50": 3662.0,
+     "p95": 7799.0
+    },
+    "answer_first": {
+     "n": 3,
+     "mean": 3547.3,
+     "p50": 3347.0,
+     "p95": 4032.0
+    },
+    "react": {
+     "n": 3,
+     "mean": 0.0,
+     "p50": 0.0,
+     "p95": 0.0
+    }
+   },
+   {
+    "date": "2026-11-09",
+    "n": 289,
+    "partial": true,
+    "observed_at": "2026-11-11T02:04:20.703014+00:00",
+    "source": "workspace_request_logs",
+    "gateway": {
+     "n": 289,
+     "mean": 69838.1,
+     "p50": 30402.0,
+     "p95": 263300.0
+    },
+    "first_token": {
+     "n": 263,
+     "mean": 4671.1,
+     "p50": 3730.0,
+     "p95": 8973.0
+    },
+    "answer_first": {
+     "n": 1,
+     "mean": 3355.0,
+     "p50": 3355.0,
+     "p95": 3355.0
+    },
+    "react": {
+     "n": 1,
+     "mean": 0.0,
+     "p50": 0.0,
+     "p95": 0.0
+    }
+   },
+   {
+    "date": "2026-11-10",
+    "n": 354,
+    "partial": true,
+    "observed_at": "2026-11-11T02:04:20.703014+00:00",
+    "source": "workspace_request_logs",
+    "gateway": {
+     "n": 354,
+     "mean": 57239.2,
+     "p50": 29374.0,
+     "p95": 207078.0
+    },
+    "first_token": {
+     "n": 297,
+     "mean": 6228.2,
+     "p50": 4865.0,
+     "p95": 15362.0
+    },
+    "answer_first": {
+     "n": 1,
+     "mean": 10454.0,
+     "p50": 10454.0,
+     "p95": 10454.0
+    },
+    "react": {
+     "n": 1,
+     "mean": 0.0,
+     "p50": 0.0,
+     "p95": 0.0
+    }
+   },
+   {
+    "date": "2026-11-11",
+    "n": 80,
+    "partial": true,
+    "observed_at": "2026-11-11T02:04:20.703014+00:00",
+    "source": "workspace_request_logs",
+    "gateway": {
+     "n": 80,
+     "mean": 38282.4,
+     "p50": 34628.0,
+     "p95": 101543.0
+    },
+    "first_token": {
+     "n": 75,
+     "mean": 6459.9,
+     "p50": 4803.0,
+     "p95": 14072.0
+    },
+    "answer_first": {
+     "n": 0
+    },
+    "react": {
+     "n": 0
+    }
+   }
+  ],
   "binding_count": 138,
   "read_log_count": 137,
   "errors": {
