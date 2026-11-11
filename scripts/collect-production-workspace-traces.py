@@ -27,10 +27,47 @@ MAX_LOG = 200_000_000
 MAX_HISTORY = 8_000_000
 MAX_SESSIONS = 25
 MAX_TRACE_REQUESTS = 100
+SUMMARY_DAYS = 30
+TRACE_DAYS = 7
 NAME = re.compile(r'^[A-Za-z0-9_.-]{1,160}$')
 REQ = re.compile(r'request_id=([^\s,;]+)')
 REQUEST_ID = re.compile(r'^digitalmate-[A-Za-z0-9_-]{1,128}$')
 CHUNK = re.compile(r'process_stream chunk #\d+: request_id=\S+ event_type=(\S*)')
+USAGE_FIELDS = {key: re.compile(r"['\"]" + key + r"['\"]\s*:\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)")
+                for key in ('input_tokens', 'output_tokens', 'total_tokens', 'tpot_ms')}
+
+
+def new_usage():
+    return {'events': 0, 'input': 0, 'output': 0, 'total': 0,
+            'input_samples': 0, 'output_samples': 0, 'total_samples': 0, 'tpot_pairs': []}
+
+
+def record_usage(usage, line):
+    usage['events'] += 1
+    values = {}
+    for key, pattern in USAGE_FIELDS.items():
+        match = pattern.search(line)
+        value = float(match.group(1)) if match else None
+        values[key] = value if value is not None and math.isfinite(value) and 0 <= value <= 1e12 else None
+    for field, name in (('input_tokens', 'input'), ('output_tokens', 'output'), ('total_tokens', 'total')):
+        value = values[field]
+        if value is not None and value.is_integer():
+            usage[name] += int(value)
+            usage[name + '_samples'] += 1
+    output, tpot = values['output_tokens'], values['tpot_ms']
+    if output is not None and output.is_integer() and output > 1 and tpot is not None:
+        usage['tpot_pairs'].append((tpot, int(output) - 1))
+
+
+def metric_histogram(pairs):
+    """A bounded mergeable histogram; no individual samples are published."""
+    bins = collections.Counter()
+    for value, weight in pairs:
+        index = -1001 if value == 0 else math.floor(math.log(value) / math.log(1.02))
+        if value != 0 and (index < -1000 or index > 1000):
+            return None
+        bins[index] += weight
+    return sorted([index, weight] for index, weight in bins.items())
 
 
 def fetch(path, params, *, download=False):
@@ -141,9 +178,9 @@ def read_log(item):
     if not isinstance(logfile.get('size'), int) or logfile['size'] > MAX_LOG:
         return query, [], 'oversized', {}
     requests = {}
-    usage = collections.Counter()
+    usage = {}
     today = dt.datetime.now(CST).date()
-    cutoff = dt.datetime.combine(today - dt.timedelta(days=6), dt.time.min, CST).timestamp()
+    cutoff = dt.datetime.combine(today - dt.timedelta(days=SUMMARY_DAYS - 1), dt.time.min, CST).timestamp()
     for line in download_log(query):
         ts = stamp(line)
         if ts is None or ts < cutoff:
@@ -152,7 +189,7 @@ def read_log(item):
         if day <= today and "[JiuWenSwarmDeepAdapter] llm_usage chunk: type='llm_usage'" in line:
             # These events have no stable invocation ID in the deployed image.
             # Publish their count as records, never as deduplicated calls.
-            usage[day.isoformat()] += 1
+            record_usage(usage.setdefault(day.isoformat(), new_usage()), line)
         match = REQ.search(line)
         if not match:
             continue
@@ -180,7 +217,7 @@ def read_log(item):
         if start is None or end is None or end < start:
             continue
         date = dt.datetime.fromtimestamp(start, CST).date()
-        if not today - dt.timedelta(days=6) <= date <= today:
+        if not today - dt.timedelta(days=SUMMARY_DAYS - 1) <= date <= today:
             continue
         gateway = round((end - start) * 1000, 1)
         row = {'request_id': rid, 'date': date.isoformat(), 'gateway': gateway,
@@ -273,7 +310,7 @@ def attach_tool_events(query, rows):
     return not truncated
 
 
-def request_daily_metrics(records, date, generated_at, incomplete, usage_events=0):
+def request_daily_metrics(records, date, generated_at, incomplete, usage=None):
     """Summarize the same finished requests used for the slow-request ranking."""
     def summary(field):
         values = sorted(row[field] for _, _, row in records
@@ -281,18 +318,38 @@ def request_daily_metrics(records, date, generated_at, incomplete, usage_events=
                         and not isinstance(row[field], bool) and math.isfinite(row[field]))
         if not values:
             return {'n': 0}
-        return {'n': len(values), 'mean': round(sum(values) / len(values), 1),
+        return {'n': len(values), 'sum': sum(values), 'mean': round(sum(values) / len(values), 1),
                 'p50': round(values[int(round(.5 * (len(values) - 1)))], 1),
-                'p95': round(values[int(round(.95 * (len(values) - 1)))], 1)}
+                'p95': round(values[int(round(.95 * (len(values) - 1)))], 1),
+                'histogram': metric_histogram([(value, 1) for value in values])}
 
     statuses = collections.Counter(row.get('gateway_stream_status', 'unknown') for _, _, row in records)
     observed = statuses['normal'] + statuses['exception']
+    usage = usage or new_usage()
+    pairs = sorted(usage['tpot_pairs'])
+    weight = sum(w for _, w in pairs)
+    safe_weight = weight if weight <= 2**53 - 1 else None
+    tpot = {'n': len(pairs), 'tokens': safe_weight}
+    if safe_weight:
+        def quantile(q):
+            target = q * weight
+            seen = 0
+            for value, count in pairs:
+                seen += count
+                if seen >= target:
+                    return round(value, 2)
+        weighted_sum = sum(value * w for value, w in pairs)
+        tpot.update(weighted_sum=weighted_sum, mean=round(weighted_sum / weight, 2),
+                    p50=quantile(.5), p95=quantile(.95), histogram=metric_histogram(pairs))
+    tokens = {key: usage[key] if usage[key + '_samples'] and usage[key] <= 2**53 - 1 else None
+              for key in ('input', 'output', 'total')}
+    tokens['samples'] = {key: usage[key + '_samples'] for key in ('input', 'output', 'total')}
     return {'date': date, 'n': len(records),
             'partial': incomplete or date == dt.datetime.now(CST).date().isoformat(),
             'observed_at': generated_at, 'telemetry_observed_at': generated_at,
             'telemetry_partial': incomplete or date == dt.datetime.now(CST).date().isoformat(),
             'source': 'workspace_request_logs',
-            'model_usage_events': usage_events,
+            'model_usage_events': usage['events'], 'tokens': tokens, 'tpot': tpot,
             'gateway_stream': {'normal': statuses['normal'], 'exception': statuses['exception'],
                                'cancelled': statuses['cancelled'], 'unknown': statuses['unknown'],
                                'observed': observed, 'population': len(records),
@@ -307,7 +364,7 @@ def collect():
     if not items:
         raise SystemExit('no production bindings')
     snapshots, problems = [], {}
-    usage_by_day = collections.Counter()
+    usage_by_day = {}
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
         future_map = {pool.submit(read_log, item): idx for idx, item in enumerate(items)}
         for count, future in enumerate(concurrent.futures.as_completed(future_map), 1):
@@ -316,7 +373,11 @@ def collect():
                 query, rows, status, usage = future.result()
                 if status == 'ok':
                     snapshots.append((idx, query, rows))
-                    usage_by_day.update(usage)
+                    for day, values in usage.items():
+                        pooled = usage_by_day.setdefault(day, new_usage())
+                        for key in ('events', 'input', 'output', 'total', 'input_samples', 'output_samples', 'total_samples'):
+                            pooled[key] += values[key]
+                        pooled['tpot_pairs'].extend(values['tpot_pairs'])
                 else: problems[status] = problems.get(status, 0) + 1
             except Exception as error:
                 category = 'http_' + str(error.code) if isinstance(error, urllib.error.HTTPError) else type(error).__name__
@@ -331,10 +392,11 @@ def collect():
             grouped.setdefault(row['date'], []).append((idx, query, row))
     days, chosen, daily_metrics = [], [], []
     generated_at = dt.datetime.now(UTC).isoformat()
+    trace_cutoff = (dt.datetime.now(CST).date() - dt.timedelta(days=TRACE_DAYS - 1)).isoformat()
     for date in sorted(set(grouped) | set(usage_by_day)):
         records = grouped.get(date, [])
-        daily_metrics.append(request_daily_metrics(records, date, generated_at, bool(problems), usage_by_day[date]))
-        if not records:
+        daily_metrics.append(request_daily_metrics(records, date, generated_at, bool(problems), usage_by_day.get(date)))
+        if not records or date < trace_cutoff:
             continue
         records.sort(key=lambda item:item[2]['gateway'],reverse=True)
         slow_count = math.ceil(len(records) * .05)
