@@ -982,7 +982,7 @@ function envSummary(doc) {
   const toolHint = anchor.source === 'workspace_request_logs' ? '本次请求日志未采集工具耗时'
     : toolCount > 0
     ? `${fmtCount(toolCount)} 次工具调用 · 失败 ${fmtCount(anchor.tool_failed)} · tool_call → tool_result`
-    : '0 次工具调用 · 当日无样本 · tool_call → tool_result';
+    : '当日无已观测样本 · 覆盖率未知 · tool_call → tool_result';
   const toolTile = `<div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>工具调用</strong> 平均 / P50 / P95</div>
       <div class="stat-value combo">${fmtDuration(anchor.tool?.mean)} / ${fmtDuration(anchor.tool?.p50)} / ${fmtDuration(anchor.tool?.p95)}</div>
@@ -998,7 +998,7 @@ function envSummary(doc) {
       ? `${fmtCount(count)} 个样本 · ${hint}`
       : networkSeen
         ? '0 个样本 · 当日无样本'
-        : '等待网关发版后埋点';
+        : '不可用：缺少可验证的帧配对和时钟误差';
     return `<div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>${label}</strong> 平均 / P50 / P95</div>
       <div class="stat-value combo">${fmtDuration(anchor[key]?.mean)} / ${fmtDuration(anchor[key]?.p50)} / ${fmtDuration(anchor[key]?.p95)}</div>
@@ -3486,7 +3486,7 @@ function traceRows(item) {
   for (const [index, tool] of (Array.isArray(item.tool_events) ? item.tool_events : []).entries()) {
     if (!valid(tool.start_ms) || !Number.isFinite(tool.duration_ms) || tool.duration_ms < 0 || tool.start_ms + tool.duration_ms > total) continue;
     const name = ['bash', 'grep', 'read_file', 'tool_search'].includes(tool.name) ? tool.name : '工具';
-    rows.push({label: `${String(index + 1).padStart(2, '0')} · ${name}`, start: tool.start_ms, duration: tool.duration_ms, kind: tool.status === 'error' ? 'error' : 'tool', detail: `工具调用事件到结果事件；状态：${tool.status === 'error' ? '失败' : '成功'}`});
+    rows.push({label: `${String(index + 1).padStart(2, '0')} · ${name}`, start: tool.start_ms, duration: tool.duration_ms, kind: tool.status === 'error' ? 'error' : 'tool', detail: `工具调用事件到结果事件；状态：${tool.status === 'error' ? '失败' : tool.status === 'ok' ? '成功' : '未知'}`});
   }
   return rows;
 }

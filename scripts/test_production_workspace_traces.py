@@ -65,5 +65,29 @@ class ProductionTraceTests(unittest.TestCase):
         self.assertNotIn('PRIVATE_',json.dumps(row))
         self.assertFalse(row['trace_complete'])
 
+    def test_history_does_not_pair_across_sessions_or_duplicate_starts(self):
+        start = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+        row = {'request_id': 'digitalmate-a', 'gateway': 10000, 'start_time': start.isoformat()}
+        event = lambda ts, typ, **fields: {'request_id': 'digitalmate-a', 'timestamp': start.timestamp()+ts,
+                                          'event_type': typ, **fields}
+        histories = {
+            'one': [event(1, 'chat.tool_call', tool_call={'tool_call_id': 'cross', 'name': 'bash'}),
+                    event(2, 'chat.tool_call', tool_call={'tool_call_id': 'dup', 'name': 'bash'}),
+                    event(3, 'chat.tool_call', tool_call={'tool_call_id': 'dup', 'name': 'bash'}),
+                    event(4, 'chat.tool_result', tool_call_id='dup', success=True),
+                    event(5, 'chat.tool_call', tool_call={'tool_call_id': 'good', 'name': 'bash'}),
+                    event(6, 'chat.tool_result', tool_call_id='good')],
+            'two': [event(7, 'chat.tool_result', tool_call_id='cross', success=True)],
+        }
+        def fetch(_path, params, **_kwargs):
+            name = params['path'].split('/')[-2]
+            return '\n'.join(map(json.dumps, histories[name]))
+        with patch.object(collector, 'listing', return_value=[{'type': 'directory', 'name': 'one'},
+                                                               {'type': 'directory', 'name': 'two'}]), \
+             patch.object(collector, 'fetch', side_effect=fetch):
+            collector.attach_tool_events({}, [row])
+        self.assertEqual(row['tool_events'], [{'name': 'bash', 'start_ms': 5000.0,
+                                               'duration_ms': 1000.0, 'status': 'unknown'}])
+
 if __name__ == '__main__':
     unittest.main()
