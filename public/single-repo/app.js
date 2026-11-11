@@ -52,7 +52,7 @@
   const loadViews = () => { try { return { issues: 'table', prs: 'table', ...JSON.parse(localStorage.getItem(VIEW_KEY) || '{}') }; } catch (e) { return { issues: 'table', prs: 'table' }; } };
   const loadLine = () => { try { return localStorage.getItem(LINE_KEY); } catch (e) { return null; } };
   const loadCovSort = () => { try { return localStorage.getItem(COV_SORT_KEY) === 'lines' ? 'lines' : 'name'; } catch (e) { return 'name'; } };
-  const STATE = { snap: null, status: null, tab: 'overview', views: loadViews(), line: loadLine(), covOpen: new Set(), covSort: loadCovSort(), sort: {}, filters: { issueQ: '', issueLabel: '', issueAssignee: '', runBranch: '' }, ageFilter: { issues: null, prs: null }, coverageWeekOffset: 0, e2e: null, nightlyRuns: [], e2eSteps: {}, e2eFilter: { status: '', q: '' }, e2eLoading: new Set(), e2eErrors: new Set(), e2eCollapsed: new Set(), pollTimer: null };
+  const STATE = { snap: null, status: null, tab: 'overview', views: loadViews(), line: loadLine(), covOpen: new Set(), covSort: loadCovSort(), sort: {}, filters: { issueQ: '', issueLabel: '', issueAssignee: '', runBranch: '' }, ageFilter: { issues: null, prs: null }, coverageWeekOffset: 0, e2e: null, e2eSteps: {}, e2eFilter: { status: '', q: '' }, e2eLoading: new Set(), e2eErrors: new Set(), e2eCollapsed: new Set(), pollTimer: null };
   const returnParams = new URLSearchParams(location.search);
   const returnFocus = { line: returnParams.get('returnLine'), caseName: returnParams.get('returnCase'), pending: !!returnParams.get('returnCase'),
     e2eKey: returnParams.get('returnE2E'), e2ePending: !!returnParams.get('returnE2E') };
@@ -1101,11 +1101,6 @@
     return html;
   }
   const e2eRecordsSection = () => `<div id="e2e-records">${e2eHistoryContent()}</div>`;
-  function nightlyCollectionEntry() {
-    if (String(STATE.snap?.repo || '').toLowerCase() !== 'openjiuwen-ai/digitalmate') return '';
-    const options = STATE.nightlyRuns.map((run) => `<option value="${esc(run.id)}">${esc(`#${run.run_number} · ${run.event} · ${shortDateTime(run.created_at)} · ${run.conclusion} · run ${run.id}`)}</option>`).join('');
-    return `<section class="card" aria-label="手动采集 Nightly 数据"><h3>手动采集 Nightly 数据</h3><p class="muted">选择已完成的 Nightly，使用同一个 run ID 更新 E2E 性能、Bench 和 ST / 测试矩阵。</p><div class="filters"><label for="nightly-run-id">Nightly</label><select id="nightly-run-id" aria-label="选择已完成的 Nightly run">${options || '<option value="">暂无已发布的 Nightly 列表</option>'}</select><label for="nightly-run-id-manual">或输入 run ID</label><input id="nightly-run-id-manual" inputmode="numeric" placeholder="如 42919555343"><button class="btn" type="button" data-nightly-collect>复制 run ID</button><a class="btn primary" href="https://github.com/agent-dashboard-ai/Agent-Dashboard/actions/workflows/collect-digitalmate-nightly.yml" target="_blank" rel="noopener">打开统一采集</a></div><p class="small-note">GitHub Actions 不支持从链接预填 workflow 输入。复制后在统一采集页粘贴 run ID 并运行；需要 Agent-Dashboard 的 Actions 写权限。</p><p class="muted" data-nightly-collect-status role="status"></p></section>`;
-  }
   function renderE2EHistory() {
     const box = $('#e2e-records');
     if (!box) return;
@@ -1166,7 +1161,6 @@
     const tree = d.tree;
     const ut = d.executed.find((e) => e.artifact.startsWith('ut'));
     const e2e = d.executed.find((e) => e.layer === 'e2e' && !e.artifact.startsWith('real-e2e-results'));
-    html += nightlyCollectionEntry();
     html += tiles([
       { label: '测试文件（仓库树）', value: n(tree?.total), sub: tree ? `来源 ${esc(d.tree_source)}` : '文件树不可用' },
       { label: '有测试的包', value: tree ? `${d.inventory.filter((p) => p.tested).length}<small>/ ${d.inventory.length}</small>` : '—', tone: d.inventory.some((p) => !p.tested) ? 'warn' : 'good' },
@@ -1452,8 +1446,6 @@
       STATE.clientError = null;
       // Run records are optional: a missing index only hides that section.
       STATE.e2e = await fetchJson('./data/e2e/index.json?ts='+Date.now()).catch(() => null);
-      const nightlyRuns = await fetchJson('./data/nightly-runs.json?ts='+Date.now()).catch(() => null);
-      STATE.nightlyRuns = Array.isArray(nightlyRuns) ? nightlyRuns : Array.isArray(nightlyRuns?.runs) ? nightlyRuns.runs : [];
       STATE.e2eErrors.clear();
     } catch (err) {
       STATE.clientError = err.name === 'AbortError'
@@ -1496,28 +1488,6 @@
     renderE2EHistory();
   });
   document.addEventListener('click', (ev) => {
-    const collectNightly = ev.target.closest('[data-nightly-collect]');
-    if (collectNightly) {
-      const input = $('#nightly-run-id');
-      const manualRunId = $('#nightly-run-id-manual')?.value.trim();
-      const runId = manualRunId || input?.value;
-      const status = $('[data-nightly-collect-status]');
-      if (!runId) {
-        if (status) status.textContent = '先选择一个已完成的 Nightly。';
-        return;
-      }
-      if (!navigator.clipboard?.writeText) {
-        if (status) status.textContent = `请手动复制 run ID：${runId}`;
-        return;
-      }
-      const copied = navigator.clipboard.writeText(String(runId));
-      Promise.resolve(copied).then(() => {
-        if (status) status.textContent = `已复制 run ID ${runId}。在打开的 Actions 页面粘贴到 run_id 输入框。`;
-      }).catch(() => {
-        if (status) status.textContent = `请复制 run ID：${runId}，并粘贴到打开的 Actions 页面。`;
-      });
-      return;
-    }
     const category = ev.target.closest('[data-e2e-category]');
     if (category) {
       const open = category.getAttribute('aria-expanded') !== 'true';
