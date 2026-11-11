@@ -34,6 +34,22 @@ test('older incomplete distributions use a labelled current sample, without losi
   assert.equal(unsafe.answer_first_history.n,22); assert.equal(unsafe.answer_first,undefined);
 });
 
+test('admission samples retain their own current request denominator', () => {
+  const c=vm.createContext({});
+  vm.runInContext(extract('function mergeMetricHistogram(', '// Each bucket covers')+
+    extract('function cloudDisplayRow(', 'function cloudScopedDays(')+
+    extract('function aggregateCloudMetric(', '// Headline tiles summarize')+
+    ';globalThis.display=cloudDisplayRow;globalThis.summary=summarizeCloudWindow;',c);
+  const row={date:'2026-11-10',n:100,gateway:{n:100,histogram:[[0,100]]},first_token:{n:90,histogram:[[0,90]]},
+    current_request_metrics:{n:30,gateway_admission:{n:20,mean:100},first_text_admission:{n:15,mean:50},answer_admission:{n:0}}};
+  const displayed=c.display(row), summary=c.summary([displayed]);
+  assert.equal(displayed.n,100);
+  assert.equal(displayed.admission_population,30);
+  assert.equal(summary.admission_population,30);
+  assert.equal(summary.first_text_admission.n,15);
+  assert.equal(summary.answer_admission.n,0);
+});
+
 test('cloud cards aggregate the selected days using sample and token weights', () => {
   const c=vm.createContext({});
   vm.runInContext(extract('function mergeMetricHistogram(', '// Each bucket covers')+

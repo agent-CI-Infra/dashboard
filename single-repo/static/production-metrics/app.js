@@ -995,6 +995,9 @@ function summarizeCloudWindow(rows) {
     telemetry_partial: rows.some((row) => row.telemetry_partial), window_days: rows.length,
     window_start: rows[0].date, window_end: rows[rows.length - 1].date };
   result.current_sample_days = rows.filter((row) => row.current_sample_used).length;
+  const populations = rows.map((row) => row.admission_population ?? row.n);
+  result.admission_population = populations.every((n) => Number.isSafeInteger(n) && n >= 0)
+    ? populations.reduce((sum, n) => sum + n, 0) : null;
   for (const key of ['gateway', 'first_token', 'answer_first', 'gateway_admission', 'first_text_admission', 'answer_admission', 'answer_first_history', 'react', 'tool', 'ttft', 'tpot', 'uplink_send', 'downlink_first_text', 'downlink_terminal']) {
     result[key] = aggregateCloudMetric(rows, key);
   }
@@ -1069,7 +1072,10 @@ function envSummary(doc) {
   // so a collection gap is visible as a gap rather than as a missing metric.
   const requestTile = (key, label, hint) => {
     const sampleCount = Number.isFinite(anchor[key]?.n) ? anchor[key].n : 0;
-    const count = sampleCount > 0 ? `${fmtCount(sampleCount)} 个请求` : '所选范围无样本';
+    const admissionMetric = ['gateway_admission', 'first_text_admission', 'answer_admission'].includes(key);
+    const count = admissionMetric && anchor.admission_population > 0 && sampleCount <= anchor.admission_population
+      ? `${fmtCount(sampleCount)} / ${fmtCount(anchor.admission_population)} 个已结束请求有样本`
+      : sampleCount > 0 ? `${fmtCount(sampleCount)} 个请求` : '所选范围无样本';
     return `<div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>${label}</strong> 平均 / P50 / P95（s）</div>
       <div class="stat-value combo">${formatted(anchor[key], 'mean', seconds)} / ${formatted(anchor[key], 'p50', seconds)} / ${formatted(anchor[key], 'p95', seconds)}</div>
@@ -3879,8 +3885,9 @@ function cloudDisplayRow(row) {
   if (current?.answer_first_history?.n > 0 && current.answer_first_history.n > (result.answer_first_history?.n || 0)) {
     result.answer_first_history = current.answer_first_history;
   }
-  for (const key of ['gateway_admission', 'first_text_admission', 'answer_admission']) {
-    if (current?.[key]?.n > 0 && current[key].n > (result[key]?.n || 0)) result[key] = current[key];
+  if (current?.gateway_admission?.n > (result.gateway_admission?.n || 0)) {
+    for (const key of ['gateway_admission', 'first_text_admission', 'answer_admission']) result[key] = current[key];
+    result.admission_population = current.n;
   }
   return result;
 }
