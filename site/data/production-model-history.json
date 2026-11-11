@@ -1,10 +1,10 @@
 {
  "schema": "digitalmate/e2e-performance-history@1",
  "metrics_version": 7,
- "generated_at": "2026-11-11T01:45:51Z",
- "updated_at": "2026-11-11T01:45:51Z",
+ "generated_at": "2026-11-11T06:27:27Z",
+ "updated_at": "2026-11-11T06:27:27Z",
  "window_start": "2026-10-07T16:00:00+00:00",
- "window_end": "2026-11-11T01:44:31+00:00",
+ "window_end": "2026-11-11T06:26:07+00:00",
  "current_day_partial": true,
  "complete_through": "2026-11-10",
  "partial_day": "2026-11-11",
@@ -1295,16 +1295,16 @@
      "date": "2026-11-11",
      "status": "COMPLETED",
      "partial": true,
-     "query_ms": 255,
-     "duration_sum_ms": 57790,
-     "duration_sample_count": 227,
-     "duration_p50_ms": 247,
-     "duration_p95_ms": 336,
-     "success_count": 227,
-     "query_count": 227,
+     "query_ms": 258,
+     "duration_sum_ms": 70814,
+     "duration_sample_count": 274,
+     "duration_p50_ms": 248,
+     "duration_p95_ms": 404,
+     "success_count": 274,
+     "query_count": 274,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-11T01:39:22Z",
+     "finished_at": "2026-11-11T06:16:42Z",
      "failed_queries": 0,
      "unknown_status_count": 0,
      "blocked_queries": 0,
@@ -1319,8 +1319,8 @@
       "status": "success",
       "reason": null
      },
-     "slow_count": 12,
-     "slow_threshold_ms": 336,
+     "slow_count": 14,
+     "slow_threshold_ms": 404,
      "hours": [
       {
        "hour": 0,
@@ -1377,13 +1377,53 @@
        "duration_sum_ms": 10216,
        "duration_sample_count": 39,
        "failed": 0
+      },
+      {
+       "hour": 10,
+       "calls": 27,
+       "success_count": 27,
+       "duration_sum_ms": 7795,
+       "duration_sample_count": 27,
+       "failed": 0
+      },
+      {
+       "hour": 11,
+       "calls": 4,
+       "success_count": 4,
+       "duration_sum_ms": 1056,
+       "duration_sample_count": 4,
+       "failed": 0
+      },
+      {
+       "hour": 12,
+       "calls": 1,
+       "success_count": 1,
+       "duration_sum_ms": 216,
+       "duration_sample_count": 1,
+       "failed": 0
+      },
+      {
+       "hour": 13,
+       "calls": 9,
+       "success_count": 9,
+       "duration_sum_ms": 2557,
+       "duration_sample_count": 9,
+       "failed": 0
+      },
+      {
+       "hour": 14,
+       "calls": 6,
+       "success_count": 6,
+       "duration_sum_ms": 1400,
+       "duration_sample_count": 6,
+       "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/bge-m3",
-       "call_count": 227,
-       "success_count": 227,
+       "call_count": 274,
+       "success_count": 274,
        "failed_count": 0,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
@@ -1393,7 +1433,7 @@
        "ttft_estimated_sample_count": 0,
        "ttft_estimated_sum_ms": null,
        "ttft_estimated_histogram": [],
-       "ttft_filtered_count": 128,
+       "ttft_filtered_count": 149,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
@@ -1405,14 +1445,14 @@
        "tpot_histogram": [],
        "tpot_estimated_histogram": [],
        "tpot_filtered_count": 0,
-       "duration_sum_ms": 57790,
-       "duration_p50_ms": 247,
-       "duration_p95_ms": 336,
-       "duration_sample_count": 227,
-       "input_tokens": 25505,
+       "duration_sum_ms": 70814,
+       "duration_p50_ms": 248,
+       "duration_p95_ms": 404,
+       "duration_sample_count": 274,
+       "input_tokens": 28541,
        "output_tokens": 0,
-       "total_tokens": 25505,
-       "token_sample_count": 227,
+       "total_tokens": 28541,
+       "token_sample_count": 274,
        "token_coverage": 1.0,
        "failed_input_tokens": null,
        "failed_output_tokens": null,
@@ -1430,6 +1470,14 @@
        "reason": null
       },
       {
+       "request_id": "fb283e34-ec82-4a5b-93c6-76a2f2cc3e6e",
+       "call_id": "fb283e34-ec82-4a5b-93c6-76a2f2cc3e6e",
+       "start_time": "2026-11-11T02:39:32.016+00:00",
+       "duration_ms": 664,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "4f36134c-fd5c-45a8-9899-d66d4d35ab26",
        "call_id": "4f36134c-fd5c-45a8-9899-d66d4d35ab26",
        "start_time": "2026-11-11T01:09:18.477+00:00",
@@ -1442,6 +1490,22 @@
        "call_id": "76611c4b-13c5-4371-bba4-0a1cb27d23fb",
        "start_time": "2026-11-11T01:11:20.815+00:00",
        "duration_ms": 595,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "dcccc56e-7e4c-4b39-b6d5-7df924d246c9",
+       "call_id": "dcccc56e-7e4c-4b39-b6d5-7df924d246c9",
+       "start_time": "2026-11-11T02:03:43.037+00:00",
+       "duration_ms": 482,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "2d28e84d-834f-4261-8ff4-7f95a8fa683f",
+       "call_id": "2d28e84d-834f-4261-8ff4-7f95a8fa683f",
+       "start_time": "2026-11-11T05:40:07.539+00:00",
+       "duration_ms": 473,
        "status": "success",
        "reason": null
       },
@@ -1478,6 +1542,14 @@
        "reason": null
       },
       {
+       "request_id": "562fc9dc-e37d-440d-bb5a-b1f1f90f5368",
+       "call_id": "562fc9dc-e37d-440d-bb5a-b1f1f90f5368",
+       "start_time": "2026-11-11T02:06:23.105+00:00",
+       "duration_ms": 428,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "987cb37e-a378-4a9c-be2f-7858370df374",
        "call_id": "987cb37e-a378-4a9c-be2f-7858370df374",
        "start_time": "2026-11-10T23:41:05.496+00:00",
@@ -1486,34 +1558,18 @@
        "reason": null
       },
       {
+       "request_id": "67d467ef-7a80-4219-903f-a0f20dc84cb7",
+       "call_id": "67d467ef-7a80-4219-903f-a0f20dc84cb7",
+       "start_time": "2026-11-11T05:04:09.229+00:00",
+       "duration_ms": 426,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "42327fb8-8731-49c4-a155-7fb979456c4a",
        "call_id": "42327fb8-8731-49c4-a155-7fb979456c4a",
        "start_time": "2026-11-10T16:21:56.045+00:00",
        "duration_ms": 404,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "8de635ea-92b7-4a51-8b31-7b46b43dc1fb",
-       "call_id": "8de635ea-92b7-4a51-8b31-7b46b43dc1fb",
-       "start_time": "2026-11-10T16:51:57.767+00:00",
-       "duration_ms": 377,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "0a9d48ee-2b9f-4d3d-9bbc-95808ae5fdf2",
-       "call_id": "0a9d48ee-2b9f-4d3d-9bbc-95808ae5fdf2",
-       "start_time": "2026-11-11T00:25:27.479+00:00",
-       "duration_ms": 357,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "8ff65350-b7ae-4c2a-974c-6ca317e65566",
-       "call_id": "8ff65350-b7ae-4c2a-974c-6ca317e65566",
-       "start_time": "2026-11-10T22:59:35.963+00:00",
-       "duration_ms": 336,
        "status": "success",
        "reason": null
       }
@@ -1525,16 +1581,16 @@
     "date": "2026-11-11",
     "status": "COMPLETED",
     "partial": true,
-    "query_ms": 255,
-    "duration_sum_ms": 57790,
-    "duration_sample_count": 227,
-    "duration_p50_ms": 247,
-    "duration_p95_ms": 336,
-    "success_count": 227,
-    "query_count": 227,
+    "query_ms": 258,
+    "duration_sum_ms": 70814,
+    "duration_sample_count": 274,
+    "duration_p50_ms": 248,
+    "duration_p95_ms": 404,
+    "success_count": 274,
+    "query_count": 274,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-11T01:39:22Z",
+    "finished_at": "2026-11-11T06:16:42Z",
     "failed_queries": 0,
     "unknown_status_count": 0,
     "blocked_queries": 0,
@@ -1549,8 +1605,8 @@
      "status": "success",
      "reason": null
     },
-    "slow_count": 12,
-    "slow_threshold_ms": 336,
+    "slow_count": 14,
+    "slow_threshold_ms": 404,
     "hours": [
      {
       "hour": 0,
@@ -1607,13 +1663,53 @@
       "duration_sum_ms": 10216,
       "duration_sample_count": 39,
       "failed": 0
+     },
+     {
+      "hour": 10,
+      "calls": 27,
+      "success_count": 27,
+      "duration_sum_ms": 7795,
+      "duration_sample_count": 27,
+      "failed": 0
+     },
+     {
+      "hour": 11,
+      "calls": 4,
+      "success_count": 4,
+      "duration_sum_ms": 1056,
+      "duration_sample_count": 4,
+      "failed": 0
+     },
+     {
+      "hour": 12,
+      "calls": 1,
+      "success_count": 1,
+      "duration_sum_ms": 216,
+      "duration_sample_count": 1,
+      "failed": 0
+     },
+     {
+      "hour": 13,
+      "calls": 9,
+      "success_count": 9,
+      "duration_sum_ms": 2557,
+      "duration_sample_count": 9,
+      "failed": 0
+     },
+     {
+      "hour": 14,
+      "calls": 6,
+      "success_count": 6,
+      "duration_sum_ms": 1400,
+      "duration_sample_count": 6,
+      "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/bge-m3",
-      "call_count": 227,
-      "success_count": 227,
+      "call_count": 274,
+      "success_count": 274,
       "failed_count": 0,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
@@ -1623,7 +1719,7 @@
       "ttft_estimated_sample_count": 0,
       "ttft_estimated_sum_ms": null,
       "ttft_estimated_histogram": [],
-      "ttft_filtered_count": 128,
+      "ttft_filtered_count": 149,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
@@ -1635,14 +1731,14 @@
       "tpot_histogram": [],
       "tpot_estimated_histogram": [],
       "tpot_filtered_count": 0,
-      "duration_sum_ms": 57790,
-      "duration_p50_ms": 247,
-      "duration_p95_ms": 336,
-      "duration_sample_count": 227,
-      "input_tokens": 25505,
+      "duration_sum_ms": 70814,
+      "duration_p50_ms": 248,
+      "duration_p95_ms": 404,
+      "duration_sample_count": 274,
+      "input_tokens": 28541,
       "output_tokens": 0,
-      "total_tokens": 25505,
-      "token_sample_count": 227,
+      "total_tokens": 28541,
+      "token_sample_count": 274,
       "token_coverage": 1.0,
       "failed_input_tokens": null,
       "failed_output_tokens": null,
@@ -1660,6 +1756,14 @@
       "reason": null
      },
      {
+      "request_id": "fb283e34-ec82-4a5b-93c6-76a2f2cc3e6e",
+      "call_id": "fb283e34-ec82-4a5b-93c6-76a2f2cc3e6e",
+      "start_time": "2026-11-11T02:39:32.016+00:00",
+      "duration_ms": 664,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "4f36134c-fd5c-45a8-9899-d66d4d35ab26",
       "call_id": "4f36134c-fd5c-45a8-9899-d66d4d35ab26",
       "start_time": "2026-11-11T01:09:18.477+00:00",
@@ -1672,6 +1776,22 @@
       "call_id": "76611c4b-13c5-4371-bba4-0a1cb27d23fb",
       "start_time": "2026-11-11T01:11:20.815+00:00",
       "duration_ms": 595,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "dcccc56e-7e4c-4b39-b6d5-7df924d246c9",
+      "call_id": "dcccc56e-7e4c-4b39-b6d5-7df924d246c9",
+      "start_time": "2026-11-11T02:03:43.037+00:00",
+      "duration_ms": 482,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "2d28e84d-834f-4261-8ff4-7f95a8fa683f",
+      "call_id": "2d28e84d-834f-4261-8ff4-7f95a8fa683f",
+      "start_time": "2026-11-11T05:40:07.539+00:00",
+      "duration_ms": 473,
       "status": "success",
       "reason": null
      },
@@ -1708,6 +1828,14 @@
       "reason": null
      },
      {
+      "request_id": "562fc9dc-e37d-440d-bb5a-b1f1f90f5368",
+      "call_id": "562fc9dc-e37d-440d-bb5a-b1f1f90f5368",
+      "start_time": "2026-11-11T02:06:23.105+00:00",
+      "duration_ms": 428,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "987cb37e-a378-4a9c-be2f-7858370df374",
       "call_id": "987cb37e-a378-4a9c-be2f-7858370df374",
       "start_time": "2026-11-10T23:41:05.496+00:00",
@@ -1716,34 +1844,18 @@
       "reason": null
      },
      {
+      "request_id": "67d467ef-7a80-4219-903f-a0f20dc84cb7",
+      "call_id": "67d467ef-7a80-4219-903f-a0f20dc84cb7",
+      "start_time": "2026-11-11T05:04:09.229+00:00",
+      "duration_ms": 426,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "42327fb8-8731-49c4-a155-7fb979456c4a",
       "call_id": "42327fb8-8731-49c4-a155-7fb979456c4a",
       "start_time": "2026-11-10T16:21:56.045+00:00",
       "duration_ms": 404,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "8de635ea-92b7-4a51-8b31-7b46b43dc1fb",
-      "call_id": "8de635ea-92b7-4a51-8b31-7b46b43dc1fb",
-      "start_time": "2026-11-10T16:51:57.767+00:00",
-      "duration_ms": 377,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "0a9d48ee-2b9f-4d3d-9bbc-95808ae5fdf2",
-      "call_id": "0a9d48ee-2b9f-4d3d-9bbc-95808ae5fdf2",
-      "start_time": "2026-11-11T00:25:27.479+00:00",
-      "duration_ms": 357,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "8ff65350-b7ae-4c2a-974c-6ca317e65566",
-      "call_id": "8ff65350-b7ae-4c2a-974c-6ca317e65566",
-      "start_time": "2026-11-10T22:59:35.963+00:00",
-      "duration_ms": 336,
       "status": "success",
       "reason": null
      }
@@ -18508,16 +18620,16 @@
      "date": "2026-11-11",
      "status": "COMPLETED",
      "partial": true,
-     "query_ms": 9971,
-     "duration_sum_ms": 5643656,
-     "duration_sample_count": 566,
-     "duration_p50_ms": 7590,
-     "duration_p95_ms": 25673,
-     "success_count": 566,
-     "query_count": 582,
+     "query_ms": 9822,
+     "duration_sum_ms": 6649551,
+     "duration_sample_count": 677,
+     "duration_p50_ms": 7424,
+     "duration_p95_ms": 26028,
+     "success_count": 677,
+     "query_count": 693,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-11T01:39:40Z",
+     "finished_at": "2026-11-11T06:16:40Z",
      "failed_queries": 16,
      "unknown_status_count": 0,
      "blocked_queries": 0,
@@ -18525,17 +18637,17 @@
       "rate_limit": 16
      },
      "timeout_count": 0,
-     "latency_max_ms": 63460,
+     "latency_max_ms": 124123,
      "latency_max_request": {
-      "request_id": "21e83037774c4e44a9fb4d892ccdcdca",
-      "call_id": "38134b2d-18ab-44cf-bd82-017d6f92189b",
-      "start_time": "2026-11-11T00:25:58.438+00:00",
-      "duration_ms": 63460,
+      "request_id": "865337e36d764fb5bc2862e5b35c84c1",
+      "call_id": "37cc11b3-e66a-4aba-8422-695483bbb4ca",
+      "start_time": "2026-11-11T06:12:51.866+00:00",
+      "duration_ms": 124123,
       "status": "success",
       "reason": null
      },
-     "slow_count": 30,
-     "slow_threshold_ms": 25271,
+     "slow_count": 35,
+     "slow_threshold_ms": 25673,
      "hours": [
       {
        "hour": 0,
@@ -18592,24 +18704,68 @@
        "duration_sum_ms": 549434,
        "duration_sample_count": 73,
        "failed": 0
+      },
+      {
+       "hour": 10,
+       "calls": 53,
+       "success_count": 53,
+       "duration_sum_ms": 455585,
+       "duration_sample_count": 53,
+       "failed": 0
+      },
+      {
+       "hour": 11,
+       "calls": 17,
+       "success_count": 17,
+       "duration_sum_ms": 133349,
+       "duration_sample_count": 17,
+       "failed": 0
+      },
+      {
+       "hour": 12,
+       "calls": 2,
+       "success_count": 2,
+       "duration_sum_ms": 9533,
+       "duration_sample_count": 2,
+       "failed": 0
+      },
+      {
+       "hour": 13,
+       "calls": 14,
+       "success_count": 14,
+       "duration_sum_ms": 75783,
+       "duration_sample_count": 14,
+       "failed": 0
+      },
+      {
+       "hour": 14,
+       "calls": 25,
+       "success_count": 25,
+       "duration_sum_ms": 331645,
+       "duration_sample_count": 25,
+       "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 582,
-       "success_count": 566,
+       "call_count": 693,
+       "success_count": 677,
        "failed_count": 16,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
        "ttft_sample_count": 0,
        "ttft_sum_ms": null,
-       "ttft_estimated_avg_ms": 4033,
-       "ttft_estimated_sample_count": 237,
-       "ttft_estimated_sum_ms": 955845,
+       "ttft_estimated_avg_ms": 3703,
+       "ttft_estimated_sample_count": 310,
+       "ttft_estimated_sum_ms": 1147935,
        "ttft_estimated_histogram": [
         [
          316,
+         1
+        ],
+        [
+         317,
          1
         ],
         [
@@ -18629,12 +18785,20 @@
          2
         ],
         [
+         338,
+         1
+        ],
+        [
          339,
          1
         ],
         [
          340,
-         3
+         4
+        ],
+        [
+         343,
+         1
         ],
         [
          345,
@@ -18645,24 +18809,32 @@
          1
         ],
         [
+         348,
+         1
+        ],
+        [
          349,
          3
         ],
         [
          350,
-         3
+         5
         ],
         [
          351,
-         3
+         5
         ],
         [
          352,
-         1
+         3
         ],
         [
          353,
-         4
+         6
+        ],
+        [
+         354,
+         2
         ],
         [
          355,
@@ -18670,7 +18842,7 @@
         ],
         [
          356,
-         6
+         7
         ],
         [
          357,
@@ -18678,27 +18850,27 @@
         ],
         [
          358,
-         1
+         5
         ],
         [
          359,
-         1
+         3
         ],
         [
          360,
-         1
+         3
         ],
         [
          361,
-         4
+         6
         ],
         [
          362,
-         1
+         2
         ],
         [
          363,
-         2
+         4
         ],
         [
          364,
@@ -18706,19 +18878,19 @@
         ],
         [
          366,
-         3
-        ],
-        [
-         367,
-         1
-        ],
-        [
-         368,
          4
         ],
         [
+         367,
+         2
+        ],
+        [
+         368,
+         7
+        ],
+        [
          369,
-         5
+         7
         ],
         [
          370,
@@ -18726,7 +18898,7 @@
         ],
         [
          371,
-         2
+         3
         ],
         [
          372,
@@ -18734,19 +18906,19 @@
         ],
         [
          373,
-         1
+         2
         ],
         [
          374,
-         4
+         7
         ],
         [
          375,
-         3
+         4
         ],
         [
          376,
-         4
+         5
         ],
         [
          377,
@@ -18754,15 +18926,19 @@
         ],
         [
          379,
-         1
+         3
         ],
         [
          380,
-         2
+         5
         ],
         [
          381,
-         3
+         5
+        ],
+        [
+         382,
+         2
         ],
         [
          383,
@@ -18770,7 +18946,7 @@
         ],
         [
          384,
-         3
+         4
         ],
         [
          385,
@@ -18778,7 +18954,7 @@
         ],
         [
          387,
-         2
+         3
         ],
         [
          388,
@@ -18790,15 +18966,15 @@
         ],
         [
          390,
-         2
+         3
         ],
         [
          391,
-         1
+         2
         ],
         [
          392,
-         2
+         3
         ],
         [
          393,
@@ -18810,7 +18986,7 @@
         ],
         [
          396,
-         2
+         3
         ],
         [
          397,
@@ -18822,7 +18998,7 @@
         ],
         [
          400,
-         4
+         5
         ],
         [
          401,
@@ -18834,7 +19010,7 @@
         ],
         [
          403,
-         2
+         3
         ],
         [
          404,
@@ -18873,6 +19049,10 @@
          1
         ],
         [
+         415,
+         1
+        ],
+        [
          416,
          1
         ],
@@ -18887,6 +19067,14 @@
         [
          419,
          2
+        ],
+        [
+         420,
+         1
+        ],
+        [
+         421,
+         1
         ],
         [
          422,
@@ -18934,11 +19122,11 @@
         ],
         [
          435,
-         2
+         3
         ],
         [
          437,
-         2
+         3
         ],
         [
          438,
@@ -18950,7 +19138,7 @@
         ],
         [
          440,
-         5
+         6
         ],
         [
          441,
@@ -18958,7 +19146,11 @@
         ],
         [
          442,
-         2
+         3
+        ],
+        [
+         444,
+         1
         ],
         [
          445,
@@ -18966,7 +19158,7 @@
         ],
         [
          446,
-         4
+         5
         ],
         [
          448,
@@ -18990,7 +19182,7 @@
         ],
         [
          453,
-         1
+         2
         ],
         [
          454,
@@ -18999,6 +19191,10 @@
         [
          455,
          4
+        ],
+        [
+         456,
+         1
         ],
         [
          457,
@@ -19049,19 +19245,27 @@
          3
         ],
         [
+         490,
+         1
+        ],
+        [
+         496,
+         1
+        ],
+        [
          506,
          1
         ]
        ],
-       "ttft_filtered_count": 179,
+       "ttft_filtered_count": 197,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
        "tpot_weight_tokens": 0,
-       "tpot_estimated_avg_ms": 4.544555806583676,
-       "tpot_estimated_sample_count": 237,
-       "tpot_estimated_decode_sum_ms": 1498590.0,
-       "tpot_estimated_weight_tokens": 329755,
+       "tpot_estimated_avg_ms": 4.914135262670391,
+       "tpot_estimated_sample_count": 310,
+       "tpot_estimated_decode_sum_ms": 2021346.0,
+       "tpot_estimated_weight_tokens": 411333,
        "tpot_histogram": [],
        "tpot_estimated_histogram": [
         [
@@ -19086,7 +19290,7 @@
         ],
         [
          42,
-         2
+         3
         ],
         [
          43,
@@ -19099,6 +19303,10 @@
         [
          46,
          2
+        ],
+        [
+         48,
+         1
         ],
         [
          49,
@@ -19114,7 +19322,7 @@
         ],
         [
          52,
-         1
+         2
         ],
         [
          53,
@@ -19130,7 +19338,7 @@
         ],
         [
          57,
-         1
+         3
         ],
         [
          58,
@@ -19142,7 +19350,7 @@
         ],
         [
          60,
-         4
+         5
         ],
         [
          61,
@@ -19154,7 +19362,7 @@
         ],
         [
          63,
-         4
+         5
         ],
         [
          64,
@@ -19178,47 +19386,47 @@
         ],
         [
          69,
-         3
-        ],
-        [
-         70,
          5
         ],
         [
-         71,
+         70,
          7
+        ],
+        [
+         71,
+         8
         ],
         [
          72,
-         11
+         13
         ],
         [
          73,
-         7
+         8
         ],
         [
          74,
-         10
+         12
         ],
         [
          75,
-         6
+         7
         ],
         [
          76,
-         6
+         7
         ],
         [
          77,
-         6
+         11
         ],
         [
          78,
-         2
+         6
         ],
         [
          79,
-         9
+         13
         ],
         [
          80,
@@ -19226,7 +19434,7 @@
         ],
         [
          81,
-         1
+         2
         ],
         [
          82,
@@ -19234,47 +19442,47 @@
         ],
         [
          83,
-         3
-        ],
-        [
-         84,
-         5
-        ],
-        [
-         85,
-         3
-        ],
-        [
-         86,
-         7
-        ],
-        [
-         87,
-         1
-        ],
-        [
-         88,
-         3
-        ],
-        [
-         89,
-         1
-        ],
-        [
-         90,
          4
         ],
         [
-         91,
+         84,
+         6
+        ],
+        [
+         85,
+         5
+        ],
+        [
+         86,
+         8
+        ],
+        [
+         87,
+         4
+        ],
+        [
+         88,
+         5
+        ],
+        [
+         89,
          2
         ],
         [
+         90,
+         7
+        ],
+        [
+         91,
+         3
+        ],
+        [
          92,
-         1
+         4
         ],
         [
          93,
-         5
+         6
         ],
         [
          94,
@@ -19285,16 +19493,32 @@
          2
         ],
         [
+         96,
+         1
+        ],
+        [
          97,
-         2
+         6
         ],
         [
          98,
-         1
+         2
         ],
         [
          99,
          4
+        ],
+        [
+         100,
+         2
+        ],
+        [
+         101,
+         1
+        ],
+        [
+         102,
+         1
         ],
         [
          103,
@@ -19306,7 +19530,11 @@
         ],
         [
          105,
-         3
+         6
+        ],
+        [
+         106,
+         2
         ],
         [
          107,
@@ -19318,22 +19546,38 @@
         ],
         [
          111,
+         2
+        ],
+        [
+         112,
+         1
+        ],
+        [
+         113,
+         1
+        ],
+        [
+         116,
          1
         ],
         [
          118,
+         2
+        ],
+        [
+         135,
          1
         ]
        ],
-       "tpot_filtered_count": 179,
-       "duration_sum_ms": 5643656,
-       "duration_p50_ms": 7590,
-       "duration_p95_ms": 25673,
-       "duration_sample_count": 566,
-       "input_tokens": 20190445,
-       "output_tokens": 805694,
-       "total_tokens": 20996139,
-       "token_sample_count": 566,
+       "tpot_filtered_count": 197,
+       "duration_sum_ms": 6649551,
+       "duration_p50_ms": 7424,
+       "duration_p95_ms": 26028,
+       "duration_sample_count": 677,
+       "input_tokens": 24595541,
+       "output_tokens": 923961,
+       "total_tokens": 25519502,
+       "token_sample_count": 677,
        "token_coverage": 1.0,
        "failed_input_tokens": 79386,
        "failed_output_tokens": 0,
@@ -19342,6 +19586,14 @@
       }
      ],
      "slow_requests": [
+      {
+       "request_id": "865337e36d764fb5bc2862e5b35c84c1",
+       "call_id": "37cc11b3-e66a-4aba-8422-695483bbb4ca",
+       "start_time": "2026-11-11T06:12:51.866+00:00",
+       "duration_ms": 124123,
+       "status": "success",
+       "reason": null
+      },
       {
        "request_id": "21e83037774c4e44a9fb4d892ccdcdca",
        "call_id": "38134b2d-18ab-44cf-bd82-017d6f92189b",
@@ -19407,6 +19659,14 @@
        "reason": null
       },
       {
+       "request_id": "5c4400a1aa6b4f9ba0ce2a7f9b90752e",
+       "call_id": "31dc5ac1-4601-4793-9f5c-6ee40bb90171",
+       "start_time": "2026-11-11T03:21:43.097+00:00",
+       "duration_ms": 42170,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "f9507246f6c94102974a54cfe33040f1",
        "call_id": "c1709ae1-4696-445a-aff9-7bfab94c8877",
        "start_time": "2026-11-10T16:25:10.796+00:00",
@@ -19435,6 +19695,14 @@
        "call_id": "29443159-db84-4cf0-81e1-255bfae45197",
        "start_time": "2026-11-10T16:37:32.835+00:00",
        "duration_ms": 36950,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "b0c7479bf756481589bbdeba4deee63d",
+       "call_id": "84c43554-8998-4062-b35c-12d825304296",
+       "start_time": "2026-11-11T06:12:14.511+00:00",
+       "duration_ms": 36716,
        "status": "success",
        "reason": null
       },
@@ -19487,6 +19755,14 @@
        "reason": null
       },
       {
+       "request_id": "f0dc04212a2e4c9b847a489a7b13b16e",
+       "call_id": "cfa14fe3-db68-4106-8580-758ae0620b96",
+       "start_time": "2026-11-11T02:05:28.471+00:00",
+       "duration_ms": 32554,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "3f4d210624e842ed91d0696d90f31bb6",
        "call_id": "38fd79dc-ffa9-4e50-8a57-d8a09c52a464",
        "start_time": "2026-11-10T21:28:02.919+00:00",
@@ -19511,10 +19787,26 @@
        "reason": null
       },
       {
+       "request_id": "3d7c2b6a81c7402aa8984a030b13d9cb",
+       "call_id": "aee567fb-8fc5-484a-8b30-78677455c88c",
+       "start_time": "2026-11-11T06:16:07.836+00:00",
+       "duration_ms": 30820,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "0db865bc4c2d44119411c2441d7d7344",
        "call_id": "81a083d0-a7f7-4955-9070-6f2b9843d750",
        "start_time": "2026-11-10T23:35:09.752+00:00",
        "duration_ms": 29924,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "795a3dedeb474faaa2294e7236a94d16",
+       "call_id": "dfa966b1-b4a6-4538-b314-2a05dec5d5dc",
+       "start_time": "2026-11-11T02:03:21.864+00:00",
+       "duration_ms": 29128,
        "status": "success",
        "reason": null
       },
@@ -19573,14 +19865,6 @@
        "duration_ms": 25673,
        "status": "success",
        "reason": null
-      },
-      {
-       "request_id": "0e4a042990d4412cb47212d544ac79b0",
-       "call_id": "38d2b6ae-28e8-46d7-a2dd-b4d523ed131e",
-       "start_time": "2026-11-10T22:59:16.458+00:00",
-       "duration_ms": 25271,
-       "status": "success",
-       "reason": null
       }
      ],
      "timeout_requests": []
@@ -19590,16 +19874,16 @@
     "date": "2026-11-11",
     "status": "COMPLETED",
     "partial": true,
-    "query_ms": 9971,
-    "duration_sum_ms": 5643656,
-    "duration_sample_count": 566,
-    "duration_p50_ms": 7590,
-    "duration_p95_ms": 25673,
-    "success_count": 566,
-    "query_count": 582,
+    "query_ms": 9822,
+    "duration_sum_ms": 6649551,
+    "duration_sample_count": 677,
+    "duration_p50_ms": 7424,
+    "duration_p95_ms": 26028,
+    "success_count": 677,
+    "query_count": 693,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-11T01:39:40Z",
+    "finished_at": "2026-11-11T06:16:40Z",
     "failed_queries": 16,
     "unknown_status_count": 0,
     "blocked_queries": 0,
@@ -19607,17 +19891,17 @@
      "rate_limit": 16
     },
     "timeout_count": 0,
-    "latency_max_ms": 63460,
+    "latency_max_ms": 124123,
     "latency_max_request": {
-     "request_id": "21e83037774c4e44a9fb4d892ccdcdca",
-     "call_id": "38134b2d-18ab-44cf-bd82-017d6f92189b",
-     "start_time": "2026-11-11T00:25:58.438+00:00",
-     "duration_ms": 63460,
+     "request_id": "865337e36d764fb5bc2862e5b35c84c1",
+     "call_id": "37cc11b3-e66a-4aba-8422-695483bbb4ca",
+     "start_time": "2026-11-11T06:12:51.866+00:00",
+     "duration_ms": 124123,
      "status": "success",
      "reason": null
     },
-    "slow_count": 30,
-    "slow_threshold_ms": 25271,
+    "slow_count": 35,
+    "slow_threshold_ms": 25673,
     "hours": [
      {
       "hour": 0,
@@ -19674,24 +19958,68 @@
       "duration_sum_ms": 549434,
       "duration_sample_count": 73,
       "failed": 0
+     },
+     {
+      "hour": 10,
+      "calls": 53,
+      "success_count": 53,
+      "duration_sum_ms": 455585,
+      "duration_sample_count": 53,
+      "failed": 0
+     },
+     {
+      "hour": 11,
+      "calls": 17,
+      "success_count": 17,
+      "duration_sum_ms": 133349,
+      "duration_sample_count": 17,
+      "failed": 0
+     },
+     {
+      "hour": 12,
+      "calls": 2,
+      "success_count": 2,
+      "duration_sum_ms": 9533,
+      "duration_sample_count": 2,
+      "failed": 0
+     },
+     {
+      "hour": 13,
+      "calls": 14,
+      "success_count": 14,
+      "duration_sum_ms": 75783,
+      "duration_sample_count": 14,
+      "failed": 0
+     },
+     {
+      "hour": 14,
+      "calls": 25,
+      "success_count": 25,
+      "duration_sum_ms": 331645,
+      "duration_sample_count": 25,
+      "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 582,
-      "success_count": 566,
+      "call_count": 693,
+      "success_count": 677,
       "failed_count": 16,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
       "ttft_sample_count": 0,
       "ttft_sum_ms": null,
-      "ttft_estimated_avg_ms": 4033,
-      "ttft_estimated_sample_count": 237,
-      "ttft_estimated_sum_ms": 955845,
+      "ttft_estimated_avg_ms": 3703,
+      "ttft_estimated_sample_count": 310,
+      "ttft_estimated_sum_ms": 1147935,
       "ttft_estimated_histogram": [
        [
         316,
+        1
+       ],
+       [
+        317,
         1
        ],
        [
@@ -19711,12 +20039,20 @@
         2
        ],
        [
+        338,
+        1
+       ],
+       [
         339,
         1
        ],
        [
         340,
-        3
+        4
+       ],
+       [
+        343,
+        1
        ],
        [
         345,
@@ -19727,24 +20063,32 @@
         1
        ],
        [
+        348,
+        1
+       ],
+       [
         349,
         3
        ],
        [
         350,
-        3
+        5
        ],
        [
         351,
-        3
+        5
        ],
        [
         352,
-        1
+        3
        ],
        [
         353,
-        4
+        6
+       ],
+       [
+        354,
+        2
        ],
        [
         355,
@@ -19752,7 +20096,7 @@
        ],
        [
         356,
-        6
+        7
        ],
        [
         357,
@@ -19760,27 +20104,27 @@
        ],
        [
         358,
-        1
+        5
        ],
        [
         359,
-        1
+        3
        ],
        [
         360,
-        1
+        3
        ],
        [
         361,
-        4
+        6
        ],
        [
         362,
-        1
+        2
        ],
        [
         363,
-        2
+        4
        ],
        [
         364,
@@ -19788,19 +20132,19 @@
        ],
        [
         366,
-        3
-       ],
-       [
-        367,
-        1
-       ],
-       [
-        368,
         4
        ],
        [
+        367,
+        2
+       ],
+       [
+        368,
+        7
+       ],
+       [
         369,
-        5
+        7
        ],
        [
         370,
@@ -19808,7 +20152,7 @@
        ],
        [
         371,
-        2
+        3
        ],
        [
         372,
@@ -19816,19 +20160,19 @@
        ],
        [
         373,
-        1
+        2
        ],
        [
         374,
-        4
+        7
        ],
        [
         375,
-        3
+        4
        ],
        [
         376,
-        4
+        5
        ],
        [
         377,
@@ -19836,15 +20180,19 @@
        ],
        [
         379,
-        1
+        3
        ],
        [
         380,
-        2
+        5
        ],
        [
         381,
-        3
+        5
+       ],
+       [
+        382,
+        2
        ],
        [
         383,
@@ -19852,7 +20200,7 @@
        ],
        [
         384,
-        3
+        4
        ],
        [
         385,
@@ -19860,7 +20208,7 @@
        ],
        [
         387,
-        2
+        3
        ],
        [
         388,
@@ -19872,15 +20220,15 @@
        ],
        [
         390,
-        2
+        3
        ],
        [
         391,
-        1
+        2
        ],
        [
         392,
-        2
+        3
        ],
        [
         393,
@@ -19892,7 +20240,7 @@
        ],
        [
         396,
-        2
+        3
        ],
        [
         397,
@@ -19904,7 +20252,7 @@
        ],
        [
         400,
-        4
+        5
        ],
        [
         401,
@@ -19916,7 +20264,7 @@
        ],
        [
         403,
-        2
+        3
        ],
        [
         404,
@@ -19955,6 +20303,10 @@
         1
        ],
        [
+        415,
+        1
+       ],
+       [
         416,
         1
        ],
@@ -19969,6 +20321,14 @@
        [
         419,
         2
+       ],
+       [
+        420,
+        1
+       ],
+       [
+        421,
+        1
        ],
        [
         422,
@@ -20016,11 +20376,11 @@
        ],
        [
         435,
-        2
+        3
        ],
        [
         437,
-        2
+        3
        ],
        [
         438,
@@ -20032,7 +20392,7 @@
        ],
        [
         440,
-        5
+        6
        ],
        [
         441,
@@ -20040,7 +20400,11 @@
        ],
        [
         442,
-        2
+        3
+       ],
+       [
+        444,
+        1
        ],
        [
         445,
@@ -20048,7 +20412,7 @@
        ],
        [
         446,
-        4
+        5
        ],
        [
         448,
@@ -20072,7 +20436,7 @@
        ],
        [
         453,
-        1
+        2
        ],
        [
         454,
@@ -20081,6 +20445,10 @@
        [
         455,
         4
+       ],
+       [
+        456,
+        1
        ],
        [
         457,
@@ -20131,19 +20499,27 @@
         3
        ],
        [
+        490,
+        1
+       ],
+       [
+        496,
+        1
+       ],
+       [
         506,
         1
        ]
       ],
-      "ttft_filtered_count": 179,
+      "ttft_filtered_count": 197,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
       "tpot_weight_tokens": 0,
-      "tpot_estimated_avg_ms": 4.544555806583676,
-      "tpot_estimated_sample_count": 237,
-      "tpot_estimated_decode_sum_ms": 1498590.0,
-      "tpot_estimated_weight_tokens": 329755,
+      "tpot_estimated_avg_ms": 4.914135262670391,
+      "tpot_estimated_sample_count": 310,
+      "tpot_estimated_decode_sum_ms": 2021346.0,
+      "tpot_estimated_weight_tokens": 411333,
       "tpot_histogram": [],
       "tpot_estimated_histogram": [
        [
@@ -20168,7 +20544,7 @@
        ],
        [
         42,
-        2
+        3
        ],
        [
         43,
@@ -20181,6 +20557,10 @@
        [
         46,
         2
+       ],
+       [
+        48,
+        1
        ],
        [
         49,
@@ -20196,7 +20576,7 @@
        ],
        [
         52,
-        1
+        2
        ],
        [
         53,
@@ -20212,7 +20592,7 @@
        ],
        [
         57,
-        1
+        3
        ],
        [
         58,
@@ -20224,7 +20604,7 @@
        ],
        [
         60,
-        4
+        5
        ],
        [
         61,
@@ -20236,7 +20616,7 @@
        ],
        [
         63,
-        4
+        5
        ],
        [
         64,
@@ -20260,47 +20640,47 @@
        ],
        [
         69,
-        3
-       ],
-       [
-        70,
         5
        ],
        [
-        71,
+        70,
         7
+       ],
+       [
+        71,
+        8
        ],
        [
         72,
-        11
+        13
        ],
        [
         73,
-        7
+        8
        ],
        [
         74,
-        10
+        12
        ],
        [
         75,
-        6
+        7
        ],
        [
         76,
-        6
+        7
        ],
        [
         77,
-        6
+        11
        ],
        [
         78,
-        2
+        6
        ],
        [
         79,
-        9
+        13
        ],
        [
         80,
@@ -20308,7 +20688,7 @@
        ],
        [
         81,
-        1
+        2
        ],
        [
         82,
@@ -20316,47 +20696,47 @@
        ],
        [
         83,
-        3
-       ],
-       [
-        84,
-        5
-       ],
-       [
-        85,
-        3
-       ],
-       [
-        86,
-        7
-       ],
-       [
-        87,
-        1
-       ],
-       [
-        88,
-        3
-       ],
-       [
-        89,
-        1
-       ],
-       [
-        90,
         4
        ],
        [
-        91,
+        84,
+        6
+       ],
+       [
+        85,
+        5
+       ],
+       [
+        86,
+        8
+       ],
+       [
+        87,
+        4
+       ],
+       [
+        88,
+        5
+       ],
+       [
+        89,
         2
        ],
        [
+        90,
+        7
+       ],
+       [
+        91,
+        3
+       ],
+       [
         92,
-        1
+        4
        ],
        [
         93,
-        5
+        6
        ],
        [
         94,
@@ -20367,16 +20747,32 @@
         2
        ],
        [
+        96,
+        1
+       ],
+       [
         97,
-        2
+        6
        ],
        [
         98,
-        1
+        2
        ],
        [
         99,
         4
+       ],
+       [
+        100,
+        2
+       ],
+       [
+        101,
+        1
+       ],
+       [
+        102,
+        1
        ],
        [
         103,
@@ -20388,7 +20784,11 @@
        ],
        [
         105,
-        3
+        6
+       ],
+       [
+        106,
+        2
        ],
        [
         107,
@@ -20400,22 +20800,38 @@
        ],
        [
         111,
+        2
+       ],
+       [
+        112,
+        1
+       ],
+       [
+        113,
+        1
+       ],
+       [
+        116,
         1
        ],
        [
         118,
+        2
+       ],
+       [
+        135,
         1
        ]
       ],
-      "tpot_filtered_count": 179,
-      "duration_sum_ms": 5643656,
-      "duration_p50_ms": 7590,
-      "duration_p95_ms": 25673,
-      "duration_sample_count": 566,
-      "input_tokens": 20190445,
-      "output_tokens": 805694,
-      "total_tokens": 20996139,
-      "token_sample_count": 566,
+      "tpot_filtered_count": 197,
+      "duration_sum_ms": 6649551,
+      "duration_p50_ms": 7424,
+      "duration_p95_ms": 26028,
+      "duration_sample_count": 677,
+      "input_tokens": 24595541,
+      "output_tokens": 923961,
+      "total_tokens": 25519502,
+      "token_sample_count": 677,
       "token_coverage": 1.0,
       "failed_input_tokens": 79386,
       "failed_output_tokens": 0,
@@ -20424,6 +20840,14 @@
      }
     ],
     "slow_requests": [
+     {
+      "request_id": "865337e36d764fb5bc2862e5b35c84c1",
+      "call_id": "37cc11b3-e66a-4aba-8422-695483bbb4ca",
+      "start_time": "2026-11-11T06:12:51.866+00:00",
+      "duration_ms": 124123,
+      "status": "success",
+      "reason": null
+     },
      {
       "request_id": "21e83037774c4e44a9fb4d892ccdcdca",
       "call_id": "38134b2d-18ab-44cf-bd82-017d6f92189b",
@@ -20489,6 +20913,14 @@
       "reason": null
      },
      {
+      "request_id": "5c4400a1aa6b4f9ba0ce2a7f9b90752e",
+      "call_id": "31dc5ac1-4601-4793-9f5c-6ee40bb90171",
+      "start_time": "2026-11-11T03:21:43.097+00:00",
+      "duration_ms": 42170,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "f9507246f6c94102974a54cfe33040f1",
       "call_id": "c1709ae1-4696-445a-aff9-7bfab94c8877",
       "start_time": "2026-11-10T16:25:10.796+00:00",
@@ -20517,6 +20949,14 @@
       "call_id": "29443159-db84-4cf0-81e1-255bfae45197",
       "start_time": "2026-11-10T16:37:32.835+00:00",
       "duration_ms": 36950,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "b0c7479bf756481589bbdeba4deee63d",
+      "call_id": "84c43554-8998-4062-b35c-12d825304296",
+      "start_time": "2026-11-11T06:12:14.511+00:00",
+      "duration_ms": 36716,
       "status": "success",
       "reason": null
      },
@@ -20569,6 +21009,14 @@
       "reason": null
      },
      {
+      "request_id": "f0dc04212a2e4c9b847a489a7b13b16e",
+      "call_id": "cfa14fe3-db68-4106-8580-758ae0620b96",
+      "start_time": "2026-11-11T02:05:28.471+00:00",
+      "duration_ms": 32554,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "3f4d210624e842ed91d0696d90f31bb6",
       "call_id": "38fd79dc-ffa9-4e50-8a57-d8a09c52a464",
       "start_time": "2026-11-10T21:28:02.919+00:00",
@@ -20593,10 +21041,26 @@
       "reason": null
      },
      {
+      "request_id": "3d7c2b6a81c7402aa8984a030b13d9cb",
+      "call_id": "aee567fb-8fc5-484a-8b30-78677455c88c",
+      "start_time": "2026-11-11T06:16:07.836+00:00",
+      "duration_ms": 30820,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "0db865bc4c2d44119411c2441d7d7344",
       "call_id": "81a083d0-a7f7-4955-9070-6f2b9843d750",
       "start_time": "2026-11-10T23:35:09.752+00:00",
       "duration_ms": 29924,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "795a3dedeb474faaa2294e7236a94d16",
+      "call_id": "dfa966b1-b4a6-4538-b314-2a05dec5d5dc",
+      "start_time": "2026-11-11T02:03:21.864+00:00",
+      "duration_ms": 29128,
       "status": "success",
       "reason": null
      },
@@ -20653,14 +21117,6 @@
       "call_id": "f21aab56-bd71-41db-b7cc-b5cab7208d2d",
       "start_time": "2026-11-10T23:42:12.877+00:00",
       "duration_ms": 25673,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "0e4a042990d4412cb47212d544ac79b0",
-      "call_id": "38d2b6ae-28e8-46d7-a2dd-b4d523ed131e",
-      "start_time": "2026-11-10T22:59:16.458+00:00",
-      "duration_ms": 25271,
       "status": "success",
       "reason": null
      }
@@ -21891,16 +22347,16 @@
      "date": "2026-11-11",
      "status": "COMPLETED",
      "partial": true,
-     "query_ms": 6866,
-     "duration_sum_ms": 7668883,
-     "duration_sample_count": 1117,
-     "duration_p50_ms": 5707,
-     "duration_p95_ms": 17003,
-     "success_count": 1117,
-     "query_count": 1125,
+     "query_ms": 7311,
+     "duration_sum_ms": 11529064,
+     "duration_sample_count": 1577,
+     "duration_p50_ms": 6345,
+     "duration_p95_ms": 17246,
+     "success_count": 1577,
+     "query_count": 1585,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-11T01:44:37Z",
+     "finished_at": "2026-11-11T06:17:27Z",
      "failed_queries": 8,
      "unknown_status_count": 0,
      "blocked_queries": 0,
@@ -21917,8 +22373,8 @@
       "status": "success",
       "reason": null
      },
-     "slow_count": 57,
-     "slow_threshold_ms": 16955,
+     "slow_count": 80,
+     "slow_threshold_ms": 17094,
      "hours": [
       {
        "hour": 0,
@@ -21986,18 +22442,58 @@
       },
       {
        "hour": 9,
-       "calls": 102,
-       "success_count": 102,
-       "duration_sum_ms": 812504,
-       "duration_sample_count": 102,
+       "calls": 117,
+       "success_count": 117,
+       "duration_sum_ms": 979665,
+       "duration_sample_count": 117,
+       "failed": 0
+      },
+      {
+       "hour": 10,
+       "calls": 92,
+       "success_count": 92,
+       "duration_sum_ms": 951052,
+       "duration_sample_count": 92,
+       "failed": 0
+      },
+      {
+       "hour": 11,
+       "calls": 27,
+       "success_count": 27,
+       "duration_sum_ms": 158573,
+       "duration_sample_count": 27,
+       "failed": 0
+      },
+      {
+       "hour": 12,
+       "calls": 115,
+       "success_count": 115,
+       "duration_sum_ms": 1061614,
+       "duration_sample_count": 115,
+       "failed": 0
+      },
+      {
+       "hour": 13,
+       "calls": 172,
+       "success_count": 172,
+       "duration_sum_ms": 1215978,
+       "duration_sample_count": 172,
+       "failed": 0
+      },
+      {
+       "hour": 14,
+       "calls": 39,
+       "success_count": 39,
+       "duration_sum_ms": 305803,
+       "duration_sample_count": 39,
        "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 1125,
-       "success_count": 1117,
+       "call_count": 1585,
+       "success_count": 1577,
        "failed_count": 8,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
@@ -22007,7 +22503,7 @@
        "ttft_estimated_sample_count": 0,
        "ttft_estimated_sum_ms": null,
        "ttft_estimated_histogram": [],
-       "ttft_filtered_count": 550,
+       "ttft_filtered_count": 768,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
@@ -22018,15 +22514,15 @@
        "tpot_estimated_weight_tokens": 0,
        "tpot_histogram": [],
        "tpot_estimated_histogram": [],
-       "tpot_filtered_count": 550,
-       "duration_sum_ms": 7668883,
-       "duration_p50_ms": 5707,
-       "duration_p95_ms": 17003,
-       "duration_sample_count": 1117,
-       "input_tokens": 14171956,
-       "output_tokens": 971232,
-       "total_tokens": 15143188,
-       "token_sample_count": 1117,
+       "tpot_filtered_count": 768,
+       "duration_sum_ms": 11529064,
+       "duration_p50_ms": 6345,
+       "duration_p95_ms": 17246,
+       "duration_sample_count": 1577,
+       "input_tokens": 26350346,
+       "output_tokens": 1540009,
+       "total_tokens": 27890355,
+       "token_sample_count": 1577,
        "token_coverage": 1.0,
        "failed_input_tokens": 193827,
        "failed_output_tokens": 0,
@@ -22040,6 +22536,14 @@
        "call_id": "c1691f86-2a72-45ee-9eeb-305a4804d209",
        "start_time": "2026-11-10T17:12:03.529+00:00",
        "duration_ms": 53585,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "b4023be47c2f47feb20e730c641788a9",
+       "call_id": "b81c1d52-ea6d-4fff-8aa7-2c495808a6c8",
+       "start_time": "2026-11-11T02:18:36.034+00:00",
+       "duration_ms": 50811,
        "status": "success",
        "reason": null
       },
@@ -22060,10 +22564,82 @@
        "reason": null
       },
       {
+       "request_id": "8893d35ed4b34d1bb7a3b559d2494f6b",
+       "call_id": "a660e933-b8f7-4aba-b110-b1deefbd5cc8",
+       "start_time": "2026-11-11T05:03:51.773+00:00",
+       "duration_ms": 42856,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "1888626c98544764bcaa4877591fb04b",
+       "call_id": "4c78d67a-d902-46c2-b6bd-5f038ebd4cbc",
+       "start_time": "2026-11-11T01:48:18.466+00:00",
+       "duration_ms": 41333,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "eeb206f0ac684a8c98e5aab1bb1e84eb",
+       "call_id": "70e77974-f4f7-41e5-a900-e47ef49278e4",
+       "start_time": "2026-11-11T04:58:29.615+00:00",
+       "duration_ms": 40968,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "a897e967b5fc4688b5dd3867c4be2aa4",
+       "call_id": "985677ae-0ba1-4731-9eb1-feef0ac84865",
+       "start_time": "2026-11-11T02:20:00.863+00:00",
+       "duration_ms": 38631,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "0e1a8540480f4bf887fdce9b53152f9d",
+       "call_id": "d09f6627-2e84-49d5-85c9-97105622e59e",
+       "start_time": "2026-11-11T02:46:43.457+00:00",
+       "duration_ms": 38604,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "ff6679acbb594bbbafab6d492cbc3d0f",
+       "call_id": "e78ec396-7ed8-48ae-a47f-140a1404534b",
+       "start_time": "2026-11-11T02:49:40.841+00:00",
+       "duration_ms": 35840,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "c4990b480b83499ca8bd784ea58967f4",
+       "call_id": "0804775a-2475-435c-9721-eb010a77357b",
+       "start_time": "2026-11-11T02:05:03.966+00:00",
+       "duration_ms": 34984,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "2e2f8bd90aa94e9a83b2e5905ef3beae",
+       "call_id": "7f00cc2b-c764-4dbc-9492-d68862eacc94",
+       "start_time": "2026-11-11T04:35:48.540+00:00",
+       "duration_ms": 34826,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "f4bd471970bd45a8b55d67c506c5c834",
        "call_id": "5f39e482-bf92-44bc-b9da-a1b37f2804ef",
        "start_time": "2026-11-10T16:42:52.180+00:00",
        "duration_ms": 32459,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "f30dd00b218e4617b2e316ea278fd553",
+       "call_id": "e8f99e7f-5642-418b-989b-0931d8256fa5",
+       "start_time": "2026-11-11T04:06:17.177+00:00",
+       "duration_ms": 31984,
        "status": "success",
        "reason": null
       },
@@ -22132,6 +22708,14 @@
        "reason": null
       },
       {
+       "request_id": "fa0c1e8fa7c04339936f72b342ae4200",
+       "call_id": "9a5166d2-3682-4015-be4e-bb842e8abd6b",
+       "start_time": "2026-11-11T03:27:54.704+00:00",
+       "duration_ms": 27728,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "83d81097d1e74eb78707adbc2297f0ab",
        "call_id": "27e32c92-1227-4e75-b65b-18326de7c540",
        "start_time": "2026-11-10T16:50:55.754+00:00",
@@ -22164,10 +22748,26 @@
        "reason": null
       },
       {
+       "request_id": "dc921823498b4c28bd20e4127df8d4ea",
+       "call_id": "23bf67f8-25fc-4851-b6ec-4eba20b881ad",
+       "start_time": "2026-11-11T04:39:52.545+00:00",
+       "duration_ms": 26490,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "9a1061bed2e54e7d8dc34880632bad4b",
        "call_id": "af8097e9-a1a5-4a0c-81fd-b752b4be38e0",
        "start_time": "2026-11-10T16:47:27.787+00:00",
        "duration_ms": 26197,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "ff1dacd631f84425b4aa7a6f8567ff97",
+       "call_id": "4d238a61-a79c-44ba-b349-77db61d56d71",
+       "start_time": "2026-11-11T06:14:22.642+00:00",
+       "duration_ms": 26049,
        "status": "success",
        "reason": null
       },
@@ -22184,6 +22784,22 @@
        "call_id": "da44d218-f0c7-43dd-9282-6dc27a5bd94b",
        "start_time": "2026-11-10T16:45:02.145+00:00",
        "duration_ms": 25658,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "ccff6d2c4d3e4b35a9deb280550ec720",
+       "call_id": "43bf851c-5718-42f2-8867-766b887e8b44",
+       "start_time": "2026-11-11T04:39:13.465+00:00",
+       "duration_ms": 25447,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "eeaf5ef7926a4463a0341d552bda218b",
+       "call_id": "4c3b1d92-c927-4f33-8d34-31777540fcf2",
+       "start_time": "2026-11-11T05:47:17.459+00:00",
+       "duration_ms": 25107,
        "status": "success",
        "reason": null
       },
@@ -22260,6 +22876,14 @@
        "reason": null
       },
       {
+       "request_id": "44d15c6b3f1745b3a4744c38b721d511",
+       "call_id": "fa45c6fc-f6cf-43ef-b59e-bc1a3c2e10dd",
+       "start_time": "2026-11-11T05:14:17.924+00:00",
+       "duration_ms": 23251,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "72fa38a6ae254829b8d0634ca1529da6",
        "call_id": "af832072-3354-4db3-8c31-9a9130e61bba",
        "start_time": "2026-11-11T01:29:52.471+00:00",
@@ -22284,154 +22908,26 @@
        "reason": null
       },
       {
-       "request_id": "250dbf0201c744a0ac95531f5736c745",
-       "call_id": "f35072c7-5f20-4fda-bfa4-24fbe17dcb2d",
-       "start_time": "2026-11-10T16:39:01.707+00:00",
-       "duration_ms": 20703,
+       "request_id": "486a7f5a2dd04bf8905ccf6917d07d2b",
+       "call_id": "546d542c-0949-4c6d-9729-f7b397d01c59",
+       "start_time": "2026-11-11T02:42:43.077+00:00",
+       "duration_ms": 22299,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "f64eafe4eef44831aadfb472ec8ff0af",
-       "call_id": "c47218ce-0238-484a-b9ca-b35c4ce44855",
-       "start_time": "2026-11-10T23:59:11.955+00:00",
-       "duration_ms": 20662,
+       "request_id": "2ebbdbaa88694e4d9336b8c1e2bf4aea",
+       "call_id": "e2a30a77-5757-4733-b6f4-4615c9d4e647",
+       "start_time": "2026-11-11T02:06:23.144+00:00",
+       "duration_ms": 22186,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "2529eba30ad041279b0161380fa00179",
-       "call_id": "7722de09-e5ea-4186-816f-eed9c614fe95",
-       "start_time": "2026-11-10T23:38:54.044+00:00",
-       "duration_ms": 20597,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "610e14e7ef0d4f498ad8bafa6677821f",
-       "call_id": "8a42a183-acb8-41ab-b9b3-148b982579f6",
-       "start_time": "2026-11-10T16:32:36.579+00:00",
-       "duration_ms": 20038,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "c58ba436fd8f43d88cd92168bc26aff0",
-       "call_id": "c35aeb87-edd4-4a86-be38-aa9949b4155d",
-       "start_time": "2026-11-10T19:10:04.302+00:00",
-       "duration_ms": 19309,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "e0c287f0c8c5454b8869181e89727c4b",
-       "call_id": "98e8711f-9b51-45a7-bf03-bfc31468f201",
-       "start_time": "2026-11-10T16:35:50.458+00:00",
-       "duration_ms": 19255,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "4c60f46e431e4670921eaeab6fe958eb",
-       "call_id": "e2e3a911-77f3-49ca-b16e-c2243f13790e",
-       "start_time": "2026-11-10T16:03:02.252+00:00",
-       "duration_ms": 19108,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "73ee77d69843468fabedda805087d5c0",
-       "call_id": "4cb7afca-def2-490c-b4b1-868217c33935",
-       "start_time": "2026-11-10T16:52:01.455+00:00",
-       "duration_ms": 19018,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "6f74d1bba81e482ab4147baa14755021",
-       "call_id": "e05a0145-063f-4444-85d5-86b33cb55465",
-       "start_time": "2026-11-10T18:08:21.585+00:00",
-       "duration_ms": 18728,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "65dfe549bb0f4f588960679142193208",
-       "call_id": "76977741-eeed-4183-9214-29e44675060e",
-       "start_time": "2026-11-10T16:30:47.023+00:00",
-       "duration_ms": 18675,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "f6cfaf27ad6746e293a3ea6e8fdab4ec",
-       "call_id": "51951b74-6f3b-4670-84bf-82b2d8f03264",
-       "start_time": "2026-11-10T16:10:41.489+00:00",
-       "duration_ms": 18544,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "0011dad1a147497ca9e7e69c749ab884",
-       "call_id": "bde07500-0c10-47e4-b749-b2c8d9d4c626",
-       "start_time": "2026-11-10T16:58:13.990+00:00",
-       "duration_ms": 18161,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "d50a57749fd54e778480bc5abe78d7f4",
-       "call_id": "8b0a13c9-d1ab-48fd-bb72-4d950c802a02",
-       "start_time": "2026-11-10T23:44:14.405+00:00",
-       "duration_ms": 18121,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "d2c3531b397541a69c182173580fadde",
-       "call_id": "f9e72083-7568-4bbe-a24f-7d95841deb82",
-       "start_time": "2026-11-10T17:14:19.335+00:00",
-       "duration_ms": 18061,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "c8513fa171fd400b83ef75601540b605",
-       "call_id": "032cdf96-5b23-483f-954e-3374f682c519",
-       "start_time": "2026-11-10T16:27:29.956+00:00",
-       "duration_ms": 18044,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "46463b3147ee406987315316d4a05d55",
-       "call_id": "63618788-2efe-4f40-8c62-4308e0c1def7",
-       "start_time": "2026-11-10T17:00:53.924+00:00",
-       "duration_ms": 18018,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "03e8283b17b8458c933b36080086e8c5",
-       "call_id": "80183da9-ab7c-435b-b75e-ded8457db869",
-       "start_time": "2026-11-10T21:30:23.024+00:00",
-       "duration_ms": 17786,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "833138c674914515946e986ba7ca2eb4",
-       "call_id": "92026d9a-9655-4b84-9eb4-481711c6bbc2",
-       "start_time": "2026-11-10T16:22:29.055+00:00",
-       "duration_ms": 17658,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "44dd80445b4146b79b052ac05f1e56c6",
-       "call_id": "32f3e6d1-86f8-4ab4-aaf3-f31f80da94df",
-       "start_time": "2026-11-10T17:09:33.166+00:00",
-       "duration_ms": 17605,
+       "request_id": "30c0af7d858a4f2b94bb5b91942fdd8a",
+       "call_id": "645f043b-b28e-48c7-adeb-a22117839eec",
+       "start_time": "2026-11-11T02:46:34.550+00:00",
+       "duration_ms": 21845,
        "status": "success",
        "reason": null
       }
@@ -22443,16 +22939,16 @@
     "date": "2026-11-11",
     "status": "COMPLETED",
     "partial": true,
-    "query_ms": 6866,
-    "duration_sum_ms": 7668883,
-    "duration_sample_count": 1117,
-    "duration_p50_ms": 5707,
-    "duration_p95_ms": 17003,
-    "success_count": 1117,
-    "query_count": 1125,
+    "query_ms": 7311,
+    "duration_sum_ms": 11529064,
+    "duration_sample_count": 1577,
+    "duration_p50_ms": 6345,
+    "duration_p95_ms": 17246,
+    "success_count": 1577,
+    "query_count": 1585,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-11T01:44:37Z",
+    "finished_at": "2026-11-11T06:17:27Z",
     "failed_queries": 8,
     "unknown_status_count": 0,
     "blocked_queries": 0,
@@ -22469,8 +22965,8 @@
      "status": "success",
      "reason": null
     },
-    "slow_count": 57,
-    "slow_threshold_ms": 16955,
+    "slow_count": 80,
+    "slow_threshold_ms": 17094,
     "hours": [
      {
       "hour": 0,
@@ -22538,18 +23034,58 @@
      },
      {
       "hour": 9,
-      "calls": 102,
-      "success_count": 102,
-      "duration_sum_ms": 812504,
-      "duration_sample_count": 102,
+      "calls": 117,
+      "success_count": 117,
+      "duration_sum_ms": 979665,
+      "duration_sample_count": 117,
+      "failed": 0
+     },
+     {
+      "hour": 10,
+      "calls": 92,
+      "success_count": 92,
+      "duration_sum_ms": 951052,
+      "duration_sample_count": 92,
+      "failed": 0
+     },
+     {
+      "hour": 11,
+      "calls": 27,
+      "success_count": 27,
+      "duration_sum_ms": 158573,
+      "duration_sample_count": 27,
+      "failed": 0
+     },
+     {
+      "hour": 12,
+      "calls": 115,
+      "success_count": 115,
+      "duration_sum_ms": 1061614,
+      "duration_sample_count": 115,
+      "failed": 0
+     },
+     {
+      "hour": 13,
+      "calls": 172,
+      "success_count": 172,
+      "duration_sum_ms": 1215978,
+      "duration_sample_count": 172,
+      "failed": 0
+     },
+     {
+      "hour": 14,
+      "calls": 39,
+      "success_count": 39,
+      "duration_sum_ms": 305803,
+      "duration_sample_count": 39,
       "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 1125,
-      "success_count": 1117,
+      "call_count": 1585,
+      "success_count": 1577,
       "failed_count": 8,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
@@ -22559,7 +23095,7 @@
       "ttft_estimated_sample_count": 0,
       "ttft_estimated_sum_ms": null,
       "ttft_estimated_histogram": [],
-      "ttft_filtered_count": 550,
+      "ttft_filtered_count": 768,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
@@ -22570,15 +23106,15 @@
       "tpot_estimated_weight_tokens": 0,
       "tpot_histogram": [],
       "tpot_estimated_histogram": [],
-      "tpot_filtered_count": 550,
-      "duration_sum_ms": 7668883,
-      "duration_p50_ms": 5707,
-      "duration_p95_ms": 17003,
-      "duration_sample_count": 1117,
-      "input_tokens": 14171956,
-      "output_tokens": 971232,
-      "total_tokens": 15143188,
-      "token_sample_count": 1117,
+      "tpot_filtered_count": 768,
+      "duration_sum_ms": 11529064,
+      "duration_p50_ms": 6345,
+      "duration_p95_ms": 17246,
+      "duration_sample_count": 1577,
+      "input_tokens": 26350346,
+      "output_tokens": 1540009,
+      "total_tokens": 27890355,
+      "token_sample_count": 1577,
       "token_coverage": 1.0,
       "failed_input_tokens": 193827,
       "failed_output_tokens": 0,
@@ -22592,6 +23128,14 @@
       "call_id": "c1691f86-2a72-45ee-9eeb-305a4804d209",
       "start_time": "2026-11-10T17:12:03.529+00:00",
       "duration_ms": 53585,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "b4023be47c2f47feb20e730c641788a9",
+      "call_id": "b81c1d52-ea6d-4fff-8aa7-2c495808a6c8",
+      "start_time": "2026-11-11T02:18:36.034+00:00",
+      "duration_ms": 50811,
       "status": "success",
       "reason": null
      },
@@ -22612,10 +23156,82 @@
       "reason": null
      },
      {
+      "request_id": "8893d35ed4b34d1bb7a3b559d2494f6b",
+      "call_id": "a660e933-b8f7-4aba-b110-b1deefbd5cc8",
+      "start_time": "2026-11-11T05:03:51.773+00:00",
+      "duration_ms": 42856,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "1888626c98544764bcaa4877591fb04b",
+      "call_id": "4c78d67a-d902-46c2-b6bd-5f038ebd4cbc",
+      "start_time": "2026-11-11T01:48:18.466+00:00",
+      "duration_ms": 41333,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "eeb206f0ac684a8c98e5aab1bb1e84eb",
+      "call_id": "70e77974-f4f7-41e5-a900-e47ef49278e4",
+      "start_time": "2026-11-11T04:58:29.615+00:00",
+      "duration_ms": 40968,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "a897e967b5fc4688b5dd3867c4be2aa4",
+      "call_id": "985677ae-0ba1-4731-9eb1-feef0ac84865",
+      "start_time": "2026-11-11T02:20:00.863+00:00",
+      "duration_ms": 38631,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "0e1a8540480f4bf887fdce9b53152f9d",
+      "call_id": "d09f6627-2e84-49d5-85c9-97105622e59e",
+      "start_time": "2026-11-11T02:46:43.457+00:00",
+      "duration_ms": 38604,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "ff6679acbb594bbbafab6d492cbc3d0f",
+      "call_id": "e78ec396-7ed8-48ae-a47f-140a1404534b",
+      "start_time": "2026-11-11T02:49:40.841+00:00",
+      "duration_ms": 35840,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "c4990b480b83499ca8bd784ea58967f4",
+      "call_id": "0804775a-2475-435c-9721-eb010a77357b",
+      "start_time": "2026-11-11T02:05:03.966+00:00",
+      "duration_ms": 34984,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "2e2f8bd90aa94e9a83b2e5905ef3beae",
+      "call_id": "7f00cc2b-c764-4dbc-9492-d68862eacc94",
+      "start_time": "2026-11-11T04:35:48.540+00:00",
+      "duration_ms": 34826,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "f4bd471970bd45a8b55d67c506c5c834",
       "call_id": "5f39e482-bf92-44bc-b9da-a1b37f2804ef",
       "start_time": "2026-11-10T16:42:52.180+00:00",
       "duration_ms": 32459,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "f30dd00b218e4617b2e316ea278fd553",
+      "call_id": "e8f99e7f-5642-418b-989b-0931d8256fa5",
+      "start_time": "2026-11-11T04:06:17.177+00:00",
+      "duration_ms": 31984,
       "status": "success",
       "reason": null
      },
@@ -22684,6 +23300,14 @@
       "reason": null
      },
      {
+      "request_id": "fa0c1e8fa7c04339936f72b342ae4200",
+      "call_id": "9a5166d2-3682-4015-be4e-bb842e8abd6b",
+      "start_time": "2026-11-11T03:27:54.704+00:00",
+      "duration_ms": 27728,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "83d81097d1e74eb78707adbc2297f0ab",
       "call_id": "27e32c92-1227-4e75-b65b-18326de7c540",
       "start_time": "2026-11-10T16:50:55.754+00:00",
@@ -22716,10 +23340,26 @@
       "reason": null
      },
      {
+      "request_id": "dc921823498b4c28bd20e4127df8d4ea",
+      "call_id": "23bf67f8-25fc-4851-b6ec-4eba20b881ad",
+      "start_time": "2026-11-11T04:39:52.545+00:00",
+      "duration_ms": 26490,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "9a1061bed2e54e7d8dc34880632bad4b",
       "call_id": "af8097e9-a1a5-4a0c-81fd-b752b4be38e0",
       "start_time": "2026-11-10T16:47:27.787+00:00",
       "duration_ms": 26197,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "ff1dacd631f84425b4aa7a6f8567ff97",
+      "call_id": "4d238a61-a79c-44ba-b349-77db61d56d71",
+      "start_time": "2026-11-11T06:14:22.642+00:00",
+      "duration_ms": 26049,
       "status": "success",
       "reason": null
      },
@@ -22736,6 +23376,22 @@
       "call_id": "da44d218-f0c7-43dd-9282-6dc27a5bd94b",
       "start_time": "2026-11-10T16:45:02.145+00:00",
       "duration_ms": 25658,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "ccff6d2c4d3e4b35a9deb280550ec720",
+      "call_id": "43bf851c-5718-42f2-8867-766b887e8b44",
+      "start_time": "2026-11-11T04:39:13.465+00:00",
+      "duration_ms": 25447,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "eeaf5ef7926a4463a0341d552bda218b",
+      "call_id": "4c3b1d92-c927-4f33-8d34-31777540fcf2",
+      "start_time": "2026-11-11T05:47:17.459+00:00",
+      "duration_ms": 25107,
       "status": "success",
       "reason": null
      },
@@ -22812,6 +23468,14 @@
       "reason": null
      },
      {
+      "request_id": "44d15c6b3f1745b3a4744c38b721d511",
+      "call_id": "fa45c6fc-f6cf-43ef-b59e-bc1a3c2e10dd",
+      "start_time": "2026-11-11T05:14:17.924+00:00",
+      "duration_ms": 23251,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "72fa38a6ae254829b8d0634ca1529da6",
       "call_id": "af832072-3354-4db3-8c31-9a9130e61bba",
       "start_time": "2026-11-11T01:29:52.471+00:00",
@@ -22836,154 +23500,26 @@
       "reason": null
      },
      {
-      "request_id": "250dbf0201c744a0ac95531f5736c745",
-      "call_id": "f35072c7-5f20-4fda-bfa4-24fbe17dcb2d",
-      "start_time": "2026-11-10T16:39:01.707+00:00",
-      "duration_ms": 20703,
+      "request_id": "486a7f5a2dd04bf8905ccf6917d07d2b",
+      "call_id": "546d542c-0949-4c6d-9729-f7b397d01c59",
+      "start_time": "2026-11-11T02:42:43.077+00:00",
+      "duration_ms": 22299,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "f64eafe4eef44831aadfb472ec8ff0af",
-      "call_id": "c47218ce-0238-484a-b9ca-b35c4ce44855",
-      "start_time": "2026-11-10T23:59:11.955+00:00",
-      "duration_ms": 20662,
+      "request_id": "2ebbdbaa88694e4d9336b8c1e2bf4aea",
+      "call_id": "e2a30a77-5757-4733-b6f4-4615c9d4e647",
+      "start_time": "2026-11-11T02:06:23.144+00:00",
+      "duration_ms": 22186,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "2529eba30ad041279b0161380fa00179",
-      "call_id": "7722de09-e5ea-4186-816f-eed9c614fe95",
-      "start_time": "2026-11-10T23:38:54.044+00:00",
-      "duration_ms": 20597,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "610e14e7ef0d4f498ad8bafa6677821f",
-      "call_id": "8a42a183-acb8-41ab-b9b3-148b982579f6",
-      "start_time": "2026-11-10T16:32:36.579+00:00",
-      "duration_ms": 20038,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "c58ba436fd8f43d88cd92168bc26aff0",
-      "call_id": "c35aeb87-edd4-4a86-be38-aa9949b4155d",
-      "start_time": "2026-11-10T19:10:04.302+00:00",
-      "duration_ms": 19309,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "e0c287f0c8c5454b8869181e89727c4b",
-      "call_id": "98e8711f-9b51-45a7-bf03-bfc31468f201",
-      "start_time": "2026-11-10T16:35:50.458+00:00",
-      "duration_ms": 19255,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "4c60f46e431e4670921eaeab6fe958eb",
-      "call_id": "e2e3a911-77f3-49ca-b16e-c2243f13790e",
-      "start_time": "2026-11-10T16:03:02.252+00:00",
-      "duration_ms": 19108,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "73ee77d69843468fabedda805087d5c0",
-      "call_id": "4cb7afca-def2-490c-b4b1-868217c33935",
-      "start_time": "2026-11-10T16:52:01.455+00:00",
-      "duration_ms": 19018,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "6f74d1bba81e482ab4147baa14755021",
-      "call_id": "e05a0145-063f-4444-85d5-86b33cb55465",
-      "start_time": "2026-11-10T18:08:21.585+00:00",
-      "duration_ms": 18728,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "65dfe549bb0f4f588960679142193208",
-      "call_id": "76977741-eeed-4183-9214-29e44675060e",
-      "start_time": "2026-11-10T16:30:47.023+00:00",
-      "duration_ms": 18675,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "f6cfaf27ad6746e293a3ea6e8fdab4ec",
-      "call_id": "51951b74-6f3b-4670-84bf-82b2d8f03264",
-      "start_time": "2026-11-10T16:10:41.489+00:00",
-      "duration_ms": 18544,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "0011dad1a147497ca9e7e69c749ab884",
-      "call_id": "bde07500-0c10-47e4-b749-b2c8d9d4c626",
-      "start_time": "2026-11-10T16:58:13.990+00:00",
-      "duration_ms": 18161,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "d50a57749fd54e778480bc5abe78d7f4",
-      "call_id": "8b0a13c9-d1ab-48fd-bb72-4d950c802a02",
-      "start_time": "2026-11-10T23:44:14.405+00:00",
-      "duration_ms": 18121,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "d2c3531b397541a69c182173580fadde",
-      "call_id": "f9e72083-7568-4bbe-a24f-7d95841deb82",
-      "start_time": "2026-11-10T17:14:19.335+00:00",
-      "duration_ms": 18061,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "c8513fa171fd400b83ef75601540b605",
-      "call_id": "032cdf96-5b23-483f-954e-3374f682c519",
-      "start_time": "2026-11-10T16:27:29.956+00:00",
-      "duration_ms": 18044,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "46463b3147ee406987315316d4a05d55",
-      "call_id": "63618788-2efe-4f40-8c62-4308e0c1def7",
-      "start_time": "2026-11-10T17:00:53.924+00:00",
-      "duration_ms": 18018,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "03e8283b17b8458c933b36080086e8c5",
-      "call_id": "80183da9-ab7c-435b-b75e-ded8457db869",
-      "start_time": "2026-11-10T21:30:23.024+00:00",
-      "duration_ms": 17786,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "833138c674914515946e986ba7ca2eb4",
-      "call_id": "92026d9a-9655-4b84-9eb4-481711c6bbc2",
-      "start_time": "2026-11-10T16:22:29.055+00:00",
-      "duration_ms": 17658,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "44dd80445b4146b79b052ac05f1e56c6",
-      "call_id": "32f3e6d1-86f8-4ab4-aaf3-f31f80da94df",
-      "start_time": "2026-11-10T17:09:33.166+00:00",
-      "duration_ms": 17605,
+      "request_id": "30c0af7d858a4f2b94bb5b91942fdd8a",
+      "call_id": "645f043b-b28e-48c7-adeb-a22117839eec",
+      "start_time": "2026-11-11T02:46:34.550+00:00",
+      "duration_ms": 21845,
       "status": "success",
       "reason": null
      }
