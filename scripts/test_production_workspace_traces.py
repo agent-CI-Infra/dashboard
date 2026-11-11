@@ -15,7 +15,8 @@ class ProductionTraceTests(unittest.TestCase):
         rows = [(0, {}, {'gateway': 100.0, 'first_token': 20.0, 'request_id': 'secret-id'}),
                 (1, {}, {'gateway': 300.0, 'first_token': 40.0, 'request_id': 'other-id'})]
         day = collector.request_daily_metrics(rows, '2026-11-10', '2026-11-11T01:00:00Z', True)
-        self.assertEqual(day['gateway'], {'n': 2, 'mean': 200.0, 'p50': 100.0, 'p95': 300.0})
+        self.assertEqual({key: day['gateway'][key] for key in ('n', 'mean', 'p50', 'p95')},
+                         {'n': 2, 'mean': 200.0, 'p50': 100.0, 'p95': 300.0})
         self.assertEqual(day['first_token']['mean'], 30.0)
         self.assertEqual(day['answer_first'], {'n': 0})
         self.assertTrue(day['partial'])
@@ -61,7 +62,7 @@ class ProductionTraceTests(unittest.TestCase):
              patch.object(collector, 'download_log', return_value=iter(log)):
             _, rows, status, usage = collector.read_log({})
         self.assertEqual(status, 'ok')
-        self.assertEqual(sum(usage.values()), 1)
+        self.assertEqual(sum(item['events'] for item in usage.values()), 1)
         date = rows[0]['date']
         day = collector.request_daily_metrics([(0, {}, row) for row in rows], date, now.isoformat(), False, usage[date])
         self.assertEqual(day['model_usage_events'], 1)
@@ -69,6 +70,24 @@ class ProductionTraceTests(unittest.TestCase):
                                                 'unknown': 0, 'observed': 2, 'population': 3, 'exception_rate': 0.5})
         self.assertNotIn('PRIVATE', json.dumps(day))
         self.assertNotIn('failure_rate', day)
+
+    def test_usage_token_totals_and_weighted_tpot_exclude_bad_values(self):
+        usage = collector.new_usage()
+        collector.record_usage(usage, "'input_tokens': 100, 'output_tokens': 3, 'total_tokens': 103, 'tpot_ms': 2")
+        collector.record_usage(usage, "'input_tokens': 200, 'output_tokens': 5, 'total_tokens': 205, 'tpot_ms': 8")
+        collector.record_usage(usage, "'input_tokens': -1, 'output_tokens': 1, 'total_tokens': 1, 'tpot_ms': 1e9999")
+        day = collector.request_daily_metrics([], '2026-11-10', '2026-11-11T00:00:00Z', True, usage)
+        self.assertEqual(day['model_usage_events'], 3)
+        self.assertEqual(day['tokens']['input'], 300)
+        self.assertEqual(day['tokens']['output'], 9)
+        self.assertEqual(day['tokens']['samples']['input'], 2)
+        self.assertEqual(day['tpot']['n'], 2)
+        self.assertEqual(day['tpot']['tokens'], 6)
+        self.assertEqual(day['tpot']['mean'], 6.0)
+        self.assertEqual(day['tpot']['p50'], 8.0)
+        self.assertEqual(sum(weight for _, weight in day['tpot']['histogram']), 6)
+        self.assertIsNone(collector.metric_histogram([(1e-10, 1)]))
+        self.assertEqual(collector.metric_histogram([(0, 1)]), [[-1001, 1]])
 
     def test_unknown_gateway_outcomes_do_not_become_zero_failure(self):
         row = {'gateway': 10, 'gateway_stream_status': 'cancelled'}
@@ -81,6 +100,21 @@ class ProductionTraceTests(unittest.TestCase):
         with patch.object(collector.OPENER, 'open', return_value=Response(b'abc\n')):
             with self.assertRaisesRegex(ValueError, 'incomplete'):
                 list(collector.download_log({}))
+
+    def test_older_days_publish_aggregate_only_and_keep_trace_details_for_seven_days(self):
+        today = dt.datetime.now(collector.CST).date()
+        old = (today - dt.timedelta(days=10)).isoformat()
+        recent = today.isoformat()
+        rows = [{'request_id': 'digitalmate-old-private', 'date': old, 'gateway': 100},
+                {'request_id': 'digitalmate-new', 'date': recent, 'gateway': 200}]
+        with patch.object(collector, 'TOKEN', 'test'), \
+             patch.object(collector, 'binding_list', return_value=[{}]), \
+             patch.object(collector, 'read_log', return_value=({}, rows, 'ok', {})), \
+             patch.object(collector, 'attach_tool_events', return_value=True):
+            result = collector.collect()
+        self.assertIn(old, [row['date'] for row in result['request_daily_metrics']])
+        self.assertNotIn(old, [row['date'] for row in result['days']])
+        self.assertNotIn('digitalmate-old-private', json.dumps(result))
 
     def test_history_pairs_exact_request_and_drops_private_fields(self):
         start = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)

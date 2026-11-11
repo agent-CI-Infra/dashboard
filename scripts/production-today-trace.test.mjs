@@ -5,6 +5,60 @@ import vm from 'node:vm';
 const code = readFileSync(new URL('../single-repo/static/production-metrics/app.js', import.meta.url), 'utf8');
 function extract(a,b) { const x=code.indexOf(a), y=code.indexOf(b,x); assert(x>=0 && y>x); return code.slice(x,y); }
 
+test('cloud cards aggregate the selected days using sample and token weights', () => {
+  const c=vm.createContext({});
+  vm.runInContext(extract('function mergeMetricHistogram(', '// Each bucket covers')+
+    extract('function aggregateCloudMetric(', '// Headline tiles summarize')+
+    ';globalThis.summary=summarizeCloudWindow;',c);
+  const rows=[
+    {date:'2026-11-10',gateway:{n:2,sum:200,mean:100,p50:100,p95:100,histogram:[[0,2]]},
+     tpot:{n:1,tokens:10,weighted_sum:20,mean:2,p50:2,p95:2,histogram:[[35,10]]},
+     tokens:{input:100,output:20,total:120,samples:{input:1,output:1,total:1}},model_usage_events:1,
+     gateway_stream:{normal:1,exception:1,observed:2,population:2,cancelled:0,unknown:0}},
+    {date:'2026-11-11',gateway:{n:8,sum:1600,mean:200,p50:200,p95:200,histogram:[[35,8]]},
+     tpot:{n:1,tokens:30,weighted_sum:240,mean:8,p50:8,p95:8,histogram:[[105,30]]},
+     tokens:{input:300,output:40,total:340,samples:{input:1,output:1,total:1}},model_usage_events:1,
+     gateway_stream:{normal:8,exception:0,observed:8,population:8,cancelled:0,unknown:0}},
+  ];
+  const today=c.summary([rows[1]]), both=c.summary(rows);
+  assert.equal(today.gateway.mean,200);
+  assert.equal(both.gateway.mean,180);
+  assert.equal(both.tpot.mean,6.5);
+  assert.equal(both.tokens.input,400);
+  assert.equal(both.tokens.output,60);
+  assert.equal(both.model_usage_events,2);
+  assert.equal(both.gateway_stream.exception_rate,0.1);
+  assert.equal(both.gateway.approx,true);
+  assert.notEqual(both.gateway.p95,null);
+});
+
+test('cloud multi-day percentiles stay unavailable if any distribution is missing', () => {
+  const c=vm.createContext({});
+  vm.runInContext(extract('function mergeMetricHistogram(', '// Each bucket covers')+
+    extract('function aggregateCloudMetric(', '// Headline tiles summarize')+
+    ';globalThis.metric=aggregateCloudMetric;',c);
+  const out=c.metric([{gateway:{n:1,mean:10,p50:10,p95:10,histogram:[[0,1]]}},
+                      {gateway:{n:1,mean:20,p50:20,p95:20}}], 'gateway');
+  assert.equal(out.mean,15);
+  assert.equal(out.p50,undefined);
+  assert.equal(out.p95,undefined);
+});
+
+test('cloud summary cards render the requested date window, not its last day', () => {
+  const c=vm.createContext({});
+  vm.runInContext(`const NETWORK_TILES=[]; const fmtSecondsBare=String, fmtCount=String, fmtDuration=String,
+    fmtTpotBare=String, fmtPercent=String, fmtDateTime=String, esc=String, trimNumberZeros=String;`+
+    extract('function mergeMetricHistogram(', '// Each bucket covers')+
+    extract('function aggregateCloudMetric(', '// Outlier analysis.')+';globalThis.render=envSummary;',c);
+  const rows=[{date:'2026-11-10',gateway:{n:1,mean:10,p50:10,p95:10}},
+              {date:'2026-11-11',gateway:{n:3,mean:30,p50:30,p95:30}}];
+  const today=c.render({days:[rows[1]]});
+  const week=c.render({days:rows});
+  assert.match(today, /30 \/ 30 \/ 30/);
+  assert.match(week, /25 \/ undefined \/ undefined/);
+  assert.match(week, /2026-11-10 至 2026-11-11/);
+});
+
 test('cloud model events and stream exception rates keep separate semantics', () => {
   const c=vm.createContext({});
   vm.runInContext(extract('function envCallSeries(', 'function envCallTrend(')+';globalThis.series=envCallSeries;',c);

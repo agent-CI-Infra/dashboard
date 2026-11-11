@@ -935,7 +935,7 @@ function envTpotTrend(doc) {
       n: row?.tpot?.n,
       note: Number.isFinite(row?.tpot?.tokens) ? `${fmtCount(row.tpot.tokens)} token 权重` : '',
     }),
-    note: '云侧 Agent 调用口径（每次模型调用）：TPOT = 首 Token 后至调用结束的耗时 ÷（输出 Token 数 − 1）；均值按后续输出 Token 数加权，P50/P95 为调用级最近排名分位；仅统计输出 Token > 1 且 TPOT ≥ 0.1 ms/token 的调用；* 为部分日。',
+    note: '云侧 Agent 用量记录口径：TPOT 为日志中的每条用量记录值，均值及分位数按输出 Token 数 − 1 加权；仅统计输出 Token > 1 且 TPOT 有效的记录。记录缺少调用 ID，可能重复；* 为部分日。',
   });
 }
 
@@ -948,12 +948,96 @@ const NETWORK_TILES = [
   ['downlink_terminal', '下行终态 recv 单程', '网关终态帧 → 端侧 recv'],
 ];
 
-// Headline tiles use the latest day in the selected window, including partial days.
+// Merge daily summaries without averaging percentiles or mixing sample weights.
+function aggregateCloudMetric(rows, key) {
+  const entries = rows.map((row) => row?.[key]).filter((item) => Number.isSafeInteger(item?.n) && item.n > 0);
+  if (!entries.length) return { n: 0, days: 0 };
+  const weighted = key === 'tpot';
+  const n = entries.reduce((sum, item) => sum + item.n, 0);
+  const weights = entries.map((item) => weighted ? item.tokens : item.n);
+  const candidateWeight = weights.every((weight) => Number.isSafeInteger(weight) && weight > 0)
+    ? weights.reduce((sum, weight) => sum + weight, 0) : 0;
+  const validWeights = Number.isSafeInteger(candidateWeight) && candidateWeight > 0;
+  const totalWeight = validWeights ? candidateWeight : 0;
+  const validMeans = validWeights && entries.every((item) => Number.isFinite(weighted ? item.weighted_sum : item.sum) || Number.isFinite(item.mean));
+  const result = { n, days: entries.length, mean: validMeans ? entries.reduce((sum, item, index) => {
+    const exactSum = weighted ? item.weighted_sum : item.sum;
+    return sum + (Number.isFinite(exactSum) ? exactSum : item.mean * weights[index]);
+  }, 0) / totalWeight : null };
+  if (weighted) result.tokens = totalWeight || null;
+  if (entries.length === 1) {
+    result.p50 = entries[0].p50;
+    result.p95 = entries[0].p95;
+    return result;
+  }
+  const bins = new Map();
+  const complete = validWeights && entries.every((item, index) => mergeMetricHistogram(bins, item.histogram, weights[index]));
+  if (complete) {
+    const percentile = (q) => {
+      const target = Math.ceil(totalWeight * q);
+      let seen = 0;
+      for (const [index, count] of [...bins.entries()].sort((a, b) => a[0] - b[0])) {
+        seen += count;
+        if (seen >= target) return index === -1001 ? 0 : 1.02 ** (index + .5);
+      }
+      return null;
+    };
+    result.p50 = percentile(.5);
+    result.p95 = percentile(.95);
+    result.approx = true;
+  }
+  return result;
+}
+
+function summarizeCloudWindow(rows) {
+  if (!rows.length) return null;
+  const result = { date: rows[rows.length - 1].date, partial: rows.some((row) => row.partial),
+    telemetry_partial: rows.some((row) => row.telemetry_partial), window_days: rows.length,
+    window_start: rows[0].date, window_end: rows[rows.length - 1].date };
+  for (const key of ['gateway', 'first_token', 'answer_first', 'react', 'tool', 'tpot', 'uplink_send', 'downlink_first_text', 'downlink_terminal']) {
+    result[key] = aggregateCloudMetric(rows, key);
+  }
+  const current = rows.filter((row) => Number.isFinite(row.model_usage_events));
+  result.telemetry_days = current.length;
+  if (current.length) {
+    result.source = 'workspace_request_logs';
+    result.model_usage_events = current.reduce((sum, row) => sum + row.model_usage_events, 0);
+    const streams = current.map((row) => row.gateway_stream).filter(Boolean);
+    const stream = {};
+    for (const key of ['normal', 'exception', 'cancelled', 'unknown', 'observed', 'population']) {
+      stream[key] = streams.reduce((sum, value) => sum + (Number.isFinite(value[key]) ? value[key] : 0), 0);
+    }
+    stream.exception_rate = stream.observed ? stream.exception / stream.observed : null;
+    result.gateway_stream = stream;
+    result.telemetry_partial ||= current.length < rows.length;
+    result.telemetry_observed_at = current.map((row) => row.telemetry_observed_at || '').sort().at(-1) || null;
+  } else {
+    const legacy = rows.map((row) => row.calls).filter(Boolean);
+    if (legacy.length && legacy.every((call) => ['total', 'success', 'failed'].every((key) => Number.isFinite(call[key])))) {
+      result.calls = {};
+      for (const key of ['total', 'success', 'failed']) result.calls[key] = legacy.reduce((sum, call) => sum + (Number.isFinite(call[key]) ? call[key] : 0), 0);
+      result.failure_rate = result.calls.total ? result.calls.failed / result.calls.total : null;
+    }
+  }
+  result.tokens = { samples: {}, days: {} };
+  for (const key of ['input', 'output', 'total']) {
+    const values = rows.filter((row) => Number.isSafeInteger(row?.tokens?.[key]) && row.tokens[key] >= 0);
+    const total = values.reduce((sum, row) => sum + row.tokens[key], 0);
+    result.tokens[key] = values.length && Number.isSafeInteger(total) ? total : null;
+    result.tokens.days[key] = values.length;
+    result.tokens.samples[key] = values.reduce((sum, row) => sum + (Number.isFinite(row.tokens?.samples?.[key]) ? row.tokens.samples[key] : 0), 0);
+  }
+  result.tool_failed = rows.reduce((sum, row) => sum + (Number.isFinite(row.tool_failed) ? row.tool_failed : 0), 0);
+  return result;
+}
+
+// Headline tiles summarize the selected calendar window, including partial days.
 function envSummary(doc) {
   const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date && row.gateway) : [];
   if (!rows.length) return '';
-  const anchor = rows[rows.length - 1];
+  const anchor = summarizeCloudWindow(rows);
   const seconds = (value) => fmtSecondsBare(value);
+  const formatted = (metric, field, formatter) => `${metric?.approx && field !== 'mean' && Number.isFinite(metric?.[field]) ? '≈' : ''}${formatter(metric?.[field])}`;
   const workspaceMetrics = anchor.source === 'workspace_request_logs' || Number.isFinite(anchor.model_usage_events);
   const rateValue = workspaceMetrics ? anchor.gateway_stream?.exception_rate : anchor.failure_rate;
   const rate = Number.isFinite(rateValue) ? fmtPercent(rateValue * 100) : '—';
@@ -962,7 +1046,7 @@ function envSummary(doc) {
   const rateLabel = workspaceMetrics ? '网关流异常率' : '旧版模型事件失败率';
   const countValue = workspaceMetrics ? anchor.model_usage_events : anchor.calls?.total;
   const callHint = workspaceMetrics
-    ? `已识别网关流 ${fmtCount(anchor.gateway_stream?.observed)} / ${fmtCount(anchor.gateway_stream?.population)} · 取消 ${fmtCount(anchor.gateway_stream?.cancelled)} · 用量记录不可按调用 ID 去重${anchor.telemetry_partial ? ' · 部分覆盖' : ''}${anchor.telemetry_observed_at ? ` · 采集于 ${esc(fmtDateTime(anchor.telemetry_observed_at))}` : ''}`
+    ? `已识别网关流 ${fmtCount(anchor.gateway_stream?.observed)} / ${fmtCount(anchor.gateway_stream?.population)} · 用量覆盖 ${fmtCount(anchor.telemetry_days)} / ${fmtCount(anchor.window_days)} 天 · 取消 ${fmtCount(anchor.gateway_stream?.cancelled)}${anchor.telemetry_partial ? ' · 部分覆盖' : ''}${anchor.telemetry_observed_at ? ` · 最新采集 ${esc(fmtDateTime(anchor.telemetry_observed_at))}` : ''}`
     : `旧口径 · 成功事件 ${fmtCount(anchor.calls?.success)} / 失败事件 ${fmtCount(anchor.calls?.failed)}`;
   const tokenValues = [anchor.tokens?.input, anchor.tokens?.output, anchor.tokens?.total];
   const tokenMax = Math.max(...tokenValues.map((value) => (Number.isFinite(value) ? value : 0)));
@@ -976,24 +1060,24 @@ function envSummary(doc) {
   // so a collection gap is visible as a gap rather than as a missing metric.
   const requestTile = (key, label, hint) => {
     const sampleCount = Number.isFinite(anchor[key]?.n) ? anchor[key].n : 0;
-    const count = sampleCount > 0 ? `${fmtCount(sampleCount)} 个请求` : '0 个请求 · 当日无样本';
+    const count = sampleCount > 0 ? `${fmtCount(sampleCount)} 个请求` : '所选范围无样本';
     return `<div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>${label}</strong> 平均 / P50 / P95（s）</div>
-      <div class="stat-value combo">${seconds(anchor[key]?.mean)} / ${seconds(anchor[key]?.p50)} / ${seconds(anchor[key]?.p95)}</div>
-      <div class="stat-hint">${count} · ${hint}</div>
+      <div class="stat-value combo">${formatted(anchor[key], 'mean', seconds)} / ${formatted(anchor[key], 'p50', seconds)} / ${formatted(anchor[key], 'p95', seconds)}</div>
+      <div class="stat-hint">${count} · 覆盖 ${fmtCount(anchor[key]?.days)} / ${fmtCount(anchor.window_days)} 天 · ${hint}</div>
     </div>`;
   };
   const firstTile = requestTile('first_token', '首吐字', '网关受理 → 首个文本 chunk');
   const answerTile = requestTile('answer_first', '答案首吐字', '网关受理 → 首个答案 chunk');
   const reactTile = requestTile('react', 'ReAct 阶段', '首个文本 chunk → 答案首吐字 · 思考 + 工具');
   const toolCount = Number.isFinite(anchor.tool?.n) ? anchor.tool.n : 0;
-  const toolHint = anchor.source === 'workspace_request_logs' ? '本次请求日志未采集工具耗时'
-    : toolCount > 0
-    ? `${fmtCount(toolCount)} 次工具调用 · 失败 ${fmtCount(anchor.tool_failed)} · tool_call → tool_result`
+  const toolHint = toolCount > 0
+    ? `${fmtCount(toolCount)} 次工具调用 · tool_call → tool_result`
+    : anchor.source === 'workspace_request_logs' ? '当前日志采集未提供工具耗时'
     : '当日无已观测样本 · 覆盖率未知 · tool_call → tool_result';
   const toolTile = `<div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>工具调用</strong> 平均 / P50 / P95</div>
-      <div class="stat-value combo">${fmtDuration(anchor.tool?.mean)} / ${fmtDuration(anchor.tool?.p50)} / ${fmtDuration(anchor.tool?.p95)}</div>
+      <div class="stat-value combo">${formatted(anchor.tool, 'mean', fmtDuration)} / ${formatted(anchor.tool, 'p50', fmtDuration)} / ${formatted(anchor.tool, 'p95', fmtDuration)}</div>
       <div class="stat-hint">${toolHint}</div>
     </div>`;
   // One-way network latency is sampled on the client by the next gateway
@@ -1009,20 +1093,21 @@ function envSummary(doc) {
         : '不可用：缺少可验证的帧配对和时钟误差';
     return `<div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>${label}</strong> 平均 / P50 / P95</div>
-      <div class="stat-value combo">${fmtDuration(anchor[key]?.mean)} / ${fmtDuration(anchor[key]?.p50)} / ${fmtDuration(anchor[key]?.p95)}</div>
+      <div class="stat-value combo">${formatted(anchor[key], 'mean', fmtDuration)} / ${formatted(anchor[key], 'p50', fmtDuration)} / ${formatted(anchor[key], 'p95', fmtDuration)}</div>
       <div class="stat-hint">${availability}</div>
     </div>`;
   };
-  return `<section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
+  const rangeNote = `云侧卡片汇总 ${esc(anchor.window_start)} 至 ${esc(anchor.window_end)}（${fmtCount(anchor.window_days)} 个有数据的日期）${anchor.partial ? ' · 含部分覆盖' : ''}。均值按样本数或输出 Token 加权；多日分位数仅在可合并分布完整时显示，≈ 表示近似。`;
+  return `<p class="data-freshness">${rangeNote}</p><section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>${countLabel}</strong> / <strong>${rateLabel}</strong></div>
       <div class="stat-value combo">${fmtCount(countValue)} / <span class="${failureTone}">${rate}</span></div>
-      <div class="stat-hint">${callHint} · ${esc(anchor.date)}${anchor.partial ? ' 部分日' : ''}</div>
+      <div class="stat-hint">${callHint}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>请求耗时</strong>平均 / P50 / P95（s）</div>
-      <div class="stat-value combo">${seconds(anchor.gateway.mean)} / ${seconds(anchor.gateway.p50)} / ${seconds(anchor.gateway.p95)}</div>
-      <div class="stat-hint">${fmtCount(anchor.gateway.n)} 个已结束请求 · 不含端侧与网络</div>
+      <div class="stat-value combo">${formatted(anchor.gateway, 'mean', seconds)} / ${formatted(anchor.gateway, 'p50', seconds)} / ${formatted(anchor.gateway, 'p95', seconds)}</div>
+      <div class="stat-hint">${fmtCount(anchor.gateway.n)} 个已结束请求 · 覆盖 ${fmtCount(anchor.gateway.days)} / ${fmtCount(anchor.window_days)} 天 · 不含端侧与网络</div>
     </div>
     ${firstTile}
     ${answerTile}
@@ -1031,13 +1116,13 @@ function envSummary(doc) {
     ${NETWORK_TILES.map(([key, label, hint]) => networkTile(key, label, hint)).join('')}
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>TPOT</strong> 平均 / P50 / P95（ms/token）</div>
-      <div class="stat-value combo">${fmtTpotBare(anchor.tpot?.mean)} / ${fmtTpotBare(anchor.tpot?.p50)} / ${fmtTpotBare(anchor.tpot?.p95)}</div>
-      <div class="stat-hint">${fmtCount(anchor.tpot?.n)} 次调用 · ${fmtCount(anchor.tpot?.tokens)} token 加权</div>
+      <div class="stat-value combo">${formatted(anchor.tpot, 'mean', fmtTpotBare)} / ${formatted(anchor.tpot, 'p50', fmtTpotBare)} / ${formatted(anchor.tpot, 'p95', fmtTpotBare)}</div>
+      <div class="stat-hint">${fmtCount(anchor.tpot?.n)} 条用量记录 · ${fmtCount(anchor.tpot?.tokens)} 个输出间隔加权 · 覆盖 ${fmtCount(anchor.tpot?.days)} / ${fmtCount(anchor.window_days)} 天 · 不可按调用 ID 去重</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">云侧 Agent 输入 / 输出 / 总 Token${tokenUnit ? `（${tokenUnit}）` : ''}</div>
       <div class="stat-value combo">${tokenBare(anchor.tokens?.input)} / ${tokenBare(anchor.tokens?.output)} / ${tokenBare(anchor.tokens?.total)}</div>
-      <div class="stat-hint">成功调用 ${fmtCount(anchor.calls?.success)} 次 · llm_usage 累计</div>
+      <div class="stat-hint">llm_usage 记录累计 · 输出覆盖 ${fmtCount(anchor.tokens?.days?.output)} / ${fmtCount(anchor.window_days)} 天 · 可能含重复记录</div>
     </div>
   </section>`;
 }
@@ -3744,7 +3829,7 @@ function renderEnv() {
   const timeText = latestObserved ? `采集于 ${esc(fmtDateTime(latestObserved))}`
     : snapshotTime ? `快照生成于 ${esc(fmtDateTime(snapshotTime))}，行级采集时间未知` : '采集时间未知';
   const requestOnly = scoped.days.some((row) => row.source === 'workspace_request_logs');
-  const freshness = `<p class="data-freshness">云侧数据${timeText}${stale ? ' · 超过 6 小时未更新，请检查采集任务' : ''}${state.envRefreshFailed ? ' · 刷新失败，保留上次快照' : ''}${state.rangeDays === 1 && !scoped.days.length ? ' · 尚无当天采集数据' : ''}${requestOnly ? ' · 模型用量记录不可去重，网关流异常率不代表业务请求失败率；模型 Token 和工具耗时尚未采集' : ''}；* 表示部分日或日志覆盖不全；定时采集，并非实时流。</p>`;
+  const freshness = `<p class="data-freshness">云侧数据${timeText}${stale ? ' · 超过 6 小时未更新，请检查采集任务' : ''}${state.envRefreshFailed ? ' · 刷新失败，保留上次快照' : ''}${state.rangeDays === 1 && !scoped.days.length ? ' · 尚无当天采集数据' : ''}${requestOnly ? ' · 模型用量及 Token 基于日志记录，可能重复；网关流异常率不代表业务请求失败率，工具耗时尚未完整采集' : ''}；* 表示部分日或日志覆盖不全；定时采集，并非实时流。</p>`;
   target.innerHTML = `${freshness}${envSummary(scoped)}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTtftTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
   refineCharts(target);
 }

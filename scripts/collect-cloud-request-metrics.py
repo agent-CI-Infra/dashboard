@@ -808,6 +808,9 @@ def with_workspace_traces(previous, traces):
             if isinstance(day.get('model_usage_events'), int) and isinstance(day.get('gateway_stream'), dict):
                 old['model_usage_events'] = day['model_usage_events']
                 old['gateway_stream'] = dict(day['gateway_stream'])
+                for key in ('tokens', 'tpot'):
+                    if key in day:
+                        old[key] = day[key]
                 old['telemetry_observed_at'] = day.get('telemetry_observed_at') or day.get('observed_at')
                 old['telemetry_partial'] = True
                 existing[day['date']] = old
