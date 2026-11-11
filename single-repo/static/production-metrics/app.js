@@ -954,8 +954,16 @@ function envSummary(doc) {
   if (!rows.length) return '';
   const anchor = rows[rows.length - 1];
   const seconds = (value) => fmtSecondsBare(value);
-  const rate = Number.isFinite(anchor.failure_rate) ? fmtPercent(anchor.failure_rate * 100) : '—';
-  const failureTone = Number.isFinite(anchor.failure_rate) && anchor.failure_rate > 0 ? 'failed' : 'ok';
+  const workspaceMetrics = anchor.source === 'workspace_request_logs';
+  const rateValue = workspaceMetrics ? anchor.gateway_stream?.exception_rate : anchor.failure_rate;
+  const rate = Number.isFinite(rateValue) ? fmtPercent(rateValue * 100) : '—';
+  const failureTone = Number.isFinite(rateValue) && rateValue > 0 ? 'failed' : 'ok';
+  const countLabel = workspaceMetrics ? '模型用量记录数' : '旧版调用事件数';
+  const rateLabel = workspaceMetrics ? '网关流异常率' : '旧版模型事件失败率';
+  const countValue = workspaceMetrics ? anchor.model_usage_events : anchor.calls?.total;
+  const callHint = workspaceMetrics
+    ? `已识别网关流 ${fmtCount(anchor.gateway_stream?.observed)} / ${fmtCount(anchor.n)} · 取消 ${fmtCount(anchor.gateway_stream?.cancelled)} · 用量记录不可按调用 ID 去重`
+    : `旧口径 · 成功事件 ${fmtCount(anchor.calls?.success)} / 失败事件 ${fmtCount(anchor.calls?.failed)}`;
   const tokenValues = [anchor.tokens?.input, anchor.tokens?.output, anchor.tokens?.total];
   const tokenMax = Math.max(...tokenValues.map((value) => (Number.isFinite(value) ? value : 0)));
   const [tokenDiv, tokenUnit] = tokenMax >= 1e9 ? [1e9, 'B'] : tokenMax >= 1e6 ? [1e6, 'M'] : tokenMax >= 1e3 ? [1e3, 'k'] : [1, ''];
@@ -1007,9 +1015,9 @@ function envSummary(doc) {
   };
   return `<section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
     <div class="stat-card">
-      <div class="stat-label">云侧 Agent<strong>调用数</strong> / <strong>请求失败率</strong></div>
-      <div class="stat-value combo">${fmtCount(anchor.calls?.total)} / <span class="${failureTone}">${rate}</span></div>
-      <div class="stat-hint">成功 ${fmtCount(anchor.calls?.success)} / 失败 ${fmtCount(anchor.calls?.failed)} · ${esc(anchor.date)}${anchor.partial ? ' 部分日' : ''}</div>
+      <div class="stat-label">云侧 Agent<strong>${countLabel}</strong> / <strong>${rateLabel}</strong></div>
+      <div class="stat-value combo">${fmtCount(countValue)} / <span class="${failureTone}">${rate}</span></div>
+      <div class="stat-hint">${callHint} · ${esc(anchor.date)}${anchor.partial ? ' 部分日' : ''}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>请求耗时</strong>平均 / P50 / P95（s）</div>
@@ -1195,11 +1203,18 @@ function envAnomaly(doc) {
 // Cloud call volume and failure rate share one card: counts on the left axis,
 // the failure percentage on the right. Failed calls come from llm_call_error
 // events (budget exceeded, timeouts), successful ones from llm_usage records.
+function envCallSeries(rows) {
+  return {
+    calls: rows.map((row) => Number.isFinite(row?.model_usage_events) ? row.model_usage_events
+      : Number.isFinite(row?.calls?.total) ? row.calls.total : null),
+    rates: rows.map((row) => (Number.isFinite(row?.gateway_stream?.exception_rate) ? row.gateway_stream.exception_rate * 100 : null)),
+  };
+}
+
 function envCallTrend(doc) {
   const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date) : [];
   if (!rows.length) return '';
-  const calls = rows.map((row) => (Number.isFinite(row?.calls?.total) ? row.calls.total : null));
-  const rates = rows.map((row) => (Number.isFinite(row?.failure_rate) ? row.failure_rate * 100 : null));
+  const { calls, rates } = envCallSeries(rows);
   if (!calls.some((value) => value !== null) && !rates.some((value) => value !== null)) return '';
 
   const { width, height } = chartSize(1000, 230, { hostId: 'env-latency' });
@@ -1260,10 +1275,9 @@ function envCallTrend(doc) {
   const zones = rows
     .map((row, index) => {
       const lines = [`${row.date}${row.partial ? ' · 部分日' : ''}`];
-      if (row.calls) {
-        lines.push(`调用 ${fmtCount(row.calls.total)} · 成功 ${fmtCount(row.calls.success)} / 失败 ${fmtCount(row.calls.failed)}`);
-      }
-      if (Number.isFinite(row.failure_rate)) lines.push(`失败率 ${(row.failure_rate * 100).toFixed(1)}%`);
+      if (Number.isFinite(row.model_usage_events)) lines.push(`模型用量记录 ${fmtCount(row.model_usage_events)}（不能按调用去重）`);
+      else if (row.calls) lines.push(`旧版调用事件 ${fmtCount(row.calls.total)}（含失败事件）`);
+      if (Number.isFinite(row.gateway_stream?.exception_rate)) lines.push(`网关流异常率 ${(row.gateway_stream.exception_rate * 100).toFixed(1)}% · 已识别 ${fmtCount(row.gateway_stream.observed)} / ${fmtCount(row.n)}，取消 ${fmtCount(row.gateway_stream.cancelled)}`);
       if (lines.length === 1) return '';
       const cx = x(index);
       const left = Math.max(pad.left, cx - zoneWidth / 2);
@@ -1273,14 +1287,14 @@ function envCallTrend(doc) {
     .join('');
 
   const legend = [
-    ['env_calls', '调用数', 'env-calls'],
-    ['env_fail', '请求失败率', 'env-fail'],
+    ['env_calls', '模型用量记录数', 'env-calls'],
+    ['env_fail', '网关流异常率', 'env-fail'],
   ]
     .map(([key, label, style]) => `<button class="legend-toggle latency-toggle" type="button" data-env-layer="${key}" aria-pressed="true"><i class="legend-line ${style}"></i><span>${label}</span></button>`)
     .join('');
 
-  const head = `<div class="trend-head"><h3>云侧 Agent 调用数与请求失败率</h3><div class="trend-legend">${legend}</div></div>`;
-  return `<div class="trend-card wide env-trend">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="云侧 Agent 每日调用数与请求失败率">
+  const head = `<div class="trend-head"><h3>云侧模型用量记录与网关流异常率</h3><div class="trend-legend">${legend}</div></div>`;
+  return `<div class="trend-card wide env-trend">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="每日模型用量记录数与网关流异常率">
     ${grid}
     <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
     <g class="latency-layer env-calls" data-env-series="env_calls">${linePath(calls, yCall) ? `<path class="trend-series" d="${linePath(calls, yCall)}" />` : ''}${marks(calls, yCall, fmtCount)}</g>
@@ -1288,7 +1302,7 @@ function envCallTrend(doc) {
     ${xLabels}
     <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
     ${zones}
-  </svg><p class="chart-note">调用数 = 成功调用（llm_usage）+ 失败调用（llm_call_error），左轴为调用次数，右轴为失败率；失败率 = 失败 ÷（成功 + 失败），仅统计已知终态的调用；失败主要为 422 预算超限与 408 超时；* 为部分日。</p></div>`;
+  </svg><p class="chart-note">模型用量记录按 llm_usage 日志计数，缺少调用 ID，可能有重复，不能当作精确调用数；旧日蓝线含失败事件，口径不同。网关流异常率 = 流异常 ÷（流正常结束 + 流异常），取消和未知终态不计入；正常流仍可能包含业务错误，因此不代表业务请求失败率。* 为部分日或覆盖不全。</p></div>`;
 }
 
 function envCallDetail(doc) {
@@ -3729,7 +3743,7 @@ function renderEnv() {
   const timeText = latestObserved ? `采集于 ${esc(fmtDateTime(latestObserved))}`
     : snapshotTime ? `快照生成于 ${esc(fmtDateTime(snapshotTime))}，行级采集时间未知` : '采集时间未知';
   const requestOnly = scoped.days.some((row) => row.source === 'workspace_request_logs');
-  const freshness = `<p class="data-freshness">云侧数据${timeText}${stale ? ' · 超过 6 小时未更新，请检查采集任务' : ''}${state.envRefreshFailed ? ' · 刷新失败，保留上次快照' : ''}${state.rangeDays === 1 && !scoped.days.length ? ' · 尚无当天采集数据' : ''}${requestOnly ? ' · 新采集行仅包含已结束请求的网关及首字耗时；模型、工具和调用数等指标尚未采集' : ''}；* 表示部分日或日志覆盖不全；定时采集，并非实时流。</p>`;
+  const freshness = `<p class="data-freshness">云侧数据${timeText}${stale ? ' · 超过 6 小时未更新，请检查采集任务' : ''}${state.envRefreshFailed ? ' · 刷新失败，保留上次快照' : ''}${state.rangeDays === 1 && !scoped.days.length ? ' · 尚无当天采集数据' : ''}${requestOnly ? ' · 模型用量记录不可去重，网关流异常率不代表业务请求失败率；模型 Token 和工具耗时尚未采集' : ''}；* 表示部分日或日志覆盖不全；定时采集，并非实时流。</p>`;
   target.innerHTML = `${freshness}${envSummary(scoped)}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTtftTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
   refineCharts(target);
 }
