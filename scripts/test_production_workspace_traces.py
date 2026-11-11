@@ -1,4 +1,5 @@
 import datetime as dt
+import hashlib
 import importlib.util
 import io
 import json
@@ -11,6 +12,28 @@ collector = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(collector)
 
 class ProductionTraceTests(unittest.TestCase):
+    def test_product_timing_requires_unique_match_and_never_copies_private_fields(self):
+        rid = 'digitalmate-example'
+        digest = hashlib.sha256(rid.encode()).hexdigest()
+        item = {'v': 1, 'event': 'product_turn', 'request_hashes': [digest], 'elapsed_ms': 100,
+                'outcome': 'returned', 'steps': [{'name': 'session.route', 'start_ms': 5, 'ms': 15, 'timeout': False}],
+                'task_hash': 'PRIVATE', 'arbitrary': 'PRIVATE'}
+        entry = {'name': 'product-turns-2026-11-11.jsonl', 'type': 'file', 'size': 1000}
+        row = {'request_id': rid}
+        with patch.object(collector, 'listing', return_value=[entry]), patch.object(collector, 'fetch', return_value=json.dumps(item)):
+            self.assertEqual(collector.attach_product_turns({}, [row]), 1)
+        self.assertEqual(row['product_trajectory']['steps'][0]['name'], 'session.route')
+        self.assertNotIn('PRIVATE', json.dumps(row))
+        self.assertNotIn(digest, json.dumps(row))
+        row = {'request_id': rid}
+        with patch.object(collector, 'listing', return_value=[entry]), patch.object(collector, 'fetch', return_value='\n'.join([json.dumps(item),json.dumps(item)])):
+            self.assertEqual(collector.attach_product_turns({}, [row]), 0)
+        self.assertNotIn('product_trajectory', row)
+        invalid = dict(item, steps=[{'name': 'session.route', 'start_ms': 90, 'ms': 20}])
+        with patch.object(collector, 'listing', return_value=[entry]), patch.object(collector, 'fetch', return_value='\n'.join([json.dumps(item),json.dumps(invalid)])):
+            self.assertEqual(collector.attach_product_turns({}, [row]), 0)
+        self.assertNotIn('product_trajectory', row)
+
     def test_request_percentiles_use_nearest_rank(self):
         rows = [(0, {}, {'gateway': value}) for value in (1, 2, 3, 4)]
         result = collector.request_daily_metrics(rows, '2026-11-10', '2026-11-11T00:00:00Z', False)

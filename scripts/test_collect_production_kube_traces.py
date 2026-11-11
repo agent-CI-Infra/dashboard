@@ -41,6 +41,11 @@ class KubeTraceTests(unittest.TestCase):
                  'start_t': now.timestamp(), 'ms': 120.0, 'status': 'ok'},
             ]
             (work / f'tool-calls-{day}.jsonl').write_text('\n'.join(map(json.dumps, records)), encoding='utf8')
+            observation = {'v': 1, 'event': 'product_turn',
+                'request_hashes': [hashlib.sha256(b'digitalmate-tool').hexdigest()],
+                'elapsed_ms': 500, 'outcome': 'returned',
+                'steps': [{'name': 'session.route', 'start_ms': 10, 'ms': 20, 'timeout': False}]}
+            (work / f'product-turns-{day}.jsonl').write_text(json.dumps(observation), encoding='utf8')
             source = Path(__file__).with_name('collect-production-workspace-traces.py').read_text(encoding='utf8')
             with patch.object(remote, 'ROOT', root):
                 result = remote.run_collector([workspace], source)
@@ -49,6 +54,8 @@ class KubeTraceTests(unittest.TestCase):
             self.assertEqual(row['tool']['mean'], 120.0)
             self.assertEqual(row['tool_coverage']['matched'], 1)
             self.assertEqual(result['tool_collection_incomplete'], 0)
+            self.assertEqual(result['product_trace_count'], 1)
+            self.assertEqual(result['days'][0]['anomaly']['latency']['slow_requests'][0]['product_trajectory']['steps'][0]['name'], 'session.route')
 
     def test_full_collector_attaches_native_spans_without_publishing_private_metadata(self):
         with tempfile.TemporaryDirectory() as folder:

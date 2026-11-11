@@ -7,6 +7,7 @@ history content, workspace identifiers and credentials stay in memory.
 import concurrent.futures
 import collections
 import datetime as dt
+import hashlib
 import json
 import math
 import os
@@ -31,8 +32,12 @@ SUMMARY_DAYS = 30
 TRACE_DAYS = 7
 NAME = re.compile(r'^[A-Za-z0-9_.-]{1,160}$')
 TOOL_FILE = re.compile(r'^tool-calls-\d{4}-\d{2}-\d{2}\.jsonl$')
+PRODUCT_FILE = re.compile(r'^product-turns-\d{4}-\d{2}-\d{2}\.jsonl$')
 MAX_TOOL_FILE = 16_000_000
 MAX_TOOL_FILES = 32
+PRODUCT_PHASES = {'session.proximity', 'session.route', 'session.prepare', 'session.commit', 'session.claim',
+                  'classify', 'brief', 'brief.memory', 'runtime.open_session', 'execute', 'post.reviews',
+                  'post.next_steps', 'post.citations', 'run.start', 'task.saved', 'posted'}
 REQ = re.compile(r'request_id=([^\s,;]+)')
 REQUEST_ID = re.compile(r'^digitalmate-[A-Za-z0-9_-]{1,128}$')
 CHUNK = re.compile(r'process_stream chunk #\d+: request_id=\S+ event_type=(\S*)')
@@ -84,7 +89,9 @@ def fetch(path, params, *, download=False):
             with OPENER.open(req, timeout=30) as response:
                 if download:
                     length = int(response.headers.get('Content-Length', '0'))
-                    limit = MAX_HISTORY if str(params.get('path', '')).endswith('history.jsonl') else MAX_LOG
+                    filename = str(params.get('path', '')).rsplit('/', 1)[-1]
+                    limit = (MAX_HISTORY if filename == 'history.jsonl' else MAX_TOOL_FILE
+                             if TOOL_FILE.fullmatch(filename) or PRODUCT_FILE.fullmatch(filename) else MAX_LOG)
                     if length > limit:
                         raise ValueError('file exceeds bound')
                     body = response.read(limit + 1)
@@ -224,6 +231,61 @@ def read_tool_metrics(query):
             except (ValueError, TypeError, KeyError, OverflowError, OSError):
                 complete = False
     return days, bool(files), complete
+
+
+def attach_product_turns(query, rows):
+    """Attach only unique, request-hash-matched, content-free product observations."""
+    by_hash = {hashlib.sha256(row['request_id'].encode('utf8')).hexdigest(): row for row in rows}
+    if len(by_hash) != len(rows):
+        return 0
+    files = [e for e in listing(query, 'workswarm') if e.get('type') == 'file'
+             and PRODUCT_FILE.fullmatch(str(e.get('name', '')))]
+    files.sort(key=lambda entry: entry['name'], reverse=True)
+    # An incomplete search could hide a conflicting record; never claim a unique match.
+    if len(files) > MAX_TOOL_FILES:
+        return 0
+    candidates = {}
+    for entry in files:
+        if type(entry.get('size')) is not int or entry['size'] > MAX_TOOL_FILE:
+            return 0
+        raw = fetch('/api/workspace-files', {**query, 'path': 'workswarm/' + entry['name'], 'action': 'download'}, download=True)
+        if len(raw.encode('utf8')) > MAX_TOOL_FILE:
+            return 0
+        for line in raw.splitlines():
+            try:
+                item = json.loads(line)
+                if not isinstance(item, dict) or item.get('v') != 1 or item.get('event') != 'product_turn':
+                    return 0
+                links, steps, total = item.get('request_hashes'), item.get('steps'), item.get('elapsed_ms')
+                if (not isinstance(links, list) or len(links) > 16 or not all(isinstance(h, str) and re.fullmatch(r'[0-9a-f]{64}', h) for h in links)
+                        or len(set(links)) != len(links) or not isinstance(steps, list) or len(steps) > 128
+                        or type(total) not in (int, float) or not math.isfinite(total) or total < 0):
+                    return 0
+                clean = []
+                for step in steps:
+                    if not isinstance(step, dict) or step.get('name') not in PRODUCT_PHASES:
+                        raise ValueError('invalid phase')
+                    start, duration = step.get('start_ms'), step.get('ms')
+                    if (type(start) not in (int, float) or type(duration) not in (int, float)
+                            or not math.isfinite(start) or not math.isfinite(duration)
+                            or start < 0 or duration < 0 or start + duration > total):
+                        raise ValueError('invalid phase timing')
+                    clean.append({'name': step['name'], 'start_ms': start, 'duration_ms': duration,
+                                  'timeout': step.get('timeout') is True})
+                outcome = item.get('outcome') if item.get('outcome') in ('returned', 'raised', 'cancelled') else 'unknown'
+                observation = {'duration_ms': total, 'steps': clean, 'outcome': outcome,
+                               'truncated': item.get('truncated') is True, 'shared_request_count': len(links)}
+                for request_hash in links:
+                    if request_hash in by_hash:
+                        candidates.setdefault(request_hash, []).append(observation)
+            except (ValueError, TypeError, OverflowError):
+                return 0
+    count = 0
+    for request_hash, values in candidates.items():
+        if len(values) == 1:
+            by_hash[request_hash]['product_trajectory'] = values[0]
+            count += 1
+    return count
 
 
 def read_log(item):
@@ -605,9 +667,13 @@ def collect():
     by_binding = {}
     for idx, query, row in chosen[:MAX_TRACE_REQUESTS]:
         by_binding.setdefault(idx, (query, []))[1].append(row)
-    details_ok = details_failed = native_count = 0
+    details_ok = details_failed = native_count = product_count = 0
     for index,(query, rows) in enumerate(by_binding.values(),1):
         native_count += attach_native_trajectories(query, rows)
+        try:
+            product_count += attach_product_turns(query, rows)
+        except (OSError, ValueError, KeyError, TypeError, urllib.error.HTTPError):
+            pass  # Missing product logs do not make another source complete.
         try:
             if attach_tool_events(query, rows): details_ok += 1
             else: details_failed += 1
@@ -626,6 +692,7 @@ def collect():
               'answer_workspaces_complete':answer_coverage['complete'],
               'answer_workspaces_partial':answer_coverage['partial'],
               'native_trace_count':native_count,
+              'product_trace_count':product_count,
               'trace_request_limit':MAX_TRACE_REQUESTS,'days':days}
     print('output: days',len(days),'slow requests',sum(len(d['anomaly']['latency']['slow_requests']) for d in days),
           'requests with tool events',sum(bool(row.get('tool_events')) for d in days for row in d['anomaly']['latency']['slow_requests']),flush=True)

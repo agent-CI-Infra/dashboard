@@ -7,6 +7,19 @@ const part=(start,end)=>src.slice(src.indexOf(start),src.indexOf(end,src.indexOf
 const c=vm.createContext({});
 vm.runInContext(`const state={traceFilter:'all'}; const esc=(v)=>String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'); const fmtDuration=(v)=>v+'ms';`+part('function slowTraceCandidates(doc)', 'function renderRequestTraces(doc)')+';globalThis.rows=traceRows;globalThis.html=traceHtml;globalThis.available=availableTraceCandidates;globalThis.state=state;',c);
 const incident={scope:'local',gateway:1000,user_event_ms:20,final_ms:990,tools:[{index:1,name:'bash',start_ms:100,duration_ms:500,success:false,summary:'超时',result_chars:10}],models:[{index:1,time_ms:99,input_tokens:30,cache_read_tokens:20,cache_miss_tokens:10}]};
+test('product phases use a separate clock and reject invalid or unknown spans',()=>{
+ const item={scope:'cloud',gateway:3000,product_trajectory:{duration_ms:800,steps:[
+  {name:'session.proximity',start_ms:10,duration_ms:200},{name:'session.route',start_ms:20,duration_ms:50},
+  {name:'<private>',start_ms:20,duration_ms:50},{name:'brief',start_ms:799,duration_ms:10}]}};
+ const html=c.html(item);assert.match(html,/产品侧阶段/);assert.match(html,/会话路由/);
+ assert.match(html,/使用不同起点/);assert.match(html,/800ms/);assert.doesNotMatch(html,/<private>/);assert.doesNotMatch(html,/准备 Brief/);
+});
+test('local diagnostics are shown only on loopback',()=>{
+ const item={scope:'cloud',gateway:1000,tool_events:[{name:'tool',start_ms:100,duration_ms:20,status:'ok',local_debug_name:'weather',local_debug_arguments:{location:'Hong Kong'}}]};
+ c.location={hostname:'public.example'};let rows=c.rows(item);assert.match(rows[1].label,/工具/);assert.equal(rows[1].arguments,null);
+ c.location={hostname:'127.0.0.1'};rows=c.rows(item);assert.match(rows[1].label,/weather/);assert.match(rows[1].arguments,/Hong Kong/);
+ delete c.location;
+});
 test('native spans render actual model and nested phase intervals on their own root clock',()=>{
  const item={scope:'cloud',gateway:3000,native_trajectory:{duration_ms:2000,root_span_id:'a',spans:[
   {span_id:'b',parent_span_id:'a',kind:'phase',label:'输入准备',start_ms:100,duration_ms:200},

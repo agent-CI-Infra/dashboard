@@ -210,10 +210,11 @@ def run_collector(names, source):
         relative = params.get('path', '')
         is_history = relative.endswith('/history.jsonl')
         is_tool_file = relative.startswith('workswarm/') and namespace['TOOL_FILE'].fullmatch(relative.removeprefix('workswarm/'))
-        if not download or not (is_history or is_tool_file):
+        is_product_file = relative.startswith('workswarm/') and namespace['PRODUCT_FILE'].fullmatch(relative.removeprefix('workswarm/'))
+        if not download or not (is_history or is_tool_file or is_product_file):
             raise ValueError('unexpected workspace operation')
         path = path_for(params['name'], relative)
-        limit = namespace['MAX_TOOL_FILE'] if is_tool_file else namespace['MAX_HISTORY']
+        limit = namespace['MAX_TOOL_FILE'] if (is_tool_file or is_product_file) else namespace['MAX_HISTORY']
         with path.open('rb') as handle:
             body = handle.read(limit + 1)
         if len(body) > limit:

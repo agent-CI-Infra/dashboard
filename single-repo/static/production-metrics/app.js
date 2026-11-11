@@ -3626,10 +3626,29 @@ function traceRows(item) {
   if (valid(answer)) rows.push({label: '答案输出阶段', start: answer, duration: total - answer, kind: 'answer', detail: '首个答案文本至请求结束'});
   for (const [index, tool] of (Array.isArray(item.tool_events) ? item.tool_events : []).entries()) {
     if (!valid(tool.start_ms) || !Number.isFinite(tool.duration_ms) || tool.duration_ms < 0 || tool.start_ms + tool.duration_ms > total) continue;
-    const name = ['bash', 'grep', 'read_file', 'tool_search'].includes(tool.name) ? tool.name : '工具';
-    rows.push({label: `${String(index + 1).padStart(2, '0')} · ${name}`, start: tool.start_ms, duration: tool.duration_ms, kind: tool.status === 'error' ? 'error' : 'tool', detail: `工具调用事件到结果事件；状态：${tool.status === 'error' ? '失败' : tool.status === 'ok' ? '成功' : '未知'}`});
+    const local = typeof location !== 'undefined' && ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+    const name = local && typeof tool.local_debug_name === 'string' ? tool.local_debug_name : (['bash', 'grep', 'read_file', 'tool_search'].includes(tool.name) ? tool.name : '工具');
+    const args = local && tool.local_debug_arguments != null ? (typeof tool.local_debug_arguments === 'string' ? tool.local_debug_arguments : JSON.stringify(tool.local_debug_arguments, null, 2)) : null;
+    rows.push({label: `${String(index + 1).padStart(2, '0')} · ${name}`, start: tool.start_ms, duration: tool.duration_ms, kind: tool.status === 'error' ? 'error' : 'tool', detail: `工具调用事件到结果事件；状态：${tool.status === 'error' ? '失败' : tool.status === 'ok' ? '成功' : '未知'}`, arguments: args});
   }
   return rows;
+}
+
+function productTraceHtml(item) {
+  const product = item?.product_trajectory;
+  if (!product || !Number.isFinite(product.duration_ms) || product.duration_ms <= 0 || !Array.isArray(product.steps)) return '';
+  const labels = {'session.proximity':'会话准入', 'session.route':'会话路由', 'session.prepare':'准入准备',
+    'session.commit':'准入提交', 'session.claim':'执行资格', 'classify':'执行分类', 'brief':'准备 Brief',
+    'brief.memory':'读取记忆', 'runtime.open_session':'准备运行时会话', 'execute':'执行任务',
+    'post.reviews':'结果检查', 'post.next_steps':'后续步骤', 'post.citations':'引用处理',
+    'run.start':'开始执行', 'task.saved':'任务已保存', 'posted':'回复已提交'};
+  const phases = product.steps.filter((s) => Object.hasOwn(labels, s?.name) && Number.isFinite(s.start_ms)
+    && Number.isFinite(s.duration_ms) && s.start_ms >= 0 && s.duration_ms >= 0
+    && s.start_ms + s.duration_ms <= product.duration_ms);
+  if (!phases.length) return '';
+  const bars = phases.map((s) => `<div class="trace-event-row"><span class="trace-event-name">${esc(labels[s.name])}${s.timeout ? ' · 超时' : ''}</span><span class="trace-event-track"><span class="trace-bar trace-phase${s.duration_ms === 0 ? ' trace-point' : ''}" style="left:${(100*s.start_ms/product.duration_ms).toFixed(3)}%;width:${(100*s.duration_ms/product.duration_ms).toFixed(3)}%"></span></span><span class="trace-duration">${fmtDuration(s.duration_ms)}</span></div>`).join('');
+  const shared = product.shared_request_count > 1 ? `该产品回合关联 ${fmtCount(product.shared_request_count)} 个运行时请求；` : '';
+  return `<section class="product-trajectory"><div class="trajectory-head"><div><strong>产品侧阶段</strong><span class="muted">${fmtDuration(product.duration_ms)} · ${phases.length} 个阶段${product.truncated ? ' · 已截断' : ''}</span></div><p>${shared}从产品侧计时器创建开始，包含会话、Brief 与执行；阶段可能嵌套或并行，与下方网关／运行时轨迹使用不同起点，不能直接相加。</p></div><div class="trajectory-table"><div class="trajectory-columns"><span>阶段</span><span>产品侧相对时间</span><span>耗时</span></div>${bars}</div></section>`;
 }
 
 function traceHtml(item) {
@@ -3655,7 +3674,7 @@ function traceHtml(item) {
     : '当前快照没有逐次工具调用时间，暂无法绘制工具明细；思考与工具阶段不等于单次工具调用。';
   const phaseNote = !native && missingPhases ? ' 部分阶段标记未记录，无法绘制对应区间。' : '';
   const emptyList = filter === 'models' ? '该请求没有可可靠关联的模型记账记录。' : '当前筛选没有可展示的事件。';
-  return `<div class="trajectory-head"><div><strong>执行轨迹</strong><span class="muted">${fmtDuration(total)} · ${rows.length} 条记录 · 当前 ${visible.length} 条</span></div><p>${esc(note + phaseNote)}</p></div>
+  return `${productTraceHtml(item)}<div class="trajectory-head"><div><strong>执行轨迹</strong><span class="muted">${fmtDuration(total)} · ${rows.length} 条记录 · 当前 ${visible.length} 条</span></div><p>${esc(note + phaseNote)}</p></div>
     <div class="trace-overview" aria-label="轨迹总览"><div class="trace-overview-total"></div><div class="trace-overview-events">${marks}</div></div>
     <div class="trajectory-legend"><span><i class="legend-dot total-dot"></i>本轮运行</span>${native ? '<span><i class="legend-dot phase-dot"></i>运行阶段</span>' : ''}<span><i class="legend-dot event-dot"></i>事件</span><span><i class="legend-dot tool-dot"></i>工具</span><span><i class="legend-dot model-dot"></i>${native ? '模型调用' : '模型记账点'}</span></div>
     <div class="trajectory-toolbar"><label><span class="sr-only">搜索轨迹</span><input id="trace-search" type="search" placeholder="搜索事件或工具" autocomplete="off"></label><div class="trace-filters" aria-label="轨迹筛选">${filters}</div></div>
@@ -3738,7 +3757,7 @@ $('request-traces').addEventListener('click', (event) => {
   $('request-traces').querySelectorAll('[data-trace-row]').forEach((node) => node.classList.toggle('selected', node === button));
   const detail = $('trace-detail');
   button.insertAdjacentElement('afterend', detail);
-  detail.innerHTML = `<strong>${esc(row.label)}</strong><div>相对开始：${(row.start / 1000).toFixed(3)} 秒 · ${row.duration === 0 ? '记录类型：时间点' : `事件间隔：${(row.duration / 1000).toFixed(3)} 秒`}</div><div>${esc(row.detail || '')}</div>`;
+  detail.innerHTML = `<strong>${esc(row.label)}</strong><div>相对开始：${(row.start / 1000).toFixed(3)} 秒 · ${row.duration === 0 ? '记录类型：时间点' : `事件间隔：${(row.duration / 1000).toFixed(3)} 秒`}</div><div>${esc(row.detail || '')}</div>${row.arguments != null ? `<div style="margin-top:8px;font-weight:600">调用参数（仅本机诊断数据）</div><pre style="white-space:pre-wrap;overflow-wrap:anywhere;margin:4px 0 0">${esc(row.arguments)}</pre>` : ''}`;
 });
 
 $('request-traces').addEventListener('input', (event) => {
