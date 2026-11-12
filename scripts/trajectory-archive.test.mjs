@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {selectTraces, coverageText, detailPath, PAGE_SIZE} from '../single-repo/static/production-metrics/trajectory-archive.js';
+import {selectTraces, coverageText, detailPath, spanBar, PAGE_SIZE} from '../single-repo/static/production-metrics/trajectory-archive.js';
 
 test('full archive search covers non-slow requests and every page', () => {
   const rows=Array.from({length:251},(_,i)=>({key:String(i),request_id:`digitalmate-${i}`,lifecycle:'final',start_time:'2026-11-11T17:00:00Z'}));
@@ -18,4 +18,10 @@ test('coverage never claims atomic consistency or complete collection', () => {
 test('detail fetch cannot escape the archive or use remote URLs', () => {
   assert.equal(detailPath(`traces/${'a'.repeat(64)}/3.json`),`traces/${'a'.repeat(64)}/3.json`);
   for(const path of ['../../secret.json','https://example.org/steal','traces/a/1.json','//example.org/a']) assert.throws(()=>detailPath(path));
+});
+test('timeline clips numeric intervals and only uses fixed colors', () => {
+  const html = spanBar({start_ms:50,duration_ms:500,kind:'model'},100);
+  assert.match(html,/left:50%;width:50%/);
+  assert.equal(spanBar({start_ms:NaN,duration_ms:1},100),'');
+  assert.doesNotMatch(spanBar({start_ms:0,duration_ms:1,kind:'evil'},100),/evil/);
 });

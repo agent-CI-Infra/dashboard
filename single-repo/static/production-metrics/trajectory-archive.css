@@ -1,0 +1,9 @@
+#trajectory-archive button { border: 1px solid var(--border, #dce1e9); border-radius: 6px; padding: 6px 12px; background: var(--card, #fff); color: inherit; cursor: pointer; }
+#trajectory-archive button:hover:not(:disabled) { border-color: #377ec8; color: #377ec8; }
+#trajectory-archive button:disabled { cursor: default; opacity: .45; }
+#trajectory-archive select { border: 1px solid var(--border, #dce1e9); border-radius: 6px; background: var(--card, #fff); color: inherit; padding: 8px; }
+#trajectory-archive td { vertical-align: middle; }
+#archive-detail { margin-top: 24px; }
+.archive-track { display: block; position: relative; height: 14px; min-width: 160px; background: #8593a71a; border-radius: 3px; }
+.archive-bar { display: block; position: absolute; height: 100%; min-width: 2px; border-radius: 3px; }
+@media (max-width: 700px) { #archive-form { flex-wrap: wrap; } #archive-form input[type=search] { flex-basis: 100%; } }

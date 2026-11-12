@@ -85,10 +85,13 @@ def archive_page(local, key, after):
         con.set_progress_handler(lambda: int(time.monotonic() > deadline), 10000)
         if con.execute('PRAGMA quick_check').fetchone()[0] != 'ok':
             raise ValueError('invalid copy')
-        query = con.execute('''SELECT rowid,trace_id,span_id,parent_span_id,request_id,lifecycle,
-            start_time_unix_nano,end_time_unix_nano,has_error,
-            CASE WHEN length(raw_json)<=? THEN raw_json ELSE NULL END
-            FROM trajectory_current_records WHERE rowid>? ORDER BY rowid LIMIT ?''',
+        query = con.execute('''SELECT c.rowid,c.trace_id,c.span_id,c.parent_span_id,c.request_id,c.lifecycle,
+            c.start_time_unix_nano,c.end_time_unix_nano,c.has_error,
+            CASE WHEN length(COALESCE(NULLIF(c.raw_json,X''),a.raw_json))<=?
+                 THEN COALESCE(NULLIF(c.raw_json,X''),a.raw_json) ELSE NULL END
+            FROM trajectory_current_records c LEFT JOIN otlp_span_records a
+            ON a.trace_id=c.trace_id AND a.span_id=c.span_id
+            WHERE c.rowid>? ORDER BY c.rowid LIMIT ?''',
             (MAX_NATIVE_PAYLOAD, after, ARCHIVE_PAGE + 1))
         more = False
         for i, record in enumerate(query):

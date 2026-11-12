@@ -38,7 +38,8 @@ class ArchiveTests(unittest.TestCase):
         con.executescript('''PRAGMA journal_mode=WAL;
           CREATE TABLE trajectory_current_records
           (trace_id TEXT, span_id TEXT, parent_span_id TEXT, request_id TEXT, lifecycle TEXT,
-           start_time_unix_nano INTEGER, end_time_unix_nano INTEGER, has_error INTEGER, raw_json BLOB);''')
+           start_time_unix_nano INTEGER, end_time_unix_nano INTEGER, has_error INTEGER, raw_json BLOB);
+          CREATE TABLE otlp_span_records (trace_id TEXT, span_id TEXT, raw_json BLOB, PRIMARY KEY(trace_id,span_id));''')
         raw = zlib.compress(json.dumps({'resourceSpans':[{'scopeSpans':[{'spans':[{
             'name':'chat SECRET_MODEL', 'content':'SECRET_PROMPT'}]}]}]}).encode())
         for i in range(spans):
@@ -91,6 +92,16 @@ class ArchiveTests(unittest.TestCase):
         self.merge(self.collect())
         self.assertEqual(self.index['coverage']['archived_spans'],7)
         self.assertFalse(list((self.output / 'staging').glob('*.json')))
+
+    def test_labels_are_recovered_from_final_otlp_archive(self):
+        db = self.make_db()
+        con = sqlite3.connect(db)
+        con.execute('INSERT INTO otlp_span_records SELECT trace_id,span_id,raw_json FROM trajectory_current_records')
+        con.execute("UPDATE trajectory_current_records SET raw_json=X''")
+        con.commit(); con.close()
+        self.merge(self.collect())
+        detail = json.loads((self.output / self.index['traces'][0]['pages'][0]).read_text(encoding='utf-8'))
+        self.assertTrue(all(r['label'] == '模型调用' for r in detail['spans']))
 
     def test_generation_change_restarts_staging_and_failure_retains_archive(self):
         db = self.make_db(spans=7)

@@ -11,13 +11,23 @@ export function selectTraces(traces, query, lifecycle, day = '') {
 export function coverageText(doc) {
   const c = doc.coverage || {};
   const states = c.statuses || {};
-  return `每小时增量采集 · 最近运行 ${formatTime(doc.generated_at)}。授权工作区 ${c.authorized_workspaces ?? 0}/${c.bindings ?? 0}；发现 ${c.discovered_databases ?? 0} 个库，本轮观察校验通过且已读完 ${c.observed_databases ?? 0} 个，待采或待重试 ${c.pending_databases ?? 0} 个（WAL 等辅助文件存在 ${states.active_sidecars ?? 0}，读取失败 ${states.read_error ?? 0}，大小超限 ${states.size_limit ?? 0}，复制中变化 ${states.changing ?? 0}）。目录错误 ${c.inventory_errors ?? 0}，未再发现 ${c.not_seen_databases ?? 0}，无效记录 ${c.invalid_records ?? 0}。累计归档 ${c.archived_traces ?? 0} 条轨迹、${c.archived_spans ?? 0} 个跨度。只读文件副本一致性未经写入端确认，不代表全量无遗漏；历史结果保留原采集时间。`;
+  return `每小时增量采集 · 最近运行 ${formatTime(doc.generated_at)}。授权工作区 ${c.authorized_workspaces ?? 0}/${c.bindings ?? 0}；发现 ${c.discovered_databases ?? 0} 个库，本轮观察校验通过且已读完 ${c.observed_databases ?? 0} 个，待采或待重试 ${c.pending_databases ?? 0} 个（WAL 等辅助文件存在 ${states.active_sidecars ?? 0}，读取失败 ${states.read_error ?? 0}，大小超限 ${states.size_limit ?? 0}，复制中变化 ${states.changing ?? 0}）。授权映射失败 ${Object.values(c.scope_errors || {}).reduce((a,b)=>a+b,0)}，目录错误 ${c.inventory_errors ?? 0}，未再发现 ${c.not_seen_databases ?? 0}，无效记录 ${c.invalid_records ?? 0}。累计归档 ${c.archived_traces ?? 0} 条轨迹、${c.archived_spans ?? 0} 个跨度。只读文件副本一致性未经写入端确认，不代表全量无遗漏；历史结果保留原采集时间。`;
 }
 const formatTime = value => value ? new Date(value).toLocaleString('zh-CN', {timeZone:'Asia/Shanghai', hour12:false}) : '未知';
 const duration = value => Number.isFinite(value) ? `${(value / 1000).toFixed(3)} 秒` : '—';
 export function detailPath(path) {
   if (!/^traces\/[0-9a-f]{64}\/\d+\.json$/.test(path)) throw new Error('invalid detail path');
   return path;
+}
+
+export function spanBar(span, total) {
+  if (!Number.isFinite(total) || total <= 0 || !Number.isFinite(span.start_ms)
+      || !Number.isFinite(span.duration_ms)) return '';
+  const left = Math.max(0, Math.min(100, 100 * span.start_ms / total));
+  const width = Math.max(0, Math.min(100 - left, 100 * span.duration_ms / total));
+  const colors = {phase:'#6476dc', agent:'#9b6bd2', model:'#d39a30', tool:'#35a798', event:'#8593a7'};
+  const color = span.error ? '#cc5260' : colors[span.kind] || colors.event;
+  return `<span class="archive-track"><span class="archive-bar" style="left:${left}%;width:${width}%;background:${color}"></span></span>`;
 }
 
 async function startArchive() {
@@ -50,7 +60,7 @@ async function startArchive() {
       const data = await get(detailPath(entry.pages[part]));
       if (generation !== requestGeneration) return;
       if (data.key !== key) throw new Error('identity mismatch');
-      node('archive-detail').innerHTML = `<h3>原生轨迹 · ${escape(entry.request_id || entry.key.slice(0,16))}</h3><p class="muted">采集于 ${escape(formatTime(entry.observed_at))} · 一致性未经写入端确认 · ${escape(statusNames[entry.lifecycle] || '未知')}。本页展示第 ${data.offset + 1}–${data.offset + data.spans.length} / ${data.total} 个跨度；跨度可能嵌套或并行，不能相加。运行中跨度的结束耗时尚未确定。</p><div class="table-wrap"><table class="history-table"><thead><tr><th>阶段</th><th>状态</th><th>相对开始</th><th>耗时</th><th>跨度 / 父跨度</th></tr></thead><tbody>${data.spans.map(s => `<tr><td>${escape(s.label)}</td><td>${escape(statusNames[s.lifecycle] || '未知')}${s.error ? ' · 错误' : ''}</td><td>${escape(duration(s.start_ms))}</td><td>${s.lifecycle === 'running' ? '待结束' : escape(duration(s.duration_ms))}</td><td><code>${escape(s.span_id)}</code><br><small>${escape(s.parent_span_id || '根跨度')}</small></td></tr>`).join('')}</tbody></table></div><div class="trajectory-toolbar"><button type="button" data-archive-part="${part - 1}" ${part === 0 ? 'disabled' : ''}>上一页跨度</button><button type="button" data-archive-part="${part + 1}" ${part + 1 >= entry.pages.length ? 'disabled' : ''}>下一页跨度</button></div>`;
+      node('archive-detail').innerHTML = `<h3>原生轨迹 · ${escape(entry.request_id || entry.key.slice(0,16))}</h3><p class="muted">采集于 ${escape(formatTime(entry.observed_at))} · 一致性未经写入端确认 · ${escape(statusNames[entry.lifecycle] || '未知')}。保留历史跨度 ${entry.retained_spans || 0} 个。本页展示第 ${data.offset + 1}–${data.offset + data.spans.length} / ${data.total} 个跨度；跨度可能嵌套或并行，不能相加。运行中跨度的结束耗时尚未确定。</p><div class="table-wrap"><table class="history-table"><thead><tr><th>阶段</th><th>状态</th><th>相对开始</th><th>时间轴</th><th>耗时</th><th>跨度 / 父跨度</th></tr></thead><tbody>${data.spans.map(s => `<tr><td>${escape(s.label)}</td><td>${escape(statusNames[s.lifecycle] || '未知')}${s.error ? ' · 错误' : ''}</td><td>${escape(duration(s.start_ms))}</td><td>${spanBar(s, entry.duration_ms)}</td><td>${s.lifecycle === 'running' ? '待结束' : escape(duration(s.duration_ms))}</td><td><code>${escape(s.span_id)}</code><br><small>${escape(s.parent_span_id || '根跨度')}</small></td></tr>`).join('')}</tbody></table></div><div class="trajectory-toolbar"><button type="button" data-archive-part="${part - 1}" ${part === 0 ? 'disabled' : ''}>上一页跨度</button><button type="button" data-archive-part="${part + 1}" ${part + 1 >= entry.pages.length ? 'disabled' : ''}>下一页跨度</button></div>`;
     } catch {
       if (generation === requestGeneration) node('archive-detail').textContent = '轨迹明细暂时读取失败，请稍后重试。';
     }
