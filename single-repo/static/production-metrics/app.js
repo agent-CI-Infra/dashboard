@@ -109,16 +109,11 @@ function fmtDateTime(iso) {
   if (!iso) return '—';
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return String(iso);
-  return new Intl.DateTimeFormat('zh-CN', {
-    timeZone: 'Asia/Shanghai',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  })
-    .format(date)
-    .replace(/\//g, '-');
+  // China has a fixed UTC+08:00 offset for the current production data.
+  // UTC getters also avoid browser extensions overriding Intl's timeZone.
+  const china = new Date(date.getTime() + 8 * 60 * 60 * 1000);
+  const pad = (value) => String(value).padStart(2, '0');
+  return `${pad(china.getUTCMonth() + 1)}-${pad(china.getUTCDate())} ${pad(china.getUTCHours())}:${pad(china.getUTCMinutes())}`;
 }
 
 function niceMax(value) {
@@ -162,9 +157,9 @@ function modelDisplayName(name) {
 }
 
 function todayShanghai(now = new Date()) {
-  const parts = new Intl.DateTimeFormat('en-US', {timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit'}).formatToParts(now);
-  const value = (type) => parts.find((part) => part.type === type).value;
-  return `${value('year')}-${value('month')}-${value('day')}`;
+  const china = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+  const pad = (value) => String(value).padStart(2, '0');
+  return `${china.getUTCFullYear()}-${pad(china.getUTCMonth() + 1)}-${pad(china.getUTCDate())}`;
 }
 
 function historyLatestDate(history) {
@@ -352,13 +347,7 @@ function hoursUntil(hours, cutoffHour) {
 function shanghaiHour(iso) {
   const date = new Date(iso || '');
   if (Number.isNaN(date.getTime())) return null;
-  const hour = new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Asia/Shanghai',
-    hour: '2-digit',
-    hour12: false,
-  }).format(date);
-  const value = Number(hour);
-  return Number.isFinite(value) ? value % 24 : null;
+  return new Date(date.getTime() + 8 * 60 * 60 * 1000).getUTCHours();
 }
 
 function windowAverage(window) {
