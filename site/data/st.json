@@ -1,7 +1,177 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-12T00:54:28.564Z",
+  "updatedAt": "2026-11-12T02:23:34.580Z",
+  "catalog": [
+    {
+      "name": "real_model_text_reply",
+      "key": "text",
+      "title": "文本回复",
+      "coverageId": "",
+      "nightly": true,
+      "requirement": ""
+    },
+    {
+      "name": "real_model_txt_download_and_content",
+      "key": "text-file",
+      "title": "文本生成 TXT 并下载",
+      "coverageId": "",
+      "nightly": true,
+      "requirement": ""
+    },
+    {
+      "name": "real_model_multi_turn",
+      "key": "multi",
+      "title": "三轮对话与上下文更新",
+      "coverageId": "",
+      "nightly": true,
+      "requirement": ""
+    },
+    {
+      "name": "real_model_file_to_text",
+      "key": "file-text",
+      "title": "上传文件并提取文本",
+      "coverageId": "",
+      "nightly": true,
+      "requirement": ""
+    },
+    {
+      "name": "real_model_file_to_file",
+      "key": "file-file",
+      "title": "上传 CSV 并生成转换文件",
+      "coverageId": "",
+      "nightly": true,
+      "requirement": ""
+    },
+    {
+      "name": "real_model_structured_choice",
+      "key": "choice",
+      "title": "结构化选项回答并继续任务",
+      "coverageId": "",
+      "nightly": true,
+      "requirement": ""
+    },
+    {
+      "name": "gateway_connection",
+      "key": "connection",
+      "title": "Gateway 连接检查",
+      "coverageId": "",
+      "nightly": true,
+      "requirement": ""
+    },
+    {
+      "name": "session_isolation_parallel",
+      "key": "session-isolation-parallel",
+      "title": "双会话并发隔离",
+      "coverageId": "CON-01",
+      "nightly": true,
+      "requirement": ""
+    },
+    {
+      "name": "duplicate_downlink_idempotent",
+      "key": "duplicate-downlink-idempotent",
+      "title": "同一真实确认帧三次下行与幂等恢复",
+      "coverageId": "CON-04",
+      "nightly": false,
+      "requirement": "live-wire"
+    },
+    {
+      "name": "protocol_invalid_task_identity",
+      "key": "protocol-invalid-task-identity",
+      "title": "当前真实下行 task_id 八种异常与原事件恢复",
+      "coverageId": "PRO-02",
+      "nightly": false,
+      "requirement": "live-wire"
+    },
+    {
+      "name": "protocol_unknown_event_forward_compat",
+      "key": "protocol-unknown-event-forward-compat",
+      "title": "当前真实事件的未知类型和新增字段兼容",
+      "coverageId": "PRO-03",
+      "nightly": false,
+      "requirement": "live-wire"
+    },
+    {
+      "name": "protocol_malformed_optional_fields",
+      "key": "protocol-malformed-optional-fields",
+      "title": "不同实时增量的 segment_id/earlier 八种类型异常",
+      "coverageId": "PRO-01",
+      "nightly": false,
+      "requirement": "live-wire"
+    },
+    {
+      "name": "protocol_chunk_boundary_reassembly",
+      "key": "protocol-chunk-boundary-reassembly",
+      "title": "当前中英 Unicode/Markdown 文本与 UTF-8 continuation 分片重组",
+      "coverageId": "PRO-06",
+      "nightly": false,
+      "requirement": "live-wire"
+    },
+    {
+      "name": "reset_detached_recovery",
+      "key": "reset-detached-recovery",
+      "title": "独立房间 reset/detached 与真实断链恢复",
+      "coverageId": "REC-03",
+      "nightly": true,
+      "requirement": ""
+    },
+    {
+      "name": "content_refusal_context_recovery",
+      "key": "content-refusal-context-recovery",
+      "title": "内容拦截后同房间连续发送与历史保留",
+      "coverageId": "REC-04",
+      "nightly": false,
+      "requirement": "model-boundary"
+    },
+    {
+      "name": "artifact_receipt_required",
+      "key": "artifact-receipt-required",
+      "title": "真实产物的缺失回执、无效 ID、不可读内容与恢复",
+      "coverageId": "ART-01",
+      "nightly": false,
+      "requirement": "live-wire"
+    },
+    {
+      "name": "attachment_metadata_conflict",
+      "key": "attachment-metadata-conflict",
+      "title": "附件元数据冲突与真实云端对照",
+      "coverageId": "ATT-01",
+      "nightly": true,
+      "requirement": ""
+    },
+    {
+      "name": "attachment_corrupt_recovery",
+      "key": "attachment-corrupt-recovery",
+      "title": "损坏图片与文本恢复",
+      "coverageId": "ATT-02",
+      "nightly": true,
+      "requirement": ""
+    },
+    {
+      "name": "attachment_image_understanding",
+      "key": "attachment-image-understanding",
+      "title": "真实华为 HDR/MPF 相机 JPG 原图识别",
+      "coverageId": "ATT-03",
+      "nightly": true,
+      "requirement": ""
+    },
+    {
+      "name": "skill_default_generation",
+      "key": "skill-default-generation",
+      "title": "默认生成技能：Word / Excel / PPT / PDF 各交付一个文件",
+      "coverageId": "SKL-01",
+      "nightly": true,
+      "requirement": ""
+    },
+    {
+      "name": "skill_default_parsing",
+      "key": "skill-default-parsing",
+      "title": "默认解析技能：文本 PDF 提取与 CSV 对账单合计",
+      "coverageId": "SKL-02",
+      "nightly": true,
+      "requirement": ""
+    }
+  ],
   "runs": [
     {
       "runId": 43129531068,
