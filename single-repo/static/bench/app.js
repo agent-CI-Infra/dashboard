@@ -320,6 +320,20 @@
       ]),
     ].join('')
 
+    const groups = g.groups || {}
+    const bar = (item) => {
+      const rate = Number(item.product) || 0
+      return `<div class="gaia-bar"><span class="label">${esc(item.key)} <i>${item.n} 条</i></span>` +
+        `<span class="track"><span class="fill" style="width:${Math.max(1.5, rate * 100).toFixed(1)}%"></span></span>` +
+        `<span class="value">${pct1(rate)}</span></div>`
+    }
+    const block = (title, items) => items && items.length
+      ? `<h4>${esc(title)}</h4>${items.map(bar).join('')}`
+      : ''
+    $('#gaia-chart').innerHTML = block('能力类型（product 完成率）', groups.type) +
+      block('步骤数（product 完成率）', groups.steps) +
+      block('是否带附件（product 完成率）', groups.file)
+
     $('#gaia-buckets').innerHTML = `<thead><tr><th>分桶</th><th class="num">条数</th><th class="num">占全部</th><th>product 分母</th><th>说明</th></tr></thead><tbody>${
       GAIA_BUCKETS.map(([key, label, cls, role]) => {
         const count = Number(buckets[key]) || 0
@@ -330,7 +344,7 @@
       }).join('')
     }</tbody>`
 
-    $('#gaia-note').textContent = `口径：官方 scorer 移植 + 适配 prompt（末行要求 Final answer:）+ 只认显式答案行；validation 自评，不是官方榜单分。引用须同时带镜像 digest、后端与单 trial。后端：${g.backend || '—'}`
+    $('#gaia-note').textContent = `分类口径：GAIA 只公开 Level、是否需附件和每题标注的步数/工具数，没有“推理 vs 搜索”标签；这里以“工具数 = 0”作纯推理的代理，其余算工具/检索，属代理分类。柱长用 product pass@1（PASS ÷ 可判分）。原口径：官方 scorer 移植 + 适配 prompt（末行要求 Final answer:）+ 只认显式答案行；validation 自评，不是官方榜单分。引用须同时带镜像 digest、后端与单 trial。后端：${g.backend || '—'}`
 
     const details = $('#gaia-details')
     let filled = false
@@ -341,9 +355,11 @@
         const bucket = String(t.bucket || '').split('(')[0].toUpperCase()
         const [label, cls] = GAIA_BUCKET_LABEL[bucket] || ['—', 'unknown']
         const ms = Number(t.durationMs) > 0 ? fmtMs(t.durationMs) : '—'
-        return `<tr><td class="mono">${esc(t.id)}</td><td class="num">${t.level ? `L${esc(t.level)}` : '—'}</td><td><span class="status ${cls}">${label}</span></td><td class="mono">${esc(t.reason || '—')}</td><td class="num">${ms}</td></tr>`
+        const steps = t.steps === null || t.steps === undefined ? '—' : esc(t.steps)
+        const kind = t.type ? esc(t.type) : '—'
+        return `<tr><td class="mono">${esc(t.id)}</td><td class="num">${t.level ? `L${esc(t.level)}` : '—'}</td><td>${kind}</td><td class="num">${steps}</td><td>${t.hasFile ? '是' : '否'}</td><td><span class="status ${cls}">${label}</span></td><td class="mono">${esc(t.reason || '—')}</td><td class="num">${ms}</td></tr>`
       }).join('')
-      $('#gaia-tasks').innerHTML = `<thead><tr><th>task</th><th class="num">难度</th><th>结果</th><th>原因</th><th class="num">时长</th></tr></thead><tbody>${rows}</tbody>`
+      $('#gaia-tasks').innerHTML = `<thead><tr><th>task</th><th class="num">难度</th><th>类型</th><th class="num">步数</th><th>附件</th><th>结果</th><th>原因</th><th class="num">时长</th></tr></thead><tbody>${rows}</tbody>`
     }
     details.addEventListener('toggle', () => {
       if (details.open) fillTasks()
