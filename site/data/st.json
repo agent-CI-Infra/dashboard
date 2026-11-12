@@ -1,8 +1,488 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-11T15:07:24.083Z",
+  "updatedAt": "2026-11-12T00:54:28.564Z",
   "runs": [
+    {
+      "runId": 43129531068,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43129531068",
+      "createdAt": "2026-11-12T00:44:48Z",
+      "headSha": "1542c255204f",
+      "conclusion": "success",
+      "st": {
+        "runId": "ST-1794444333370-a330f9",
+        "status": "passed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [],
+        "cases": [
+          {
+            "name": "real_model_text_reply",
+            "key": "text",
+            "title": "文本回复",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 7208,
+            "stage": "validate-text",
+            "detail": "Reply marker verified"
+          },
+          {
+            "name": "real_model_txt_download_and_content",
+            "key": "text-file",
+            "title": "文本生成 TXT 并下载",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 14422,
+            "stage": "validate-file",
+            "detail": "Downloaded TXT exact content verified: ST-1794444333370-a330f9.txt"
+          },
+          {
+            "name": "real_model_multi_turn",
+            "key": "multi",
+            "title": "三轮对话与上下文更新",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 35448,
+            "stage": "validate-context",
+            "detail": "Three turns retained the random code and updated quantity"
+          },
+          {
+            "name": "real_model_file_to_text",
+            "key": "file-text",
+            "title": "上传文件并提取文本",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 15193,
+            "stage": "validate-file-text",
+            "detail": "Uploaded source was referenced and hidden fixture values extracted"
+          },
+          {
+            "name": "real_model_file_to_file",
+            "key": "file-file",
+            "title": "上传 CSV 并生成转换文件",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 54520,
+            "stage": "validate-file",
+            "detail": "Real CSV uploaded, transformed, downloaded and both rows checked"
+          },
+          {
+            "name": "real_model_structured_choice",
+            "key": "choice",
+            "title": "结构化选项回答并继续任务",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 12818,
+            "stage": "validate-choice",
+            "detail": "Real pending question, selected B through product answer flow, same task resumed and verified"
+          },
+          {
+            "name": "session_isolation_parallel",
+            "key": "session-isolation-parallel",
+            "title": "双会话并发隔离",
+            "coverageId": "CON-01",
+            "status": "passed",
+            "elapsedMs": 17067,
+            "stage": "parallel-verify-history",
+            "detail": "Two real concurrent room submissions (shared transport); B completed first; each durable history and event-driven production projection contained only its own marker"
+          },
+          {
+            "name": "reset_detached_recovery",
+            "key": "reset-detached-recovery",
+            "title": "独立房间 reset/detached 与真实断链恢复",
+            "coverageId": "REC-03",
+            "status": "passed",
+            "elapsedMs": 42801,
+            "stage": "wait-task",
+            "detail": "Actual ST socket close auto-reconnected without resubmission; the original task/interaction resumed once. Normal room.reset on this run's isolated room cancelled/detached the second held task. Same-room text and production send state recovered after both branches."
+          },
+          {
+            "name": "attachment_metadata_conflict",
+            "key": "attachment-metadata-conflict",
+            "title": "附件元数据冲突与真实云端对照",
+            "coverageId": "ATT-01",
+            "status": "passed",
+            "elapsedMs": 24008,
+            "stage": "wait-task",
+            "detail": "Extension/magic rejection had zero socket calls; derived MIME, complete PNG and hidden TXT value verified against real cloud"
+          },
+          {
+            "name": "attachment_corrupt_recovery",
+            "key": "attachment-corrupt-recovery",
+            "title": "损坏图片与文本恢复",
+            "coverageId": "ATT-02",
+            "status": "passed",
+            "elapsedMs": 18361,
+            "stage": "wait-task",
+            "detail": "Zero-byte, wrong-signature and truncated PNG paths checked; same-room text completed afterwards"
+          },
+          {
+            "name": "attachment_image_understanding",
+            "key": "attachment-image-understanding",
+            "title": "真实华为 HDR/MPF 相机 JPG 原图识别",
+            "coverageId": "ATT-03",
+            "status": "passed",
+            "elapsedMs": 13567,
+            "stage": "wait-task",
+            "detail": "Real Huawei HDR/MPF JPEG uploaded through the production helper and recognized as HONOR"
+          },
+          {
+            "name": "skill_default_generation",
+            "key": "skill-default-generation",
+            "title": "默认生成技能：Word / Excel / PPT / PDF 各交付一个文件",
+            "coverageId": "SKL-01",
+            "status": "passed",
+            "elapsedMs": 90979,
+            "stage": "wait-task",
+            "detail": "Default generation skills verified: Word, Excel, PPT and PDF each delivered one artifact (4 turns)"
+          },
+          {
+            "name": "skill_default_parsing",
+            "key": "skill-default-parsing",
+            "title": "默认解析技能：文本 PDF 提取与 CSV 对账单合计",
+            "coverageId": "SKL-02",
+            "status": "passed",
+            "elapsedMs": 27977,
+            "stage": "wait-task",
+            "detail": "Default parsing skills verified: text PDF extraction and CSV statement total returned every expected marker (2 turns)"
+          }
+        ]
+      }
+    },
+    {
+      "runId": 43052000630,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43052000630",
+      "createdAt": "2026-11-11T15:48:21Z",
+      "headSha": "90afe808bfa5",
+      "conclusion": "failure",
+      "st": {
+        "runId": "ST-1794412155092-8e03b7",
+        "status": "failed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "content_refusal_context_recovery [failed]: [ASSERT_MISMATCH] The armed boundary refusal did not become a structured safety failure",
+          "skill_default_generation [failed]: Model task failed: 模型服务出错，这一轮停了。请在设置里检查模型连接，然后再试一次。"
+        ],
+        "cases": [
+          {
+            "name": "real_model_text_reply",
+            "key": "text",
+            "title": "文本回复",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 19294,
+            "stage": "validate-text",
+            "detail": "Reply marker verified"
+          },
+          {
+            "name": "real_model_txt_download_and_content",
+            "key": "text-file",
+            "title": "文本生成 TXT 并下载",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 31071,
+            "stage": "validate-file",
+            "detail": "Downloaded TXT exact content verified: ST-1794412155092-8e03b7.txt"
+          },
+          {
+            "name": "real_model_multi_turn",
+            "key": "multi",
+            "title": "三轮对话与上下文更新",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 48484,
+            "stage": "validate-context",
+            "detail": "Three turns retained the random code and updated quantity"
+          },
+          {
+            "name": "real_model_file_to_text",
+            "key": "file-text",
+            "title": "上传文件并提取文本",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 15694,
+            "stage": "validate-file-text",
+            "detail": "Uploaded source was referenced and hidden fixture values extracted"
+          },
+          {
+            "name": "real_model_file_to_file",
+            "key": "file-file",
+            "title": "上传 CSV 并生成转换文件",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 48500,
+            "stage": "validate-file",
+            "detail": "Real CSV uploaded, transformed, downloaded and both rows checked"
+          },
+          {
+            "name": "real_model_structured_choice",
+            "key": "choice",
+            "title": "结构化选项回答并继续任务",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 16330,
+            "stage": "validate-choice",
+            "detail": "Real pending question, selected B through product answer flow, same task resumed and verified"
+          },
+          {
+            "name": "session_isolation_parallel",
+            "key": "session-isolation-parallel",
+            "title": "双会话并发隔离",
+            "coverageId": "CON-01",
+            "status": "passed",
+            "elapsedMs": 27366,
+            "stage": "parallel-verify-history",
+            "detail": "Two real concurrent room submissions (shared transport); B completed first; each durable history and event-driven production projection contained only its own marker"
+          },
+          {
+            "name": "reset_detached_recovery",
+            "key": "reset-detached-recovery",
+            "title": "独立房间 reset/detached 与真实断链恢复",
+            "coverageId": "REC-03",
+            "status": "passed",
+            "elapsedMs": 51655,
+            "stage": "wait-task",
+            "detail": "Actual ST socket close auto-reconnected without resubmission; the original task/interaction resumed once. Normal room.reset on this run's isolated room cancelled/detached the second held task. Same-room text and production send state recovered after both branches."
+          },
+          {
+            "name": "content_refusal_context_recovery",
+            "key": "content-refusal-context-recovery",
+            "title": "内容拦截后同房间连续发送与历史保留",
+            "coverageId": "REC-04",
+            "status": "failed",
+            "elapsedMs": 8117,
+            "stage": "wait-task",
+            "detail": "[ASSERT_MISMATCH] The armed boundary refusal did not become a structured safety failure"
+          },
+          {
+            "name": "attachment_metadata_conflict",
+            "key": "attachment-metadata-conflict",
+            "title": "附件元数据冲突与真实云端对照",
+            "coverageId": "ATT-01",
+            "status": "passed",
+            "elapsedMs": 19683,
+            "stage": "wait-task",
+            "detail": "Extension/magic rejection had zero socket calls; derived MIME, complete PNG and hidden TXT value verified against real cloud"
+          },
+          {
+            "name": "attachment_corrupt_recovery",
+            "key": "attachment-corrupt-recovery",
+            "title": "损坏图片与文本恢复",
+            "coverageId": "ATT-02",
+            "status": "passed",
+            "elapsedMs": 18318,
+            "stage": "wait-task",
+            "detail": "Zero-byte, wrong-signature and truncated PNG paths checked; same-room text completed afterwards"
+          },
+          {
+            "name": "attachment_image_understanding",
+            "key": "attachment-image-understanding",
+            "title": "真实华为 HDR/MPF 相机 JPG 原图识别",
+            "coverageId": "ATT-03",
+            "status": "passed",
+            "elapsedMs": 17821,
+            "stage": "wait-task",
+            "detail": "Real Huawei HDR/MPF JPEG uploaded through the production helper and recognized as HONOR"
+          },
+          {
+            "name": "skill_default_generation",
+            "key": "skill-default-generation",
+            "title": "默认生成技能：Word / Excel / PPT / PDF 各交付一个文件",
+            "coverageId": "SKL-01",
+            "status": "failed",
+            "elapsedMs": 162966,
+            "stage": "wait-task",
+            "detail": "Model task failed: 模型服务出错，这一轮停了。请在设置里检查模型连接，然后再试一次。"
+          },
+          {
+            "name": "skill_default_parsing",
+            "key": "skill-default-parsing",
+            "title": "默认解析技能：文本 PDF 提取与 CSV 对账单合计",
+            "coverageId": "SKL-02",
+            "status": "passed",
+            "elapsedMs": 52119,
+            "stage": "wait-task",
+            "detail": "Default parsing skills verified: text PDF extraction and CSV statement total returned every expected marker (2 turns)"
+          }
+        ]
+      }
+    },
+    {
+      "runId": 43049441652,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43049441652",
+      "createdAt": "2026-11-11T15:32:53Z",
+      "headSha": "6654a480b15c",
+      "conclusion": "failure",
+      "st": {
+        "runId": "ST-1794411247833-e35961",
+        "status": "blocked",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "content_refusal_context_recovery [blocked]: [SETUP_FAIL] Scoped model-boundary-v1 refusal fixture is required; no client failure is fabricated",
+          "artifact_receipt_required [blocked]: [SETUP_FAIL] Actual live artifact receipt control is required"
+        ],
+        "cases": [
+          {
+            "name": "real_model_text_reply",
+            "key": "text",
+            "title": "文本回复",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 6881,
+            "stage": "validate-text",
+            "detail": "Reply marker verified"
+          },
+          {
+            "name": "real_model_txt_download_and_content",
+            "key": "text-file",
+            "title": "文本生成 TXT 并下载",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 31557,
+            "stage": "validate-file",
+            "detail": "Downloaded TXT exact content verified: ST-1794411247833-e35961.txt"
+          },
+          {
+            "name": "real_model_multi_turn",
+            "key": "multi",
+            "title": "三轮对话与上下文更新",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 64197,
+            "stage": "validate-context",
+            "detail": "Three turns retained the random code and updated quantity"
+          },
+          {
+            "name": "real_model_file_to_text",
+            "key": "file-text",
+            "title": "上传文件并提取文本",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 19586,
+            "stage": "validate-file-text",
+            "detail": "Uploaded source was referenced and hidden fixture values extracted"
+          },
+          {
+            "name": "real_model_file_to_file",
+            "key": "file-file",
+            "title": "上传 CSV 并生成转换文件",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 66675,
+            "stage": "validate-file",
+            "detail": "Real CSV uploaded, transformed, downloaded and both rows checked"
+          },
+          {
+            "name": "real_model_structured_choice",
+            "key": "choice",
+            "title": "结构化选项回答并继续任务",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 13468,
+            "stage": "validate-choice",
+            "detail": "Real pending question, selected B through product answer flow, same task resumed and verified"
+          },
+          {
+            "name": "session_isolation_parallel",
+            "key": "session-isolation-parallel",
+            "title": "双会话并发隔离",
+            "coverageId": "CON-01",
+            "status": "passed",
+            "elapsedMs": 17772,
+            "stage": "parallel-verify-history",
+            "detail": "Two real concurrent room submissions (shared transport); B completed first; each durable history and event-driven production projection contained only its own marker"
+          },
+          {
+            "name": "reset_detached_recovery",
+            "key": "reset-detached-recovery",
+            "title": "独立房间 reset/detached 与真实断链恢复",
+            "coverageId": "REC-03",
+            "status": "passed",
+            "elapsedMs": 48938,
+            "stage": "wait-task",
+            "detail": "Actual ST socket close auto-reconnected without resubmission; the original task/interaction resumed once. Normal room.reset on this run's isolated room cancelled/detached the second held task. Same-room text and production send state recovered after both branches."
+          },
+          {
+            "name": "content_refusal_context_recovery",
+            "key": "content-refusal-context-recovery",
+            "title": "内容拦截后同房间连续发送与历史保留",
+            "coverageId": "REC-04",
+            "status": "blocked",
+            "elapsedMs": 855,
+            "stage": "create-isolated-room",
+            "detail": "[SETUP_FAIL] Scoped model-boundary-v1 refusal fixture is required; no client failure is fabricated"
+          },
+          {
+            "name": "artifact_receipt_required",
+            "key": "artifact-receipt-required",
+            "title": "真实产物的缺失回执、无效 ID、不可读内容与恢复",
+            "coverageId": "ART-01",
+            "status": "blocked",
+            "elapsedMs": 1180,
+            "stage": "create-isolated-room",
+            "detail": "[SETUP_FAIL] Actual live artifact receipt control is required"
+          },
+          {
+            "name": "attachment_metadata_conflict",
+            "key": "attachment-metadata-conflict",
+            "title": "附件元数据冲突与真实云端对照",
+            "coverageId": "ATT-01",
+            "status": "passed",
+            "elapsedMs": 19607,
+            "stage": "wait-task",
+            "detail": "Extension/magic rejection had zero socket calls; derived MIME, complete PNG and hidden TXT value verified against real cloud"
+          },
+          {
+            "name": "attachment_corrupt_recovery",
+            "key": "attachment-corrupt-recovery",
+            "title": "损坏图片与文本恢复",
+            "coverageId": "ATT-02",
+            "status": "passed",
+            "elapsedMs": 32671,
+            "stage": "wait-task",
+            "detail": "Zero-byte, wrong-signature and truncated PNG paths checked; same-room text completed afterwards"
+          },
+          {
+            "name": "attachment_image_understanding",
+            "key": "attachment-image-understanding",
+            "title": "真实华为 HDR/MPF 相机 JPG 原图识别",
+            "coverageId": "ATT-03",
+            "status": "passed",
+            "elapsedMs": 15111,
+            "stage": "wait-task",
+            "detail": "Real Huawei HDR/MPF JPEG uploaded through the production helper and recognized as HONOR"
+          },
+          {
+            "name": "skill_default_generation",
+            "key": "skill-default-generation",
+            "title": "默认生成技能：Word / Excel / PPT / PDF 各交付一个文件",
+            "coverageId": "SKL-01",
+            "status": "passed",
+            "elapsedMs": 161868,
+            "stage": "wait-task",
+            "detail": "Default generation skills verified: Word, Excel, PPT and PDF each delivered one artifact (4 turns)"
+          },
+          {
+            "name": "skill_default_parsing",
+            "key": "skill-default-parsing",
+            "title": "默认解析技能：文本 PDF 提取与 CSV 对账单合计",
+            "coverageId": "SKL-02",
+            "status": "passed",
+            "elapsedMs": 38993,
+            "stage": "wait-task",
+            "detail": "Default parsing skills verified: text PDF extraction and CSV statement total returned every expected marker (2 turns)"
+          }
+        ]
+      }
+    },
     {
       "runId": 43042930182,
       "attempt": 1,
