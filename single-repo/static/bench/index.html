@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>DigitalMate Bench</title>
-    <link rel="stylesheet" href="style.css?v=20261106.2" />
+    <link rel="stylesheet" href="style.css?v=20261112.1" />
   </head>
   <body>
     <main class="page">
@@ -17,6 +17,20 @@
           <p id="source-line" class="muted"></p>
         </div>
         <div id="latest" class="cards" aria-live="polite"></div>
+      </section>
+
+      <section class="block" id="gaia-block" aria-labelledby="gaia-title" hidden>
+        <div class="block-head">
+          <h2 id="gaia-title">GAIA 全量（165）</h2>
+          <p id="gaia-meta" class="muted small"></p>
+        </div>
+        <div id="gaia-kpis" class="cards"></div>
+        <div class="scroll" style="margin-top: 12px"><table id="gaia-buckets" class="grid"></table></div>
+        <p id="gaia-note" class="muted small" style="margin-top: 8px"></p>
+        <details id="gaia-details" style="margin-top: 10px">
+          <summary class="muted small" style="cursor: pointer">展开逐条结果</summary>
+          <div class="scroll" style="margin-top: 8px"><table id="gaia-tasks" class="grid"></table></div>
+        </details>
       </section>
 
       <section class="block" aria-labelledby="trend-title">
@@ -43,6 +57,6 @@
         <div class="scroll"><table id="history" class="grid"></table></div>
       </section>
     </main>
-    <script src="app.js?v=20261106.2"></script>
+    <script src="app.js?v=20261112.1"></script>
   </body>
 </html>

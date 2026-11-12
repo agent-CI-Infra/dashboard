@@ -259,6 +259,98 @@
   // ------------------------------------------------------------ trend chart
   // One line per benchmark, shared y-axis. Keep the labels stable even when a
   // run only contains one profile (older nightly runs are Pi-Bench only).
+  // GAIA full-run summary, written by the board's bench collector at
+  // <board>/data/bench/gaia-165/gaia-165.json. Optional: a board without that
+  // file simply does not show the section.
+  const GAIA_URLS = ['../data/bench/gaia-165/gaia-165.json', 'data/bench/gaia-165/gaia-165.json']
+  const GAIA_BUCKETS = [
+    ['PASS', '通过', 'pass', '进分子'],
+    ['FAIL', '未通过', 'fail', '进分母，算不通过'],
+    ['NOT_RUN', '未运行', 'blocked', '不进分母，单列'],
+    ['ERROR', '基建错误', 'error', '不进分母，单列'],
+  ]
+  const pct1 = (v) => (v === null || v === undefined || !Number.isFinite(Number(v)) ? '—' : `${(Number(v) * 100).toFixed(1)}%`)
+  const GAIA_BUCKET_LABEL = { PASS: ['通过', 'pass'], FAIL: ['未通过', 'fail'], NOT_RUN: ['未运行', 'blocked'], ERROR: ['基建错误', 'error'] }
+
+  async function loadGaia() {
+    for (const url of GAIA_URLS) {
+      try {
+        const res = await fetch(url, { cache: 'no-store' })
+        if (res.ok) return res.json()
+      } catch {
+        // Optional file: leave the section hidden.
+      }
+    }
+    return null
+  }
+
+  function renderGaia(g) {
+    if (!g || !Array.isArray(g.tasks) || !g.tasks.length) return
+    const raw = g.raw || {}
+    const prod = g.product || {}
+    const buckets = g.buckets || {}
+    const n = Number(raw.n) || g.tasks.length
+    const notRun = Number(buckets.NOT_RUN) || 0
+    const errors = Number(buckets.ERROR) || 0
+    const judged = Number(prod.den) || n - notRun - errors
+    const lat = g.latency_ms || {}
+    const listOf = (obj) => Object.entries(obj || {}).map(([k, v]) => `${k} ${v}`).join(' · ')
+
+    $('#gaia-meta').textContent = [g.window, '单 trial', g.backend ? '集群内专用后端' : ''].filter(Boolean).join(' · ')
+    $('#gaia-kpis').innerHTML = [
+      card('raw pass@1', `<span class="mono">${raw.pass ?? '—'}/${n}</span>`, [
+        ['含义', 'PASS ÷ 全部任务；没跑成、基建错误的也算不通过'],
+        ['值', `<b>${pct1(raw.rate)}</b>`],
+      ]),
+      card('product pass@1', `<span class="mono">${prod.pass ?? '—'}/${judged}</span>`, [
+        ['含义', 'PASS ÷ 可判分任务（剔除 NOT_RUN 与 ERROR）'],
+        ['值', `<b>${pct1(prod.rate)}</b>`],
+      ]),
+      card('可判分率', `<span class="mono">${judged}/${n}</span>`, [
+        ['含义', '可判分 ÷ 全部；低于 80% 时 product 只能算有限覆盖'],
+        ['值', `<b>${pct1(judged / n)}</b>`],
+      ]),
+      card('不可判率', `<span class="mono">${notRun + errors}/${n}</span>`, [
+        ['含义', '(NOT_RUN + ERROR) ÷ 全部；本项目红线 20%'],
+        ['值', `<b>${pct1((notRun + errors) / n)}</b>`],
+      ]),
+      card('p50 / p95', `<span class="mono">${lat.n ? `n=${lat.n}` : '全部任务'}</span>`, [
+        ['含义', '单任务墙钟时长；不含上传即被拒的任务'],
+        ['值', `<b>${fmtMs(lat.p50)} / ${fmtMs(lat.p95)}</b>`],
+      ]),
+    ].join('')
+
+    $('#gaia-buckets').innerHTML = `<thead><tr><th>分桶</th><th class="num">条数</th><th class="num">占全部</th><th>product 分母</th><th>说明</th></tr></thead><tbody>${
+      GAIA_BUCKETS.map(([key, label, cls, role]) => {
+        const count = Number(buckets[key]) || 0
+        const why = key === 'NOT_RUN' ? listOf(g.not_run) || '—'
+          : key === 'FAIL' ? listOf(g.fail) || '—'
+            : key === 'PASS' ? '答对' : '连接断开 / 模型服务异常'
+        return `<tr><td><span class="status ${cls}">${esc(label)}</span></td><td class="num">${count}</td><td class="num">${pct1(count / n)}</td><td>${esc(role)}</td><td class="mono">${esc(why)}</td></tr>`
+      }).join('')
+    }</tbody>`
+
+    $('#gaia-note').textContent = `口径：官方 scorer 移植 + 适配 prompt（末行要求 Final answer:）+ 只认显式答案行；validation 自评，不是官方榜单分。引用须同时带镜像 digest、后端与单 trial。后端：${g.backend || '—'}`
+
+    const details = $('#gaia-details')
+    let filled = false
+    const fillTasks = () => {
+      if (filled) return
+      filled = true
+      const rows = g.tasks.map((t) => {
+        const bucket = String(t.bucket || '').split('(')[0].toUpperCase()
+        const [label, cls] = GAIA_BUCKET_LABEL[bucket] || ['—', 'unknown']
+        const ms = Number(t.durationMs) > 0 ? fmtMs(t.durationMs) : '—'
+        return `<tr><td class="mono">${esc(t.id)}</td><td class="num">${t.level ? `L${esc(t.level)}` : '—'}</td><td><span class="status ${cls}">${label}</span></td><td class="mono">${esc(t.reason || '—')}</td><td class="num">${ms}</td></tr>`
+      }).join('')
+      $('#gaia-tasks').innerHTML = `<thead><tr><th>task</th><th class="num">难度</th><th>结果</th><th>原因</th><th class="num">时长</th></tr></thead><tbody>${rows}</tbody>`
+    }
+    details.addEventListener('toggle', () => {
+      if (details.open) fillTasks()
+    })
+    $('#gaia-block').hidden = false
+  }
+
   const SERIES = [
     { key: 'gaia', label: 'GAIA', match: /GAIA/i, color: '#4e79a7' },
     { key: 'past', label: 'PAST-Bench', match: /PAST/i, color: '#f28e2b' },
@@ -398,6 +490,7 @@
         : `最近 ${runs.length} 次运行`
       renderLatest(runs)
       renderTables(runs)
+      renderGaia(await loadGaia())
       lastRuns = runs
       renderChart(runs)
     } catch (err) {
