@@ -102,6 +102,7 @@ test('cloud trace source identifies Kubernetes when present', () => {
   const c=vm.createContext({});
   vm.runInContext(extract('function cloudCollectionLabel(', 'function renderRequestTraces(')+';globalThis.label=cloudCollectionLabel;', c);
   assert.equal(c.label({collection_source:'kubernetes_shared_workspace'}), 'Kubernetes 生产工作区');
+  assert.equal(c.label({collection_source:'production_sfs_ssh'}), 'SFS 生产工作区');
   assert.equal(c.label({}), '现网');
 });
 
