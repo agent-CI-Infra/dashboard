@@ -149,7 +149,9 @@ def read_native_connection(connection, correlation):
         if not any(row['kind'] in ('phase', 'agent', 'model', 'tool') for row in spans):
             return None
         return {'root_span_id': root_id, 'duration_ms': round((end-start)/1_000_000, 3), 'spans': spans}
-    except (OSError, ValueError, TypeError, KeyError, sqlite3.Error, UnicodeError):
+    except sqlite3.Error as error:
+        raise OSError('native trajectory database unavailable') from error
+    except (OSError, ValueError, TypeError, KeyError, UnicodeError):
         return None
 
 
@@ -170,10 +172,12 @@ def read_native_trajectory(query, correlation):
             return read_native_connection(connection, correlation)
         finally:
             connection.close()
-    except sqlite3.Error as error:
+    except FileNotFoundError:
+        return None
+    except (sqlite3.Error, OSError) as error:
         # Do not expose paths or SQLite details in the public snapshot.
         raise OSError('native trajectory database unavailable') from error
-    except (OSError, ValueError, TypeError, KeyError, UnicodeError):
+    except (ValueError, TypeError, KeyError, UnicodeError):
         return None
 
 

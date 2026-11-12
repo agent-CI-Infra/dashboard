@@ -71,6 +71,15 @@ class KubeTraceTests(unittest.TestCase):
             traces.attach_native_trajectories({}, [absent])
         self.assertEqual(absent['native_trace_state'], 'unavailable')
 
+    def test_sqlite_query_error_is_signalled_without_private_details(self):
+        from unittest.mock import Mock
+        correlation = {'session_id': 'test', 'request_id': 'digitalmate-a', 'trace_id': 'a'*32, 'span_id': '1'*16}
+        connection = Mock()
+        connection.execute.side_effect = sqlite3.OperationalError('PRIVATE')
+        with self.assertRaises(OSError) as caught:
+            remote.read_native_connection(connection, correlation)
+        self.assertNotIn('PRIVATE', str(caught.exception))
+
     def test_sqlite_open_error_is_signalled_without_private_path(self):
         session = 'PRIVATE'
         with tempfile.TemporaryDirectory() as folder:
