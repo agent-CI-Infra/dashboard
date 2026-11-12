@@ -1446,16 +1446,29 @@
     ]);
 
     const mruns = runs.slice(0, 12);
-    const order = []; const seen = new Set();
-    for (const r of mruns) for (const c of r.st.cases || []) if (!seen.has(c.name)) { seen.add(c.name); order.push(c); }
+    // The collector publishes the full registered scenario set (catalog): direct
+    // scenes run every nightly, the live-wire and boundary-injection scenes are
+    // explicit-only and stay grey here so coverage gaps are visible.
+    const catalog = Array.isArray(d.catalog) && d.catalog.length ? d.catalog : null;
+    const order = catalog ? catalog.slice() : (() => {
+      const list = []; const seen = new Set();
+      for (const r of mruns) for (const c of r.st.cases || []) if (!seen.has(c.name)) { seen.add(c.name); list.push(c); }
+      return list;
+    })();
     const cell = (r, name) => {
       const hit = (r.st.cases || []).find((x) => x.name === name);
       if (!hit) return '<span class="muted" title="本轮未运行">·</span>';
       return hit.status === 'passed' ? badge('✓', 'good') : hit.status === 'failed' ? badge('✕', 'bad') : badge('!', 'warn');
     };
-    const matrixCols = [{ key: 'title', label: '用例' }, ...mruns.map((r) => ({ key: 'r', label: `#${String(r.runId).slice(-6)}`, sortable: false, render: (row) => row.cells[mruns.indexOf(r)] }))];
-    const matrixRows = order.map((c) => ({ title: `${c.title || c.name}${c.coverageId ? ` (${c.coverageId})` : ''}`, cells: mruns.map((r) => cell(r, c.name)) }));
-    html += sectionHead('用例 × 运行矩阵', `最近 ${mruns.length} 轮 · ✓ 通过 ✕ 失败 ! 阻塞 · 未运行`);
+    const requirement = (c) => (c.requirement === 'live-wire' ? badge('live-wire', '') : c.requirement === 'model-boundary' ? badge('boundary', '') : '');
+    const matrixCols = [{ key: 'title', label: '用例', render: (row) => row.html }, ...mruns.map((r) => ({ key: 'r', label: `#${String(r.runId).slice(-6)}`, sortable: false, render: (row) => row.cells[mruns.indexOf(r)] }))];
+    const matrixRows = order.map((c) => ({
+      html: `${esc(c.title || c.name)}${c.coverageId ? ` <span class="muted">${esc(c.coverageId)}</span>` : ''}${c.nightly === false ? ' ' + requirement(c) : ''}`,
+      cells: mruns.map((r) => cell(r, c.name)),
+    }));
+    const nightlyCount = catalog ? catalog.filter((c) => c.nightly !== false).length : order.length;
+    const explicitCount = catalog ? catalog.length - nightlyCount : 0;
+    html += sectionHead('用例 × 运行矩阵', catalog ? `共 ${catalog.length} 个场景 · ${nightlyCount} 个 nightly 直连 · ${explicitCount} 个显式（live-wire / boundary）` : `最近 ${mruns.length} 轮`);
     html += `<div class="card">${table('t-st-matrix', matrixCols, matrixRows)}</div>`;
 
     html += sectionHead('最新运行用例明细', `${esc(latest.st.runner || '—')} · ${esc(latest.st.machine || '—')}${latest.st.runId ? ` · ST runId <code>${esc(latest.st.runId)}</code>` : ''}`);
