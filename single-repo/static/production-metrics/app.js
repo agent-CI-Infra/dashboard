@@ -3630,6 +3630,7 @@ function availableTraceCandidates(doc, localTrace) {
 }
 
 function cloudCollectionLabel(collection) {
+  if (collection?.collection_source === 'production_sfs_ssh') return 'SFS 生产工作区';
   return collection?.collection_source === 'kubernetes_shared_workspace' ? 'Kubernetes 生产工作区' : '现网';
 }
 

@@ -1,11 +1,15 @@
 name: Collect DigitalMate cloud request metrics
 on:
   workflow_dispatch:
+    inputs:
+      validate_only:
+        description: Collect and validate without publishing
+        required: false
+        default: false
+        type: boolean
   schedule:
-    # Same freshness budget as the model-side collector: GitHub delays or drops
-    # scheduled runs, so a three-hour cadence means a missed tick is replaced by
-    # the next one instead of leaving the board a day behind.
-    - cron: '45 */3 * * *'
+    # Hourly target; GitHub may delay or skip scheduled runs.
+    - cron: '10 * * * *'
 permissions:
   contents: write
   actions: write
@@ -19,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.ref }}
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
@@ -27,20 +31,33 @@ jobs:
       - name: Collect cloud-side aggregates
         env:
           ADX_TOKEN: ${{ secrets.ADX_TOKEN }}
+          SFS_SSH_PRIVATE_KEY: ${{ secrets.SFS_SSH_PRIVATE_KEY }}
         run: |
           set -euo pipefail
           if [ -z "$ADX_TOKEN" ]; then
             echo '::error::ADX_TOKEN is not configured.'
             exit 1
           fi
+          if [ -z "$SFS_SSH_PRIVATE_KEY" ]; then
+            echo '::error::SFS_SSH_PRIVATE_KEY is not configured.'
+            exit 1
+          fi
+          key_file="$RUNNER_TEMP/production-sfs-key"
+          trap 'rm -f "$key_file"' EXIT
+          umask 077
+          printf '%s\n' "$SFS_SSH_PRIVATE_KEY" > "$key_file"
+          unset SFS_SSH_PRIVATE_KEY
+          export SFS_SSH_KEY_FILE="$key_file"
+          export SFS_KNOWN_HOSTS_FILE="$GITHUB_WORKSPACE/config/production-sfs-known-hosts"
           mkdir -p /tmp/cloud-metrics
           git fetch origin digitalmate:refs/remotes/origin/digitalmate
           git show origin/digitalmate:site/data/env-request-latency-daily.json \
             > /tmp/cloud-metrics/previous.json
-          python3 scripts/collect-cloud-request-metrics.py \
+          python3 scripts/collect-production-sfs-traces.py \
             /tmp/cloud-metrics/env-request-latency-daily.json \
             /tmp/cloud-metrics/previous.json
       - name: Publish aggregate to the DigitalMate data branch
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.validate_only }}
         id: update
         run: |
           set -euo pipefail
