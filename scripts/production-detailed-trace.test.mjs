@@ -39,6 +39,16 @@ test('retained native profile discloses its original collection time',()=>{
  const item={scope:'cloud',gateway:1000,native_trace_retained_from:'2026-11-11T10:00:00Z',native_trajectory:{duration_ms:900,root_span_id:'a',spans:[]}};
  c.state.traceDisplay='native';assert.match(c.html(item),/原生轨迹沿用 2026-11-11T10:00:00Z/);
 });
+test('archive profile identifies its source and unconfirmed consistency on the native clock',()=>{
+ const item={scope:'cloud',gateway:1500,native_trace_source:'sfs_archive',native_trace_consistency:'unconfirmed',
+  native_trace_observed_at:'2026-11-12T12:00:00Z',native_trace_retained_span_count:2,
+  native_trajectory:{duration_ms:1000,root_span_id:'a',spans:[]}};
+ c.state.traceDisplay='native';const html=c.html(item);
+ assert.match(html,/原生跨度来自全量归档/);assert.match(html,/2026-11-12T12:00:00Z/);
+ assert.match(html,/只读副本一致性未经写入端确认/);assert.match(html,/2 个历史保留跨度/);
+ assert.match(html,/1000ms/);assert.doesNotMatch(html,/1500ms/);
+ c.state.traceDisplay='events';assert.match(c.html(item),/1500ms/);c.state.traceDisplay='native';
+});
 test('records full history as intervals and point events without inferring model duration',()=>{
  const rows=c.rows(incident); assert.equal(rows.length,5); assert.equal(rows.filter(r=>r.kind==='error')[0].duration,500);
  const point=rows.find(r=>r.kind==='model-point');assert.equal(point.start,99);assert.equal(point.duration,0);assert.match(point.detail,/无法推算模型耗时/);

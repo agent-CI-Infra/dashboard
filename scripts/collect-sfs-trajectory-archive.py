@@ -4,8 +4,10 @@ import collections
 import datetime as dt
 import importlib.util
 import json
+import math
 import os
 from pathlib import Path
+import re
 import shutil
 
 HERE = Path(__file__).resolve().parent
@@ -134,12 +136,128 @@ def merge_batch(state, previous_index, batch, output, scope, now):
     return state, index
 
 
+def archive_native_profile(output, entry):
+    """Translate a complete archived tree onto the existing native root clock."""
+    key = entry['key']
+    if not re.fullmatch('[0-9a-f]{64}', key) or entry['lifecycle'] != 'final':
+        raise ValueError('invalid archive identity')
+    rows = []
+    for page_number, relative in enumerate(entry['pages']):
+        if relative != f'traces/{key}/{page_number}.json':
+            raise ValueError('invalid archive path')
+        path = (output / relative).resolve(strict=True)
+        if not path.is_relative_to(output.resolve(strict=True)):
+            raise ValueError('archive path escapes root')
+        page = load_json(path, {})
+        if (page.get('schema') != SCHEMA or page.get('key') != key
+                or page.get('offset') != len(rows) or page.get('total') != entry['span_count']):
+            raise ValueError('incomplete archive page')
+        rows.extend(page['spans'])
+    if not rows or len(rows) != entry['span_count']:
+        raise ValueError('incomplete archive')
+    total = entry['duration_ms']
+    roots = [row for row in rows if not row.get('parent_span_id')]
+    if (len(roots) != 1 or roots[0]['start_ms'] != 0
+            or abs(roots[0]['duration_ms'] - total) > .002):
+        raise ValueError('ambiguous archive root')
+    root_id = roots[0]['span_id']
+    by_id = {row['span_id']: row for row in rows}
+    if len(by_id) != len(rows):
+        raise ValueError('duplicate archive spans')
+    spans = []
+    for row in rows:
+        if (not re.fullmatch('[0-9a-f]{16}', row['span_id']) or row['lifecycle'] != 'final'
+                or row['kind'] not in ('phase', 'agent', 'model', 'tool', 'event')
+                or not isinstance(row['label'], str)
+                or any(type(row[f]) not in (int, float) or not math.isfinite(row[f]) or row[f] < 0
+                       for f in ('start_ms', 'duration_ms'))
+                or row['start_ms'] + row['duration_ms'] > total + .002):
+            raise ValueError('invalid archive span')
+        if row['span_id'] == root_id:
+            continue
+        ancestor, seen = row['parent_span_id'], {row['span_id']}
+        while ancestor != root_id:
+            if ancestor not in by_id or ancestor in seen:
+                raise ValueError('incomplete archive ancestry')
+            seen.add(ancestor)
+            ancestor = by_id[ancestor]['parent_span_id']
+        spans.append({field: row[field] for field in ('span_id', 'parent_span_id', 'kind', 'label',
+                                                     'start_ms', 'duration_ms', 'error')})
+    return {'root_span_id': root_id, 'duration_ms': total, 'spans': spans}
+
+
+def attach_archived_profiles(metrics, index, output):
+    """Fill slow-request profiles by unique request ID AND contained time window.
+
+    Gateway duration/tool events remain untouched. Ambiguous links, missing
+    pages and unfinished trees must never replace the existing event fallback.
+    """
+    collection = metrics.get('cloud_trace_collection') or {}
+    if collection.get('schema') != 'digitalmate/cloud-traces@1' or index.get('schema') != SCHEMA:
+        raise ValueError('invalid collection schema')
+    rows = [row for day in collection.get('days', [])
+            for row in ((day.get('anomaly') or {}).get('latency') or {}).get('slow_requests', [])]
+    counts = collections.Counter(row.get('request_id') for row in rows)
+    by_request = collections.defaultdict(list)
+    for entry in index['traces']:
+        for rid in set(entry.get('request_ids', [])) | {entry.get('request_id')}:
+            if rid:
+                by_request[rid].append(entry)
+    linked, errors = 0, 0
+    for row in rows:
+        rid = row.get('request_id')
+        # Revalidate previously linked profiles against the current archive.
+        # A newly discovered duplicate must not leave a stale unique link.
+        if row.get('native_trace_source') == 'sfs_archive':
+            for field in ('native_trajectory', 'native_trace_source', 'native_trace_consistency',
+                          'native_trace_observed_at', 'native_trace_retained_span_count',
+                          'native_trace_retained_from'):
+                row.pop(field, None)
+            row.setdefault('native_trace_state', 'unavailable')
+        if (counts[rid] != 1 or row.get('native_trace_state') == 'ambiguous'
+                or (row.get('native_trajectory') and row.get('native_trace_source') != 'sfs_archive')):
+            continue
+        candidates = by_request[rid]
+        if len(candidates) > 1:
+            row['native_trace_state'] = 'ambiguous'
+        if len(candidates) != 1 or candidates[0].get('request_id') != rid:
+            continue
+        entry = candidates[0]
+        if entry.get('lifecycle') != 'final':
+            continue
+        try:
+            start = dt.datetime.fromisoformat(row['start_time'])
+            native_start = dt.datetime.fromisoformat(entry['start_time'])
+            offset = (native_start - start).total_seconds() * 1000
+            total, gateway = entry['duration_ms'], row['gateway']
+            if (not start.tzinfo or not native_start.tzinfo or not math.isfinite(offset)
+                    or type(total) not in (int, float) or not math.isfinite(total) or total <= 0
+                    or type(gateway) not in (int, float) or not math.isfinite(gateway)
+                    or offset < -.002 or offset + total > gateway + .002):
+                continue
+            native = archive_native_profile(output, entry)
+        except (OSError, ValueError, TypeError, KeyError):
+            errors += 1
+            continue
+        row.update(native_trajectory=native, native_trace_source='sfs_archive',
+                   native_trace_consistency='unconfirmed', native_trace_observed_at=entry['observed_at'],
+                   native_trace_retained_span_count=entry.get('retained_spans', 0))
+        row.pop('native_trace_state', None)
+        row.pop('native_trace_retained_from', None)
+        linked += 1
+    collection['archived_native_trace_count'] = linked
+    collection['archive_link_errors'] = errors
+    collection['native_trace_count'] = sum(isinstance(row.get('native_trajectory'), dict) for row in rows)
+    return metrics
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--state', type=Path, required=True)
     parser.add_argument('--previous', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--next-state', type=Path, required=True)
+    parser.add_argument('--metrics', type=Path, help='Attach archived native profiles to the slow-request snapshot')
     args = parser.parse_args()
     state = load_json(args.state, {'schema': SCHEMA, 'databases': {}})
     previous = load_json(args.previous / 'index.json', {'schema': SCHEMA, 'traces': []})
@@ -157,6 +275,11 @@ def main():
     state, index = merge_batch(state, previous, batch, args.output,
                                {'bindings': count, 'authorized_workspaces': len(names), 'errors': dict(errors)}, now)
     write_json(args.next_state, state)
+    if args.metrics:
+        metrics = attach_archived_profiles(load_json(args.metrics, {}), index, args.output)
+        write_json(args.metrics, metrics)
+        print(json.dumps({'archived_profiles_linked': metrics['cloud_trace_collection']['archived_native_trace_count'],
+                          'archive_link_errors': metrics['cloud_trace_collection']['archive_link_errors']}))
     print(json.dumps(index['coverage'], ensure_ascii=False))
 
 

@@ -41,6 +41,15 @@ five minutes; this is an hourly collection target, not a real-time feed. GitHub
 scheduled execution can be delayed. The existing slow-request view remains a
 sample and does not become a full archive merely because the archive exists.
 
+The same collection run links finalized archive trees into the slow-request
+snapshot using a unique request ID and a native time window contained within
+the gateway request. Every detail page and parent chain must be present; ID
+conflicts, unfinished trees and invalid pages keep the event fallback. Existing
+directly collected native profiles are preserved. Archive links disclose their
+observation time and unconfirmed consistency, including after console refreshes.
+Native timings remain relative to the native root; gateway timings and tool
+events retain their separate clock. Metrics and archive publish together.
+
 Validation: `python -m unittest discover -s scripts -p 'test_sfs_trajectory_archive.py'`
 and `node --test scripts/trajectory-archive.test.mjs`.
 

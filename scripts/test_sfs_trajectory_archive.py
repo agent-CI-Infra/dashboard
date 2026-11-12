@@ -1,3 +1,5 @@
+import copy
+import datetime as dt
 import hashlib
 import importlib.util
 import json
@@ -59,6 +61,102 @@ class ArchiveTests(unittest.TestCase):
     def merge(self, batch):
         self.state, self.index = archive.merge_batch(self.state, self.index, batch, self.output,
             {'bindings':1,'authorized_workspaces':1,'errors':{}}, '2026-11-12T12:00:00+00:00')
+
+    def matching_metrics(self):
+        entry = self.index['traces'][0]
+        start = dt.datetime.fromisoformat(entry['start_time']) - dt.timedelta(milliseconds=250)
+        row = {'request_id':entry['request_id'], 'start_time':start.isoformat(),
+               'gateway':entry['duration_ms'] + 500, 'native_trace_state':'read_error',
+               'tool_events':[{'name':'tool', 'start_ms':300, 'duration_ms':10}]}
+        return {'cloud_trace_collection':{'schema':'digitalmate/cloud-traces@1',
+                'days':[{'anomaly':{'latency':{'slow_requests':[row]}}}]}}, row
+
+    def test_archive_links_all_detail_pages_without_changing_gateway_clock(self):
+        self.make_db(spans=701)
+        self.merge(self.collect())
+        metrics, row = self.matching_metrics()
+        before = copy.deepcopy(row)
+        archive.attach_archived_profiles(metrics, self.index, self.output)
+        self.assertEqual(len(row['native_trajectory']['spans']), 700)
+        self.assertEqual(row['native_trajectory']['duration_ms'], 1000)
+        self.assertEqual(row['native_trajectory']['root_span_id'], f'{1:016x}')
+        for field in ('gateway', 'start_time', 'tool_events'):
+            self.assertEqual(row[field], before[field])
+        self.assertEqual(row['native_trace_consistency'], 'unconfirmed')
+        self.assertEqual(row['native_trace_source'], 'sfs_archive')
+        self.assertEqual(row['native_trace_observed_at'], self.index['traces'][0]['observed_at'])
+        self.assertNotIn('native_trace_state', row)
+        self.assertEqual(metrics['cloud_trace_collection']['archived_native_trace_count'], 1)
+        self.assertEqual(metrics['cloud_trace_collection']['archive_link_errors'], 0)
+
+    def test_archive_leaves_existing_direct_native_profile_untouched(self):
+        self.make_db(); self.merge(self.collect())
+        metrics, row = self.matching_metrics()
+        row.pop('native_trace_state')
+        row['native_trajectory'] = {'root_span_id':'direct-root', 'duration_ms':900, 'spans':[]}
+        before = copy.deepcopy(row)
+        archive.attach_archived_profiles(metrics, self.index, self.output)
+        self.assertEqual(row, before)
+        self.assertEqual(metrics['cloud_trace_collection']['native_trace_count'], 1)
+        self.assertEqual(metrics['cloud_trace_collection']['archived_native_trace_count'], 0)
+
+    def test_archive_rejects_conflicting_ids_unfinished_trees_and_wrong_time_windows(self):
+        self.make_db(); self.merge(self.collect())
+        for case in ('request', 'duplicate_request', 'duplicate_trace', 'subspan_conflict',
+                     'root_request', 'pending', 'ambiguous', 'later_start', 'earlier_end'):
+            with self.subTest(case=case):
+                metrics, row = self.matching_metrics()
+                index = copy.deepcopy(self.index)
+                entry = index['traces'][0]
+                if case == 'request': row['request_id'] = 'different'
+                if case == 'duplicate_request':
+                    metrics['cloud_trace_collection']['days'][0]['anomaly']['latency']['slow_requests'].append(dict(row))
+                if case in ('duplicate_trace', 'subspan_conflict'):
+                    duplicate = dict(entry, key='f'*64)
+                    if case == 'subspan_conflict': duplicate['request_id'] = 'other-root'
+                    index['traces'].append(duplicate)
+                if case == 'root_request': entry['request_id'] = 'other-root'
+                if case == 'pending': entry['lifecycle'] = 'pending_descendants'
+                if case == 'ambiguous': row['native_trace_state'] = 'ambiguous'
+                if case == 'later_start':
+                    row['start_time'] = (dt.datetime.fromisoformat(entry['start_time']) + dt.timedelta(seconds=1)).isoformat()
+                if case == 'earlier_end': row['gateway'] = 500
+                archive.attach_archived_profiles(metrics, index, self.output)
+                self.assertNotIn('native_trajectory', row)
+
+    def test_archive_revalidates_old_link_when_another_trace_claims_the_request(self):
+        self.make_db(); self.merge(self.collect())
+        metrics, row = self.matching_metrics()
+        archive.attach_archived_profiles(metrics, self.index, self.output)
+        self.index['traces'].append(dict(self.index['traces'][0], key='f'*64))
+        archive.attach_archived_profiles(metrics, self.index, self.output)
+        self.assertNotIn('native_trajectory', row)
+        self.assertEqual(row['native_trace_state'], 'ambiguous')
+
+    def test_archive_rejects_missing_pages_wrong_identity_and_broken_ancestry(self):
+        self.make_db(); self.merge(self.collect())
+        entry = self.index['traces'][0]
+        path = self.output / entry['pages'][0]
+        original = json.loads(path.read_text(encoding='utf-8'))
+        for case in ('missing', 'wrong_key', 'wrong_total', 'missing_root', 'missing_parent',
+                     'cycle', 'pending_span', 'outside_root', 'unsafe_path'):
+            with self.subTest(case=case):
+                page = copy.deepcopy(original)
+                index = copy.deepcopy(self.index)
+                if case == 'wrong_key': page['key'] = 'f'*64
+                if case == 'wrong_total': page['total'] += 1
+                if case == 'missing_root': page['spans'][0]['parent_span_id'] = 'f'*16
+                if case == 'missing_parent': page['spans'][1]['parent_span_id'] = 'f'*16
+                if case == 'cycle': page['spans'][1]['parent_span_id'] = page['spans'][1]['span_id']
+                if case == 'pending_span': page['spans'][1]['lifecycle'] = 'partial'
+                if case == 'outside_root': page['spans'][1]['duration_ms'] = 2000
+                if case == 'unsafe_path': index['traces'][0]['pages'] = ['../private.json']
+                archive.write_json(path, page)
+                if case == 'missing': path.unlink()
+                metrics, row = self.matching_metrics()
+                archive.attach_archived_profiles(metrics, index, self.output)
+                self.assertNotIn('native_trajectory', row)
+                self.assertEqual(metrics['cloud_trace_collection']['archive_link_errors'], 1)
 
     def test_wal_header_copy_reads_all_spans_and_keeps_source_untouched(self):
         db = self.make_db(spans=701)
