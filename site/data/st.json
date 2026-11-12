@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-12T02:23:34.580Z",
+  "updatedAt": "2026-11-12T06:12:28.024Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -173,6 +173,95 @@
     }
   ],
   "runs": [
+    {
+      "runId": 43152650829,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43152650829",
+      "createdAt": "2026-11-12T04:09:38Z",
+      "headSha": "b9ff0872",
+      "conclusion": "success",
+      "st": {
+        "runId": "ST-1794456473565-213046",
+        "status": "passed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [],
+        "liveWire": [
+          {
+            "suite": "artifact",
+            "caseName": "artifact_receipt_required",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "business",
+            "caseName": "duplicate_downlink_idempotent",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "chunks",
+            "caseName": "protocol_chunk_boundary_reassembly",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "connection",
+            "caseName": "gateway_connection",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "forward",
+            "caseName": "protocol_unknown_event_forward_compat",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "identity",
+            "caseName": "protocol_invalid_task_identity",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "optional",
+            "caseName": "protocol_malformed_optional_fields",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          }
+        ],
+        "cases": [
+          {
+            "name": "real_model_text_reply",
+            "key": "text",
+            "title": "文本回复",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 9316,
+            "stage": "validate-text",
+            "detail": "Reply marker verified"
+          },
+          {
+            "name": "real_model_txt_download_and_content",
+            "key": "text-file",
+            "title": "文本生成 TXT 并下载",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 33996,
+            "stage": "validate-file",
+            "detail": "Downloaded TXT exact content verified: ST-1794456473565-213046.txt"
+          }
+        ]
+      }
+    },
     {
       "runId": 43129531068,
       "attempt": 1,
