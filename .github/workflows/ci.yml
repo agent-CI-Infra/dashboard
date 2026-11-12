@@ -38,6 +38,12 @@ jobs:
       - name: Test gate collectors
         run: npm run test:collector
 
+      - name: Test read-only trajectory archive
+        run: |
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts -p 'test_sfs_trajectory_archive.py' -v
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts -p 'test_collect_production*traces.py' -v
+          node --test scripts/trajectory-archive.test.mjs scripts/production-detailed-trace.test.mjs
+
       - name: Run tests
         run: npm test
 
