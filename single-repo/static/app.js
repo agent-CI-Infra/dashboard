@@ -1456,6 +1456,9 @@
       return list;
     })();
     const cell = (r, name) => {
+      // Live-wire cases live in their own lane artifact; the merge attaches them per run.
+      const lw = (r.st.liveWire || []).find((x) => x.caseName === name);
+      if (lw) return lw.status === 'passed' ? badge('✓', 'good') : lw.status === 'failed' ? badge('✕', 'bad') : badge('!', 'warn');
       const hit = (r.st.cases || []).find((x) => x.name === name);
       if (!hit) return '<span class="muted" title="本轮未运行">·</span>';
       return hit.status === 'passed' ? badge('✓', 'good') : hit.status === 'failed' ? badge('✕', 'bad') : badge('!', 'warn');
@@ -1479,6 +1482,19 @@
       { key: 'stage', label: '结束阶段', render: (c) => esc(c.stage || '') },
       { key: 'detail', label: '说明', render: (c) => `<span class="muted">${esc(c.detail || '')}</span>` },
     ], cases)}</div>`;
+
+    const liveWire = latest.st.liveWire || [];
+    if (liveWire.length) {
+      const lwTitle = (name) => (catalog || []).find((c) => c.name === name)?.title || name;
+      html += sectionHead('live-wire 套件明细', `${liveWire.filter((x) => x.status === 'passed').length}/${liveWire.length} 通过 · 本机 relay + hdc rport，三方证据核对`);
+      html += `<div class="card">${table('t-st-live-wire', [
+        { key: 'suite', label: '套件', render: (x) => `<code>${esc(x.suite)}</code>` },
+        { key: 'caseName', label: '用例', render: (x) => esc(lwTitle(x.caseName)) },
+        { key: 'status', label: '证据', render: (x) => stBadge(x.status) },
+        { key: 'nativeStatus', label: 'Native', render: (x) => stBadge(x.nativeStatus) },
+        { key: 'issues', label: 'issues', render: (x) => `<span class="muted">${esc((x.issues || []).join('; '))}</span>` },
+      ], liveWire)}</div>`;
+    }
 
     html += sectionHead('运行历史', `数据由 collect-digitalmate-st 从 nightly 的 digitalmate-st-* artifact 同步 · 保留 90 轮`);
     html += `<div class="card">${table('t-st-runs', [

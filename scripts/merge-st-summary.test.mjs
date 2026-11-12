@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { execFileSync } from 'node:child_process'
-import { buildEntry, buildErrorEntry, merge, SCHEMA, ST_CASES } from './merge-st-summary.mjs'
+import { buildEntry, buildErrorEntry, merge, readLiveWireRuns, SCHEMA, ST_CASES } from './merge-st-summary.mjs'
 
 const RUN = {
   id: 43039010304,
@@ -121,6 +121,31 @@ test('CLI merges a downloaded artifact directory', () => {
     const written2 = JSON.parse(fs.readFileSync(out2, 'utf8'))
     assert.equal(written2.runs[0].st.status, 'failed')
     assert.match(written2.runs[0].st.issues[0], /summary\.json/)
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('live-wire suite directories merge into the run entry', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'st-lw-'))
+  try {
+    const write = (suite, assessment) => {
+      fs.mkdirSync(path.join(dir, suite), { recursive: true })
+      fs.writeFileSync(path.join(dir, suite, 'wire-assessment.json'), JSON.stringify(assessment))
+    }
+    write('connection', { status: 'passed', nativeStatus: 'passed', issues: [] })
+    write('business', { status: 'blocked', nativeStatus: 'passed', issues: ['transport error'] })
+    write('unknown-suite', { status: 'passed' })
+    fs.mkdirSync(path.join(dir, 'empty'), { recursive: true })
+    const runs = readLiveWireRuns(dir)
+    assert.deepEqual(runs.map((r) => [r.suite, r.caseName, r.status]), [
+      ['business', 'duplicate_downlink_idempotent', 'blocked'],
+      ['connection', 'gateway_connection', 'passed'],
+    ])
+    assert.deepEqual(readLiveWireRuns(path.join(dir, 'missing')), [])
+    const entry = buildEntry({ summary: SUMMARY, run: RUN, liveWire: runs })
+    assert.equal(entry.st.liveWire.length, 2)
+    assert.equal(entry.st.liveWire[0].issues[0], 'transport error')
   } finally {
     fs.rmSync(dir, { recursive: true, force: true })
   }
