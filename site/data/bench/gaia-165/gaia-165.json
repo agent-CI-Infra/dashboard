@@ -1,0 +1,1224 @@
+{
+ "schema": "digitalmate-bench-gaia-165/v1",
+ "runId": "manual-gaia-baseline-20261111",
+ "benchmark": "GAIA validation (165 tasks)",
+ "split": "validation",
+ "official_leaderboard": false,
+ "window": "2026-11-10 21:34 → 2026-11-11 08:09 (Asia/Shanghai)",
+ "image": "swr.ap-southeast-1.myhuaweicloud.com/openjiuwen-online-test/digitalmate@sha256:b8e327b774f9ba22e3c0cc2ecc9006c51796602f1bc161bc99dde7adedfb8efe",
+ "source_commit": "e3e640668c6a",
+ "client_commit": "871c14cc（冻结）",
+ "runner_commit": "daf0d9ac",
+ "sealed_tag": "sealed/gaia-98e13bf8",
+ "backend": "k8s bench-gaia-main（专用后端，非云侧网关）· 单 pod 单并发 · 25 条一片 · 片间重启",
+ "trials": 1,
+ "raw": {
+  "pass": 95,
+  "n": 165,
+  "rate": 0.576
+ },
+ "product": {
+  "pass": 95,
+  "den": 131,
+  "rate": 0.725
+ },
+ "buckets": {
+  "PASS": 95,
+  "ERROR": 4,
+  "FAIL": 36,
+  "NOT_RUN": 30
+ },
+ "not_run": {
+  "unsupported-file-type": 23,
+  "product-content-filter": 3,
+  "task-cap": 4
+ },
+ "fail": {
+  "extra-element": 1,
+  "numeric-mismatch": 11,
+  "text-mismatch": 15,
+  "format-noise": 7,
+  "no-final-answer": 2
+ },
+ "by_level": {
+  "1": {
+   "PASS": 35,
+   "FAIL": 10,
+   "NOT_RUN": 8
+  },
+  "2": {
+   "ERROR": 4,
+   "FAIL": 21,
+   "PASS": 46,
+   "NOT_RUN": 15
+  },
+  "3": {
+   "PASS": 14,
+   "NOT_RUN": 7,
+   "FAIL": 5
+  }
+ },
+ "latency_ms": {
+  "p50": 115708,
+  "p95": 635636,
+  "n": 145,
+  "excluded": "20 tasks rejected at upload (durationMs=0)"
+ },
+ "tasks": [
+  {
+   "id": "GAIA-VAL-05BA3443E9-11",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "extra-element",
+   "durationMs": 29523
+  },
+  {
+   "id": "GAIA-VAL-0AFF695182-31",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "numeric-mismatch",
+   "durationMs": 26152
+  },
+  {
+   "id": "GAIA-VAL-0DBC463817-45",
+   "level": 1,
+   "bucket": "FAIL",
+   "reason": "text-mismatch",
+   "durationMs": 577063
+  },
+  {
+   "id": "GAIA-VAL-26C86B72C3-74",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "format-noise",
+   "durationMs": 102718
+  },
+  {
+   "id": "GAIA-VAL-27E32B79BD-35",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "format-noise",
+   "durationMs": 151152
+  },
+  {
+   "id": "GAIA-VAL-2E86EB36BB-14",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "numeric-mismatch",
+   "durationMs": 792754
+  },
+  {
+   "id": "GAIA-VAL-2F9BFC5C11-09",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "numeric-mismatch",
+   "durationMs": 211672
+  },
+  {
+   "id": "GAIA-VAL-32E31F12C5-82",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "numeric-mismatch",
+   "durationMs": 375546
+  },
+  {
+   "id": "GAIA-VAL-38ED7AFFA7-162",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "text-mismatch",
+   "durationMs": 635636
+  },
+  {
+   "id": "GAIA-VAL-43328C34C2-10",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "format-noise",
+   "durationMs": 46497
+  },
+  {
+   "id": "GAIA-VAL-45A1354F9F-141",
+   "level": 1,
+   "bucket": "FAIL",
+   "reason": "text-mismatch",
+   "durationMs": 172676
+  },
+  {
+   "id": "GAIA-VAL-4F164F8D5F-104",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "text-mismatch",
+   "durationMs": 531406
+  },
+  {
+   "id": "GAIA-VAL-5623FA6A49-85",
+   "level": 1,
+   "bucket": "FAIL",
+   "reason": "format-noise",
+   "durationMs": 232382
+  },
+  {
+   "id": "GAIA-VAL-5C90240729-143",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "format-noise",
+   "durationMs": 200794
+  },
+  {
+   "id": "GAIA-VAL-601807D0A1-121",
+   "level": 3,
+   "bucket": "FAIL",
+   "reason": "numeric-mismatch",
+   "durationMs": 47527
+  },
+  {
+   "id": "GAIA-VAL-711BE2880D-26",
+   "level": 1,
+   "bucket": "FAIL",
+   "reason": "text-mismatch",
+   "durationMs": 236325
+  },
+  {
+   "id": "GAIA-VAL-73359C3C9B-148",
+   "level": 1,
+   "bucket": "FAIL",
+   "reason": "text-mismatch",
+   "durationMs": 143902
+  },
+  {
+   "id": "GAIA-VAL-7BCB25921A-163",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "text-mismatch",
+   "durationMs": 73931
+  },
+  {
+   "id": "GAIA-VAL-7CACA654BB-114",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "text-mismatch",
+   "durationMs": 73170
+  },
+  {
+   "id": "GAIA-VAL-7DC365C283-103",
+   "level": 3,
+   "bucket": "FAIL",
+   "reason": "text-mismatch",
+   "durationMs": 29546
+  },
+  {
+   "id": "GAIA-VAL-835D524565-23",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "numeric-mismatch",
+   "durationMs": 63420
+  },
+  {
+   "id": "GAIA-VAL-917C306D17-119",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "no-final-answer",
+   "durationMs": 4936
+  },
+  {
+   "id": "GAIA-VAL-92084AD36F-145",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "text-mismatch",
+   "durationMs": 10128
+  },
+  {
+   "id": "GAIA-VAL-A4D73860E1-130",
+   "level": 1,
+   "bucket": "FAIL",
+   "reason": "text-mismatch",
+   "durationMs": 502213
+  },
+  {
+   "id": "GAIA-VAL-A55674DE71-96",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "numeric-mismatch",
+   "durationMs": 117039
+  },
+  {
+   "id": "GAIA-VAL-A5B1D849ED-149",
+   "level": 1,
+   "bucket": "FAIL",
+   "reason": "numeric-mismatch",
+   "durationMs": 35567
+  },
+  {
+   "id": "GAIA-VAL-A86A4B2583-48",
+   "level": 1,
+   "bucket": "FAIL",
+   "reason": "format-noise",
+   "durationMs": 175775
+  },
+  {
+   "id": "GAIA-VAL-B814760A42-63",
+   "level": 1,
+   "bucket": "FAIL",
+   "reason": "format-noise",
+   "durationMs": 214169
+  },
+  {
+   "id": "GAIA-VAL-BA905972AF-131",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "numeric-mismatch",
+   "durationMs": 145160
+  },
+  {
+   "id": "GAIA-VAL-C7826A08C7-05",
+   "level": 3,
+   "bucket": "FAIL",
+   "reason": "text-mismatch",
+   "durationMs": 83285
+  },
+  {
+   "id": "GAIA-VAL-C82F0D2523-158",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "numeric-mismatch",
+   "durationMs": 156467
+  },
+  {
+   "id": "GAIA-VAL-CC26476DA4-94",
+   "level": 3,
+   "bucket": "FAIL",
+   "reason": "text-mismatch",
+   "durationMs": 103665
+  },
+  {
+   "id": "GAIA-VAL-D042FCBBD7-123",
+   "level": 1,
+   "bucket": "FAIL",
+   "reason": "text-mismatch",
+   "durationMs": 75604
+  },
+  {
+   "id": "GAIA-VAL-D946934A71-44",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "numeric-mismatch",
+   "durationMs": 512987
+  },
+  {
+   "id": "GAIA-VAL-F194BD939A-156",
+   "level": 3,
+   "bucket": "FAIL",
+   "reason": "text-mismatch",
+   "durationMs": 179713
+  },
+  {
+   "id": "GAIA-VAL-FDF9B4148A-126",
+   "level": 2,
+   "bucket": "FAIL",
+   "reason": "no-final-answer",
+   "durationMs": 29692
+  },
+  {
+   "id": "GAIA-VAL-00E41B8243-93",
+   "level": 2,
+   "bucket": "ERROR",
+   "reason": "infra",
+   "durationMs": 442275
+  },
+  {
+   "id": "GAIA-VAL-080C932322-117",
+   "level": 2,
+   "bucket": "ERROR",
+   "reason": "infra",
+   "durationMs": 621259
+  },
+  {
+   "id": "GAIA-VAL-1F6FAEF601-86",
+   "level": 2,
+   "bucket": "ERROR",
+   "reason": "infra",
+   "durationMs": 9274
+  },
+  {
+   "id": "GAIA-VAL-354D112679-138",
+   "level": 2,
+   "bucket": "ERROR",
+   "reason": "infra",
+   "durationMs": 2056
+  },
+  {
+   "id": "GAIA-VAL-0B2B5CCA0D-33",
+   "level": 2,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-15E7E53E32-92",
+   "level": 2,
+   "bucket": "NOT_RUN",
+   "reason": "product-content-filter",
+   "durationMs": 14909
+  },
+  {
+   "id": "GAIA-VAL-177595B1E9-40",
+   "level": 3,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-2A5EFDC06C-29",
+   "level": 2,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-3248DAFEBE-77",
+   "level": 1,
+   "bucket": "NOT_RUN",
+   "reason": "task-cap",
+   "durationMs": 906342
+  },
+  {
+   "id": "GAIA-VAL-3B8D15686E-49",
+   "level": 2,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-48A2737299-13",
+   "level": 2,
+   "bucket": "NOT_RUN",
+   "reason": "task-cap",
+   "durationMs": 904547
+  },
+  {
+   "id": "GAIA-VAL-56E3996E7C-125",
+   "level": 3,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-5F2435C261-122",
+   "level": 2,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-651F9850BD-65",
+   "level": 2,
+   "bucket": "NOT_RUN",
+   "reason": "task-cap",
+   "durationMs": 903037
+  },
+  {
+   "id": "GAIA-VAL-7651063B3B-62",
+   "level": 1,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-808D0F9765-57",
+   "level": 2,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-80EC9B4C82-68",
+   "level": 1,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-921471B367-24",
+   "level": 1,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-9907C9D945-112",
+   "level": 3,
+   "bucket": "NOT_RUN",
+   "reason": "product-content-filter",
+   "durationMs": 375153
+  },
+  {
+   "id": "GAIA-VAL-AAFC75BE15-133",
+   "level": 1,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-ACCD8C55CC-36",
+   "level": 2,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 1482
+  },
+  {
+   "id": "GAIA-VAL-BC465F6E94-07",
+   "level": 2,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-BD164F61BB-84",
+   "level": 2,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-C672647A15-101",
+   "level": 3,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-CE3E72BFAF-71",
+   "level": 2,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 1480
+  },
+  {
+   "id": "GAIA-VAL-D438B83566-37",
+   "level": 3,
+   "bucket": "NOT_RUN",
+   "reason": "task-cap",
+   "durationMs": 902563
+  },
+  {
+   "id": "GAIA-VAL-D7E53FDFC5-83",
+   "level": 1,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-F1D4AD9200-109",
+   "level": 1,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-F380D34D76-155",
+   "level": 2,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 1518
+  },
+  {
+   "id": "GAIA-VAL-F805C6EA41-160",
+   "level": 2,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-FA182D1263-76",
+   "level": 3,
+   "bucket": "NOT_RUN",
+   "reason": "product-content-filter",
+   "durationMs": 65614
+  },
+  {
+   "id": "GAIA-VAL-FC9A8F003C-100",
+   "level": 1,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-FD54682820-139",
+   "level": 3,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-FFAAA609A8-50",
+   "level": 2,
+   "bucket": "NOT_RUN",
+   "reason": "unsupported-file-type",
+   "durationMs": 0
+  },
+  {
+   "id": "GAIA-VAL-0011B22D84-51",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 94281
+  },
+  {
+   "id": "GAIA-VAL-07219A1054-41",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 54958
+  },
+  {
+   "id": "GAIA-VAL-0AA7FA9594-02",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 210275
+  },
+  {
+   "id": "GAIA-VAL-0ADCC66D41-116",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 120153
+  },
+  {
+   "id": "GAIA-VAL-0E0AAC2B6C-46",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 583343
+  },
+  {
+   "id": "GAIA-VAL-101099D484-129",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 493706
+  },
+  {
+   "id": "GAIA-VAL-11C528DB7A-39",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 16845
+  },
+  {
+   "id": "GAIA-VAL-1209A07B75-60",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 151656
+  },
+  {
+   "id": "GAIA-VAL-1452E0A5C2-54",
+   "level": 3,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 121177
+  },
+  {
+   "id": "GAIA-VAL-14E82626D2-01",
+   "level": 3,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 326164
+  },
+  {
+   "id": "GAIA-VAL-181F440C5B-118",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 286896
+  },
+  {
+   "id": "GAIA-VAL-19A91D036C-03",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 228590
+  },
+  {
+   "id": "GAIA-VAL-1C5FF3A097-128",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 352794
+  },
+  {
+   "id": "GAIA-VAL-1DFBF5E057-144",
+   "level": 3,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 58798
+  },
+  {
+   "id": "GAIA-VAL-1E45184CA4-43",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 12067
+  },
+  {
+   "id": "GAIA-VAL-1EC061A758-134",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 275360
+  },
+  {
+   "id": "GAIA-VAL-1EF9086C3C-58",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 144361
+  },
+  {
+   "id": "GAIA-VAL-25E51F6E0C-105",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 78312
+  },
+  {
+   "id": "GAIA-VAL-276C2128BE-95",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 57594
+  },
+  {
+   "id": "GAIA-VAL-2EBC03D723-157",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 104880
+  },
+  {
+   "id": "GAIA-VAL-2FE3E922F4-154",
+   "level": 3,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 82333
+  },
+  {
+   "id": "GAIA-VAL-3708984F08-47",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 37300
+  },
+  {
+   "id": "GAIA-VAL-3B34793BC1-88",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 127513
+  },
+  {
+   "id": "GAIA-VAL-3D38D72518-111",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 328268
+  },
+  {
+   "id": "GAIA-VAL-3F9B8F9B1B-108",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 120832
+  },
+  {
+   "id": "GAIA-VAL-436C1CCFAF-113",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 112924
+  },
+  {
+   "id": "GAIA-VAL-4484670E7A-22",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 164119
+  },
+  {
+   "id": "GAIA-VAL-4C0671AE2B-132",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 74165
+  },
+  {
+   "id": "GAIA-VAL-5020BF00DE-38",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 32130
+  },
+  {
+   "id": "GAIA-VAL-5137B172B1-42",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 36439
+  },
+  {
+   "id": "GAIA-VAL-54C09F1F93-99",
+   "level": 3,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 501693
+  },
+  {
+   "id": "GAIA-VAL-580F524581-153",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 98494
+  },
+  {
+   "id": "GAIA-VAL-582E34C083-72",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 39283
+  },
+  {
+   "id": "GAIA-VAL-61C9DB5B8E-20",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 99551
+  },
+  {
+   "id": "GAIA-VAL-657C0B7A24-19",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 21461
+  },
+  {
+   "id": "GAIA-VAL-66C45D6516-161",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 216062
+  },
+  {
+   "id": "GAIA-VAL-68D8C180B7-32",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 186846
+  },
+  {
+   "id": "GAIA-VAL-6DEF26BCB1-102",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 93410
+  },
+  {
+   "id": "GAIA-VAL-7072F2B615-15",
+   "level": 3,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 68271
+  },
+  {
+   "id": "GAIA-VAL-71AD8A6F0F-90",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 412857
+  },
+  {
+   "id": "GAIA-VAL-73EF6F232F-12",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 40461
+  },
+  {
+   "id": "GAIA-VAL-7511E4BEF5-91",
+   "level": 3,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 299400
+  },
+  {
+   "id": "GAIA-VAL-795843D739-140",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 68666
+  },
+  {
+   "id": "GAIA-VAL-79E0DC9413-28",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 320849
+  },
+  {
+   "id": "GAIA-VAL-7A968F11CA-78",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 100814
+  },
+  {
+   "id": "GAIA-VAL-7B3247F387-152",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 152102
+  },
+  {
+   "id": "GAIA-VAL-7F6A897E4E-142",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 25269
+  },
+  {
+   "id": "GAIA-VAL-7FA94505D5-165",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 79052
+  },
+  {
+   "id": "GAIA-VAL-81A0445FD7-52",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 81983
+  },
+  {
+   "id": "GAIA-VAL-82744E88BD-98",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 509090
+  },
+  {
+   "id": "GAIA-VAL-8621E9AB49-06",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 210666
+  },
+  {
+   "id": "GAIA-VAL-8A0A2DA816-124",
+   "level": 3,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 73096
+  },
+  {
+   "id": "GAIA-VAL-8A931BE013-110",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 221618
+  },
+  {
+   "id": "GAIA-VAL-8E8069BF53-69",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 55978
+  },
+  {
+   "id": "GAIA-VAL-900D36A41A-79",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 113663
+  },
+  {
+   "id": "GAIA-VAL-903D4B8158-87",
+   "level": 3,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 255792
+  },
+  {
+   "id": "GAIA-VAL-922C7C2EB3-18",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 135076
+  },
+  {
+   "id": "GAIA-VAL-94B3A7F13B-137",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 41351
+  },
+  {
+   "id": "GAIA-VAL-990560951F-107",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 657080
+  },
+  {
+   "id": "GAIA-VAL-9927621865-135",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 115708
+  },
+  {
+   "id": "GAIA-VAL-997E451EA4-146",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 59225
+  },
+  {
+   "id": "GAIA-VAL-9A9939E37E-30",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 8538
+  },
+  {
+   "id": "GAIA-VAL-9E89F5E5D3-56",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 95795
+  },
+  {
+   "id": "GAIA-VAL-A211CA9123-80",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 170097
+  },
+  {
+   "id": "GAIA-VAL-A24CD0D463-147",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 163911
+  },
+  {
+   "id": "GAIA-VAL-A52DE90201-120",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 43207
+  },
+  {
+   "id": "GAIA-VAL-A6E94A2087-55",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 25822
+  },
+  {
+   "id": "GAIA-VAL-AA08CE4275-127",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 11678
+  },
+  {
+   "id": "GAIA-VAL-AAB770948B-150",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 67413
+  },
+  {
+   "id": "GAIA-VAL-AEA19E1240-27",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 11079
+  },
+  {
+   "id": "GAIA-VAL-AF8D367FA4-21",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 89153
+  },
+  {
+   "id": "GAIA-VAL-AFC60AC21C-04",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 312162
+  },
+  {
+   "id": "GAIA-VAL-B8EC94EF58-136",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 129174
+  },
+  {
+   "id": "GAIA-VAL-BC6470EAA0-59",
+   "level": 3,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 35206
+  },
+  {
+   "id": "GAIA-VAL-C4A291F8C9-34",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 89609
+  },
+  {
+   "id": "GAIA-VAL-C5AEB3BB24-106",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 175911
+  },
+  {
+   "id": "GAIA-VAL-C7901B3FAA-73",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 10776
+  },
+  {
+   "id": "GAIA-VAL-CDE2FC18E5-17",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 46012
+  },
+  {
+   "id": "GAIA-VAL-CE4328EFD6-151",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 57445
+  },
+  {
+   "id": "GAIA-VAL-D0BA87D8A5-159",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 113817
+  },
+  {
+   "id": "GAIA-VAL-D0D36F0E9E-08",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 37510
+  },
+  {
+   "id": "GAIA-VAL-D4047A9677-75",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 77874
+  },
+  {
+   "id": "GAIA-VAL-D514CB126F-81",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 423071
+  },
+  {
+   "id": "GAIA-VAL-DECF274A1E-16",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 245977
+  },
+  {
+   "id": "GAIA-VAL-E27FCD4049-61",
+   "level": 3,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 159744
+  },
+  {
+   "id": "GAIA-VAL-E2E53DB716-70",
+   "level": 3,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 495526
+  },
+  {
+   "id": "GAIA-VAL-E424150204-164",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 211875
+  },
+  {
+   "id": "GAIA-VAL-E61841D06E-66",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 246862
+  },
+  {
+   "id": "GAIA-VAL-EB29DF1928-97",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 273128
+  },
+  {
+   "id": "GAIA-VAL-F1DD5ECD95-25",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 852357
+  },
+  {
+   "id": "GAIA-VAL-F4E4A88C05-64",
+   "level": 3,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 549721
+  },
+  {
+   "id": "GAIA-VAL-F61011CDC2-89",
+   "level": 3,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 36171
+  },
+  {
+   "id": "GAIA-VAL-F84B22DEEE-53",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 39256
+  },
+  {
+   "id": "GAIA-VAL-FBC1201B32-67",
+   "level": 2,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 219983
+  },
+  {
+   "id": "GAIA-VAL-FBC662574B-115",
+   "level": 1,
+   "bucket": "PASS",
+   "reason": "",
+   "durationMs": 134722
+  }
+ ]
+}

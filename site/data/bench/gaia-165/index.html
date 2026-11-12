@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GAIA validation 165 · DigitalMate</title>
+<style>
+:root{color-scheme:light dark;--bg:#f6f7f9;--card:#fff;--ink:#1c2430;--dim:#61708a;--line:#dde3ec;--ok:#0f7b46;--bad:#b42318;--skip:#8a5a00;--err:#6b21a8}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1724;--card:#18202e;--ink:#e5e9f0;--dim:#98a6bc;--line:#2b3648;--ok:#34d399;--bad:#f87171;--skip:#fbbf24;--err:#c084fc}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif}
+main{max-width:1180px;margin:0 auto;padding:32px 20px 64px}a{color:#2563eb}
+h1{font-size:26px;margin:0 0 6px}h2{font-size:18px;margin:30px 0 10px}
+p.meta{color:var(--dim);margin:0 0 8px;font-size:13px}
+table{width:100%;border-collapse:collapse;background:var(--card);font-size:13px;margin-top:8px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:color-mix(in srgb,var(--card) 88%,var(--ink));font-weight:600;white-space:nowrap}
+td:first-child{white-space:nowrap}tr.ok td:nth-child(3){color:var(--ok)}tr.bad td:nth-child(3){color:var(--bad)}
+tr.skip td:nth-child(3){color:var(--skip)}tr.err td:nth-child(3){color:var(--err)}
+.kpis{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;min-width:150px}
+.kpi b{display:block;font-size:22px}.kpi span{color:var(--dim);font-size:12px}
+.note{color:var(--dim);font-size:13px;margin-top:18px}code{font-size:12px}
+details summary{cursor:pointer;color:#2563eb;font-size:13px;margin-top:10px}
+</style></head><body><main>
+<a href="../../../">← DigitalMate 看板</a>
+<h1>GAIA validation 165 · 全量结果</h1>
+<p class="meta">2026-11-10 21:34 → 2026-11-11 08:09 (Asia/Shanghai) · 单 trial · 集群内专用后端（非云侧网关）· 代码 tag <code>sealed/gaia-98e13bf8</code></p>
+<p class="meta">镜像 <code>swr.ap-southeast-1.myhuaweicloud.com/openjiuwen-online-test/digitalmate@sha256:b8e327b774f9ba22e3c0cc2ecc9006c51796602f1bc161bc99dde7adedfb8efe</code> · source <code>e3e640668c6a</code> · client <code>871c14cc（冻结）</code> · runner <code>daf0d9ac</code></p>
+
+<div class="kpis">
+<div class="kpi"><b>57.6%</b><span>raw pass@1 · 95/165</span></div>
+<div class="kpi"><b>72.5%</b><span>product pass@1 · 95/131</span></div>
+<div class="kpi"><b>79.4%</b><span>可判分率 · 131/165</span></div>
+<div class="kpi"><b>20.6%</b><span>不可判率 · 34/165（红线 20%）</span></div>
+<div class="kpi"><b>115.7s / 635.6s</b><span>p50 / p95 时长（n=145）</span></div>
+</div>
+
+<h2>指标是什么、代表什么</h2>
+<table><thead><tr><th>指标</th><th>含义</th><th>本轮值</th></tr></thead><tbody><tr class=""><td>raw pass@1</td><td>PASS ÷ 全部任务（165）。没答对、没跑成、基建错误的都算不通过——最保守，对外优先引用这一栏。</td><td>95 / 165 = <b>57.6%</b></td></tr>
+<tr class=""><td>product pass@1</td><td>PASS ÷ 可判分任务（165 − NOT_RUN 30 − ERROR 4 = 131）。剔除的是“题目没能正常进入判分”，不是“答错”。</td><td>95 / 131 = <b>72.5%</b></td></tr>
+<tr class=""><td>可判分率</td><td>可判分任务 ÷ 全部任务，衡量这轮结果覆盖了多少题。</td><td>131 / 165 = 79.4%（<b>低于 80%</b>）</td></tr>
+<tr class=""><td>不可判率</td><td>(NOT_RUN + ERROR) ÷ 全部任务。本项目红线 20%，本轮 <b>20.6% 已踩线</b>，product 只能叫“有限覆盖下的产品分”。</td><td>34 / 165 = 20.6%</td></tr>
+<tr class=""><td>trials</td><td>每个任务跑几次。本轮 1 次，所以 pass@k / pass^k 与 pass@1 同值，不具 flaky 判定意义。</td><td>1</td></tr>
+<tr class=""><td>p50 / p95 时长</td><td>单任务墙钟时长中位数 / 95 分位。p95 高是活循环与重任务（长跑接近 900s 上限）导致。</td><td>95.8s / 613.7s</td></tr>
+<tr class=""><td>NOT_RUN</td><td>任务没跑到底，且不是模型答错：附件打不开、活循环被墙钟截断、内容安全误拦。单列，不进 product 分母。</td><td>30 条</td></tr>
+<tr class=""><td>FAIL</td><td>任务跑完了，答案没通过判分：答错、或多给了元素、或没按格式写 Final answer。</td><td>36 条</td></tr>
+<tr class=""><td>ERROR</td><td>基建错误：连接断开、模型服务异常。与题目无关，重跑多半能恢复。</td><td>4 条</td></tr>
+</tbody></table>
+
+<h2>结果分布</h2>
+<table><thead><tr><th>分桶</th><th>条数</th><th>占 165</th><th>进不进 product 分母</th></tr></thead><tbody>
+<tr class="ok"><td>PASS</td><td>95</td><td>57.6%</td><td>进（分子）</td></tr>
+
+<tr class="bad"><td>FAIL</td><td>36</td><td>21.8%</td><td>进（算不通过）</td></tr>
+
+<tr class="skip"><td>NOT_RUN</td><td>30</td><td>18.2%</td><td>不进（单列）</td></tr>
+
+<tr class="err"><td>ERROR</td><td>4</td><td>2.4%</td><td>不进（单列）</td></tr>
+
+</tbody></table>
+
+<h2>没跑成的 30 条：为什么、怎么处置</h2>
+<table><thead><tr><th>类别</th><th>条数</th><th>是什么</th><th>处置</th></tr></thead><tbody><tr class=""><td>unsupported-file-type</td><td>23</td><td>产品打不开文件类型：xlsx 13、mp3 3、docx 1、zip 2、pptx 1 上传即被拒；另有 3 条 PDF 能上传但模型明说读不了</td><td>产品能力缺口，等文件类型支持后重跑；整类记 NOT_RUN，不从分母里偷偷删</td></tr>
+<tr class=""><td>task-cap</td><td>4</td><td>900 秒墙钟截断的活循环：还在出帧、永不收敛（461 / 636 / 738 / 832 帧）</td><td>终止契约修复后重跑；截断时写了完整 json，可审计</td></tr>
+<tr class=""><td>product-content-filter</td><td>3</td><td>请求被判未通过内容安全检查，上下文被重置、任务直接终止（题目本身普通）</td><td>产品侧查误拦</td></tr>
+</tbody></table>
+
+<h2>没通过的 36 条：哪些是真效果问题</h2>
+<table><thead><tr><th>类型</th><th>条数</th><th>性质</th><th>说明</th></tr></thead><tbody><tr class=""><td>text-mismatch</td><td>15</td><td>效果问题</td><td>文本答案与标准答案规范化后不相等（真答错）</td></tr>
+<tr class=""><td>numeric-mismatch</td><td>11</td><td>效果问题</td><td>数值不一致（真答错，含单位/量级差）</td></tr>
+<tr class=""><td>format-noise</td><td>7</td><td>格式/指令问题</td><td>人眼等价但官方 exact 判 0（如 <code>n = 2</code> vs <code>2</code>）</td></tr>
+<tr class=""><td>no-final-answer</td><td>2</td><td>格式/指令问题</td><td>没写 <code>Final answer:</code> 行，按口径不采信散文</td></tr>
+<tr class=""><td>extra-element</td><td>1</td><td>效果问题</td><td>多给了元素，列表匹配失败</td></tr>
+</tbody></table>
+<p class="note">效果类 27 条（text 15 + numeric 11 + extra 1），格式/指令类 9 条（format-noise 7 + no-final-answer 2）。格式类不剔除——官方口径仍算 FAIL，但必须单列，否则会把“没按格式”读成“不会做”。</p>
+
+<h2>按难度（product 口径）</h2>
+<table><thead><tr><th>Level</th><th>题数</th><th>PASS / 可判分</th><th>通过率</th></tr></thead><tbody><tr class=""><td>L1</td><td>53</td><td>35/45</td><td>77.8%</td></tr>
+<tr class=""><td>L2</td><td>86</td><td>46/67</td><td>68.7%</td></tr>
+<tr class=""><td>L3</td><td>26</td><td>14/19</td><td>73.7%</td></tr>
+</tbody></table>
+
+<h2>逐条结果（165）</h2>
+<details open><summary>展开 / 收起</summary>
+<table><thead><tr><th>task</th><th>level</th><th>bucket</th><th>原因</th><th>时长</th></tr></thead><tbody><tr class="err"><td>GAIA-VAL-00E41B8243-93</td><td>L2</td><td>ERROR</td><td>infra</td><td>442.3s</td></tr>
+<tr class="err"><td>GAIA-VAL-080C932322-117</td><td>L2</td><td>ERROR</td><td>infra</td><td>621.3s</td></tr>
+<tr class="err"><td>GAIA-VAL-1F6FAEF601-86</td><td>L2</td><td>ERROR</td><td>infra</td><td>9.3s</td></tr>
+<tr class="err"><td>GAIA-VAL-354D112679-138</td><td>L2</td><td>ERROR</td><td>infra</td><td>2.1s</td></tr>
+<tr class="bad"><td>GAIA-VAL-05BA3443E9-11</td><td>L2</td><td>FAIL</td><td>extra-element</td><td>29.5s</td></tr>
+<tr class="bad"><td>GAIA-VAL-0AFF695182-31</td><td>L2</td><td>FAIL</td><td>numeric-mismatch</td><td>26.2s</td></tr>
+<tr class="bad"><td>GAIA-VAL-0DBC463817-45</td><td>L1</td><td>FAIL</td><td>text-mismatch</td><td>577.1s</td></tr>
+<tr class="bad"><td>GAIA-VAL-26C86B72C3-74</td><td>L2</td><td>FAIL</td><td>format-noise</td><td>102.7s</td></tr>
+<tr class="bad"><td>GAIA-VAL-27E32B79BD-35</td><td>L2</td><td>FAIL</td><td>format-noise</td><td>151.2s</td></tr>
+<tr class="bad"><td>GAIA-VAL-2E86EB36BB-14</td><td>L2</td><td>FAIL</td><td>numeric-mismatch</td><td>792.8s</td></tr>
+<tr class="bad"><td>GAIA-VAL-2F9BFC5C11-09</td><td>L2</td><td>FAIL</td><td>numeric-mismatch</td><td>211.7s</td></tr>
+<tr class="bad"><td>GAIA-VAL-32E31F12C5-82</td><td>L2</td><td>FAIL</td><td>numeric-mismatch</td><td>375.5s</td></tr>
+<tr class="bad"><td>GAIA-VAL-38ED7AFFA7-162</td><td>L2</td><td>FAIL</td><td>text-mismatch</td><td>635.6s</td></tr>
+<tr class="bad"><td>GAIA-VAL-43328C34C2-10</td><td>L2</td><td>FAIL</td><td>format-noise</td><td>46.5s</td></tr>
+<tr class="bad"><td>GAIA-VAL-45A1354F9F-141</td><td>L1</td><td>FAIL</td><td>text-mismatch</td><td>172.7s</td></tr>
+<tr class="bad"><td>GAIA-VAL-4F164F8D5F-104</td><td>L2</td><td>FAIL</td><td>text-mismatch</td><td>531.4s</td></tr>
+<tr class="bad"><td>GAIA-VAL-5623FA6A49-85</td><td>L1</td><td>FAIL</td><td>format-noise</td><td>232.4s</td></tr>
+<tr class="bad"><td>GAIA-VAL-5C90240729-143</td><td>L2</td><td>FAIL</td><td>format-noise</td><td>200.8s</td></tr>
+<tr class="bad"><td>GAIA-VAL-601807D0A1-121</td><td>L3</td><td>FAIL</td><td>numeric-mismatch</td><td>47.5s</td></tr>
+<tr class="bad"><td>GAIA-VAL-711BE2880D-26</td><td>L1</td><td>FAIL</td><td>text-mismatch</td><td>236.3s</td></tr>
+<tr class="bad"><td>GAIA-VAL-73359C3C9B-148</td><td>L1</td><td>FAIL</td><td>text-mismatch</td><td>143.9s</td></tr>
+<tr class="bad"><td>GAIA-VAL-7BCB25921A-163</td><td>L2</td><td>FAIL</td><td>text-mismatch</td><td>73.9s</td></tr>
+<tr class="bad"><td>GAIA-VAL-7CACA654BB-114</td><td>L2</td><td>FAIL</td><td>text-mismatch</td><td>73.2s</td></tr>
+<tr class="bad"><td>GAIA-VAL-7DC365C283-103</td><td>L3</td><td>FAIL</td><td>text-mismatch</td><td>29.5s</td></tr>
+<tr class="bad"><td>GAIA-VAL-835D524565-23</td><td>L2</td><td>FAIL</td><td>numeric-mismatch</td><td>63.4s</td></tr>
+<tr class="bad"><td>GAIA-VAL-917C306D17-119</td><td>L2</td><td>FAIL</td><td>no-final-answer</td><td>4.9s</td></tr>
+<tr class="bad"><td>GAIA-VAL-92084AD36F-145</td><td>L2</td><td>FAIL</td><td>text-mismatch</td><td>10.1s</td></tr>
+<tr class="bad"><td>GAIA-VAL-A4D73860E1-130</td><td>L1</td><td>FAIL</td><td>text-mismatch</td><td>502.2s</td></tr>
+<tr class="bad"><td>GAIA-VAL-A55674DE71-96</td><td>L2</td><td>FAIL</td><td>numeric-mismatch</td><td>117.0s</td></tr>
+<tr class="bad"><td>GAIA-VAL-A5B1D849ED-149</td><td>L1</td><td>FAIL</td><td>numeric-mismatch</td><td>35.6s</td></tr>
+<tr class="bad"><td>GAIA-VAL-A86A4B2583-48</td><td>L1</td><td>FAIL</td><td>format-noise</td><td>175.8s</td></tr>
+<tr class="bad"><td>GAIA-VAL-B814760A42-63</td><td>L1</td><td>FAIL</td><td>format-noise</td><td>214.2s</td></tr>
+<tr class="bad"><td>GAIA-VAL-BA905972AF-131</td><td>L2</td><td>FAIL</td><td>numeric-mismatch</td><td>145.2s</td></tr>
+<tr class="bad"><td>GAIA-VAL-C7826A08C7-05</td><td>L3</td><td>FAIL</td><td>text-mismatch</td><td>83.3s</td></tr>
+<tr class="bad"><td>GAIA-VAL-C82F0D2523-158</td><td>L2</td><td>FAIL</td><td>numeric-mismatch</td><td>156.5s</td></tr>
+<tr class="bad"><td>GAIA-VAL-CC26476DA4-94</td><td>L3</td><td>FAIL</td><td>text-mismatch</td><td>103.7s</td></tr>
+<tr class="bad"><td>GAIA-VAL-D042FCBBD7-123</td><td>L1</td><td>FAIL</td><td>text-mismatch</td><td>75.6s</td></tr>
+<tr class="bad"><td>GAIA-VAL-D946934A71-44</td><td>L2</td><td>FAIL</td><td>numeric-mismatch</td><td>513.0s</td></tr>
+<tr class="bad"><td>GAIA-VAL-F194BD939A-156</td><td>L3</td><td>FAIL</td><td>text-mismatch</td><td>179.7s</td></tr>
+<tr class="bad"><td>GAIA-VAL-FDF9B4148A-126</td><td>L2</td><td>FAIL</td><td>no-final-answer</td><td>29.7s</td></tr>
+<tr class="skip"><td>GAIA-VAL-0B2B5CCA0D-33</td><td>L2</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-15E7E53E32-92</td><td>L2</td><td>NOT_RUN</td><td>product-content-filter</td><td>14.9s</td></tr>
+<tr class="skip"><td>GAIA-VAL-177595B1E9-40</td><td>L3</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-2A5EFDC06C-29</td><td>L2</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-3248DAFEBE-77</td><td>L1</td><td>NOT_RUN</td><td>task-cap</td><td>906.3s</td></tr>
+<tr class="skip"><td>GAIA-VAL-3B8D15686E-49</td><td>L2</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-48A2737299-13</td><td>L2</td><td>NOT_RUN</td><td>task-cap</td><td>904.5s</td></tr>
+<tr class="skip"><td>GAIA-VAL-56E3996E7C-125</td><td>L3</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-5F2435C261-122</td><td>L2</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-651F9850BD-65</td><td>L2</td><td>NOT_RUN</td><td>task-cap</td><td>903.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-7651063B3B-62</td><td>L1</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-808D0F9765-57</td><td>L2</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-80EC9B4C82-68</td><td>L1</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-921471B367-24</td><td>L1</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-9907C9D945-112</td><td>L3</td><td>NOT_RUN</td><td>product-content-filter</td><td>375.2s</td></tr>
+<tr class="skip"><td>GAIA-VAL-AAFC75BE15-133</td><td>L1</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-ACCD8C55CC-36</td><td>L2</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>1.5s</td></tr>
+<tr class="skip"><td>GAIA-VAL-BC465F6E94-07</td><td>L2</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-BD164F61BB-84</td><td>L2</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-C672647A15-101</td><td>L3</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-CE3E72BFAF-71</td><td>L2</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>1.5s</td></tr>
+<tr class="skip"><td>GAIA-VAL-D438B83566-37</td><td>L3</td><td>NOT_RUN</td><td>task-cap</td><td>902.6s</td></tr>
+<tr class="skip"><td>GAIA-VAL-D7E53FDFC5-83</td><td>L1</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-F1D4AD9200-109</td><td>L1</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-F380D34D76-155</td><td>L2</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>1.5s</td></tr>
+<tr class="skip"><td>GAIA-VAL-F805C6EA41-160</td><td>L2</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-FA182D1263-76</td><td>L3</td><td>NOT_RUN</td><td>product-content-filter</td><td>65.6s</td></tr>
+<tr class="skip"><td>GAIA-VAL-FC9A8F003C-100</td><td>L1</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-FD54682820-139</td><td>L3</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="skip"><td>GAIA-VAL-FFAAA609A8-50</td><td>L2</td><td>NOT_RUN</td><td>unsupported-file-type</td><td>0.0s</td></tr>
+<tr class="ok"><td>GAIA-VAL-0011B22D84-51</td><td>L1</td><td>PASS</td><td>—</td><td>94.3s</td></tr>
+<tr class="ok"><td>GAIA-VAL-07219A1054-41</td><td>L1</td><td>PASS</td><td>—</td><td>55.0s</td></tr>
+<tr class="ok"><td>GAIA-VAL-0AA7FA9594-02</td><td>L2</td><td>PASS</td><td>—</td><td>210.3s</td></tr>
+<tr class="ok"><td>GAIA-VAL-0ADCC66D41-116</td><td>L2</td><td>PASS</td><td>—</td><td>120.2s</td></tr>
+<tr class="ok"><td>GAIA-VAL-0E0AAC2B6C-46</td><td>L2</td><td>PASS</td><td>—</td><td>583.3s</td></tr>
+<tr class="ok"><td>GAIA-VAL-101099D484-129</td><td>L1</td><td>PASS</td><td>—</td><td>493.7s</td></tr>
+<tr class="ok"><td>GAIA-VAL-11C528DB7A-39</td><td>L1</td><td>PASS</td><td>—</td><td>16.8s</td></tr>
+<tr class="ok"><td>GAIA-VAL-1209A07B75-60</td><td>L1</td><td>PASS</td><td>—</td><td>151.7s</td></tr>
+<tr class="ok"><td>GAIA-VAL-1452E0A5C2-54</td><td>L3</td><td>PASS</td><td>—</td><td>121.2s</td></tr>
+<tr class="ok"><td>GAIA-VAL-14E82626D2-01</td><td>L3</td><td>PASS</td><td>—</td><td>326.2s</td></tr>
+<tr class="ok"><td>GAIA-VAL-181F440C5B-118</td><td>L1</td><td>PASS</td><td>—</td><td>286.9s</td></tr>
+<tr class="ok"><td>GAIA-VAL-19A91D036C-03</td><td>L1</td><td>PASS</td><td>—</td><td>228.6s</td></tr>
+<tr class="ok"><td>GAIA-VAL-1C5FF3A097-128</td><td>L2</td><td>PASS</td><td>—</td><td>352.8s</td></tr>
+<tr class="ok"><td>GAIA-VAL-1DFBF5E057-144</td><td>L3</td><td>PASS</td><td>—</td><td>58.8s</td></tr>
+<tr class="ok"><td>GAIA-VAL-1E45184CA4-43</td><td>L1</td><td>PASS</td><td>—</td><td>12.1s</td></tr>
+<tr class="ok"><td>GAIA-VAL-1EC061A758-134</td><td>L1</td><td>PASS</td><td>—</td><td>275.4s</td></tr>
+<tr class="ok"><td>GAIA-VAL-1EF9086C3C-58</td><td>L2</td><td>PASS</td><td>—</td><td>144.4s</td></tr>
+<tr class="ok"><td>GAIA-VAL-25E51F6E0C-105</td><td>L1</td><td>PASS</td><td>—</td><td>78.3s</td></tr>
+<tr class="ok"><td>GAIA-VAL-276C2128BE-95</td><td>L1</td><td>PASS</td><td>—</td><td>57.6s</td></tr>
+<tr class="ok"><td>GAIA-VAL-2EBC03D723-157</td><td>L1</td><td>PASS</td><td>—</td><td>104.9s</td></tr>
+<tr class="ok"><td>GAIA-VAL-2FE3E922F4-154</td><td>L3</td><td>PASS</td><td>—</td><td>82.3s</td></tr>
+<tr class="ok"><td>GAIA-VAL-3708984F08-47</td><td>L1</td><td>PASS</td><td>—</td><td>37.3s</td></tr>
+<tr class="ok"><td>GAIA-VAL-3B34793BC1-88</td><td>L1</td><td>PASS</td><td>—</td><td>127.5s</td></tr>
+<tr class="ok"><td>GAIA-VAL-3D38D72518-111</td><td>L2</td><td>PASS</td><td>—</td><td>328.3s</td></tr>
+<tr class="ok"><td>GAIA-VAL-3F9B8F9B1B-108</td><td>L2</td><td>PASS</td><td>—</td><td>120.8s</td></tr>
+<tr class="ok"><td>GAIA-VAL-436C1CCFAF-113</td><td>L2</td><td>PASS</td><td>—</td><td>112.9s</td></tr>
+<tr class="ok"><td>GAIA-VAL-4484670E7A-22</td><td>L2</td><td>PASS</td><td>—</td><td>164.1s</td></tr>
+<tr class="ok"><td>GAIA-VAL-4C0671AE2B-132</td><td>L1</td><td>PASS</td><td>—</td><td>74.2s</td></tr>
+<tr class="ok"><td>GAIA-VAL-5020BF00DE-38</td><td>L1</td><td>PASS</td><td>—</td><td>32.1s</td></tr>
+<tr class="ok"><td>GAIA-VAL-5137B172B1-42</td><td>L2</td><td>PASS</td><td>—</td><td>36.4s</td></tr>
+<tr class="ok"><td>GAIA-VAL-54C09F1F93-99</td><td>L3</td><td>PASS</td><td>—</td><td>501.7s</td></tr>
+<tr class="ok"><td>GAIA-VAL-580F524581-153</td><td>L2</td><td>PASS</td><td>—</td><td>98.5s</td></tr>
+<tr class="ok"><td>GAIA-VAL-582E34C083-72</td><td>L2</td><td>PASS</td><td>—</td><td>39.3s</td></tr>
+<tr class="ok"><td>GAIA-VAL-61C9DB5B8E-20</td><td>L2</td><td>PASS</td><td>—</td><td>99.6s</td></tr>
+<tr class="ok"><td>GAIA-VAL-657C0B7A24-19</td><td>L1</td><td>PASS</td><td>—</td><td>21.5s</td></tr>
+<tr class="ok"><td>GAIA-VAL-66C45D6516-161</td><td>L2</td><td>PASS</td><td>—</td><td>216.1s</td></tr>
+<tr class="ok"><td>GAIA-VAL-68D8C180B7-32</td><td>L1</td><td>PASS</td><td>—</td><td>186.8s</td></tr>
+<tr class="ok"><td>GAIA-VAL-6DEF26BCB1-102</td><td>L1</td><td>PASS</td><td>—</td><td>93.4s</td></tr>
+<tr class="ok"><td>GAIA-VAL-7072F2B615-15</td><td>L3</td><td>PASS</td><td>—</td><td>68.3s</td></tr>
+<tr class="ok"><td>GAIA-VAL-71AD8A6F0F-90</td><td>L2</td><td>PASS</td><td>—</td><td>412.9s</td></tr>
+<tr class="ok"><td>GAIA-VAL-73EF6F232F-12</td><td>L2</td><td>PASS</td><td>—</td><td>40.5s</td></tr>
+<tr class="ok"><td>GAIA-VAL-7511E4BEF5-91</td><td>L3</td><td>PASS</td><td>—</td><td>299.4s</td></tr>
+<tr class="ok"><td>GAIA-VAL-795843D739-140</td><td>L2</td><td>PASS</td><td>—</td><td>68.7s</td></tr>
+<tr class="ok"><td>GAIA-VAL-79E0DC9413-28</td><td>L2</td><td>PASS</td><td>—</td><td>320.8s</td></tr>
+<tr class="ok"><td>GAIA-VAL-7A968F11CA-78</td><td>L2</td><td>PASS</td><td>—</td><td>100.8s</td></tr>
+<tr class="ok"><td>GAIA-VAL-7B3247F387-152</td><td>L2</td><td>PASS</td><td>—</td><td>152.1s</td></tr>
+<tr class="ok"><td>GAIA-VAL-7F6A897E4E-142</td><td>L1</td><td>PASS</td><td>—</td><td>25.3s</td></tr>
+<tr class="ok"><td>GAIA-VAL-7FA94505D5-165</td><td>L1</td><td>PASS</td><td>—</td><td>79.1s</td></tr>
+<tr class="ok"><td>GAIA-VAL-81A0445FD7-52</td><td>L1</td><td>PASS</td><td>—</td><td>82.0s</td></tr>
+<tr class="ok"><td>GAIA-VAL-82744E88BD-98</td><td>L1</td><td>PASS</td><td>—</td><td>509.1s</td></tr>
+<tr class="ok"><td>GAIA-VAL-8621E9AB49-06</td><td>L2</td><td>PASS</td><td>—</td><td>210.7s</td></tr>
+<tr class="ok"><td>GAIA-VAL-8A0A2DA816-124</td><td>L3</td><td>PASS</td><td>—</td><td>73.1s</td></tr>
+<tr class="ok"><td>GAIA-VAL-8A931BE013-110</td><td>L2</td><td>PASS</td><td>—</td><td>221.6s</td></tr>
+<tr class="ok"><td>GAIA-VAL-8E8069BF53-69</td><td>L2</td><td>PASS</td><td>—</td><td>56.0s</td></tr>
+<tr class="ok"><td>GAIA-VAL-900D36A41A-79</td><td>L2</td><td>PASS</td><td>—</td><td>113.7s</td></tr>
+<tr class="ok"><td>GAIA-VAL-903D4B8158-87</td><td>L3</td><td>PASS</td><td>—</td><td>255.8s</td></tr>
+<tr class="ok"><td>GAIA-VAL-922C7C2EB3-18</td><td>L2</td><td>PASS</td><td>—</td><td>135.1s</td></tr>
+<tr class="ok"><td>GAIA-VAL-94B3A7F13B-137</td><td>L2</td><td>PASS</td><td>—</td><td>41.4s</td></tr>
+<tr class="ok"><td>GAIA-VAL-990560951F-107</td><td>L1</td><td>PASS</td><td>—</td><td>657.1s</td></tr>
+<tr class="ok"><td>GAIA-VAL-9927621865-135</td><td>L2</td><td>PASS</td><td>—</td><td>115.7s</td></tr>
+<tr class="ok"><td>GAIA-VAL-997E451EA4-146</td><td>L2</td><td>PASS</td><td>—</td><td>59.2s</td></tr>
+<tr class="ok"><td>GAIA-VAL-9A9939E37E-30</td><td>L1</td><td>PASS</td><td>—</td><td>8.5s</td></tr>
+<tr class="ok"><td>GAIA-VAL-9E89F5E5D3-56</td><td>L2</td><td>PASS</td><td>—</td><td>95.8s</td></tr>
+<tr class="ok"><td>GAIA-VAL-A211CA9123-80</td><td>L1</td><td>PASS</td><td>—</td><td>170.1s</td></tr>
+<tr class="ok"><td>GAIA-VAL-A24CD0D463-147</td><td>L2</td><td>PASS</td><td>—</td><td>163.9s</td></tr>
+<tr class="ok"><td>GAIA-VAL-A52DE90201-120</td><td>L1</td><td>PASS</td><td>—</td><td>43.2s</td></tr>
+<tr class="ok"><td>GAIA-VAL-A6E94A2087-55</td><td>L1</td><td>PASS</td><td>—</td><td>25.8s</td></tr>
+<tr class="ok"><td>GAIA-VAL-AA08CE4275-127</td><td>L1</td><td>PASS</td><td>—</td><td>11.7s</td></tr>
+<tr class="ok"><td>GAIA-VAL-AAB770948B-150</td><td>L2</td><td>PASS</td><td>—</td><td>67.4s</td></tr>
+<tr class="ok"><td>GAIA-VAL-AEA19E1240-27</td><td>L1</td><td>PASS</td><td>—</td><td>11.1s</td></tr>
+<tr class="ok"><td>GAIA-VAL-AF8D367FA4-21</td><td>L2</td><td>PASS</td><td>—</td><td>89.2s</td></tr>
+<tr class="ok"><td>GAIA-VAL-AFC60AC21C-04</td><td>L2</td><td>PASS</td><td>—</td><td>312.2s</td></tr>
+<tr class="ok"><td>GAIA-VAL-B8EC94EF58-136</td><td>L2</td><td>PASS</td><td>—</td><td>129.2s</td></tr>
+<tr class="ok"><td>GAIA-VAL-BC6470EAA0-59</td><td>L3</td><td>PASS</td><td>—</td><td>35.2s</td></tr>
+<tr class="ok"><td>GAIA-VAL-C4A291F8C9-34</td><td>L2</td><td>PASS</td><td>—</td><td>89.6s</td></tr>
+<tr class="ok"><td>GAIA-VAL-C5AEB3BB24-106</td><td>L1</td><td>PASS</td><td>—</td><td>175.9s</td></tr>
+<tr class="ok"><td>GAIA-VAL-C7901B3FAA-73</td><td>L1</td><td>PASS</td><td>—</td><td>10.8s</td></tr>
+<tr class="ok"><td>GAIA-VAL-CDE2FC18E5-17</td><td>L2</td><td>PASS</td><td>—</td><td>46.0s</td></tr>
+<tr class="ok"><td>GAIA-VAL-CE4328EFD6-151</td><td>L2</td><td>PASS</td><td>—</td><td>57.4s</td></tr>
+<tr class="ok"><td>GAIA-VAL-D0BA87D8A5-159</td><td>L2</td><td>PASS</td><td>—</td><td>113.8s</td></tr>
+<tr class="ok"><td>GAIA-VAL-D0D36F0E9E-08</td><td>L2</td><td>PASS</td><td>—</td><td>37.5s</td></tr>
+<tr class="ok"><td>GAIA-VAL-D4047A9677-75</td><td>L2</td><td>PASS</td><td>—</td><td>77.9s</td></tr>
+<tr class="ok"><td>GAIA-VAL-D514CB126F-81</td><td>L2</td><td>PASS</td><td>—</td><td>423.1s</td></tr>
+<tr class="ok"><td>GAIA-VAL-DECF274A1E-16</td><td>L2</td><td>PASS</td><td>—</td><td>246.0s</td></tr>
+<tr class="ok"><td>GAIA-VAL-E27FCD4049-61</td><td>L3</td><td>PASS</td><td>—</td><td>159.7s</td></tr>
+<tr class="ok"><td>GAIA-VAL-E2E53DB716-70</td><td>L3</td><td>PASS</td><td>—</td><td>495.5s</td></tr>
+<tr class="ok"><td>GAIA-VAL-E424150204-164</td><td>L2</td><td>PASS</td><td>—</td><td>211.9s</td></tr>
+<tr class="ok"><td>GAIA-VAL-E61841D06E-66</td><td>L2</td><td>PASS</td><td>—</td><td>246.9s</td></tr>
+<tr class="ok"><td>GAIA-VAL-EB29DF1928-97</td><td>L1</td><td>PASS</td><td>—</td><td>273.1s</td></tr>
+<tr class="ok"><td>GAIA-VAL-F1DD5ECD95-25</td><td>L2</td><td>PASS</td><td>—</td><td>852.4s</td></tr>
+<tr class="ok"><td>GAIA-VAL-F4E4A88C05-64</td><td>L3</td><td>PASS</td><td>—</td><td>549.7s</td></tr>
+<tr class="ok"><td>GAIA-VAL-F61011CDC2-89</td><td>L3</td><td>PASS</td><td>—</td><td>36.2s</td></tr>
+<tr class="ok"><td>GAIA-VAL-F84B22DEEE-53</td><td>L1</td><td>PASS</td><td>—</td><td>39.3s</td></tr>
+<tr class="ok"><td>GAIA-VAL-FBC1201B32-67</td><td>L2</td><td>PASS</td><td>—</td><td>220.0s</td></tr>
+<tr class="ok"><td>GAIA-VAL-FBC662574B-115</td><td>L1</td><td>PASS</td><td>—</td><td>134.7s</td></tr>
+</tbody></table>
+</details>
+
+<p class="note">口径：官方 scorer 移植 + 适配 prompt（末尾要求 <code>Final answer:</code> 行）+ 更严的答案提取（只认显式行，散文记 0）+ validation 自评；<b>不是官方榜单分</b>。引用必须同时带：镜像 digest、后端（集群内 bench-gaia-main）、单 trial。完整说明见仓库 <code>docs/bench/gaia.md</code> §10.24。数据文件：<a href="gaia-165.json">gaia-165.json</a></p>
+</main></body></html>
