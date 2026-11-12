@@ -1935,7 +1935,25 @@
   $('#refresh-btn').addEventListener('click', refresh);
   // Browsers throttle timers in background tabs; re-sync as soon as the tab is visible again.
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { clearTimeout(STATE.pollTimer); load(); } });
+  const productionFrame = document.querySelector('#tab-production-metrics iframe');
+  const floatingRange = document.querySelector('#production-floating-range');
+  productionFrame?.addEventListener('load', () => productionFrame.contentWindow?.postMessage({type:'production-metrics-range-request'}, location.origin));
+  floatingRange?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-production-range]');
+    if (!button || button.disabled) return;
+    const range = Number(button.dataset.productionRange);
+    if ([0, 1, 7, 30].includes(range)) productionFrame?.contentWindow?.postMessage({type:'production-metrics-range-select', range}, location.origin);
+  });
   window.addEventListener('message', (event) => {
+    if (event.data?.type === 'production-metrics-range-state') {
+      if (event.origin !== location.origin || event.source !== productionFrame?.contentWindow || ![0, 1, 7, 30].includes(event.data.range)) return;
+      floatingRange.hidden = false;
+      floatingRange.querySelectorAll('[data-production-range]').forEach((button) => {
+        button.setAttribute('aria-pressed', String(Number(button.dataset.productionRange) === event.data.range));
+        button.disabled = !!event.data.disabled;
+      });
+      return;
+    }
     const name = String(event.data?.type || '').replace(/-height$/, '');
     if (!DIGITALMATE_TABS[name]) return;
     const frame = document.querySelector(`#tab-${name} iframe`);
