@@ -1,13 +1,14 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-12T10:14:18.474Z",
+  "updatedAt": "2026-11-12T10:31:18.128Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
       "key": "text",
       "title": "文本回复",
       "coverageId": "",
+      "group": "business",
       "nightly": true,
       "requirement": ""
     },
@@ -16,6 +17,7 @@
       "key": "text-file",
       "title": "文本生成 TXT 并下载",
       "coverageId": "",
+      "group": "business",
       "nightly": true,
       "requirement": ""
     },
@@ -24,6 +26,7 @@
       "key": "multi",
       "title": "三轮对话与上下文更新",
       "coverageId": "",
+      "group": "business",
       "nightly": true,
       "requirement": ""
     },
@@ -32,6 +35,7 @@
       "key": "file-text",
       "title": "上传文件并提取文本",
       "coverageId": "",
+      "group": "business",
       "nightly": true,
       "requirement": ""
     },
@@ -40,6 +44,7 @@
       "key": "file-file",
       "title": "上传 CSV 并生成转换文件",
       "coverageId": "",
+      "group": "business",
       "nightly": true,
       "requirement": ""
     },
@@ -48,6 +53,7 @@
       "key": "choice",
       "title": "结构化选项回答并继续任务",
       "coverageId": "",
+      "group": "business",
       "nightly": true,
       "requirement": ""
     },
@@ -56,6 +62,7 @@
       "key": "connection",
       "title": "Gateway 连接检查",
       "coverageId": "",
+      "group": "business",
       "nightly": true,
       "requirement": ""
     },
@@ -64,6 +71,7 @@
       "key": "session-isolation-parallel",
       "title": "双会话并发隔离",
       "coverageId": "CON-01",
+      "group": "business",
       "nightly": true,
       "requirement": ""
     },
@@ -72,6 +80,7 @@
       "key": "duplicate-downlink-idempotent",
       "title": "同一真实确认帧三次下行与幂等恢复",
       "coverageId": "CON-04",
+      "group": "business",
       "nightly": false,
       "requirement": "live-wire"
     },
@@ -80,6 +89,7 @@
       "key": "protocol-invalid-task-identity",
       "title": "当前真实下行 task_id 八种异常与原事件恢复",
       "coverageId": "PRO-02",
+      "group": "business",
       "nightly": false,
       "requirement": "live-wire"
     },
@@ -88,6 +98,7 @@
       "key": "protocol-unknown-event-forward-compat",
       "title": "当前真实事件的未知类型和新增字段兼容",
       "coverageId": "PRO-03",
+      "group": "business",
       "nightly": false,
       "requirement": "live-wire"
     },
@@ -96,6 +107,7 @@
       "key": "protocol-malformed-optional-fields",
       "title": "不同实时增量的 segment_id/earlier 八种类型异常",
       "coverageId": "PRO-01",
+      "group": "business",
       "nightly": false,
       "requirement": "live-wire"
     },
@@ -104,6 +116,7 @@
       "key": "protocol-chunk-boundary-reassembly",
       "title": "当前中英 Unicode/Markdown 文本与 UTF-8 continuation 分片重组",
       "coverageId": "PRO-06",
+      "group": "business",
       "nightly": false,
       "requirement": "live-wire"
     },
@@ -112,22 +125,16 @@
       "key": "reset-detached-recovery",
       "title": "独立房间 reset/detached 与真实断链恢复",
       "coverageId": "REC-03",
+      "group": "business",
       "nightly": true,
       "requirement": ""
-    },
-    {
-      "name": "content_refusal_context_recovery",
-      "key": "content-refusal-context-recovery",
-      "title": "内容拦截后同房间连续发送与历史保留",
-      "coverageId": "REC-04",
-      "nightly": false,
-      "requirement": "model-boundary"
     },
     {
       "name": "artifact_receipt_required",
       "key": "artifact-receipt-required",
       "title": "真实产物的缺失回执、无效 ID、不可读内容与恢复",
       "coverageId": "ART-01",
+      "group": "business",
       "nightly": false,
       "requirement": "live-wire"
     },
@@ -136,6 +143,7 @@
       "key": "attachment-metadata-conflict",
       "title": "附件元数据冲突与真实云端对照",
       "coverageId": "ATT-01",
+      "group": "business",
       "nightly": true,
       "requirement": ""
     },
@@ -144,6 +152,7 @@
       "key": "attachment-corrupt-recovery",
       "title": "损坏图片与文本恢复",
       "coverageId": "ATT-02",
+      "group": "business",
       "nightly": true,
       "requirement": ""
     },
@@ -152,6 +161,7 @@
       "key": "attachment-image-understanding",
       "title": "真实华为 HDR/MPF 相机 JPG 原图识别",
       "coverageId": "ATT-03",
+      "group": "business",
       "nightly": true,
       "requirement": ""
     },
@@ -160,6 +170,7 @@
       "key": "skill-default-generation",
       "title": "默认生成技能：Word / Excel / PPT / PDF 各交付一个文件",
       "coverageId": "SKL-01",
+      "group": "business",
       "nightly": true,
       "requirement": ""
     },
@@ -168,20 +179,131 @@
       "key": "skill-default-parsing",
       "title": "默认解析技能：文本 PDF 提取与 CSV 对账单合计",
       "coverageId": "SKL-02",
+      "group": "business",
       "nightly": true,
       "requirement": ""
+    },
+    {
+      "name": "local_attachment_blocked_types",
+      "key": "attachment-policy/local_attachment_blocked_types",
+      "title": "拒绝的类型",
+      "coverageId": "",
+      "group": "component",
+      "nightly": true,
+      "requirement": "",
+      "suite": "attachment-policy"
+    },
+    {
+      "name": "local_attachment_image_containers",
+      "key": "attachment-policy/local_attachment_image_containers",
+      "title": "图片容器",
+      "coverageId": "",
+      "group": "component",
+      "nightly": true,
+      "requirement": "",
+      "suite": "attachment-policy"
+    },
+    {
+      "name": "local_attachment_magic_mismatch",
+      "key": "attachment-policy/local_attachment_magic_mismatch",
+      "title": "魔数不符",
+      "coverageId": "",
+      "group": "component",
+      "nightly": true,
+      "requirement": "",
+      "suite": "attachment-policy"
+    },
+    {
+      "name": "local_attachment_size_limits",
+      "key": "attachment-policy/local_attachment_size_limits",
+      "title": "大小限制",
+      "coverageId": "",
+      "group": "component",
+      "nightly": true,
+      "requirement": "",
+      "suite": "attachment-policy"
+    },
+    {
+      "name": "local_attachment_supported_controls",
+      "key": "attachment-policy/local_attachment_supported_controls",
+      "title": "支持的控件",
+      "coverageId": "",
+      "group": "component",
+      "nightly": true,
+      "requirement": "",
+      "suite": "attachment-policy"
+    },
+    {
+      "name": "local_attachment_preview_decode",
+      "key": "attachment-policy/local_attachment_preview_decode",
+      "title": "预览解码",
+      "coverageId": "",
+      "group": "component",
+      "nightly": true,
+      "requirement": "",
+      "suite": "attachment-policy"
+    },
+    {
+      "name": "native_topic_projection",
+      "key": "session-proximity/native_topic_projection",
+      "title": "主题投影",
+      "coverageId": "",
+      "group": "component",
+      "nightly": true,
+      "requirement": "",
+      "suite": "session-proximity"
+    },
+    {
+      "name": "native_capacity_draft",
+      "key": "session-proximity/native_capacity_draft",
+      "title": "容量与草稿",
+      "coverageId": "",
+      "group": "component",
+      "nightly": true,
+      "requirement": "",
+      "suite": "session-proximity"
+    },
+    {
+      "name": "native_capacity_controls",
+      "key": "session-proximity/native_capacity_controls",
+      "title": "容量与控件",
+      "coverageId": "",
+      "group": "component",
+      "nightly": true,
+      "requirement": "",
+      "suite": "session-proximity"
+    },
+    {
+      "name": "fixed_review_inputs_render_on_device",
+      "key": "markdown/fixed_review_inputs_render_on_device",
+      "title": "固定输入渲染",
+      "coverageId": "",
+      "group": "component",
+      "nightly": true,
+      "requirement": "",
+      "suite": "markdown"
+    },
+    {
+      "name": "metadata_replay_and_native_buttons",
+      "key": "suggestions/metadata_replay_and_native_buttons",
+      "title": "元数据回放与原生按钮",
+      "coverageId": "",
+      "group": "component",
+      "nightly": true,
+      "requirement": "",
+      "suite": "suggestions"
     }
   ],
   "runs": [
     {
-      "runId": 43152650829,
+      "runId": 43195220740,
       "attempt": 1,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43152650829",
-      "createdAt": "2026-11-12T04:09:38Z",
-      "headSha": "b9ff0872",
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43195220740",
+      "createdAt": "2026-11-12T17:52:00Z",
+      "headSha": "08888462",
       "conclusion": "success",
       "st": {
-        "runId": "ST-1794456473565-213046",
+        "runId": "ST-1794477636829-ba4215",
         "status": "passed",
         "mode": "business",
         "runner": "digitalmate-win-st-01",
@@ -238,6 +360,307 @@
             "issues": []
           }
         ],
+        "component": [
+          {
+            "suite": "attachment-policy",
+            "title": "本地附件策略",
+            "status": "passed",
+            "runId": "ST-1794479026591-768419",
+            "issues": [],
+            "cases": [
+              {
+                "name": "local_attachment_blocked_types",
+                "title": "拒绝的类型",
+                "status": "passed",
+                "elapsedMs": 99,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_image_containers",
+                "title": "图片容器",
+                "status": "passed",
+                "elapsedMs": 112,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_magic_mismatch",
+                "title": "魔数不符",
+                "status": "passed",
+                "elapsedMs": 44,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_size_limits",
+                "title": "大小限制",
+                "status": "passed",
+                "elapsedMs": 75,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_supported_controls",
+                "title": "支持的控件",
+                "status": "passed",
+                "elapsedMs": 509,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_preview_decode",
+                "title": "预览解码",
+                "status": "passed",
+                "elapsedMs": 22,
+                "detail": "Production upload policy and native files verified"
+              }
+            ],
+            "fixtures": []
+          },
+          {
+            "suite": "markdown",
+            "title": "Markdown 渲染",
+            "status": "passed",
+            "runId": "markdown-40d199fdd2e199193df9ccd0412243e2",
+            "issues": [],
+            "cases": [],
+            "fixtures": [
+              {
+                "name": "dash-value",
+                "title": "dash-value",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "three-dash-value",
+                "title": "three-dash-value",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "malformed-separator",
+                "title": "malformed-separator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "short-final-row",
+                "title": "short-final-row",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "open-final-pipe",
+                "title": "open-final-pipe",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "sole-operator",
+                "title": "sole-operator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "padded-operator",
+                "title": "padded-operator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "orphan-leading",
+                "title": "orphan-leading",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "orphan-trailing",
+                "title": "orphan-trailing",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "fenced-table",
+                "title": "fenced-table",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "fenced-operator",
+                "title": "fenced-operator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "comparison",
+                "title": "comparison",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "stream-pending",
+                "title": "stream-pending",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "stream-boundary",
+                "title": "stream-boundary",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-prose-period",
+                "title": "link-prose-period",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-markdown-period",
+                "title": "link-markdown-period",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-balanced-parens",
+                "title": "link-balanced-parens",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-brace-boundary",
+                "title": "link-brace-boundary",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-unmatched-open",
+                "title": "link-unmatched-open",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              }
+            ]
+          },
+          {
+            "suite": "session-proximity",
+            "title": "会话邻近契约",
+            "status": "passed",
+            "runId": "ST-1794479044800-2b261e",
+            "issues": [],
+            "cases": [
+              {
+                "name": "native_topic_projection",
+                "title": "主题投影",
+                "status": "passed",
+                "elapsedMs": 1,
+                "detail": "Native contract verified"
+              },
+              {
+                "name": "native_capacity_draft",
+                "title": "容量与草稿",
+                "status": "passed",
+                "elapsedMs": 36,
+                "detail": "Native contract verified"
+              },
+              {
+                "name": "native_capacity_controls",
+                "title": "容量与控件",
+                "status": "passed",
+                "elapsedMs": 3,
+                "detail": "Native contract verified"
+              }
+            ],
+            "fixtures": []
+          },
+          {
+            "suite": "suggestions",
+            "title": "建议协议与按钮",
+            "status": "passed",
+            "runId": "suggestions-605fee715763e00fdaccc9e1d777aa63",
+            "issues": [],
+            "cases": [],
+            "fixtures": [
+              {
+                "name": "shopping-inline-tail",
+                "title": "shopping-inline-tail",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "multiline-sources",
+                "title": "multiline-sources",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "sources-with-colon",
+                "title": "sources-with-colon",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "truncated-array",
+                "title": "truncated-array",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "fenced-example",
+                "title": "fenced-example",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "ordinary-next",
+                "title": "ordinary-next",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "unsupported-view",
+                "title": "unsupported-view",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "malformed-suggestion",
+                "title": "malformed-suggestion",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "deduplicated-limited",
+                "title": "deduplicated-limited",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              }
+            ]
+          }
+        ],
         "cases": [
           {
             "name": "real_model_text_reply",
@@ -245,7 +668,7 @@
             "title": "文本回复",
             "coverageId": "",
             "status": "passed",
-            "elapsedMs": 9316,
+            "elapsedMs": 14921,
             "stage": "validate-text",
             "detail": "Reply marker verified"
           },
@@ -255,9 +678,9 @@
             "title": "文本生成 TXT 并下载",
             "coverageId": "",
             "status": "passed",
-            "elapsedMs": 33996,
+            "elapsedMs": 66713,
             "stage": "validate-file",
-            "detail": "Downloaded TXT exact content verified: ST-1794456473565-213046.txt"
+            "detail": "Downloaded TXT exact content verified: ST-1794477636829-ba4215.txt"
           }
         ]
       }
@@ -406,51 +829,6 @@
             "elapsedMs": 27977,
             "stage": "wait-task",
             "detail": "Default parsing skills verified: text PDF extraction and CSV statement total returned every expected marker (2 turns)"
-          }
-        ]
-      }
-    },
-    {
-      "runId": 43126221912,
-      "attempt": 1,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43126221912",
-      "createdAt": "2026-11-12T00:17:37Z",
-      "headSha": "69a2ebd05d84",
-      "conclusion": "failure",
-      "st": {
-        "runId": "",
-        "status": "failed",
-        "mode": "business",
-        "runner": "digitalmate-win-st-01",
-        "machine": "PC-20261103OHIZ",
-        "issues": [
-          "﻿Tool exit code 1. \r\n",
-          "Missing device report or run ID mismatch; stale results are rejected.",
-          "real_model_text_reply: missing, duplicate, or invalid case result",
-          "real_model_txt_download_and_content: missing, duplicate, or invalid case result",
-          "Hypium counts do not match the selected device verdicts."
-        ],
-        "liveWire": [],
-        "cases": [
-          {
-            "name": "real_model_text_reply",
-            "key": "text",
-            "title": "文本回复",
-            "coverageId": "",
-            "status": "failed",
-            "elapsedMs": 0,
-            "stage": "",
-            "detail": "No completed device result."
-          },
-          {
-            "name": "real_model_txt_download_and_content",
-            "key": "text-file",
-            "title": "文本生成 TXT 并下载",
-            "coverageId": "",
-            "status": "failed",
-            "elapsedMs": 0,
-            "stage": "",
-            "detail": "No completed device result."
           }
         ]
       }
