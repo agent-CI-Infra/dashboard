@@ -1,5 +1,49 @@
 # DigitalMate production metrics view
 
+## Full native trajectory archive
+
+The hourly cloud collection also runs `scripts/collect-sfs-trajectory-archive.py`.
+It enumerates all native stores in the console-authorized workspace allowlist,
+independently of slow-request selection and process-log correlation. Workspace
+authorization still uses the existing console/log fingerprint mapping; unresolved
+bindings are counted as scope errors, never silently included.
+
+The SSH reader never opens SQLite on SFS. It copies at most 256 MiB per database
+to a private temporary directory outside SFS, checks two complete file hashes and
+file/sidecar metadata, and runs SQLite `quick_check` on the copy. Any existing
+WAL, SHM or journal defers that database. These checks provide an
+**observed-stable diagnostic copy, not an atomic snapshot**. NFS caching and
+concurrent writers prevent a strict completeness guarantee. The archive always
+publishes `consistency: unconfirmed` and `complete: false`. A writer-owned or
+storage snapshot protocol is required before claiming guaranteed completeness.
+
+Each database page contains at most 2,000 spans. The byte-image hash and rowid
+cursor bind consecutive pages to one generation; changes discard staged pages
+and restart that database. A round-robin cursor, 480-second processing budget and
+1 GiB source-byte budget defer work across hourly runs instead of truncating the
+inventory. Oversized files, read failures, active sidecars, invalid records and
+missing databases remain explicit. Collection frequency cannot recover data
+already deleted by the source retention policy.
+
+Only sanitized labels, validated request identifiers, opaque trace keys, span
+relationships, lifecycle and timing leave the host. No raw databases, prompts,
+answers, tool arguments, workspace paths or session IDs are published. Sanitized
+staged pages live under `site/data/trajectory-archive/staging`; `.sync` contains
+only generation/position/status checkpoints and is excluded from Pages. Archive
+and checkpoint publication is one data-branch commit. A failed run retains both.
+Previously archived observations survive source retention; retained spans carry
+their original observation time. No archive expiry is imposed by this collector.
+
+The independent “全部原生轨迹” section searches all archived requests and pages
+the list at 50 traces and details at 500 spans. Date filtering uses Beijing time;
+it is independent of the slow-request range selector. The index refreshes every
+five minutes; this is an hourly collection target, not a real-time feed. GitHub
+scheduled execution can be delayed. The existing slow-request view remains a
+sample and does not become a full archive merely because the archive exists.
+
+Validation: `python -m unittest discover -s scripts -p 'test_sfs_trajectory_archive.py'`
+and `node --test scripts/trajectory-archive.test.mjs`.
+
 Assets are adapted from DigitalMate `dashboard/e2e-performance` (commit `c07077d`). The view reads `data/production-model-history.json`, separately from nightly E2E data. `.github/workflows/collect-production-model-metrics.yml` publishes a 35-calendar-day aggregate every three hours to the imported `digitalmate` branch and triggers Pages deployment. Configure the `PRODUCTION_GATEWAY_KEY` Actions secret in the dashboard repository. The runner must be able to reach the gateway. Collection uses up to three concurrent daily windows and logs each completed window. A failed collection leaves the previous aggregate intact.
 
 Only daily model aggregates are published, plus the failure analysis below. The published request details are limited to opaque identifiers (`request_id`, `metadata.litellm_call_id`) and timing/status fields for timeout calls and the slowest 5% of calls of each day. Prompts, responses, message content, user identifiers, API keys, IP addresses, and raw log lines are never written to the board. The gateway rows are calls, not user questions. All traffic on the configured gateway is included; production versus test traffic is not independently classified. Unknown-status records make the selected model/day failure rate unavailable. Missing values stay unavailable, not zero.

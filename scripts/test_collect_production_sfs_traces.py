@@ -20,7 +20,7 @@ class SfsTests(unittest.TestCase):
         self.assertIn('StrictHostKeyChecking=yes', args)
         self.assertIn('UserKnownHostsFile="hosts"', args)
         self.assertEqual(args[args.index('-J') + 1], 'hk-leihui')
-        self.assertEqual(json.loads(run.call_args.kwargs['input']), {'mode': 'inventory'})
+        self.assertEqual(json.loads(run.call_args.kwargs['input'])['payload'], {'mode': 'inventory'})
 
     def test_failure_never_returns_raw_stderr(self):
         with patch.dict(os.environ, {'SFS_SSH_KEY_FILE': 'key', 'SFS_KNOWN_HOSTS_FILE': 'hosts'}), \

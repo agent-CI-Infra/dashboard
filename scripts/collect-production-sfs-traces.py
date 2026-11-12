@@ -14,13 +14,14 @@ collector = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(collector)
 
 
-def ssh_operation(payload):
+def ssh_operation(payload, *, remote_source=None):
     key = os.environ.get('SFS_SSH_KEY_FILE')
     known_hosts = os.environ.get('SFS_KNOWN_HOSTS_FILE')
     if not key or not known_hosts:
         raise RuntimeError('SFS_SSH_KEY_FILE and SFS_KNOWN_HOSTS_FILE are required')
-    source = base64.b64encode(collector.REMOTE.encode('utf-8')).decode('ascii')
-    command = "python3 -c \"import base64;exec(base64.b64decode('" + source + "'))\""
+    # Send code through stdin too: the full archive reader exceeds Windows'
+    # command-line limit. Never interpolate credentials or paths into code.
+    command = 'python3 -c "import sys,json,io; e=json.load(sys.stdin); sys.stdin=io.StringIO(json.dumps(e[\'payload\'])); exec(compile(e[\'source\'],\'<collector>\',\'exec\'))"'
     args = ['ssh', '-i', key, '-o', 'IdentitiesOnly=yes', '-o', 'BatchMode=yes',
             '-o', 'StrictHostKeyChecking=yes', '-o', 'UserKnownHostsFile="' + known_hosts + '"',
             '-o', 'ConnectTimeout=30', '-p', '2222']
@@ -28,7 +29,7 @@ def ssh_operation(payload):
         args += ['-J', os.environ['SFS_SSH_JUMP']]
     args += ['root@190.92.232.35', command]
     try:
-        result = subprocess.run(args, input=json.dumps(payload), text=True, capture_output=True,
+        result = subprocess.run(args, input=json.dumps({'source': remote_source or collector.REMOTE, 'payload': payload}), text=True, capture_output=True,
                                 timeout=900, check=False)
     except (OSError, subprocess.TimeoutExpired) as error:
         raise RuntimeError('SFS SSH collection failed') from error

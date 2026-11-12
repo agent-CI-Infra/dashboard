@@ -56,6 +56,14 @@ jobs:
           python3 scripts/collect-production-sfs-traces.py \
             /tmp/cloud-metrics/env-request-latency-daily.json \
             /tmp/cloud-metrics/previous.json
+          # Persistent cursor and archive are restored together. Raw SFS files
+          # never leave the SSH host; only allowlisted timing fields are sent.
+          git worktree add --detach /tmp/cloud-metrics/seed origin/digitalmate
+          python3 scripts/collect-sfs-trajectory-archive.py \
+            --state /tmp/cloud-metrics/seed/.sync/trajectory-archive.json \
+            --previous /tmp/cloud-metrics/seed/site/data/trajectory-archive \
+            --output /tmp/cloud-metrics/trajectory-archive \
+            --next-state /tmp/cloud-metrics/trajectory-archive-state.json
       - name: Publish aggregate to the DigitalMate data branch
         if: ${{ github.event_name != 'workflow_dispatch' || !inputs.validate_only }}
         id: update
@@ -64,13 +72,16 @@ jobs:
           git fetch origin digitalmate:refs/remotes/origin/digitalmate
           git checkout -B digitalmate origin/digitalmate
           cp /tmp/cloud-metrics/env-request-latency-daily.json site/data/env-request-latency-daily.json
-          if git diff --quiet -- site/data/env-request-latency-daily.json; then
+          mkdir -p site/data/trajectory-archive .sync
+          rsync -a --delete /tmp/cloud-metrics/trajectory-archive/ site/data/trajectory-archive/
+          cp /tmp/cloud-metrics/trajectory-archive-state.json .sync/trajectory-archive.json
+          git add site/data/env-request-latency-daily.json site/data/trajectory-archive .sync/trajectory-archive.json
+          if git diff --cached --quiet; then
             echo 'changed=false' >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add site/data/env-request-latency-daily.json
           git commit -m 'chore(digitalmate): update cloud request metrics'
           git pull --rebase origin digitalmate
           git push origin HEAD:digitalmate

@@ -77,7 +77,7 @@ def fingerprint(item):
         return None, 'unavailable'
 
 
-def collect():
+def select_workspaces():
     if not traces.TOKEN:
         raise RuntimeError('ADX_TOKEN is required to select production bindings')
     inventory = kube_operation({'mode': 'inventory'})
@@ -102,9 +102,14 @@ def collect():
         names.add(candidates[0])
     if not names:
         raise RuntimeError('no unambiguous production workspaces')
+    return sorted(names), len(bindings), errors
+
+
+def collect():
+    names, binding_count, errors = select_workspaces()
     source = (HERE / 'collect-production-workspace-traces.py').read_text(encoding='utf-8')
-    result = kube_operation({'mode': 'collect', 'names': sorted(names), 'source': source})
-    result['binding_count'] = len(bindings)
+    result = kube_operation({'mode': 'collect', 'names': names, 'source': source})
+    result['binding_count'] = binding_count
     result['errors'] = dict(collections.Counter(result.get('errors', {})) + errors)
     result['collection_source'] = 'kubernetes_shared_workspace'
     if result['errors']:
