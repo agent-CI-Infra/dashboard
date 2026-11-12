@@ -153,7 +153,7 @@ export function readComponentRuns(dir) {
     if (!summary) continue
     const meta = COMPONENT_SUITES[name]
     if (!meta) continue
-    const cases = (summary.cases || []).map((item) => {
+    const mapped = (summary.cases || []).map((item) => {
       const id = item.name || item.id
       return {
         name: id,
@@ -163,6 +163,11 @@ export function readComponentRuns(dir) {
         detail: redact(item.detail),
       }
     })
+    // attachment-policy/session-proximity report one row per Hypium case;
+    // markdown/suggestions report one row per rendered fixture while the suite
+    // itself is a single case. Keep those separate so the catalog stays at 11.
+    const cases = mapped.filter((item) => meta.cases[item.name])
+    const fixtures = mapped.filter((item) => !meta.cases[item.name])
     runs.push({
       suite: name,
       title: meta.title,
@@ -170,6 +175,7 @@ export function readComponentRuns(dir) {
       runId: summary.runId || '',
       issues: Array.isArray(summary.issues) ? summary.issues.map(redact).slice(0, 5) : [],
       cases,
+      fixtures,
     })
   }
   return runs.sort((a, b) => a.suite.localeCompare(b.suite))

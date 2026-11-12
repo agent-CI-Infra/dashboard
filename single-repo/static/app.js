@@ -1460,8 +1460,16 @@
       // Live-wire cases live in their own lane artifact; the merge attaches them per run.
       const lw = (r.st.liveWire || []).find((x) => x.caseName === name);
       if (lw) return verdict(lw.status);
-      const comp = (r.st.component || []).flatMap((suite) => suite.cases || []).find((x) => x.name === name);
+      const componentSuites = r.st.component || [];
+      const comp = componentSuites.flatMap((suite) => suite.cases || []).find((x) => x.name === name);
       if (comp) return verdict(comp.status);
+      // markdown/suggestions report one row per rendered fixture, so fall back
+      // to the suite verdict for their catalog entry.
+      const componentMeta = catalog ? catalog.find((c) => c.name === name) : null;
+      if (componentMeta?.suite) {
+        const suite = componentSuites.find((s) => s.suite === componentMeta.suite);
+        if (suite) return verdict(suite.status);
+      }
       const hit = (r.st.cases || []).find((x) => x.name === name);
       if (!hit) return '<span class="muted" title="本轮未运行">·</span>';
       return verdict(hit.status);
@@ -1494,11 +1502,16 @@
 
     const component = latest.st.component || [];
     if (component.length) {
-      const rows = component.flatMap((suite) => (suite.cases || []).map((c) => ({ ...c, suite: suite.suite, suiteTitle: suite.title })));
-      html += sectionHead('组件 ST 明细', `${component.filter((x) => x.status === 'passed').length}/${component.length} 套件通过 · ${rows.filter((c) => c.status === 'passed').length}/${rows.length} 条用例`);
+      const rows = component.flatMap((suite) => [
+        ...(suite.cases || []).map((c) => ({ ...c, suite: suite.suite, suiteTitle: suite.title, kind: 'case' })),
+        ...(suite.fixtures || []).map((c) => ({ ...c, suite: suite.suite, suiteTitle: suite.title, kind: 'fixture' })),
+      ]);
+      const caseRows = rows.filter((r) => r.kind === 'case');
+      const fixtureRows = rows.filter((r) => r.kind === 'fixture');
+      html += sectionHead('组件 ST 明细', `${component.filter((x) => x.status === 'passed').length}/${component.length} 套件通过 · ${caseRows.filter((c) => c.status === 'passed').length}/${caseRows.length} 条用例${fixtureRows.length ? ` · ${fixtureRows.filter((c) => c.status === 'passed').length}/${fixtureRows.length} 个渲染样本` : ''}`);
       html += `<div class="card">${table('t-st-component', [
         { key: 'suite', label: '套件', render: (x) => esc(x.suiteTitle || x.suite) },
-        { key: 'title', label: '用例', render: (c) => esc(c.title || c.name) },
+        { key: 'title', label: '用例 / 样本', render: (c) => `${esc(c.title || c.name)}${c.kind === 'fixture' ? ' <span class="muted">样本</span>' : ''}` },
         { key: 'status', label: '结果', render: (c) => stBadge(c.status) },
         { key: 'elapsedMs', label: '耗时', num: true, render: (c) => fmtMs(c.elapsedMs), sort: (c) => c.elapsedMs ?? Infinity },
         { key: 'detail', label: '说明', render: (c) => `<span class="muted">${esc(c.detail || '')}</span>` },

@@ -162,13 +162,15 @@ test('component suites merge into the run entry and catalog', () => {
       status: 'passed', runId: 'ST-comp',
       cases: [{ name: 'local_attachment_blocked_types', status: 'passed', elapsedMs: 10 }, { name: 'local_attachment_size_limits', status: 'failed', detail: 'too large' }],
     })
-    write('markdown', { status: 'passed', runId: 'markdown-x', cases: [{ id: 'fixed_review_inputs_render_on_device', status: 'passed' }] })
+    // Real markdown summaries report rendered fixtures, not the Hypium case name.
+    write('markdown', { status: 'passed', runId: 'markdown-x', cases: [{ id: 'dash-value', status: 'passed' }] })
     write('unknown', { status: 'passed', cases: [] })
     const runs = readComponentRuns(dir)
     assert.deepEqual(runs.map((r) => r.suite), ['attachment-policy', 'markdown'])
     assert.equal(runs[0].cases.length, 2)
     assert.equal(runs[0].title, '本地附件策略')
-    assert.equal(runs[1].cases[0].title, '固定输入渲染')
+    assert.equal(runs[1].cases.length, 0)
+    assert.equal(runs[1].fixtures[0].name, 'dash-value')
     const entry = buildEntry({ summary: SUMMARY, run: RUN, component: runs })
     assert.equal(entry.st.component.length, 2)
     const catalog = buildCatalog()
