@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { execFileSync } from 'node:child_process'
-import { buildEntry, buildErrorEntry, merge, readLiveWireRuns, SCHEMA, ST_CASES } from './merge-st-summary.mjs'
+import { buildEntry, buildErrorEntry, buildCatalog, merge, readComponentRuns, readLiveWireRuns, SCHEMA, ST_CASES } from './merge-st-summary.mjs'
 
 const RUN = {
   id: 43039010304,
@@ -146,6 +146,34 @@ test('live-wire suite directories merge into the run entry', () => {
     const entry = buildEntry({ summary: SUMMARY, run: RUN, liveWire: runs })
     assert.equal(entry.st.liveWire.length, 2)
     assert.equal(entry.st.liveWire[0].issues[0], 'transport error')
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('component suites merge into the run entry and catalog', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'st-comp-'))
+  try {
+    const write = (suite, summary) => {
+      fs.mkdirSync(path.join(dir, suite), { recursive: true })
+      fs.writeFileSync(path.join(dir, suite, 'summary.json'), JSON.stringify(summary))
+    }
+    write('attachment-policy', {
+      status: 'passed', runId: 'ST-comp',
+      cases: [{ name: 'local_attachment_blocked_types', status: 'passed', elapsedMs: 10 }, { name: 'local_attachment_size_limits', status: 'failed', detail: 'too large' }],
+    })
+    write('markdown', { status: 'passed', runId: 'markdown-x', cases: [{ id: 'fixed_review_inputs_render_on_device', status: 'passed' }] })
+    write('unknown', { status: 'passed', cases: [] })
+    const runs = readComponentRuns(dir)
+    assert.deepEqual(runs.map((r) => r.suite), ['attachment-policy', 'markdown'])
+    assert.equal(runs[0].cases.length, 2)
+    assert.equal(runs[0].title, '本地附件策略')
+    assert.equal(runs[1].cases[0].title, '固定输入渲染')
+    const entry = buildEntry({ summary: SUMMARY, run: RUN, component: runs })
+    assert.equal(entry.st.component.length, 2)
+    const catalog = buildCatalog()
+    assert.equal(catalog.filter((c) => c.group === 'component').length, 11)
+    assert.equal(catalog.filter((c) => c.group === 'business').length, 20)
   } finally {
     fs.rmSync(dir, { recursive: true, force: true })
   }

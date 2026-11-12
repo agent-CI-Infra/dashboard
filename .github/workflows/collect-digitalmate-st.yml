@@ -80,7 +80,8 @@ jobs:
           # a missing live-wire artifact just leaves those rows grey.
           st_name=$(jq -r '[.artifacts[] | select(.name | startswith("digitalmate-st-")) | .name] | first // empty' /tmp/nightly-artifacts.json)
           lw_name=$(jq -r '[.artifacts[] | select(.name | startswith("digitalmate-st-live-wire-")) | .name] | first // empty' /tmp/nightly-artifacts.json)
-          rm -rf /tmp/st /tmp/lw
+          comp_name=$(jq -r '[.artifacts[] | select(.name | startswith("digitalmate-st-component-")) | .name] | first // empty' /tmp/nightly-artifacts.json)
+          rm -rf /tmp/st /tmp/lw /tmp/comp
           if [ -n "$st_name" ]; then
             gh run download "$id" -R "$repo" -n "$st_name" -D /tmp/st
           else
@@ -90,6 +91,9 @@ jobs:
           fi
           if [ -n "$lw_name" ]; then
             gh run download "$id" -R "$repo" -n "$lw_name" -D /tmp/lw || echo '::warning::live-wire artifact download failed; leaving those rows grey'
+          fi
+          if [ -n "$comp_name" ]; then
+            gh run download "$id" -R "$repo" -n "$comp_name" -D /tmp/comp || echo '::warning::component artifact download failed; leaving those rows grey'
           fi
           echo "skip=false" >> "$GITHUB_OUTPUT"
           echo "run_id=$id" >> "$GITHUB_OUTPUT"
@@ -104,7 +108,7 @@ jobs:
           fi
           node scripts/merge-st-summary.mjs \
             --st /tmp/st --run /tmp/nightly-run.json \
-            --live-wire /tmp/lw \
+            --live-wire /tmp/lw --component /tmp/comp \
             --previous /tmp/previous-st.json --out /tmp/st.json
 
       - name: Update digitalmate branch

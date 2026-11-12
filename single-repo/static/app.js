@@ -1455,24 +1455,33 @@
       for (const r of mruns) for (const c of r.st.cases || []) if (!seen.has(c.name)) { seen.add(c.name); list.push(c); }
       return list;
     })();
+    const verdict = (status) => (status === 'passed' ? badge('✓', 'good') : status === 'failed' ? badge('✕', 'bad') : badge('!', 'warn'));
     const cell = (r, name) => {
       // Live-wire cases live in their own lane artifact; the merge attaches them per run.
       const lw = (r.st.liveWire || []).find((x) => x.caseName === name);
-      if (lw) return lw.status === 'passed' ? badge('✓', 'good') : lw.status === 'failed' ? badge('✕', 'bad') : badge('!', 'warn');
+      if (lw) return verdict(lw.status);
+      const comp = (r.st.component || []).flatMap((suite) => suite.cases || []).find((x) => x.name === name);
+      if (comp) return verdict(comp.status);
       const hit = (r.st.cases || []).find((x) => x.name === name);
       if (!hit) return '<span class="muted" title="本轮未运行">·</span>';
-      return hit.status === 'passed' ? badge('✓', 'good') : hit.status === 'failed' ? badge('✕', 'bad') : badge('!', 'warn');
+      return verdict(hit.status);
     };
     const requirement = (c) => (c.requirement === 'live-wire' ? badge('live-wire', '') : c.requirement === 'model-boundary' ? badge('boundary', '') : '');
     const matrixCols = [{ key: 'title', label: '用例', render: (row) => row.html }, ...mruns.map((r) => ({ key: 'r', label: `#${String(r.runId).slice(-6)}`, sortable: false, render: (row) => row.cells[mruns.indexOf(r)] }))];
-    const matrixRows = order.map((c) => ({
+    const matrixRowsFor = (rows) => rows.map((c) => ({
       html: `${esc(c.title || c.name)}${c.coverageId ? ` <span class="muted">${esc(c.coverageId)}</span>` : ''}${c.nightly === false ? ' ' + requirement(c) : ''}`,
       cells: mruns.map((r) => cell(r, c.name)),
     }));
-    const nightlyCount = catalog ? catalog.filter((c) => c.nightly !== false).length : order.length;
-    const explicitCount = catalog ? catalog.length - nightlyCount : 0;
-    html += sectionHead('用例 × 运行矩阵', catalog ? `共 ${catalog.length} 个场景 · ${nightlyCount} 个 nightly 直连 · ${explicitCount} 个显式（live-wire / boundary）` : `最近 ${mruns.length} 轮`);
-    html += `<div class="card">${table('t-st-matrix', matrixCols, matrixRows)}</div>`;
+    const businessOrder = catalog ? catalog.filter((c) => c.group !== 'component') : order;
+    const componentOrder = catalog ? catalog.filter((c) => c.group === 'component') : [];
+    const nightlyCount = businessOrder.filter((c) => c.nightly !== false).length;
+    const explicitCount = businessOrder.length - nightlyCount;
+    html += sectionHead('业务用例 × 运行矩阵', catalog ? `共 ${businessOrder.length} 个业务场景 · ${nightlyCount} 个 nightly 直连 · ${explicitCount} 个显式（live-wire）` : `最近 ${mruns.length} 轮`);
+    html += `<div class="card">${table('t-st-matrix', matrixCols, matrixRowsFor(businessOrder))}</div>`;
+    if (componentOrder.length) {
+      html += sectionHead('组件用例 × 运行矩阵', `共 ${componentOrder.length} 条 · 本地确定性组件契约，无云端或模型请求`);
+      html += `<div class="card">${table('t-st-component-matrix', matrixCols, matrixRowsFor(componentOrder))}</div>`;
+    }
 
     html += sectionHead('最新运行用例明细', `${esc(latest.st.runner || '—')} · ${esc(latest.st.machine || '—')}${latest.st.runId ? ` · ST runId <code>${esc(latest.st.runId)}</code>` : ''}`);
     html += `<div class="card">${table('t-st-cases', [
@@ -1482,6 +1491,19 @@
       { key: 'stage', label: '结束阶段', render: (c) => esc(c.stage || '') },
       { key: 'detail', label: '说明', render: (c) => `<span class="muted">${esc(c.detail || '')}</span>` },
     ], cases)}</div>`;
+
+    const component = latest.st.component || [];
+    if (component.length) {
+      const rows = component.flatMap((suite) => (suite.cases || []).map((c) => ({ ...c, suite: suite.suite, suiteTitle: suite.title })));
+      html += sectionHead('组件 ST 明细', `${component.filter((x) => x.status === 'passed').length}/${component.length} 套件通过 · ${rows.filter((c) => c.status === 'passed').length}/${rows.length} 条用例`);
+      html += `<div class="card">${table('t-st-component', [
+        { key: 'suite', label: '套件', render: (x) => esc(x.suiteTitle || x.suite) },
+        { key: 'title', label: '用例', render: (c) => esc(c.title || c.name) },
+        { key: 'status', label: '结果', render: (c) => stBadge(c.status) },
+        { key: 'elapsedMs', label: '耗时', num: true, render: (c) => fmtMs(c.elapsedMs), sort: (c) => c.elapsedMs ?? Infinity },
+        { key: 'detail', label: '说明', render: (c) => `<span class="muted">${esc(c.detail || '')}</span>` },
+      ], rows)}</div>`;
+    }
 
     const liveWire = latest.st.liveWire || [];
     if (liveWire.length) {
