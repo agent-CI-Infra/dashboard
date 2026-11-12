@@ -38,7 +38,10 @@ export const ST_CASES = {
   protocol_malformed_optional_fields: { key: 'protocol-malformed-optional-fields', title: '不同实时增量的 segment_id/earlier 八种类型异常', coverageId: 'PRO-01', liveWireOnly: true },
   protocol_chunk_boundary_reassembly: { key: 'protocol-chunk-boundary-reassembly', title: '当前中英 Unicode/Markdown 文本与 UTF-8 continuation 分片重组', coverageId: 'PRO-06', liveWireOnly: true },
   reset_detached_recovery: { key: 'reset-detached-recovery', title: '独立房间 reset/detached 与真实断链恢复', coverageId: 'REC-03' },
-  content_refusal_context_recovery: { key: 'content-refusal-context-recovery', title: '内容拦截后同房间连续发送与历史保留', coverageId: 'REC-04', requiresBoundaryFixture: true },
+  // REC-04 is temporarily excluded from the published catalog: it needs a dedicated
+  // model-boundary injector deployment, and the board should not list a case that
+  // no lane can run yet.
+  content_refusal_context_recovery: { key: 'content-refusal-context-recovery', title: '内容拦截后同房间连续发送与历史保留', coverageId: 'REC-04', requiresBoundaryFixture: true, hidden: true },
   artifact_receipt_required: { key: 'artifact-receipt-required', title: '真实产物的缺失回执、无效 ID、不可读内容与恢复', coverageId: 'ART-01', liveWireOnly: true },
   attachment_metadata_conflict: { key: 'attachment-metadata-conflict', title: '附件元数据冲突与真实云端对照', coverageId: 'ATT-01' },
   attachment_corrupt_recovery: { key: 'attachment-corrupt-recovery', title: '损坏图片与文本恢复', coverageId: 'ATT-02' },
@@ -52,14 +55,26 @@ export const ST_CASES = {
 // live-wire fault-injection cases need the loopback relay, REC-04 needs the
 // model-boundary injector.
 export function buildCatalog() {
-  return Object.entries(ST_CASES).map(([name, meta]) => ({
+  const business = Object.entries(ST_CASES).filter(([, meta]) => !meta.hidden).map(([name, meta]) => ({
     name,
     key: meta.key,
     title: meta.title,
     coverageId: meta.coverageId || '',
+    group: 'business',
     nightly: !meta.liveWireOnly && !meta.requiresBoundaryFixture,
     requirement: meta.liveWireOnly ? 'live-wire' : meta.requiresBoundaryFixture ? 'model-boundary' : '',
   }))
+  const component = Object.entries(COMPONENT_SUITES).flatMap(([suite, meta]) => Object.entries(meta.cases).map(([name, title]) => ({
+    name,
+    key: suite + '/' + name,
+    title,
+    coverageId: '',
+    group: 'component',
+    nightly: true,
+    requirement: '',
+    suite,
+  })))
+  return [...business, ...component]
 }
 
 // live-wire suite directory name -> Hypium case name (tests/st/live-wire/run.mjs).
@@ -90,6 +105,77 @@ export function readLiveWireRuns(dir) {
       status: assessment.status || 'blocked',
       nativeStatus: assessment.nativeStatus || 'unavailable',
       issues: Array.isArray(assessment.issues) ? assessment.issues.map(redact).slice(0, 5) : [],
+    })
+  }
+  return runs.sort((a, b) => a.suite.localeCompare(b.suite))
+}
+
+// Component ST suites: deterministic on-device component contracts, published by
+// the separate digitalmate-st-component artifact. Suite -> its cases/titles.
+export const COMPONENT_SUITES = {
+  'attachment-policy': {
+    title: '本地附件策略',
+    cases: {
+      local_attachment_blocked_types: '拒绝的类型',
+      local_attachment_image_containers: '图片容器',
+      local_attachment_magic_mismatch: '魔数不符',
+      local_attachment_size_limits: '大小限制',
+      local_attachment_supported_controls: '支持的控件',
+      local_attachment_preview_decode: '预览解码',
+    },
+  },
+  'session-proximity': {
+    title: '会话邻近契约',
+    cases: {
+      native_topic_projection: '主题投影',
+      native_capacity_draft: '容量与草稿',
+      native_capacity_controls: '容量与控件',
+    },
+  },
+  markdown: {
+    title: 'Markdown 渲染',
+    cases: { fixed_review_inputs_render_on_device: '固定输入渲染' },
+  },
+  suggestions: {
+    title: '建议协议与按钮',
+    cases: { metadata_replay_and_native_buttons: '元数据回放与原生按钮' },
+  },
+}
+
+// Each suite directory holds summary.json (report.mjs or the suite's assess()).
+export function readComponentRuns(dir) {
+  if (!dir || !existsSync(dir)) return []
+  const runs = []
+  for (const name of readdirSync(dir)) {
+    const file = path.join(dir, name, 'summary.json')
+    if (!existsSync(file)) continue
+    const summary = readJson(file)
+    if (!summary) continue
+    const meta = COMPONENT_SUITES[name]
+    if (!meta) continue
+    const mapped = (summary.cases || []).map((item) => {
+      const id = item.name || item.id
+      return {
+        name: id,
+        title: meta.cases[id] || id,
+        status: item.status || 'unknown',
+        elapsedMs: typeof item.elapsedMs === 'number' ? item.elapsedMs : null,
+        detail: redact(item.detail),
+      }
+    })
+    // attachment-policy/session-proximity report one row per Hypium case;
+    // markdown/suggestions report one row per rendered fixture while the suite
+    // itself is a single case. Keep those separate so the catalog stays at 11.
+    const cases = mapped.filter((item) => meta.cases[item.name])
+    const fixtures = mapped.filter((item) => !meta.cases[item.name])
+    runs.push({
+      suite: name,
+      title: meta.title,
+      status: summary.status || 'failed',
+      runId: summary.runId || '',
+      issues: Array.isArray(summary.issues) ? summary.issues.map(redact).slice(0, 5) : [],
+      cases,
+      fixtures,
     })
   }
   return runs.sort((a, b) => a.suite.localeCompare(b.suite))
@@ -144,7 +230,7 @@ function redact(detail) {
   return String(detail || '').slice(0, 300)
 }
 
-export function buildEntry({ summary, deviceResult, run, liveWire = [] }) {
+export function buildEntry({ summary, deviceResult, run, liveWire = [], component = [] }) {
   const cases = Array.isArray(summary?.cases) ? summary.cases : []
   const mapped = cases.map((item) => {
     const meta = ST_CASES[item.name] || {}
@@ -174,6 +260,7 @@ export function buildEntry({ summary, deviceResult, run, liveWire = [] }) {
       machine: summary?.machine || '',
       issues: Array.isArray(summary?.issues) ? summary.issues.map(redact).slice(0, 5) : [],
       liveWire,
+      component,
       cases: mapped,
     },
   }
@@ -227,12 +314,13 @@ if (isMain) {
   }
   const run = readJson(args.run)
   const liveWire = readLiveWireRuns(args['live-wire'])
+  const component = readComponentRuns(args.component)
   const summaryFile = findSummary(args.st)
   let entry
   if (summaryFile) {
     const summary = readJson(summaryFile)
     const deviceFile = findDeviceResult(args.st)
-    entry = buildEntry({ summary, deviceResult: deviceFile ? readJson(deviceFile) : null, run, liveWire })
+    entry = buildEntry({ summary, deviceResult: deviceFile ? readJson(deviceFile) : null, run, liveWire, component })
   } else {
     entry = buildErrorEntry({ run, message: 'digitalmate-st artifact has no summary.json (ST job failed before report generation)' })
   }
