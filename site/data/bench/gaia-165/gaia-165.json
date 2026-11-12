@@ -1,5 +1,5 @@
 {
- "schema": "digitalmate-bench-gaia-165/v1",
+ "schema": "digitalmate-bench-gaia-165/v2",
  "runId": "manual-gaia-baseline-20261111",
  "benchmark": "GAIA validation (165 tasks)",
  "split": "validation",
@@ -40,29 +40,142 @@
   "format-noise": 7,
   "no-final-answer": 2
  },
- "by_level": {
-  "1": {
-   "PASS": 35,
-   "FAIL": 10,
-   "NOT_RUN": 8
-  },
-  "2": {
-   "ERROR": 4,
-   "FAIL": 21,
-   "PASS": 46,
-   "NOT_RUN": 15
-  },
-  "3": {
-   "PASS": 14,
-   "NOT_RUN": 7,
-   "FAIL": 5
-  }
- },
  "latency_ms": {
   "p50": 115708,
-  "p95": 635636,
+  "p95": 632761,
   "n": 145,
   "excluded": "20 tasks rejected at upload (durationMs=0)"
+ },
+ "classification_note": "GAIA 官方只给 Level、是否需附件，以及每题标注的步骤数/工具数；没有“推理 vs 搜索”标签。这里用 Number of tools = 0 作“纯推理”的代理，其余为“工具/检索”，属代理分类，不是官方口径。",
+ "groups": {
+  "type": [
+   {
+    "key": "纯推理",
+    "n": 10,
+    "passed": 10,
+    "judged": 10,
+    "raw": 1.0,
+    "product": 1.0,
+    "notRun": 0,
+    "errors": 0
+   },
+   {
+    "key": "工具/检索",
+    "n": 154,
+    "passed": 84,
+    "judged": 120,
+    "raw": 0.545,
+    "product": 0.7,
+    "notRun": 30,
+    "errors": 4
+   },
+   {
+    "key": "未知",
+    "n": 1,
+    "passed": 1,
+    "judged": 1,
+    "raw": 1.0,
+    "product": 1.0,
+    "notRun": 0,
+    "errors": 0
+   }
+  ],
+  "file": [
+   {
+    "key": "带附件",
+    "n": 38,
+    "passed": 6,
+    "judged": 12,
+    "raw": 0.158,
+    "product": 0.5,
+    "notRun": 23,
+    "errors": 3
+   },
+   {
+    "key": "无附件",
+    "n": 127,
+    "passed": 89,
+    "judged": 119,
+    "raw": 0.701,
+    "product": 0.748,
+    "notRun": 7,
+    "errors": 1
+   }
+  ],
+  "steps": [
+   {
+    "key": "1–4 步",
+    "n": 42,
+    "passed": 22,
+    "judged": 31,
+    "raw": 0.524,
+    "product": 0.71,
+    "notRun": 11,
+    "errors": 0
+   },
+   {
+    "key": "5–8 步",
+    "n": 67,
+    "passed": 37,
+    "judged": 52,
+    "raw": 0.552,
+    "product": 0.712,
+    "notRun": 12,
+    "errors": 3
+   },
+   {
+    "key": "9+ 步",
+    "n": 55,
+    "passed": 35,
+    "judged": 47,
+    "raw": 0.636,
+    "product": 0.745,
+    "notRun": 7,
+    "errors": 1
+   },
+   {
+    "key": "未知",
+    "n": 1,
+    "passed": 1,
+    "judged": 1,
+    "raw": 1.0,
+    "product": 1.0,
+    "notRun": 0,
+    "errors": 0
+   }
+  ],
+  "level": [
+   {
+    "key": 1,
+    "n": 53,
+    "passed": 35,
+    "judged": 45,
+    "raw": 0.66,
+    "product": 0.778,
+    "notRun": 8,
+    "errors": 0
+   },
+   {
+    "key": 2,
+    "n": 86,
+    "passed": 46,
+    "judged": 67,
+    "raw": 0.535,
+    "product": 0.687,
+    "notRun": 15,
+    "errors": 4
+   },
+   {
+    "key": 3,
+    "n": 26,
+    "passed": 14,
+    "judged": 19,
+    "raw": 0.538,
+    "product": 0.737,
+    "notRun": 7,
+    "errors": 0
+   }
+  ]
  },
  "tasks": [
   {
@@ -70,1155 +183,1815 @@
    "level": 2,
    "bucket": "FAIL",
    "reason": "extra-element",
-   "durationMs": 29523
+   "durationMs": 29523,
+   "type": "工具/检索",
+   "steps": 9,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-0AFF695182-31",
    "level": 2,
    "bucket": "FAIL",
    "reason": "numeric-mismatch",
-   "durationMs": 26152
+   "durationMs": 26152,
+   "type": "工具/检索",
+   "steps": 8,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-0DBC463817-45",
    "level": 1,
    "bucket": "FAIL",
    "reason": "text-mismatch",
-   "durationMs": 577063
+   "durationMs": 577063,
+   "type": "工具/检索",
+   "steps": 8,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-26C86B72C3-74",
    "level": 2,
    "bucket": "FAIL",
    "reason": "format-noise",
-   "durationMs": 102718
+   "durationMs": 102718,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-27E32B79BD-35",
    "level": 2,
    "bucket": "FAIL",
    "reason": "format-noise",
-   "durationMs": 151152
+   "durationMs": 151152,
+   "type": "工具/检索",
+   "steps": 10,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-2E86EB36BB-14",
    "level": 2,
    "bucket": "FAIL",
    "reason": "numeric-mismatch",
-   "durationMs": 792754
+   "durationMs": 792754,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 1,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-2F9BFC5C11-09",
    "level": 2,
    "bucket": "FAIL",
    "reason": "numeric-mismatch",
-   "durationMs": 211672
+   "durationMs": 211672,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-32E31F12C5-82",
    "level": 2,
    "bucket": "FAIL",
    "reason": "numeric-mismatch",
-   "durationMs": 375546
+   "durationMs": 375546,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-38ED7AFFA7-162",
    "level": 2,
    "bucket": "FAIL",
    "reason": "text-mismatch",
-   "durationMs": 635636
+   "durationMs": 635636,
+   "type": "工具/检索",
+   "steps": 9,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-43328C34C2-10",
    "level": 2,
    "bucket": "FAIL",
    "reason": "format-noise",
-   "durationMs": 46497
+   "durationMs": 46497,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 1,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-45A1354F9F-141",
    "level": 1,
    "bucket": "FAIL",
    "reason": "text-mismatch",
-   "durationMs": 172676
+   "durationMs": 172676,
+   "type": "工具/检索",
+   "steps": 9,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-4F164F8D5F-104",
    "level": 2,
    "bucket": "FAIL",
    "reason": "text-mismatch",
-   "durationMs": 531406
+   "durationMs": 531406,
+   "type": "工具/检索",
+   "steps": 12,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-5623FA6A49-85",
    "level": 1,
    "bucket": "FAIL",
    "reason": "format-noise",
-   "durationMs": 232382
+   "durationMs": 232382,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-5C90240729-143",
    "level": 2,
    "bucket": "FAIL",
    "reason": "format-noise",
-   "durationMs": 200794
+   "durationMs": 200794,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-601807D0A1-121",
    "level": 3,
    "bucket": "FAIL",
    "reason": "numeric-mismatch",
-   "durationMs": 47527
+   "durationMs": 47527,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 4,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-711BE2880D-26",
    "level": 1,
    "bucket": "FAIL",
    "reason": "text-mismatch",
-   "durationMs": 236325
+   "durationMs": 236325,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-73359C3C9B-148",
    "level": 1,
    "bucket": "FAIL",
    "reason": "text-mismatch",
-   "durationMs": 143902
+   "durationMs": 143902,
+   "type": "工具/检索",
+   "steps": 8,
+   "tools": 1,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-7BCB25921A-163",
    "level": 2,
    "bucket": "FAIL",
    "reason": "text-mismatch",
-   "durationMs": 73931
+   "durationMs": 73931,
+   "type": "工具/检索",
+   "steps": 9,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-7CACA654BB-114",
    "level": 2,
    "bucket": "FAIL",
    "reason": "text-mismatch",
-   "durationMs": 73170
+   "durationMs": 73170,
+   "type": "工具/检索",
+   "steps": 11,
+   "tools": 4,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-7DC365C283-103",
    "level": 3,
    "bucket": "FAIL",
    "reason": "text-mismatch",
-   "durationMs": 29546
+   "durationMs": 29546,
+   "type": "工具/检索",
+   "steps": 20,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-835D524565-23",
    "level": 2,
    "bucket": "FAIL",
    "reason": "numeric-mismatch",
-   "durationMs": 63420
+   "durationMs": 63420,
+   "type": "工具/检索",
+   "steps": 8,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-917C306D17-119",
    "level": 2,
    "bucket": "FAIL",
    "reason": "no-final-answer",
-   "durationMs": 4936
+   "durationMs": 4936,
+   "type": "工具/检索",
+   "steps": 3,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-92084AD36F-145",
    "level": 2,
    "bucket": "FAIL",
    "reason": "text-mismatch",
-   "durationMs": 10128
+   "durationMs": 10128,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-A4D73860E1-130",
    "level": 1,
    "bucket": "FAIL",
    "reason": "text-mismatch",
-   "durationMs": 502213
+   "durationMs": 502213,
+   "type": "工具/检索",
+   "steps": 2,
+   "tools": 1,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-A55674DE71-96",
    "level": 2,
    "bucket": "FAIL",
    "reason": "numeric-mismatch",
-   "durationMs": 117039
+   "durationMs": 117039,
+   "type": "工具/检索",
+   "steps": 9,
+   "tools": 3,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-A5B1D849ED-149",
    "level": 1,
    "bucket": "FAIL",
    "reason": "numeric-mismatch",
-   "durationMs": 35567
+   "durationMs": 35567,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-A86A4B2583-48",
    "level": 1,
    "bucket": "FAIL",
    "reason": "format-noise",
-   "durationMs": 175775
+   "durationMs": 175775,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-B814760A42-63",
    "level": 1,
    "bucket": "FAIL",
    "reason": "format-noise",
-   "durationMs": 214169
+   "durationMs": 214169,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-BA905972AF-131",
    "level": 2,
    "bucket": "FAIL",
    "reason": "numeric-mismatch",
-   "durationMs": 145160
+   "durationMs": 145160,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 2,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-C7826A08C7-05",
    "level": 3,
    "bucket": "FAIL",
    "reason": "text-mismatch",
-   "durationMs": 83285
+   "durationMs": 83285,
+   "type": "工具/检索",
+   "steps": 7,
+   "tools": 4,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-C82F0D2523-158",
    "level": 2,
    "bucket": "FAIL",
    "reason": "numeric-mismatch",
-   "durationMs": 156467
+   "durationMs": 156467,
+   "type": "工具/检索",
+   "steps": 12,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-CC26476DA4-94",
    "level": 3,
    "bucket": "FAIL",
    "reason": "text-mismatch",
-   "durationMs": 103665
+   "durationMs": 103665,
+   "type": "工具/检索",
+   "steps": 9,
+   "tools": 4,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-D042FCBBD7-123",
    "level": 1,
    "bucket": "FAIL",
    "reason": "text-mismatch",
-   "durationMs": 75604
+   "durationMs": 75604,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-D946934A71-44",
    "level": 2,
    "bucket": "FAIL",
    "reason": "numeric-mismatch",
-   "durationMs": 512987
+   "durationMs": 512987,
+   "type": "工具/检索",
+   "steps": 8,
+   "tools": 4,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-F194BD939A-156",
    "level": 3,
    "bucket": "FAIL",
    "reason": "text-mismatch",
-   "durationMs": 179713
+   "durationMs": 179713,
+   "type": "工具/检索",
+   "steps": 8,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-FDF9B4148A-126",
    "level": 2,
    "bucket": "FAIL",
    "reason": "no-final-answer",
-   "durationMs": 29692
+   "durationMs": 29692,
+   "type": "工具/检索",
+   "steps": 12,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-00E41B8243-93",
    "level": 2,
    "bucket": "ERROR",
    "reason": "infra",
-   "durationMs": 442275
+   "durationMs": 442275,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-080C932322-117",
    "level": 2,
    "bucket": "ERROR",
    "reason": "infra",
-   "durationMs": 621259
+   "durationMs": 621259,
+   "type": "工具/检索",
+   "steps": 7,
+   "tools": 6,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-1F6FAEF601-86",
    "level": 2,
    "bucket": "ERROR",
    "reason": "infra",
-   "durationMs": 9274
+   "durationMs": 9274,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 5,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-354D112679-138",
    "level": 2,
    "bucket": "ERROR",
    "reason": "infra",
-   "durationMs": 2056
+   "durationMs": 2056,
+   "type": "工具/检索",
+   "steps": 9,
+   "tools": 2,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-0B2B5CCA0D-33",
    "level": 2,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 3,
+   "tools": 1,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-15E7E53E32-92",
    "level": 2,
    "bucket": "NOT_RUN",
    "reason": "product-content-filter",
-   "durationMs": 14909
+   "durationMs": 14909,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-177595B1E9-40",
    "level": 3,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 7,
+   "tools": 4,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-2A5EFDC06C-29",
    "level": 2,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 14,
+   "tools": 3,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-3248DAFEBE-77",
    "level": 1,
    "bucket": "NOT_RUN",
    "reason": "task-cap",
-   "durationMs": 906342
+   "durationMs": 906342,
+   "type": "工具/检索",
+   "steps": 7,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-3B8D15686E-49",
    "level": 2,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 1,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-48A2737299-13",
    "level": 2,
    "bucket": "NOT_RUN",
    "reason": "task-cap",
-   "durationMs": 904547
+   "durationMs": 904547,
+   "type": "工具/检索",
+   "steps": 13,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-56E3996E7C-125",
    "level": 3,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 10,
+   "tools": 4,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-5F2435C261-122",
    "level": 2,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 2,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-651F9850BD-65",
    "level": 2,
    "bucket": "NOT_RUN",
    "reason": "task-cap",
-   "durationMs": 903037
+   "durationMs": 903037,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-7651063B3B-62",
    "level": 1,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 3,
+   "tools": 3,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-808D0F9765-57",
    "level": 2,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 8,
+   "tools": 4,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-80EC9B4C82-68",
    "level": 1,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 3,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-921471B367-24",
    "level": 1,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 2,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-9907C9D945-112",
    "level": 3,
    "bucket": "NOT_RUN",
    "reason": "product-content-filter",
-   "durationMs": 375153
+   "durationMs": 375153,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 4,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-AAFC75BE15-133",
    "level": 1,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 15,
+   "tools": 1,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-ACCD8C55CC-36",
    "level": 2,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 1482
+   "durationMs": 1482,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 1,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-BC465F6E94-07",
    "level": 2,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 3,
+   "tools": 2,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-BD164F61BB-84",
    "level": 2,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 2,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-C672647A15-101",
    "level": 3,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 7,
+   "tools": 4,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-CE3E72BFAF-71",
    "level": 2,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 1480
+   "durationMs": 1480,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 2,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-D438B83566-37",
    "level": 3,
    "bucket": "NOT_RUN",
    "reason": "task-cap",
-   "durationMs": 902563
+   "durationMs": 902563,
+   "type": "工具/检索",
+   "steps": 14,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-D7E53FDFC5-83",
    "level": 1,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 2,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-F1D4AD9200-109",
    "level": 1,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 7,
+   "tools": 1,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-F380D34D76-155",
    "level": 2,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 1518
+   "durationMs": 1518,
+   "type": "工具/检索",
+   "steps": 2,
+   "tools": 1,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-F805C6EA41-160",
    "level": 2,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 2,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-FA182D1263-76",
    "level": 3,
    "bucket": "NOT_RUN",
    "reason": "product-content-filter",
-   "durationMs": 65614
+   "durationMs": 65614,
+   "type": "工具/检索",
+   "steps": 24,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-FC9A8F003C-100",
    "level": 1,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 2,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-FD54682820-139",
    "level": 3,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 44,
+   "tools": 4,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-FFAAA609A8-50",
    "level": 2,
    "bucket": "NOT_RUN",
    "reason": "unsupported-file-type",
-   "durationMs": 0
+   "durationMs": 0,
+   "type": "工具/检索",
+   "steps": 3,
+   "tools": 1,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-0011B22D84-51",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 94281
+   "durationMs": 94281,
+   "type": "工具/检索",
+   "steps": 2,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-07219A1054-41",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 54958
+   "durationMs": 54958,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-0AA7FA9594-02",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 210275
+   "durationMs": 210275,
+   "type": "工具/检索",
+   "steps": 14,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-0ADCC66D41-116",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 120153
+   "durationMs": 120153,
+   "type": "工具/检索",
+   "steps": 9,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-0E0AAC2B6C-46",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 583343
+   "durationMs": 583343,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-101099D484-129",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 493706
+   "durationMs": 493706,
+   "type": "工具/检索",
+   "steps": 2,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-11C528DB7A-39",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 16845
+   "durationMs": 16845,
+   "type": "纯推理",
+   "steps": 4,
+   "tools": 0,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-1209A07B75-60",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 151656
+   "durationMs": 151656,
+   "type": "纯推理",
+   "steps": 2,
+   "tools": 0,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-1452E0A5C2-54",
    "level": 3,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 121177
+   "durationMs": 121177,
+   "type": "工具/检索",
+   "steps": 7,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-14E82626D2-01",
    "level": 3,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 326164
+   "durationMs": 326164,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-181F440C5B-118",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 286896
+   "durationMs": 286896,
+   "type": "工具/检索",
+   "steps": 7,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-19A91D036C-03",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 228590
+   "durationMs": 228590,
+   "type": "工具/检索",
+   "steps": 3,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-1C5FF3A097-128",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 352794
+   "durationMs": 352794,
+   "type": "工具/检索",
+   "steps": 13,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-1DFBF5E057-144",
    "level": 3,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 58798
+   "durationMs": 58798,
+   "type": "工具/检索",
+   "steps": 9,
+   "tools": 4,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-1E45184CA4-43",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 12067
+   "durationMs": 12067,
+   "type": "纯推理",
+   "steps": 6,
+   "tools": 0,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-1EC061A758-134",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 275360
+   "durationMs": 275360,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-1EF9086C3C-58",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 144361
+   "durationMs": 144361,
+   "type": "工具/检索",
+   "steps": 9,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-25E51F6E0C-105",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 78312
+   "durationMs": 78312,
+   "type": "工具/检索",
+   "steps": 8,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-276C2128BE-95",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 57594
+   "durationMs": 57594,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-2EBC03D723-157",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 104880
+   "durationMs": 104880,
+   "type": "纯推理",
+   "steps": 9,
+   "tools": 0,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-2FE3E922F4-154",
    "level": 3,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 82333
+   "durationMs": 82333,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 4,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-3708984F08-47",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 37300
+   "durationMs": 37300,
+   "type": "未知",
+   "steps": 1,
+   "tools": null,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-3B34793BC1-88",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 127513
+   "durationMs": 127513,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-3D38D72518-111",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 328268
+   "durationMs": 328268,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-3F9B8F9B1B-108",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 120832
+   "durationMs": 120832,
+   "type": "工具/检索",
+   "steps": 12,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-436C1CCFAF-113",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 112924
+   "durationMs": 112924,
+   "type": "工具/检索",
+   "steps": 10,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-4484670E7A-22",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 164119
+   "durationMs": 164119,
+   "type": "工具/检索",
+   "steps": 10,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-4C0671AE2B-132",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 74165
+   "durationMs": 74165,
+   "type": "纯推理",
+   "steps": 3,
+   "tools": 0,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-5020BF00DE-38",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 32130
+   "durationMs": 32130,
+   "type": "工具/检索",
+   "steps": 12,
+   "tools": 1,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-5137B172B1-42",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 36439
+   "durationMs": 36439,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 4,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-54C09F1F93-99",
    "level": 3,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 501693
+   "durationMs": 501693,
+   "type": "工具/检索",
+   "steps": 14,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-580F524581-153",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 98494
+   "durationMs": 98494,
+   "type": "工具/检索",
+   "steps": 7,
+   "tools": 4,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-582E34C083-72",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 39283
+   "durationMs": 39283,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-61C9DB5B8E-20",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 99551
+   "durationMs": 99551,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-657C0B7A24-19",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 21461
+   "durationMs": 21461,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-66C45D6516-161",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 216062
+   "durationMs": 216062,
+   "type": "工具/检索",
+   "steps": 13,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-68D8C180B7-32",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 186846
+   "durationMs": 186846,
+   "type": "纯推理",
+   "steps": 3,
+   "tools": 0,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-6DEF26BCB1-102",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 93410
+   "durationMs": 93410,
+   "type": "工具/检索",
+   "steps": 3,
+   "tools": 1,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-7072F2B615-15",
    "level": 3,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 68271
+   "durationMs": 68271,
+   "type": "工具/检索",
+   "steps": 12,
+   "tools": 4,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-71AD8A6F0F-90",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 412857
+   "durationMs": 412857,
+   "type": "工具/检索",
+   "steps": 11,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-73EF6F232F-12",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 40461
+   "durationMs": 40461,
+   "type": "工具/检索",
+   "steps": 11,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-7511E4BEF5-91",
    "level": 3,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 299400
+   "durationMs": 299400,
+   "type": "工具/检索",
+   "steps": 10,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-795843D739-140",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 68666
+   "durationMs": 68666,
+   "type": "工具/检索",
+   "steps": 12,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-79E0DC9413-28",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 320849
+   "durationMs": 320849,
+   "type": "工具/检索",
+   "steps": 13,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-7A968F11CA-78",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 100814
+   "durationMs": 100814,
+   "type": "工具/检索",
+   "steps": 7,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-7B3247F387-152",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 152102
+   "durationMs": 152102,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-7F6A897E4E-142",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 25269
+   "durationMs": 25269,
+   "type": "工具/检索",
+   "steps": 9,
+   "tools": 1,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-7FA94505D5-165",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 79052
+   "durationMs": 79052,
+   "type": "工具/检索",
+   "steps": 1,
+   "tools": 1,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-81A0445FD7-52",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 81983
+   "durationMs": 81983,
+   "type": "纯推理",
+   "steps": 8,
+   "tools": 0,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-82744E88BD-98",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 509090
+   "durationMs": 509090,
+   "type": "工具/检索",
+   "steps": 8,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-8621E9AB49-06",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 210666
+   "durationMs": 210666,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-8A0A2DA816-124",
    "level": 3,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 73096
+   "durationMs": 73096,
+   "type": "工具/检索",
+   "steps": 20,
+   "tools": 4,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-8A931BE013-110",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 221618
+   "durationMs": 221618,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 4,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-8E8069BF53-69",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 55978
+   "durationMs": 55978,
+   "type": "工具/检索",
+   "steps": 7,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-900D36A41A-79",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 113663
+   "durationMs": 113663,
+   "type": "工具/检索",
+   "steps": 9,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-903D4B8158-87",
    "level": 3,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 255792
+   "durationMs": 255792,
+   "type": "工具/检索",
+   "steps": 17,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-922C7C2EB3-18",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 135076
+   "durationMs": 135076,
+   "type": "工具/检索",
+   "steps": 7,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-94B3A7F13B-137",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 41351
+   "durationMs": 41351,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-990560951F-107",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 657080
+   "durationMs": 657080,
+   "type": "工具/检索",
+   "steps": 3,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-9927621865-135",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 115708
+   "durationMs": 115708,
+   "type": "工具/检索",
+   "steps": 10,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-997E451EA4-146",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 59225
+   "durationMs": 59225,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 2,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-9A9939E37E-30",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 8538
+   "durationMs": 8538,
+   "type": "纯推理",
+   "steps": 1,
+   "tools": 0,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-9E89F5E5D3-56",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 95795
+   "durationMs": 95795,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-A211CA9123-80",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 170097
+   "durationMs": 170097,
+   "type": "工具/检索",
+   "steps": 7,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-A24CD0D463-147",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 163911
+   "durationMs": 163911,
+   "type": "工具/检索",
+   "steps": 3,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-A52DE90201-120",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 43207
+   "durationMs": 43207,
+   "type": "工具/检索",
+   "steps": 2,
+   "tools": 1,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-A6E94A2087-55",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 25822
+   "durationMs": 25822,
+   "type": "工具/检索",
+   "steps": 7,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-AA08CE4275-127",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 11678
+   "durationMs": 11678,
+   "type": "纯推理",
+   "steps": 8,
+   "tools": 0,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-AAB770948B-150",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 67413
+   "durationMs": 67413,
+   "type": "工具/检索",
+   "steps": 8,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-AEA19E1240-27",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 11079
+   "durationMs": 11079,
+   "type": "纯推理",
+   "steps": 9,
+   "tools": 0,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-AF8D367FA4-21",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 89153
+   "durationMs": 89153,
+   "type": "工具/检索",
+   "steps": 14,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-AFC60AC21C-04",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 312162
+   "durationMs": 312162,
+   "type": "工具/检索",
+   "steps": 3,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-B8EC94EF58-136",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 129174
+   "durationMs": 129174,
+   "type": "工具/检索",
+   "steps": 8,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-BC6470EAA0-59",
    "level": 3,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 35206
+   "durationMs": 35206,
+   "type": "工具/检索",
+   "steps": 32,
+   "tools": 1,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-C4A291F8C9-34",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 89609
+   "durationMs": 89609,
+   "type": "工具/检索",
+   "steps": 11,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-C5AEB3BB24-106",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 175911
+   "durationMs": 175911,
+   "type": "工具/检索",
+   "steps": 2,
+   "tools": 1,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-C7901B3FAA-73",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 10776
+   "durationMs": 10776,
+   "type": "工具/检索",
+   "steps": 3,
+   "tools": 1,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-CDE2FC18E5-17",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 46012
+   "durationMs": 46012,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-CE4328EFD6-151",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 57445
+   "durationMs": 57445,
+   "type": "工具/检索",
+   "steps": null,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-D0BA87D8A5-159",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 113817
+   "durationMs": 113817,
+   "type": "工具/检索",
+   "steps": 12,
+   "tools": 1,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-D0D36F0E9E-08",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 37510
+   "durationMs": 37510,
+   "type": "工具/检索",
+   "steps": 12,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-D4047A9677-75",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 77874
+   "durationMs": 77874,
+   "type": "工具/检索",
+   "steps": 9,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-D514CB126F-81",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 423071
+   "durationMs": 423071,
+   "type": "工具/检索",
+   "steps": 8,
+   "tools": 4,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-DECF274A1E-16",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 245977
+   "durationMs": 245977,
+   "type": "工具/检索",
+   "steps": 4,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-E27FCD4049-61",
    "level": 3,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 159744
+   "durationMs": 159744,
+   "type": "工具/检索",
+   "steps": 8,
+   "tools": 4,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-E2E53DB716-70",
    "level": 3,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 495526
+   "durationMs": 495526,
+   "type": "工具/检索",
+   "steps": 14,
+   "tools": 4,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-E424150204-164",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 211875
+   "durationMs": 211875,
+   "type": "工具/检索",
+   "steps": 9,
+   "tools": 2,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-E61841D06E-66",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 246862
+   "durationMs": 246862,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 3,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-EB29DF1928-97",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 273128
+   "durationMs": 273128,
+   "type": "工具/检索",
+   "steps": 10,
+   "tools": 2,
+   "hasFile": true
   },
   {
    "id": "GAIA-VAL-F1DD5ECD95-25",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 852357
+   "durationMs": 852357,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 4,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-F4E4A88C05-64",
    "level": 3,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 549721
+   "durationMs": 549721,
+   "type": "工具/检索",
+   "steps": 12,
+   "tools": 4,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-F61011CDC2-89",
    "level": 3,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 36171
+   "durationMs": 36171,
+   "type": "工具/检索",
+   "steps": 12,
+   "tools": 4,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-F84B22DEEE-53",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 39256
+   "durationMs": 39256,
+   "type": "工具/检索",
+   "steps": 6,
+   "tools": 1,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-FBC1201B32-67",
    "level": 2,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 219983
+   "durationMs": 219983,
+   "type": "工具/检索",
+   "steps": 5,
+   "tools": 3,
+   "hasFile": false
   },
   {
    "id": "GAIA-VAL-FBC662574B-115",
    "level": 1,
    "bucket": "PASS",
    "reason": "",
-   "durationMs": 134722
+   "durationMs": 134722,
+   "type": "工具/检索",
+   "steps": 7,
+   "tools": 2,
+   "hasFile": false
   }
  ]
 }
