@@ -74,3 +74,12 @@ test('published production trace collection is rendered as cloud requests',()=>{
  assert.match(ctx.nodes['trace-picker'].innerHTML,/2 \/ 3/);
  assert.match(ctx.nodes['trace-result'].innerHTML,/执行轨迹/);
 });
+
+
+test('native read errors, unavailable records and conflicts are explained without exposing raw details',()=>{
+ const item={scope:'cloud',gateway:1000,tool_events:[]};
+ for (const [status,message] of [['read_error','原生轨迹数据库读取失败'],['unavailable','原生轨迹尚不可用'],['ambiguous','原生轨迹关联存在冲突']]) {
+  assert.ok(c.html({...item,native_trace_state:status}).includes(message));
+ }
+ assert.doesNotMatch(c.html({...item,native_trace_state:'<private>'}), /<private>/);
+});

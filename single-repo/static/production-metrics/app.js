@@ -3611,11 +3611,16 @@ function traceHtml(item) {
     : item.scope === 'local' ? '本地云侧历史样例（不属于当前范围的慢请求榜单）：工具区间为调用事件到结果事件的间隔；模型记账只表示时间点，不能当作模型耗时。'
     : hasTools ? '工具区间为调用事件到结果事件的间隔；采集有文件和大小上限，明细可能不完整；模型调用时间未可靠关联。'
     : '当前快照没有逐次工具调用时间，暂无法绘制工具明细；思考与工具阶段不等于单次工具调用。';
+  const nativeStatus = !native && item.scope === 'cloud' ? ({
+    read_error: ' 原生轨迹数据库读取失败，当前显示请求事件。',
+    unavailable: ' 原生轨迹尚不可用，当前显示请求事件。',
+    ambiguous: ' 原生轨迹关联存在冲突，当前显示请求事件。',
+  }[item.native_trace_state] || '') : '';
   const phaseNote = !native && missingPhases ? ' 部分阶段标记未记录，无法绘制对应区间。' : '';
   const retainedNote = native && typeof item.native_trace_retained_from === 'string'
     ? ` 原生轨迹沿用 ${fmtDateTime(item.native_trace_retained_from)} 的采集结果。` : '';
   const emptyList = filter === 'models' ? '该请求没有可可靠关联的模型记账记录。' : '当前筛选没有可展示的事件。';
-  return `<div class="trajectory-head"><div><strong>执行轨迹</strong><span class="muted">${fmtDuration(total)} · ${rows.length} 条记录 · 当前 ${visible.length} 条</span></div><p>${esc(note + phaseNote + retainedNote)}</p></div>
+  return `<div class="trajectory-head"><div><strong>执行轨迹</strong><span class="muted">${fmtDuration(total)} · ${rows.length} 条记录 · 当前 ${visible.length} 条</span></div><p>${esc(note + nativeStatus + phaseNote + retainedNote)}</p></div>
     <div class="trace-overview" aria-label="轨迹总览"><div class="trace-overview-total"></div><div class="trace-overview-events">${marks}</div></div>
     <div class="trajectory-legend"><span><i class="legend-dot total-dot"></i>本轮运行</span>${native ? '<span><i class="legend-dot phase-dot"></i>运行阶段</span>' : ''}<span><i class="legend-dot event-dot"></i>事件</span><span><i class="legend-dot tool-dot"></i>工具</span><span><i class="legend-dot model-dot"></i>${native ? '模型调用' : '模型记账点'}</span></div>
     ${hasNative ? `<div class="trajectory-toolbar"><div class="trace-filters" aria-label="轨迹来源"><button type="button" class="trace-filter${native ? ' active' : ''}" data-trace-display="native" aria-pressed="${native}">原生分层轨迹</button><button type="button" class="trace-filter${!native ? ' active' : ''}" data-trace-display="events" aria-pressed="${!native}">请求阶段与工具事件</button></div></div>` : ''}

@@ -170,7 +170,10 @@ def read_native_trajectory(query, correlation):
             return read_native_connection(connection, correlation)
         finally:
             connection.close()
-    except (OSError, ValueError, TypeError, KeyError, sqlite3.Error, UnicodeError):
+    except sqlite3.Error as error:
+        # Do not expose paths or SQLite details in the public snapshot.
+        raise OSError('native trajectory database unavailable') from error
+    except (OSError, ValueError, TypeError, KeyError, UnicodeError):
         return None
 
 
