@@ -1,7 +1,745 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-12T08:30:00.000Z",
+  "updatedAt": "2026-11-12T10:06:58.544Z",
   "runs": [
+    {
+      "schemaVersion": 1,
+      "kind": "bench",
+      "runId": "bench-43126221912-1",
+      "commit": "69a2ebd05d84c2f9f085a0b835cabc84100070fc",
+      "backend": "wss://onlineswarm.openjiuwen.com:20015/digitalmate/ws?binding_id=default",
+      "profile": "all",
+      "status": "PASS",
+      "benchmarks": [
+        {
+          "name": "GAIA (component)",
+          "status": "PASS",
+          "tasks": [
+            {
+              "id": "GAIA-VAL-0011B22D84-38",
+              "title": "GAIA validation Level 1: Who nominated the only Featured Article on English Wikipedia about...",
+              "status": "FLAKY",
+              "trials": 3,
+              "passes": 1,
+              "passAt1": 0.3333333333333333
+            },
+            {
+              "id": "GAIA-VAL-07219A1054-30",
+              "title": "GAIA validation Level 1: How many at bats did the Yankee with the most walks in the 1977 reg...",
+              "status": "PASS",
+              "trials": 3,
+              "passes": 3,
+              "passAt1": 1
+            },
+            {
+              "id": "GAIA-VAL-1209A07B75-44",
+              "title": "GAIA validation Level 1: What is the first name of the only Malko Competition recipient from...",
+              "status": "PASS",
+              "trials": 3,
+              "passes": 3,
+              "passAt1": 1
+            },
+            {
+              "id": "GAIA-VAL-19A91D036C-02",
+              "title": "GAIA validation Level 1: On the BBC Earth YouTube video of the Top 5 Silliest Animal Moments...",
+              "status": "FLAKY",
+              "trials": 3,
+              "passes": 2,
+              "passAt1": 0.6666666666666666
+            },
+            {
+              "id": "GAIA-VAL-1E45184CA4-32",
+              "title": "GAIA validation Level 1: In the fictional language of Tizin, basic sentences are arranged wi...",
+              "status": "FLAKY",
+              "trials": 3,
+              "passes": 2,
+              "passAt1": 0.6666666666666666
+            },
+            {
+              "id": "GAIA-VAL-3708984F08-36",
+              "title": "GAIA validation Level 1: If there is anything that doesn't make sense in the instructions, w...",
+              "status": "FLAKY",
+              "trials": 3,
+              "passes": 1,
+              "passAt1": 0.3333333333333333
+            }
+          ],
+          "trials": 18,
+          "passAt1": 0.667,
+          "passAtK": 1,
+          "passHatK": 0.33299999999999996,
+          "detail": "4 flaky",
+          "latencyMs": {
+            "p50": 32400,
+            "p95": 190300
+          }
+        },
+        {
+          "name": "PAST-Bench text proxy",
+          "status": "PASS",
+          "tasks": [
+            {
+              "id": "PAST-PG01-REFLECTION",
+              "title": "PAST-Bench PG01_release_decision_followup reflection gap review",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PAST-PG02-REFLECTION",
+              "title": "PAST-Bench PG02_ops_exception_desk reflection gap review",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PAST-PG03-REFLECTION",
+              "title": "PAST-Bench PG03_oncall_handoff_lookup reflection gap review",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PAST-PG04-REFLECTION",
+              "title": "PAST-Bench PG04_temporary_waiver_audit reflection gap review",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PAST-PG05-REFLECTION",
+              "title": "PAST-Bench PG05_change_freeze_followup reflection gap review",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PAST-PG06-REFLECTION",
+              "title": "PAST-Bench PG06_kappa_integration_review reflection gap review",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            }
+          ],
+          "trials": 6,
+          "passAt1": 1,
+          "passAtK": 1,
+          "passHatK": 1,
+          "detail": "0 flaky",
+          "latencyMs": {
+            "p50": 10200,
+            "p95": 16700
+          }
+        },
+        {
+          "name": "Pi-Bench text proxy",
+          "status": "PASS",
+          "tasks": [
+            {
+              "id": "PIB-FINANCIER-016",
+              "title": "Pi-Bench Financier_task_016: ",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PIB-FINANCIER-018",
+              "title": "Pi-Bench Financier_task_018: ",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PIB-LAW-TRAINEE-001",
+              "title": "Pi-Bench law_trainee_task_001: Drafting a Property Dispute Memorandum: Party Profiles in Contrast and",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PIB-LAW-TRAINEE-002",
+              "title": "Pi-Bench law_trainee_task_002: Drafting a Sales-Contract Complaint: One-to-One Pairing of Fact Narrat",
+              "status": "FAIL",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "PIB-LAW-TRAINEE-004",
+              "title": "Pi-Bench law_trainee_task_004: Drafting a Labor-Dispute Intake Outline: Proactively Deriving and Orga",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PIB-LAW-TRAINEE-006",
+              "title": "Pi-Bench law_trainee_task_006: Review a First-Draft Defense Brief in a Fraud Case: Fix Format and Res",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PIB-LAW-TRAINEE-009",
+              "title": "Pi-Bench law_trainee_task_009: Polishing a Loan-Dispute Complaint: Granular Prayers for Relief and St",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PIB-LAW-TRAINEE-010",
+              "title": "Pi-Bench law_trainee_task_010: Establish the Legal-Analysis Baseline: Preference for Subjective–Objec",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PIB-MARKETER-002",
+              "title": "Pi-Bench marketer_task_002: rule",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PIB-RESEARCHER-003",
+              "title": "Pi-Bench researcher_task_003: Forced to Leave Dorm Housing: Renting and Commute Baselines for a 'Jia",
+              "status": "FAIL",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "PIB-RESEARCHER-004",
+              "title": "Pi-Bench researcher_task_004: Preliminary Multimodal Agent Survey: From Text-only to Think-with-Imag",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PIB-RESEARCHER-005",
+              "title": "Pi-Bench researcher_task_005: Tracking the Frontier: DeepEyesV2 and V-star Bench Core Metrics Survey",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PIB-RESEARCHER-018",
+              "title": "Pi-Bench researcher_task_018: OpenClaw Technical Q&A Preference Task",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            }
+          ],
+          "trials": 13,
+          "passAt1": 0.846,
+          "passAtK": 0.846,
+          "passHatK": 0.846,
+          "detail": "0 flaky",
+          "latencyMs": {
+            "p50": 42300,
+            "p95": 104600
+          }
+        },
+        {
+          "name": "VitaBench 2.0 text proxy",
+          "status": "PASS",
+          "tasks": [
+            {
+              "id": "VTB-B048564-13",
+              "title": "VitaBench 2.0 ota: 休息了一个晚上真好，帮我推荐一些好玩的景点呢",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "VTB-B471882-3",
+              "title": "VitaBench 2.0 delivery: 家里牙刷坏了，给我推荐几款牙刷，我对比下，看买那款",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "VTB-B865629-16",
+              "title": "VitaBench 2.0 delivery: 9号那天领导要来检查，好紧张，现在赶紧给我推荐一杯合适的咖啡",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "VTB-B865629-7",
+              "title": "VitaBench 2.0 instore: 这周末我要办招待，给我推荐下合适的套餐，人家吃不得冰的",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "VTB-B865629-8",
+              "title": "VitaBench 2.0 delivery: 想给自己换个表，推荐几款电子手表呢",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "VTB-E941775-2",
+              "title": "VitaBench 2.0 ota: 想订张机票去旅游，你有什么好地方推荐吗？",
+              "status": "FAIL",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "VTB-N453690-5",
+              "title": "VitaBench 2.0 instore: 好无聊，有没有什么玩的，推荐一下呗",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "VTB-U200109-7",
+              "title": "VitaBench 2.0 instore: 这周上班太累了，周末要好好犒劳一下自己，帮我推荐一下自助吧",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "VTB-U804032-1",
+              "title": "VitaBench 2.0 delivery: 嘴巴感觉空空的， 看看能买些啥来嚼嚼",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            }
+          ],
+          "trials": 9,
+          "passAt1": 0.889,
+          "passAtK": 0.889,
+          "passHatK": 0.889,
+          "detail": "0 flaky",
+          "latencyMs": {
+            "p50": 23200,
+            "p95": 33600
+          }
+        },
+        {
+          "name": "VibeLifeBench office_fitout_15d stage 0",
+          "status": "PASS",
+          "tasks": [
+            {
+              "id": "office_fitout_15d",
+              "title": "VibeLifeBench office_fitout_15d stage 0",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": null
+            }
+          ],
+          "trials": 1,
+          "passAt1": null,
+          "passAtK": null,
+          "passHatK": null,
+          "detail": "0.750 (4.5/6.0 weight)",
+          "latencyMs": {
+            "p50": 119800,
+            "p95": null
+          }
+        }
+      ],
+      "generatedAt": "2026-11-12T00:17:37Z",
+      "taskCount": 0,
+      "trials": 47,
+      "passAt1": null,
+      "passAtK": null,
+      "passHatK": null,
+      "runNumber": "43126221912",
+      "runUrl": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43126221912",
+      "conclusion": "failure"
+    },
+    {
+      "schemaVersion": 1,
+      "kind": "bench",
+      "runId": "bench-42990594736-1",
+      "commit": "a2d64ea11191979e677c5b36836bd75217e6b14a",
+      "backend": "wss://onlineswarm.openjiuwen.com:20015/digitalmate/ws?binding_id=default",
+      "profile": "all",
+      "status": "FAIL",
+      "benchmarks": [
+        {
+          "name": "GAIA (component)",
+          "status": "FAIL (exit 1)",
+          "tasks": [
+            {
+              "id": "GAIA-VAL-0011B22D84-38",
+              "title": "GAIA validation Level 1: Who nominated the only Featured Article on English Wikipedia about...",
+              "status": "ERROR",
+              "trials": 3,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "GAIA-VAL-07219A1054-30",
+              "title": "GAIA validation Level 1: How many at bats did the Yankee with the most walks in the 1977 reg...",
+              "status": "ERROR",
+              "trials": 3,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "GAIA-VAL-1209A07B75-44",
+              "title": "GAIA validation Level 1: What is the first name of the only Malko Competition recipient from...",
+              "status": "ERROR",
+              "trials": 3,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "GAIA-VAL-19A91D036C-02",
+              "title": "GAIA validation Level 1: On the BBC Earth YouTube video of the Top 5 Silliest Animal Moments...",
+              "status": "ERROR",
+              "trials": 3,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "GAIA-VAL-1E45184CA4-32",
+              "title": "GAIA validation Level 1: In the fictional language of Tizin, basic sentences are arranged wi...",
+              "status": "ERROR",
+              "trials": 3,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "GAIA-VAL-3708984F08-36",
+              "title": "GAIA validation Level 1: If there is anything that doesn't make sense in the instructions, w...",
+              "status": "ERROR",
+              "trials": 3,
+              "passes": 0,
+              "passAt1": 0
+            }
+          ],
+          "trials": 18,
+          "passAt1": 0,
+          "passAtK": 0,
+          "passHatK": 0,
+          "detail": "0 flaky",
+          "latencyMs": {
+            "p50": 0,
+            "p95": 0
+          }
+        },
+        {
+          "name": "PAST-Bench text proxy",
+          "status": "PASS",
+          "tasks": [
+            {
+              "id": "PAST-PG01-REFLECTION",
+              "title": "PAST-Bench PG01_release_decision_followup reflection gap review",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PAST-PG02-REFLECTION",
+              "title": "PAST-Bench PG02_ops_exception_desk reflection gap review",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PAST-PG03-REFLECTION",
+              "title": "PAST-Bench PG03_oncall_handoff_lookup reflection gap review",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PAST-PG04-REFLECTION",
+              "title": "PAST-Bench PG04_temporary_waiver_audit reflection gap review",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PAST-PG05-REFLECTION",
+              "title": "PAST-Bench PG05_change_freeze_followup reflection gap review",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PAST-PG06-REFLECTION",
+              "title": "PAST-Bench PG06_kappa_integration_review reflection gap review",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            }
+          ],
+          "trials": 6,
+          "passAt1": 1,
+          "passAtK": 1,
+          "passHatK": 1,
+          "detail": "0 flaky",
+          "latencyMs": {
+            "p50": 18500,
+            "p95": 22000
+          }
+        },
+        {
+          "name": "Pi-Bench text proxy",
+          "status": "FAIL (exit 1)",
+          "tasks": [
+            {
+              "id": "PIB-FINANCIER-016",
+              "title": "Pi-Bench Financier_task_016: ",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PIB-FINANCIER-018",
+              "title": "Pi-Bench Financier_task_018: ",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PIB-LAW-TRAINEE-001",
+              "title": "Pi-Bench law_trainee_task_001: Drafting a Property Dispute Memorandum: Party Profiles in Contrast and",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PIB-LAW-TRAINEE-002",
+              "title": "Pi-Bench law_trainee_task_002: Drafting a Sales-Contract Complaint: One-to-One Pairing of Fact Narrat",
+              "status": "FAIL",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "PIB-LAW-TRAINEE-004",
+              "title": "Pi-Bench law_trainee_task_004: Drafting a Labor-Dispute Intake Outline: Proactively Deriving and Orga",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PIB-LAW-TRAINEE-006",
+              "title": "Pi-Bench law_trainee_task_006: Review a First-Draft Defense Brief in a Fraud Case: Fix Format and Res",
+              "status": "PASS",
+              "trials": 1,
+              "passes": 1,
+              "passAt1": 1
+            },
+            {
+              "id": "PIB-LAW-TRAINEE-009",
+              "title": "Pi-Bench law_trainee_task_009: Polishing a Loan-Dispute Complaint: Granular Prayers for Relief and St",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "PIB-LAW-TRAINEE-010",
+              "title": "Pi-Bench law_trainee_task_010: Establish the Legal-Analysis Baseline: Preference for Subjective–Objec",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "PIB-MARKETER-002",
+              "title": "Pi-Bench marketer_task_002: rule",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "PIB-RESEARCHER-003",
+              "title": "Pi-Bench researcher_task_003: Forced to Leave Dorm Housing: Renting and Commute Baselines for a 'Jia",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "PIB-RESEARCHER-004",
+              "title": "Pi-Bench researcher_task_004: Preliminary Multimodal Agent Survey: From Text-only to Think-with-Imag",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "PIB-RESEARCHER-005",
+              "title": "Pi-Bench researcher_task_005: Tracking the Frontier: DeepEyesV2 and V-star Bench Core Metrics Survey",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "PIB-RESEARCHER-018",
+              "title": "Pi-Bench researcher_task_018: OpenClaw Technical Q&A Preference Task",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            }
+          ],
+          "trials": 13,
+          "passAt1": 0.385,
+          "passAtK": 0.385,
+          "passHatK": 0.385,
+          "detail": "0 flaky",
+          "latencyMs": {
+            "p50": 69500,
+            "p95": 91900
+          }
+        },
+        {
+          "name": "VitaBench 2.0 text proxy",
+          "status": "FAIL (exit 1)",
+          "tasks": [
+            {
+              "id": "VTB-B048564-13",
+              "title": "VitaBench 2.0 ota: 休息了一个晚上真好，帮我推荐一些好玩的景点呢",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "VTB-B471882-3",
+              "title": "VitaBench 2.0 delivery: 家里牙刷坏了，给我推荐几款牙刷，我对比下，看买那款",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "VTB-B865629-16",
+              "title": "VitaBench 2.0 delivery: 9号那天领导要来检查，好紧张，现在赶紧给我推荐一杯合适的咖啡",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "VTB-B865629-7",
+              "title": "VitaBench 2.0 instore: 这周末我要办招待，给我推荐下合适的套餐，人家吃不得冰的",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "VTB-B865629-8",
+              "title": "VitaBench 2.0 delivery: 想给自己换个表，推荐几款电子手表呢",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "VTB-E941775-2",
+              "title": "VitaBench 2.0 ota: 想订张机票去旅游，你有什么好地方推荐吗？",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "VTB-N453690-5",
+              "title": "VitaBench 2.0 instore: 好无聊，有没有什么玩的，推荐一下呗",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "VTB-U200109-7",
+              "title": "VitaBench 2.0 instore: 这周上班太累了，周末要好好犒劳一下自己，帮我推荐一下自助吧",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            },
+            {
+              "id": "VTB-U804032-1",
+              "title": "VitaBench 2.0 delivery: 嘴巴感觉空空的， 看看能买些啥来嚼嚼",
+              "status": "ERROR",
+              "trials": 1,
+              "passes": 0,
+              "passAt1": 0
+            }
+          ],
+          "trials": 9,
+          "passAt1": 0,
+          "passAtK": 0,
+          "passHatK": 0,
+          "detail": "0 flaky",
+          "latencyMs": {
+            "p50": 0,
+            "p95": 0
+          }
+        },
+        {
+          "name": "VibeLifeBench office_fitout_15d stage 0",
+          "status": "FAIL (exit 1)",
+          "tasks": [],
+          "trials": 1,
+          "passAt1": null,
+          "passAtK": null,
+          "passHatK": null,
+          "detail": "—",
+          "latencyMs": null
+        }
+      ],
+      "generatedAt": "2026-11-11T08:53:19Z",
+      "taskCount": 0,
+      "trials": 47,
+      "passAt1": null,
+      "passAtK": null,
+      "passHatK": null,
+      "runNumber": "42990594736",
+      "runUrl": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/42990594736",
+      "conclusion": "failure"
+    },
     {
       "schemaVersion": 1,
       "kind": "bench",
@@ -2691,369 +3429,6 @@
           }
         }
       ]
-    },
-    {
-      "schemaVersion": 1,
-      "kind": "bench",
-      "runId": "bench-42990594736-1",
-      "commit": "a2d64ea11191979e677c5b36836bd75217e6b14a",
-      "backend": "wss://onlineswarm.openjiuwen.com:20015/digitalmate/ws?binding_id=default",
-      "profile": "all",
-      "status": "FAIL",
-      "benchmarks": [
-        {
-          "name": "GAIA (component)",
-          "status": "FAIL (exit 1)",
-          "tasks": [
-            {
-              "id": "GAIA-VAL-0011B22D84-38",
-              "title": "GAIA validation Level 1: Who nominated the only Featured Article on English Wikipedia about...",
-              "status": "ERROR",
-              "trials": 3,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "GAIA-VAL-07219A1054-30",
-              "title": "GAIA validation Level 1: How many at bats did the Yankee with the most walks in the 1977 reg...",
-              "status": "ERROR",
-              "trials": 3,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "GAIA-VAL-1209A07B75-44",
-              "title": "GAIA validation Level 1: What is the first name of the only Malko Competition recipient from...",
-              "status": "ERROR",
-              "trials": 3,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "GAIA-VAL-19A91D036C-02",
-              "title": "GAIA validation Level 1: On the BBC Earth YouTube video of the Top 5 Silliest Animal Moments...",
-              "status": "ERROR",
-              "trials": 3,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "GAIA-VAL-1E45184CA4-32",
-              "title": "GAIA validation Level 1: In the fictional language of Tizin, basic sentences are arranged wi...",
-              "status": "ERROR",
-              "trials": 3,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "GAIA-VAL-3708984F08-36",
-              "title": "GAIA validation Level 1: If there is anything that doesn't make sense in the instructions, w...",
-              "status": "ERROR",
-              "trials": 3,
-              "passes": 0,
-              "passAt1": 0
-            }
-          ],
-          "trials": 18,
-          "passAt1": 0,
-          "passAtK": 0,
-          "passHatK": 0,
-          "detail": "0 flaky",
-          "latencyMs": {
-            "p50": 0,
-            "p95": 0
-          }
-        },
-        {
-          "name": "PAST-Bench text proxy",
-          "status": "PASS",
-          "tasks": [
-            {
-              "id": "PAST-PG01-REFLECTION",
-              "title": "PAST-Bench PG01_release_decision_followup reflection gap review",
-              "status": "PASS",
-              "trials": 1,
-              "passes": 1,
-              "passAt1": 1
-            },
-            {
-              "id": "PAST-PG02-REFLECTION",
-              "title": "PAST-Bench PG02_ops_exception_desk reflection gap review",
-              "status": "PASS",
-              "trials": 1,
-              "passes": 1,
-              "passAt1": 1
-            },
-            {
-              "id": "PAST-PG03-REFLECTION",
-              "title": "PAST-Bench PG03_oncall_handoff_lookup reflection gap review",
-              "status": "PASS",
-              "trials": 1,
-              "passes": 1,
-              "passAt1": 1
-            },
-            {
-              "id": "PAST-PG04-REFLECTION",
-              "title": "PAST-Bench PG04_temporary_waiver_audit reflection gap review",
-              "status": "PASS",
-              "trials": 1,
-              "passes": 1,
-              "passAt1": 1
-            },
-            {
-              "id": "PAST-PG05-REFLECTION",
-              "title": "PAST-Bench PG05_change_freeze_followup reflection gap review",
-              "status": "PASS",
-              "trials": 1,
-              "passes": 1,
-              "passAt1": 1
-            },
-            {
-              "id": "PAST-PG06-REFLECTION",
-              "title": "PAST-Bench PG06_kappa_integration_review reflection gap review",
-              "status": "PASS",
-              "trials": 1,
-              "passes": 1,
-              "passAt1": 1
-            }
-          ],
-          "trials": 6,
-          "passAt1": 1,
-          "passAtK": 1,
-          "passHatK": 1,
-          "detail": "0 flaky",
-          "latencyMs": {
-            "p50": 18500,
-            "p95": 22000
-          }
-        },
-        {
-          "name": "Pi-Bench text proxy",
-          "status": "FAIL (exit 1)",
-          "tasks": [
-            {
-              "id": "PIB-FINANCIER-016",
-              "title": "Pi-Bench Financier_task_016: ",
-              "status": "PASS",
-              "trials": 1,
-              "passes": 1,
-              "passAt1": 1
-            },
-            {
-              "id": "PIB-FINANCIER-018",
-              "title": "Pi-Bench Financier_task_018: ",
-              "status": "PASS",
-              "trials": 1,
-              "passes": 1,
-              "passAt1": 1
-            },
-            {
-              "id": "PIB-LAW-TRAINEE-001",
-              "title": "Pi-Bench law_trainee_task_001: Drafting a Property Dispute Memorandum: Party Profiles in Contrast and",
-              "status": "PASS",
-              "trials": 1,
-              "passes": 1,
-              "passAt1": 1
-            },
-            {
-              "id": "PIB-LAW-TRAINEE-002",
-              "title": "Pi-Bench law_trainee_task_002: Drafting a Sales-Contract Complaint: One-to-One Pairing of Fact Narrat",
-              "status": "FAIL",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "PIB-LAW-TRAINEE-004",
-              "title": "Pi-Bench law_trainee_task_004: Drafting a Labor-Dispute Intake Outline: Proactively Deriving and Orga",
-              "status": "PASS",
-              "trials": 1,
-              "passes": 1,
-              "passAt1": 1
-            },
-            {
-              "id": "PIB-LAW-TRAINEE-006",
-              "title": "Pi-Bench law_trainee_task_006: Review a First-Draft Defense Brief in a Fraud Case: Fix Format and Res",
-              "status": "PASS",
-              "trials": 1,
-              "passes": 1,
-              "passAt1": 1
-            },
-            {
-              "id": "PIB-LAW-TRAINEE-009",
-              "title": "Pi-Bench law_trainee_task_009: Polishing a Loan-Dispute Complaint: Granular Prayers for Relief and St",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "PIB-LAW-TRAINEE-010",
-              "title": "Pi-Bench law_trainee_task_010: Establish the Legal-Analysis Baseline: Preference for Subjective–Objec",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "PIB-MARKETER-002",
-              "title": "Pi-Bench marketer_task_002: rule",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "PIB-RESEARCHER-003",
-              "title": "Pi-Bench researcher_task_003: Forced to Leave Dorm Housing: Renting and Commute Baselines for a 'Jia",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "PIB-RESEARCHER-004",
-              "title": "Pi-Bench researcher_task_004: Preliminary Multimodal Agent Survey: From Text-only to Think-with-Imag",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "PIB-RESEARCHER-005",
-              "title": "Pi-Bench researcher_task_005: Tracking the Frontier: DeepEyesV2 and V-star Bench Core Metrics Survey",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "PIB-RESEARCHER-018",
-              "title": "Pi-Bench researcher_task_018: OpenClaw Technical Q&A Preference Task",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            }
-          ],
-          "trials": 13,
-          "passAt1": 0.385,
-          "passAtK": 0.385,
-          "passHatK": 0.385,
-          "detail": "0 flaky",
-          "latencyMs": {
-            "p50": 69500,
-            "p95": 91900
-          }
-        },
-        {
-          "name": "VitaBench 2.0 text proxy",
-          "status": "FAIL (exit 1)",
-          "tasks": [
-            {
-              "id": "VTB-B048564-13",
-              "title": "VitaBench 2.0 ota: 休息了一个晚上真好，帮我推荐一些好玩的景点呢",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "VTB-B471882-3",
-              "title": "VitaBench 2.0 delivery: 家里牙刷坏了，给我推荐几款牙刷，我对比下，看买那款",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "VTB-B865629-16",
-              "title": "VitaBench 2.0 delivery: 9号那天领导要来检查，好紧张，现在赶紧给我推荐一杯合适的咖啡",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "VTB-B865629-7",
-              "title": "VitaBench 2.0 instore: 这周末我要办招待，给我推荐下合适的套餐，人家吃不得冰的",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "VTB-B865629-8",
-              "title": "VitaBench 2.0 delivery: 想给自己换个表，推荐几款电子手表呢",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "VTB-E941775-2",
-              "title": "VitaBench 2.0 ota: 想订张机票去旅游，你有什么好地方推荐吗？",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "VTB-N453690-5",
-              "title": "VitaBench 2.0 instore: 好无聊，有没有什么玩的，推荐一下呗",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "VTB-U200109-7",
-              "title": "VitaBench 2.0 instore: 这周上班太累了，周末要好好犒劳一下自己，帮我推荐一下自助吧",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            },
-            {
-              "id": "VTB-U804032-1",
-              "title": "VitaBench 2.0 delivery: 嘴巴感觉空空的， 看看能买些啥来嚼嚼",
-              "status": "ERROR",
-              "trials": 1,
-              "passes": 0,
-              "passAt1": 0
-            }
-          ],
-          "trials": 9,
-          "passAt1": 0,
-          "passAtK": 0,
-          "passHatK": 0,
-          "detail": "0 flaky",
-          "latencyMs": {
-            "p50": 0,
-            "p95": 0
-          }
-        },
-        {
-          "name": "VibeLifeBench office_fitout_15d stage 0",
-          "status": "FAIL (exit 1)",
-          "tasks": [],
-          "trials": 1,
-          "passAt1": null,
-          "passAtK": null,
-          "passHatK": null,
-          "detail": "—",
-          "latencyMs": null
-        }
-      ],
-      "generatedAt": "2026-11-11T08:53:19Z",
-      "taskCount": 0,
-      "trials": 47,
-      "passAt1": null,
-      "passAtK": null,
-      "passHatK": null,
-      "runNumber": "42990594736",
-      "runUrl": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/42990594736",
-      "conclusion": "failure"
     },
     {
       "schemaVersion": 1,
