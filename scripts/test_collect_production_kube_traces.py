@@ -58,6 +58,31 @@ class KubeTraceTests(unittest.TestCase):
                 bad = sessions / 'cc' / ('c'*64 + '.sqlite3'); bad.parent.mkdir(); bad.write_bytes(b'invalid')
                 self.assertEqual(remote.read_native_by_request_ids({'name':workspace}, ['digitalmate-a']), {})
 
+    def test_native_read_failure_is_sanitized_and_published_as_status(self):
+        traces = load('workspace_trace_read_status', 'collect-production-workspace-traces.py')
+        correlation = {'session_id': 'PRIVATE', 'request_id': 'digitalmate-a', 'trace_id': 'a'*32, 'span_id': '1'*16}
+        row = {'request_id': 'digitalmate-a', '_native_correlation': correlation}
+        with patch.object(traces, 'read_native_trajectory', side_effect=OSError('PRIVATE ERROR')):
+            self.assertEqual(traces.attach_native_trajectories({}, [row]), 0)
+        self.assertEqual(row['native_trace_state'], 'read_error')
+        self.assertNotIn('PRIVATE', json.dumps(row))
+        absent = {'request_id': 'digitalmate-b'}
+        with patch.object(traces, 'read_native_by_request_ids', return_value={}):
+            traces.attach_native_trajectories({}, [absent])
+        self.assertEqual(absent['native_trace_state'], 'unavailable')
+
+    def test_sqlite_open_error_is_signalled_without_private_path(self):
+        session = 'PRIVATE'
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder); workspace = 'w-' + 'f'*64
+            digest = hashlib.sha256(session.encode()).hexdigest()
+            db = root / workspace / 'workswarm/.jiuwenswarm/.trace/sessions' / digest[:2] / (digest + '.sqlite3')
+            db.parent.mkdir(parents=True); db.touch()
+            with patch.object(remote, 'ROOT', root), patch.object(remote.sqlite3, 'connect', side_effect=sqlite3.OperationalError('PRIVATE')):
+                with self.assertRaises(OSError) as caught:
+                    remote.read_native_trajectory({'name':workspace}, {'session_id':session})
+            self.assertNotIn('PRIVATE', str(caught.exception))
+
     def test_explicit_conflict_does_not_use_fallback(self):
         traces = load('workspace_collector_conflict', 'collect-production-workspace-traces.py')
         rows = [{'request_id':'digitalmate-a', '_native_correlation_conflict':True},

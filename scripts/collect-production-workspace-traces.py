@@ -280,10 +280,13 @@ def attach_native_trajectories(query, rows):
         try:
             native = read_native_trajectory(query, correlation)
         except (OSError, ValueError, TypeError, KeyError):
+            row['native_trace_state'] = 'read_error'
             continue
         if isinstance(native, dict):
             row['native_trajectory'] = native
             matched += 1
+        else:
+            row['native_trace_state'] = 'unavailable'
     if missing:
         try:
             fallback = read_native_by_request_ids(query, [r['request_id'] for r in missing])
@@ -294,6 +297,8 @@ def attach_native_trajectories(query, rows):
             if isinstance(native, dict):
                 row['native_trajectory'] = native
                 matched += 1
+            else:
+                row['native_trace_state'] = 'unavailable'
     return matched
 
 
