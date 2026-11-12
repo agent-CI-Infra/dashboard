@@ -1432,15 +1432,39 @@
     if (!runs.length) return empty('暂无 ST 运行数据');
     const latest = runs[0];
     const cases = latest.st.cases || [];
-    const passed = cases.filter((c) => c.status === 'passed').length;
+    // One resolver for both the KPI and the matrices: direct cases, relay suites
+    // and component suites (with the suite verdict for fixture-only suites).
+    const catalog = Array.isArray(d.catalog) && d.catalog.length ? d.catalog : null;
+    const caseStatus = (r, name) => {
+      const lw = (r.st.liveWire || []).find((x) => x.caseName === name);
+      if (lw) return lw.status;
+      const componentSuites = r.st.component || [];
+      const comp = componentSuites.flatMap((suite) => suite.cases || []).find((x) => x.name === name);
+      if (comp) return comp.status;
+      const meta = catalog ? catalog.find((c) => c.name === name) : null;
+      if (meta?.suite) {
+        const suite = componentSuites.find((s) => s.suite === meta.suite);
+        if (suite) return suite.status;
+      }
+      const hit = (r.st.cases || []).find((x) => x.name === name);
+      return hit ? hit.status : null;
+    };
     const medianOf = (rows) => { const v = rows.map((c) => c.elapsedMs).filter((x) => typeof x === 'number').sort((a, b) => a - b); return v.length ? v[Math.floor(v.length / 2)] : null; };
     const fmtMs = (ms) => (ms == null ? '—' : ms >= 60000 ? `${(ms / 60000).toFixed(1)} min` : `${(ms / 1000).toFixed(1)} s`);
     const stBadge = (s) => (s === 'passed' ? badge('通过', 'good') : s === 'failed' ? badge('失败', 'bad') : s === 'blocked' ? badge('阻塞', 'warn') : badge(s || '未知'));
     const failedRuns = runs.filter((r) => r.conclusion !== 'success').length;
 
+    const scopes = catalog ? catalog : cases.map((c) => ({ name: c.name, group: 'business' }));
+    const statuses = scopes.map((c) => ({ scope: c, status: caseStatus(latest, c.name) }));
+    const passed = statuses.filter((x) => x.status === 'passed').length;
+    const laneOf = (scope) => (scope.group === 'component' ? 'component' : scope.requirement === 'live-wire' ? 'relay' : 'direct');
+    const laneCount = (lane) => {
+      const rows = statuses.filter((x) => laneOf(x.scope) === lane);
+      return `${rows.filter((x) => x.status === 'passed').length}/${rows.length}`;
+    };
     let html = tiles([
       { label: '最新运行', value: `<a href="${esc(latest.url)}" target="_blank" rel="noopener">#${esc(latest.runId)}</a>`, sub: esc(String(latest.createdAt).slice(0, 16).replace('T', ' ')) + ' UTC', tone: latest.conclusion === 'success' ? 'good' : 'bad' },
-      { label: '最新通过', value: `${passed}<small>/ ${cases.length}</small>`, sub: esc(latest.st.mode || ''), tone: passed === cases.length ? 'good' : 'bad' },
+      { label: '最新通过', value: `${passed}<small>/ ${scopes.length}</small>`, sub: `直连 ${laneCount('direct')} · relay ${laneCount('relay')} · 组件 ${laneCount('component')}`, tone: passed === scopes.length ? 'good' : 'bad' },
       { label: '用例耗时中位', value: fmtMs(medianOf(cases)), sub: `runner ${esc(latest.st.runner || '—')}` },
       { label: '近 90 轮失败', value: `${failedRuns}<small>/ ${runs.length}</small>`, sub: `失败率 ${runs.length ? Math.round((failedRuns / runs.length) * 100) : 0}%`, tone: failedRuns ? 'warn' : 'good' },
     ]);
@@ -1449,7 +1473,6 @@
     // The collector publishes the full registered scenario set (catalog): direct
     // scenes run every nightly, the live-wire and boundary-injection scenes are
     // explicit-only and stay grey here so coverage gaps are visible.
-    const catalog = Array.isArray(d.catalog) && d.catalog.length ? d.catalog : null;
     const order = catalog ? catalog.slice() : (() => {
       const list = []; const seen = new Set();
       for (const r of mruns) for (const c of r.st.cases || []) if (!seen.has(c.name)) { seen.add(c.name); list.push(c); }
@@ -1457,22 +1480,8 @@
     })();
     const verdict = (status) => (status === 'passed' ? badge('✓', 'good') : status === 'failed' ? badge('✕', 'bad') : badge('!', 'warn'));
     const cell = (r, name) => {
-      // Live-wire cases live in their own lane artifact; the merge attaches them per run.
-      const lw = (r.st.liveWire || []).find((x) => x.caseName === name);
-      if (lw) return verdict(lw.status);
-      const componentSuites = r.st.component || [];
-      const comp = componentSuites.flatMap((suite) => suite.cases || []).find((x) => x.name === name);
-      if (comp) return verdict(comp.status);
-      // markdown/suggestions report one row per rendered fixture, so fall back
-      // to the suite verdict for their catalog entry.
-      const componentMeta = catalog ? catalog.find((c) => c.name === name) : null;
-      if (componentMeta?.suite) {
-        const suite = componentSuites.find((s) => s.suite === componentMeta.suite);
-        if (suite) return verdict(suite.status);
-      }
-      const hit = (r.st.cases || []).find((x) => x.name === name);
-      if (!hit) return '<span class="muted" title="本轮未运行">·</span>';
-      return verdict(hit.status);
+      const status = caseStatus(r, name);
+      return status ? verdict(status) : '<span class="muted" title="本轮未运行">·</span>';
     };
     const requirement = (c) => (c.requirement === 'live-wire' ? badge('live-wire', '') : c.requirement === 'model-boundary' ? badge('boundary', '') : '');
     const matrixCols = [{ key: 'title', label: '用例', render: (row) => row.html }, ...mruns.map((r) => ({ key: 'r', label: `#${String(r.runId).slice(-6)}`, sortable: false, render: (row) => row.cells[mruns.indexOf(r)] }))];
