@@ -3115,6 +3115,9 @@ function syncRangeButtons(disabled = false) {
     button.setAttribute('aria-pressed', String(active));
     button.disabled = disabled;
   });
+  if (window.parent !== window) {
+    window.parent.postMessage({ type: 'production-metrics-range-state', range: state.rangeDays, disabled }, location.origin);
+  }
 }
 
 function currentModelDays() {
@@ -3966,13 +3969,24 @@ $('granularity-select').addEventListener('change', (event) => {
   renderModels();
 });
 
-$('model-controls').addEventListener('click', (event) => {
+function handleRangeClick(event) {
   const button = event.target.closest('[data-range]');
   if (!button || button.disabled) return;
   const value = Number(button.dataset.range);
   state.rangeDays = Number.isFinite(value) && value > 0 ? value : 0;
   renderHeader();
   renderModels();
+}
+$('model-controls').addEventListener('click', handleRangeClick);
+$('floating-range-controls').addEventListener('click', handleRangeClick);
+window.addEventListener('message', (event) => {
+  if (event.origin !== location.origin || event.source !== window.parent) return;
+  if (event.data?.type === 'production-metrics-range-request') {
+    syncRangeButtons(!state.history);
+  } else if (event.data?.type === 'production-metrics-range-select' && [0, 1, 7, 30].includes(event.data.range)) {
+    const button = document.querySelector(`#model-controls [data-range="${event.data.range}"]`);
+    if (button && !button.disabled) button.click();
+  }
 });
 
 $('model-trends').addEventListener('click', (event) => {
@@ -4159,6 +4173,7 @@ load();
 
 // Keep the embedded view as tall as its content.
 if (window.parent !== window) {
+  document.documentElement.classList.add('embedded-metrics');
   const reportHeight = () => window.parent.postMessage({ type: 'production-metrics-height', height: document.documentElement.scrollHeight }, location.origin);
   new ResizeObserver(reportHeight).observe(document.body);
   window.addEventListener('load', reportHeight);

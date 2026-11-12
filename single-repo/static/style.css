@@ -71,6 +71,31 @@ code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monosp
 main { padding: 18px 20px 40px; max-width: 1500px; margin: 0 auto; }
 .tab { display: none; }
 .tab.active { display: block; }
+.production-floating-range {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 50;
+  display: flex;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  box-shadow: 0 4px 18px rgba(31, 35, 40, 0.18);
+}
+.production-floating-range[hidden] { display: none; }
+.production-floating-range button {
+  border: 0;
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 12px;
+  cursor: pointer;
+}
+.production-floating-range button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(31, 35, 40, 0.12); }
+.production-floating-range button:focus-visible { outline: 2px solid var(--link); outline-offset: 1px; }
+.production-floating-range button:disabled { cursor: default; opacity: .5; }
 
 /* --------------------------------------------------------------- banners */
 .banner {

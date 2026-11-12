@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GitHub 状态看板</title>
 <!-- Keep the UI bundle on one cache version so GitHub Pages cannot mix old CSS with new JS. -->
-<link rel="stylesheet" href="./style.css?v=20261105.2">
+<link rel="stylesheet" href="./style.css?v=20261112.1">
 </head>
 <body>
 <header class="topbar">
@@ -43,7 +43,7 @@
   <section id="tab-st" class="tab"><iframe src="./data/st/index.html" title="DigitalMate ST 执行情况" style="width:100%;min-height:78vh;border:0;display:block"></iframe></section>
   <section id="tab-coverage" class="tab"></section>
   <section id="tab-sync" class="tab"></section>
-  <section id="tab-production-metrics" class="tab"><iframe title="现网指标统计" src="about:blank" style="width:100%;height:1800px;border:0"></iframe></section>
+  <section id="tab-production-metrics" class="tab"><div id="production-floating-range" class="production-floating-range" role="group" aria-label="时间范围" hidden><button type="button" data-production-range="1" aria-pressed="false">当天</button><button type="button" data-production-range="7" aria-pressed="false">近 7 天</button><button type="button" data-production-range="30" aria-pressed="false">近 30 天</button><button type="button" data-production-range="0" aria-pressed="true">全部</button></div><iframe title="现网指标统计" src="about:blank" style="width:100%;height:1800px;border:0"></iframe></section>
   <section id="tab-test-matrix" class="tab"><iframe title="用例矩阵" src="about:blank" style="width:100%;height:1800px;border:0"></iframe></section>
   <section id="tab-bench" class="tab"><iframe title="Bench" src="about:blank" style="width:100%;height:1800px;border:0"></iframe></section>
 </main>
@@ -52,7 +52,7 @@
 <aside id="drawer" class="drawer hidden" aria-label="卡片详情"></aside>
 <dialog id="board-settings" class="settings"></dialog>
 <div id="tooltip" class="tooltip hidden"></div>
-<script src="./board-local.js?v=20261105.2"></script><script src="./app.js?v=20261111.2"></script>
+<script src="./board-local.js?v=20261105.2"></script><script src="./app.js?v=20261112.1"></script>
 <script src="./board.js?v=20261105.1"></script>
 <script src="./gitcode-sync.js?v=20261105.1"></script>
 </body>
