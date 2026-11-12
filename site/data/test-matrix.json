@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/test-matrix@1",
- "generatedAt": "2026-11-12T02:33:30.098Z",
+ "generatedAt": "2026-11-12T11:54:50.139Z",
  "source": {
   "repository": "openJiuwen-ai/DigitalMate",
-  "main": "add74d2b",
+  "main": "7185a613",
   "refs": [
    {
     "label": "test/st-complete-coverage",
@@ -30,13 +30,13 @@
   "e2e": 27
  },
  "nightly": {
-  "createdAt": "2026-11-11T08:53:19Z",
-  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/42990594736",
+  "createdAt": "2026-11-12T00:17:37Z",
+  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43126221912",
   "jobs": {
    "Update HK DigitalMate (latest main)": "success",
    "DigitalMate ST (Windows)": "failure",
    "Finalize archived REMINDER evidence": "skipped",
-   "E2E (all)": "success",
+   "E2E (all)": "failure",
    "Bench (full) / Bench (all)": "success",
    "Nightly report": "success"
   }
@@ -81,25 +81,25 @@
  "summary": {
   "layers": {
    "UT": {
-    "cases": 194,
-    "tests": 2534,
+    "cases": 195,
+    "tests": 2544,
     "byStatus": {
-     "ci_lane": 194
+     "ci_lane": 195
     },
     "bySuite": {},
     "byImpl": {
-     "main": 194
+     "main": 195
     }
    },
    "UT-Server": {
-    "cases": 283,
-    "tests": 4919,
+    "cases": 284,
+    "tests": 4959,
     "byStatus": {
-     "ci_lane": 283
+     "ci_lane": 284
     },
     "bySuite": {},
     "byImpl": {
-     "main": 283
+     "main": 284
     }
    },
    "REG": {
@@ -2321,6 +2321,27 @@
    "evidence": null,
    "issue": null,
    "note": "",
+   "tests": 8,
+   "layer": "UT",
+   "id": "digitalmate-failed-reply-retention.test.mjs",
+   "title": "digitalmate",
+   "module": "digitalmate",
+   "file": "tests/unit/digitalmate-failed-reply-retention.test.mjs",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "ut.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
    "tests": 10,
    "layer": "UT",
    "id": "digitalmate-failure-quote-guard.test.mjs",
@@ -2615,7 +2636,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 6,
+   "tests": 8,
    "layer": "UT",
    "id": "digitalmate-protocol-text.test.mjs",
    "title": "digitalmate",
@@ -4820,7 +4841,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 3,
+   "tests": 4,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_digitalmate_protocol.py",
    "title": "test_digitalmate_protocol",
@@ -7886,6 +7907,27 @@
    "evidence": null,
    "issue": null,
    "note": "",
+   "tests": 21,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_failed_reply_retention.py",
+   "title": "test_failed_reply_retention",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_failed_reply_retention.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
    "tests": 2,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_fair_lock.py",
@@ -8579,7 +8621,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 39,
+   "tests": 41,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_reply_stream.py",
    "title": "test_reply_stream",
@@ -8726,7 +8768,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 1,
+   "tests": 9,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_schedule_read_pause.py",
    "title": "test_schedule_read_pause",
@@ -8915,7 +8957,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 34,
+   "tests": 35,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_session_proximity_acceptance.py",
    "title": "test_session_proximity_acceptance",
@@ -9272,7 +9314,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 13,
+   "tests": 14,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_session_proximity_repository.py",
    "title": "test_session_proximity_repository",
@@ -9293,7 +9335,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 17,
+   "tests": 18,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_session_proximity_runtime_flow.py",
    "title": "test_session_proximity_runtime_flow",
@@ -9335,7 +9377,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 9,
+   "tests": 13,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_session_proximity_upgrade.py",
    "title": "test_session_proximity_upgrade",
@@ -10133,7 +10175,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 21,
+   "tests": 22,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_workswarm_flow.py",
    "title": "test_workswarm_flow",
