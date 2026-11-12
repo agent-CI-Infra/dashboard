@@ -52,7 +52,7 @@
   const loadViews = () => { try { return { issues: 'table', prs: 'table', ...JSON.parse(localStorage.getItem(VIEW_KEY) || '{}') }; } catch (e) { return { issues: 'table', prs: 'table' }; } };
   const loadLine = () => { try { return localStorage.getItem(LINE_KEY); } catch (e) { return null; } };
   const loadCovSort = () => { try { return localStorage.getItem(COV_SORT_KEY) === 'lines' ? 'lines' : 'name'; } catch (e) { return 'name'; } };
-  const STATE = { snap: null, status: null, tab: 'overview', views: loadViews(), line: loadLine(), covOpen: new Set(), covSort: loadCovSort(), sort: {}, filters: { issueQ: '', issueLabel: '', issueAssignee: '', runBranch: '' }, ageFilter: { issues: null, prs: null }, coverageWeekOffset: 0, e2e: null, nightlyRuns: [], e2eSteps: {}, e2eFilter: { status: '', q: '' }, e2eLoading: new Set(), e2eErrors: new Set(), e2eCollapsed: new Set(), performance: null, perfCase: null, pollTimer: null };
+  const STATE = { snap: null, status: null, tab: 'overview', views: loadViews(), line: loadLine(), covOpen: new Set(), covSort: loadCovSort(), sort: {}, filters: { issueQ: '', issueLabel: '', issueAssignee: '', runBranch: '' }, ageFilter: { issues: null, prs: null }, coverageWeekOffset: 0, e2e: null, nightlyRuns: [], e2eSteps: {}, e2eFilter: { status: '', q: '' }, e2eLoading: new Set(), e2eErrors: new Set(), e2eCollapsed: new Set(), performance: null, perfCase: null, st: null, pollTimer: null };
   const returnParams = new URLSearchParams(location.search);
   const returnFocus = { line: returnParams.get('returnLine'), caseName: returnParams.get('returnCase'), pending: !!returnParams.get('returnCase'),
     e2eKey: returnParams.get('returnE2E'), e2ePending: !!returnParams.get('returnE2E') };
@@ -1423,6 +1423,63 @@
     </div>`;
   }
 
+  // ST execution board: per-case verdict matrix, latest-run detail and run history,
+  // published as digitalmate/st-history@1 by the collect-digitalmate-st workflow.
+  function renderSt() {
+    const d = STATE.st;
+    if (!d) return `<div class="banner warn"><span class="icon">⏳</span><div><div class="title">ST 数据尚未同步</div><div>collect-digitalmate-st workflow 还没有发布 data/st.json。</div></div></div>`;
+    const runs = (d.runs || []).filter((r) => r && r.st);
+    if (!runs.length) return empty('暂无 ST 运行数据');
+    const latest = runs[0];
+    const cases = latest.st.cases || [];
+    const passed = cases.filter((c) => c.status === 'passed').length;
+    const medianOf = (rows) => { const v = rows.map((c) => c.elapsedMs).filter((x) => typeof x === 'number').sort((a, b) => a - b); return v.length ? v[Math.floor(v.length / 2)] : null; };
+    const fmtMs = (ms) => (ms == null ? '—' : ms >= 60000 ? `${(ms / 60000).toFixed(1)} min` : `${(ms / 1000).toFixed(1)} s`);
+    const stBadge = (s) => (s === 'passed' ? badge('通过', 'good') : s === 'failed' ? badge('失败', 'bad') : s === 'blocked' ? badge('阻塞', 'warn') : badge(s || '未知'));
+    const failedRuns = runs.filter((r) => r.conclusion !== 'success').length;
+
+    let html = tiles([
+      { label: '最新运行', value: `<a href="${esc(latest.url)}" target="_blank" rel="noopener">#${esc(latest.runId)}</a>`, sub: esc(String(latest.createdAt).slice(0, 16).replace('T', ' ')) + ' UTC', tone: latest.conclusion === 'success' ? 'good' : 'bad' },
+      { label: '最新通过', value: `${passed}<small>/ ${cases.length}</small>`, sub: esc(latest.st.mode || ''), tone: passed === cases.length ? 'good' : 'bad' },
+      { label: '用例耗时中位', value: fmtMs(medianOf(cases)), sub: `runner ${esc(latest.st.runner || '—')}` },
+      { label: '近 90 轮失败', value: `${failedRuns}<small>/ ${runs.length}</small>`, sub: `失败率 ${runs.length ? Math.round((failedRuns / runs.length) * 100) : 0}%`, tone: failedRuns ? 'warn' : 'good' },
+    ]);
+
+    const mruns = runs.slice(0, 12);
+    const order = []; const seen = new Set();
+    for (const r of mruns) for (const c of r.st.cases || []) if (!seen.has(c.name)) { seen.add(c.name); order.push(c); }
+    const cell = (r, name) => {
+      const hit = (r.st.cases || []).find((x) => x.name === name);
+      if (!hit) return '<span class="muted" title="本轮未运行">·</span>';
+      return hit.status === 'passed' ? badge('✓', 'good') : hit.status === 'failed' ? badge('✕', 'bad') : badge('!', 'warn');
+    };
+    const matrixCols = [{ key: 'title', label: '用例' }, ...mruns.map((r) => ({ key: 'r', label: `#${String(r.runId).slice(-6)}`, sortable: false, render: (row) => row.cells[mruns.indexOf(r)] }))];
+    const matrixRows = order.map((c) => ({ title: `${c.title || c.name}${c.coverageId ? ` (${c.coverageId})` : ''}`, cells: mruns.map((r) => cell(r, c.name)) }));
+    html += sectionHead('用例 × 运行矩阵', `最近 ${mruns.length} 轮 · ✓ 通过 ✕ 失败 ! 阻塞 · 未运行`);
+    html += `<div class="card">${table('t-st-matrix', matrixCols, matrixRows)}</div>`;
+
+    html += sectionHead('最新运行用例明细', `${esc(latest.st.runner || '—')} · ${esc(latest.st.machine || '—')}${latest.st.runId ? ` · ST runId <code>${esc(latest.st.runId)}</code>` : ''}`);
+    html += `<div class="card">${table('t-st-cases', [
+      { key: 'title', label: '用例', render: (c) => `${esc(c.title || c.name)}${c.coverageId ? ` <span class="muted">${esc(c.coverageId)}</span>` : ''}` },
+      { key: 'status', label: '结果', render: (c) => stBadge(c.status) },
+      { key: 'elapsedMs', label: '耗时', num: true, render: (c) => fmtMs(c.elapsedMs), sort: (c) => c.elapsedMs ?? Infinity },
+      { key: 'stage', label: '结束阶段', render: (c) => esc(c.stage || '') },
+      { key: 'detail', label: '说明', render: (c) => `<span class="muted">${esc(c.detail || '')}</span>` },
+    ], cases)}</div>`;
+
+    html += sectionHead('运行历史', `数据由 collect-digitalmate-st 从 nightly 的 digitalmate-st-* artifact 同步 · 保留 90 轮`);
+    html += `<div class="card">${table('t-st-runs', [
+      { key: 'runId', label: '运行', render: (r) => `<a href="${esc(r.url)}" target="_blank" rel="noopener">#${esc(r.runId)}</a>` },
+      { key: 'createdAt', label: '时间', render: (r) => esc(String(r.createdAt).slice(0, 16).replace('T', ' ')) + ' UTC' },
+      { key: 'conclusion', label: '结果', render: (r) => (r.conclusion === 'success' ? badge('success', 'good') : badge('failure', 'bad')) },
+      { key: 'total', label: '用例', num: true, render: (r) => n((r.st.cases || []).length) },
+      { key: 'passed', label: '通过', num: true, render: (r) => `${(r.st.cases || []).filter((c) => c.status === 'passed').length}/${(r.st.cases || []).length}` },
+      { key: 'median', label: '耗时中位', num: true, render: (r) => fmtMs(medianOf(r.st.cases || [])), sort: (r) => medianOf(r.st.cases || []) ?? Infinity },
+      { key: 'sha', label: 'commit', render: (r) => `<code>${esc(r.headSha || '—')}</code>` },
+    ], runs, { defaultSort: null })}</div>`;
+    return html;
+  }
+
   function renderTests(sec, line) {
     const d = sec?.data;
     let html = sectionState(sec, 'E2E');
@@ -1640,6 +1697,12 @@
       const frame = document.querySelector(`#tab-${name} iframe`);
       if (!tab.hidden && STATE.tab === name && frame.getAttribute('src') === 'about:blank') frame.src = src;
     }
+    // ST renders inside the shell (no iframe), but is still DigitalMate-only.
+    const stTab = document.querySelector('[data-tab="st"]');
+    if (stTab) {
+      stTab.hidden = !isDigitalMate;
+      if (snap && stTab.hidden && STATE.tab === 'st') { STATE.tab = 'overview'; history.replaceState(history.state, '', location.pathname + location.search + '#overview'); }
+    }
     btn.disabled=!!STATE.status?.refreshing;
     btn.textContent=btn.disabled?'读取中…':'刷新视图';
     if(snap){
@@ -1681,6 +1744,7 @@
     safe('ci', () => lineBar(snap) + renderCI(lineSection(snap, 'ci'), line));
     safe('tests', () => lineBar(snap) + renderTests(lineSection(snap, 'tests'), line));
     safe('coverage', () => lineBar(snap) + renderCoverage(lineSection(snap, 'tests'), line));
+    safe('st', () => renderSt());
     pinLanes(keep);
     try { if (window.GSBBoard) window.GSBBoard.onSnapshot(snap); } catch (err) { console.error(err); }
     mountBoard();
@@ -1783,6 +1847,8 @@
       STATE.nightlyRuns = Array.isArray(nightlyRuns) ? nightlyRuns : Array.isArray(nightlyRuns?.runs) ? nightlyRuns.runs : [];
       // Optional nightly performance history; a missing file hides the section on other boards.
       STATE.performance = await fetchJson('./data/e2e-performance/history.json?ts='+Date.now()).catch(() => null);
+      // Optional ST history published by collect-digitalmate-st; absent on other boards.
+      STATE.st = await fetchJson('./data/st.json?ts='+Date.now()).catch(() => null);
       STATE.e2eErrors.clear();
     } catch (err) {
       STATE.clientError = err.name === 'AbortError'
