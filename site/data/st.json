@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-12T06:12:28.024Z",
+  "updatedAt": "2026-11-12T10:14:18.474Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -406,6 +406,51 @@
             "elapsedMs": 27977,
             "stage": "wait-task",
             "detail": "Default parsing skills verified: text PDF extraction and CSV statement total returned every expected marker (2 turns)"
+          }
+        ]
+      }
+    },
+    {
+      "runId": 43126221912,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43126221912",
+      "createdAt": "2026-11-12T00:17:37Z",
+      "headSha": "69a2ebd05d84",
+      "conclusion": "failure",
+      "st": {
+        "runId": "",
+        "status": "failed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "﻿Tool exit code 1. \r\n",
+          "Missing device report or run ID mismatch; stale results are rejected.",
+          "real_model_text_reply: missing, duplicate, or invalid case result",
+          "real_model_txt_download_and_content: missing, duplicate, or invalid case result",
+          "Hypium counts do not match the selected device verdicts."
+        ],
+        "liveWire": [],
+        "cases": [
+          {
+            "name": "real_model_text_reply",
+            "key": "text",
+            "title": "文本回复",
+            "coverageId": "",
+            "status": "failed",
+            "elapsedMs": 0,
+            "stage": "",
+            "detail": "No completed device result."
+          },
+          {
+            "name": "real_model_txt_download_and_content",
+            "key": "text-file",
+            "title": "文本生成 TXT 并下载",
+            "coverageId": "",
+            "status": "failed",
+            "elapsedMs": 0,
+            "stage": "",
+            "detail": "No completed device result."
           }
         ]
       }
