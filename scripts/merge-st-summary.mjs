@@ -32,19 +32,34 @@ export const ST_CASES = {
   real_model_structured_choice: { key: 'choice', title: '结构化选项回答并继续任务' },
   gateway_connection: { key: 'connection', title: 'Gateway 连接检查' },
   session_isolation_parallel: { key: 'session-isolation-parallel', title: '双会话并发隔离', coverageId: 'CON-01' },
-  duplicate_downlink_idempotent: { key: 'duplicate-downlink-idempotent', title: '同一真实确认帧三次下行与幂等恢复', coverageId: 'CON-04' },
-  protocol_invalid_task_identity: { key: 'protocol-invalid-task-identity', title: '当前真实下行 task_id 八种异常与原事件恢复', coverageId: 'PRO-02' },
-  protocol_unknown_event_forward_compat: { key: 'protocol-unknown-event-forward-compat', title: '当前真实事件的未知类型和新增字段兼容', coverageId: 'PRO-03' },
-  protocol_malformed_optional_fields: { key: 'protocol-malformed-optional-fields', title: '不同实时增量的 segment_id/earlier 八种类型异常', coverageId: 'PRO-01' },
-  protocol_chunk_boundary_reassembly: { key: 'protocol-chunk-boundary-reassembly', title: '当前中英 Unicode/Markdown 文本与 UTF-8 continuation 分片重组', coverageId: 'PRO-06' },
+  duplicate_downlink_idempotent: { key: 'duplicate-downlink-idempotent', title: '同一真实确认帧三次下行与幂等恢复', coverageId: 'CON-04', liveWireOnly: true },
+  protocol_invalid_task_identity: { key: 'protocol-invalid-task-identity', title: '当前真实下行 task_id 八种异常与原事件恢复', coverageId: 'PRO-02', liveWireOnly: true },
+  protocol_unknown_event_forward_compat: { key: 'protocol-unknown-event-forward-compat', title: '当前真实事件的未知类型和新增字段兼容', coverageId: 'PRO-03', liveWireOnly: true },
+  protocol_malformed_optional_fields: { key: 'protocol-malformed-optional-fields', title: '不同实时增量的 segment_id/earlier 八种类型异常', coverageId: 'PRO-01', liveWireOnly: true },
+  protocol_chunk_boundary_reassembly: { key: 'protocol-chunk-boundary-reassembly', title: '当前中英 Unicode/Markdown 文本与 UTF-8 continuation 分片重组', coverageId: 'PRO-06', liveWireOnly: true },
   reset_detached_recovery: { key: 'reset-detached-recovery', title: '独立房间 reset/detached 与真实断链恢复', coverageId: 'REC-03' },
-  content_refusal_context_recovery: { key: 'content-refusal-context-recovery', title: '内容拦截后同房间连续发送与历史保留', coverageId: 'REC-04' },
-  artifact_receipt_required: { key: 'artifact-receipt-required', title: '真实产物的缺失回执、无效 ID、不可读内容与恢复', coverageId: 'ART-01' },
+  content_refusal_context_recovery: { key: 'content-refusal-context-recovery', title: '内容拦截后同房间连续发送与历史保留', coverageId: 'REC-04', requiresBoundaryFixture: true },
+  artifact_receipt_required: { key: 'artifact-receipt-required', title: '真实产物的缺失回执、无效 ID、不可读内容与恢复', coverageId: 'ART-01', liveWireOnly: true },
   attachment_metadata_conflict: { key: 'attachment-metadata-conflict', title: '附件元数据冲突与真实云端对照', coverageId: 'ATT-01' },
   attachment_corrupt_recovery: { key: 'attachment-corrupt-recovery', title: '损坏图片与文本恢复', coverageId: 'ATT-02' },
   attachment_image_understanding: { key: 'attachment-image-understanding', title: '真实华为 HDR/MPF 相机 JPG 原图识别', coverageId: 'ATT-03' },
   skill_default_generation: { key: 'skill-default-generation', title: '默认生成技能：Word / Excel / PPT / PDF 各交付一个文件', coverageId: 'SKL-01' },
   skill_default_parsing: { key: 'skill-default-parsing', title: '默认解析技能：文本 PDF 提取与 CSV 对账单合计', coverageId: 'SKL-02' },
+}
+
+// The full registered scenario set, so the board can show explicit-only cases as
+// grey rows instead of hiding them: 13 direct-backend cases run every Nightly, six
+// live-wire fault-injection cases need the loopback relay, REC-04 needs the
+// model-boundary injector.
+export function buildCatalog() {
+  return Object.entries(ST_CASES).map(([name, meta]) => ({
+    name,
+    key: meta.key,
+    title: meta.title,
+    coverageId: meta.coverageId || '',
+    nightly: !meta.liveWireOnly && !meta.requiresBoundaryFixture,
+    requirement: meta.liveWireOnly ? 'live-wire' : meta.requiresBoundaryFixture ? 'model-boundary' : '',
+  }))
 }
 
 function parse(argv) {
@@ -167,7 +182,7 @@ export function merge({ entry, previous }) {
   const merged = [entry, ...history.filter((item) => String(item.runId) !== String(entry.runId) || String(item.attempt) !== String(entry.attempt))]
     .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))
     .slice(0, MAX_RUNS)
-  return { schema: SCHEMA, repository: 'openJiuwen-ai/DigitalMate', updatedAt: new Date().toISOString(), runs: merged }
+  return { schema: SCHEMA, repository: 'openJiuwen-ai/DigitalMate', updatedAt: new Date().toISOString(), catalog: buildCatalog(), runs: merged }
 }
 
 const isMain = process.argv[1] && import.meta.url === new URL(`file://${path.resolve(process.argv[1])}`).href
