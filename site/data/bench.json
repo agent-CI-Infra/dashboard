@@ -1,7 +1,1360 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-11T18:00:50.670Z",
+  "updatedAt": "2026-11-12T08:30:00.000Z",
   "runs": [
+    {
+      "schemaVersion": 1,
+      "kind": "bench",
+      "runId": "manual-gaia-baseline-20261111",
+      "commit": "e3e640668c6a (image) / 98e13bf8 (client tree, sealed)",
+      "backend": "k8s bench-gaia-main (ws://127.0.0.1:18101 port-forward, image b8e327b7)",
+      "profile": "gaia",
+      "task": "",
+      "taskCount": 165,
+      "trials": 165,
+      "status": "PASS",
+      "passAt1": 0.5758,
+      "passAtK": 0.5758,
+      "passHatK": 0.5758,
+      "tasks": [
+        {
+          "taskId": "GAIA-VAL-0011B22D84-51",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-00E41B8243-93",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "ERROR(infra)"
+        },
+        {
+          "taskId": "GAIA-VAL-05BA3443E9-11",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-07219A1054-41",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-080C932322-117",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "ERROR(infra)"
+        },
+        {
+          "taskId": "GAIA-VAL-0AA7FA9594-02",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-0ADCC66D41-116",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-0AFF695182-31",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-0B2B5CCA0D-33",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-0DBC463817-45",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-0E0AAC2B6C-46",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-101099D484-129",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-11C528DB7A-39",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-1209A07B75-60",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-1452E0A5C2-54",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-14E82626D2-01",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-15E7E53E32-92",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(product-content-filter)"
+        },
+        {
+          "taskId": "GAIA-VAL-177595B1E9-40",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-181F440C5B-118",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-19A91D036C-03",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-1C5FF3A097-128",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-1DFBF5E057-144",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-1E45184CA4-43",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-1EC061A758-134",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-1EF9086C3C-58",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-1F6FAEF601-86",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "ERROR(infra)"
+        },
+        {
+          "taskId": "GAIA-VAL-25E51F6E0C-105",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-26C86B72C3-74",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-276C2128BE-95",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-27E32B79BD-35",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-2A5EFDC06C-29",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-2E86EB36BB-14",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-2EBC03D723-157",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-2F9BFC5C11-09",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-2FE3E922F4-154",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-3248DAFEBE-77",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(task-cap)"
+        },
+        {
+          "taskId": "GAIA-VAL-32E31F12C5-82",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-354D112679-138",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "ERROR(infra)"
+        },
+        {
+          "taskId": "GAIA-VAL-3708984F08-47",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-38ED7AFFA7-162",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-3B34793BC1-88",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-3B8D15686E-49",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-3D38D72518-111",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-3F9B8F9B1B-108",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-43328C34C2-10",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-436C1CCFAF-113",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-4484670E7A-22",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-45A1354F9F-141",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-48A2737299-13",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(task-cap)"
+        },
+        {
+          "taskId": "GAIA-VAL-4C0671AE2B-132",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-4F164F8D5F-104",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-5020BF00DE-38",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-5137B172B1-42",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-54C09F1F93-99",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-5623FA6A49-85",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-56E3996E7C-125",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-580F524581-153",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-582E34C083-72",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-5C90240729-143",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-5F2435C261-122",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-601807D0A1-121",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-61C9DB5B8E-20",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-651F9850BD-65",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(task-cap)"
+        },
+        {
+          "taskId": "GAIA-VAL-657C0B7A24-19",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-66C45D6516-161",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-68D8C180B7-32",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-6DEF26BCB1-102",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-7072F2B615-15",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-711BE2880D-26",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-71AD8A6F0F-90",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-73359C3C9B-148",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-73EF6F232F-12",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-7511E4BEF5-91",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-7651063B3B-62",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-795843D739-140",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-79E0DC9413-28",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-7A968F11CA-78",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-7B3247F387-152",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-7BCB25921A-163",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-7CACA654BB-114",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-7DC365C283-103",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-7F6A897E4E-142",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-7FA94505D5-165",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-808D0F9765-57",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-80EC9B4C82-68",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-81A0445FD7-52",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-82744E88BD-98",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-835D524565-23",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-8621E9AB49-06",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-8A0A2DA816-124",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-8A931BE013-110",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-8E8069BF53-69",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-900D36A41A-79",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-903D4B8158-87",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-917C306D17-119",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-92084AD36F-145",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-921471B367-24",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-922C7C2EB3-18",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-94B3A7F13B-137",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-990560951F-107",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-9907C9D945-112",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(product-content-filter)"
+        },
+        {
+          "taskId": "GAIA-VAL-9927621865-135",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-997E451EA4-146",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-9A9939E37E-30",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-9E89F5E5D3-56",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-A211CA9123-80",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-A24CD0D463-147",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-A4D73860E1-130",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-A52DE90201-120",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-A55674DE71-96",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-A5B1D849ED-149",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-A6E94A2087-55",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-A86A4B2583-48",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-AA08CE4275-127",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-AAB770948B-150",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-AAFC75BE15-133",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-ACCD8C55CC-36",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-AEA19E1240-27",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-AF8D367FA4-21",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-AFC60AC21C-04",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-B814760A42-63",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-B8EC94EF58-136",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-BA905972AF-131",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-BC465F6E94-07",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-BC6470EAA0-59",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-BD164F61BB-84",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-C4A291F8C9-34",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-C5AEB3BB24-106",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-C672647A15-101",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-C7826A08C7-05",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-C7901B3FAA-73",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-C82F0D2523-158",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-CC26476DA4-94",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-CDE2FC18E5-17",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-CE3E72BFAF-71",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-CE4328EFD6-151",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-D042FCBBD7-123",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-D0BA87D8A5-159",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-D0D36F0E9E-08",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-D4047A9677-75",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-D438B83566-37",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(task-cap)"
+        },
+        {
+          "taskId": "GAIA-VAL-D514CB126F-81",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-D7E53FDFC5-83",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-D946934A71-44",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-DECF274A1E-16",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-E27FCD4049-61",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-E2E53DB716-70",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-E424150204-164",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-E61841D06E-66",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-EB29DF1928-97",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-F194BD939A-156",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-F1D4AD9200-109",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-F1DD5ECD95-25",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-F380D34D76-155",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-F4E4A88C05-64",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-F61011CDC2-89",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-F805C6EA41-160",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-F84B22DEEE-53",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-FA182D1263-76",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(product-content-filter)"
+        },
+        {
+          "taskId": "GAIA-VAL-FBC1201B32-67",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-FBC662574B-115",
+          "trials": 1,
+          "passes": 1,
+          "passRate": 1,
+          "flaky": false,
+          "status": "PASS"
+        },
+        {
+          "taskId": "GAIA-VAL-FC9A8F003C-100",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-FD54682820-139",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        },
+        {
+          "taskId": "GAIA-VAL-FDF9B4148A-126",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "FAIL"
+        },
+        {
+          "taskId": "GAIA-VAL-FFAAA609A8-50",
+          "trials": 1,
+          "passes": 0,
+          "passRate": 0,
+          "flaky": false,
+          "status": "NOT_RUN(unsupported-file-type)"
+        }
+      ],
+      "detail": "基线（单 trial）：PASS 95 / FAIL 36 / NOT_RUN 30 / ERROR 4；raw 57.6%，product 72.5%（95/131）；不可判 20.6%，覆盖率告警",
+      "costUsd": {
+        "total": 0,
+        "p50": 0,
+        "p95": 0
+      },
+      "latencyMs": {
+        "p50": 94900,
+        "p95": 560900
+      },
+      "generatedAt": "2026-11-11T08:09:00.000Z",
+      "report": "docs/bench/gaia.md#1024",
+      "runNumber": "",
+      "runUrl": "",
+      "conclusion": null,
+      "note": "手动基线，非 nightly 自动采集；单 trial、方差未测。引用必须带镜像 digest b8e327b7 与 65 条口径说明。"
+    },
     {
       "schemaVersion": 1,
       "kind": "bench",
