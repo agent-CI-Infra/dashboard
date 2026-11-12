@@ -62,6 +62,39 @@ export function buildCatalog() {
   }))
 }
 
+// live-wire suite directory name -> Hypium case name (tests/st/live-wire/run.mjs).
+export const LIVE_WIRE_SUITE_CASES = {
+  connection: 'gateway_connection',
+  business: 'duplicate_downlink_idempotent',
+  identity: 'protocol_invalid_task_identity',
+  forward: 'protocol_unknown_event_forward_compat',
+  optional: 'protocol_malformed_optional_fields',
+  chunks: 'protocol_chunk_boundary_reassembly',
+  artifact: 'artifact_receipt_required',
+}
+
+// Each suite directory holds wire-assessment.json (three-way evidence verdict).
+export function readLiveWireRuns(dir) {
+  if (!dir || !existsSync(dir)) return []
+  const runs = []
+  for (const name of readdirSync(dir)) {
+    const file = path.join(dir, name, 'wire-assessment.json')
+    if (!existsSync(file)) continue
+    const assessment = readJson(file)
+    if (!assessment) continue
+    const caseName = LIVE_WIRE_SUITE_CASES[name]
+    if (!caseName) continue
+    runs.push({
+      suite: name,
+      caseName,
+      status: assessment.status || 'blocked',
+      nativeStatus: assessment.nativeStatus || 'unavailable',
+      issues: Array.isArray(assessment.issues) ? assessment.issues.map(redact).slice(0, 5) : [],
+    })
+  }
+  return runs.sort((a, b) => a.suite.localeCompare(b.suite))
+}
+
 function parse(argv) {
   const out = {}
   for (let i = 0; i < argv.length; i += 1) {
@@ -111,7 +144,7 @@ function redact(detail) {
   return String(detail || '').slice(0, 300)
 }
 
-export function buildEntry({ summary, deviceResult, run }) {
+export function buildEntry({ summary, deviceResult, run, liveWire = [] }) {
   const cases = Array.isArray(summary?.cases) ? summary.cases : []
   const mapped = cases.map((item) => {
     const meta = ST_CASES[item.name] || {}
@@ -140,6 +173,7 @@ export function buildEntry({ summary, deviceResult, run }) {
       runner: summary?.runner || '',
       machine: summary?.machine || '',
       issues: Array.isArray(summary?.issues) ? summary.issues.map(redact).slice(0, 5) : [],
+      liveWire,
       cases: mapped,
     },
   }
@@ -192,12 +226,13 @@ if (isMain) {
     throw new Error('Usage: --st ARTIFACT_DIR --run nightly-run.json --out st.json [--previous st.json]')
   }
   const run = readJson(args.run)
+  const liveWire = readLiveWireRuns(args['live-wire'])
   const summaryFile = findSummary(args.st)
   let entry
   if (summaryFile) {
     const summary = readJson(summaryFile)
     const deviceFile = findDeviceResult(args.st)
-    entry = buildEntry({ summary, deviceResult: deviceFile ? readJson(deviceFile) : null, run })
+    entry = buildEntry({ summary, deviceResult: deviceFile ? readJson(deviceFile) : null, run, liveWire })
   } else {
     entry = buildErrorEntry({ run, message: 'digitalmate-st artifact has no summary.json (ST job failed before report generation)' })
   }
