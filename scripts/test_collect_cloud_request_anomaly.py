@@ -33,6 +33,22 @@ def make_day(date, values, partial=False, sample=None):
 
 
 class TraceCollectionTests(unittest.TestCase):
+    def test_console_refresh_preserves_archived_profile_provenance(self):
+        row = {'request_id':'digitalmate-a', 'date':'2026-11-11',
+               'start_time':'2026-11-11T10:00:00+00:00', 'gateway':1000}
+        provenance = {'native_trace_source':'sfs_archive', 'native_trace_consistency':'unconfirmed',
+                      'native_trace_observed_at':'original-observation', 'native_trace_retained_span_count':2}
+        def collection(rows):
+            return {'schema':'digitalmate/cloud-traces@1', 'read_log_count':1, 'generated_at':'later-refresh',
+                    'days':[{'anomaly':{'latency':{'slow_requests':rows}}}]}
+        old = collection([{**row, **provenance, 'native_trajectory':{'duration_ms':900,'root_span_id':'a','spans':[]}}])
+        fresh = collection([dict(row)])
+        result = collector.with_workspace_traces({'days':[], 'cloud_trace_collection':old}, fresh)
+        retained = result['cloud_trace_collection']['days'][0]['anomaly']['latency']['slow_requests'][0]
+        for field, value in provenance.items():
+            self.assertEqual(retained[field], value)
+        self.assertEqual(retained['native_trace_retained_from'], 'original-observation')
+
     def test_console_refresh_retains_only_the_same_unique_native_profile(self):
         def collection(rows, stamp):
             return {'schema':'digitalmate/cloud-traces@1','read_log_count':1,'generated_at':stamp,

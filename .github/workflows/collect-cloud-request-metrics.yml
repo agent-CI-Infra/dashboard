@@ -63,7 +63,8 @@ jobs:
             --state /tmp/cloud-metrics/seed/.sync/trajectory-archive.json \
             --previous /tmp/cloud-metrics/seed/site/data/trajectory-archive \
             --output /tmp/cloud-metrics/trajectory-archive \
-            --next-state /tmp/cloud-metrics/trajectory-archive-state.json
+            --next-state /tmp/cloud-metrics/trajectory-archive-state.json \
+            --metrics /tmp/cloud-metrics/env-request-latency-daily.json
       - name: Publish aggregate to the DigitalMate data branch
         if: ${{ github.event_name != 'workflow_dispatch' || !inputs.validate_only }}
         id: update

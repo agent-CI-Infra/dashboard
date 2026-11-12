@@ -816,7 +816,8 @@ def with_workspace_traces(previous, traces):
         if not isinstance(rid, str):
             continue
         old = old_unique.get(rid)
-        observed = (old or {}).get('native_trace_retained_from') or old_collection.get('generated_at')
+        observed = ((old or {}).get('native_trace_observed_at')
+                    or (old or {}).get('native_trace_retained_from') or old_collection.get('generated_at'))
         if (not old or new_counts[rid] != 1 or row.get('native_trajectory')
                 or row.get('native_trace_state') == 'ambiguous'
                 or not isinstance(observed, str) or not observed
@@ -826,6 +827,10 @@ def with_workspace_traces(previous, traces):
             continue
         row['native_trajectory'] = copy.deepcopy(old['native_trajectory'])
         row['native_trace_retained_from'] = observed
+        for field in ('native_trace_source', 'native_trace_consistency', 'native_trace_observed_at',
+                      'native_trace_retained_span_count'):
+            if field in old:
+                row[field] = copy.deepcopy(old[field])
         retained += 1
     if retained:
         traces['retained_native_trace_count'] = retained
