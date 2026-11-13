@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-13T09:13:19Z",
+  "updatedAt": "2026-11-13T09:41:13Z",
   "source": "openJiuwen-ai/DigitalMate",
   "runners": [
     {
@@ -35,7 +35,7 @@
       "name": "digitalmate-win-st-01",
       "os": "Windows",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "Windows",
@@ -54,7 +54,7 @@
       "name": "digitalmate-win-st-02",
       "os": "Windows",
       "status": "online",
-      "busy": false,
+      "busy": true,
       "labels": [
         "self-hosted",
         "Windows",
@@ -64,7 +64,15 @@
       ],
       "machine": "winbox2 · PC-20261103SYCB",
       "emulator": "Mate 90 Pro",
-      "device": "127.0.0.1:5555"
+      "device": "127.0.0.1:5555",
+      "job": {
+        "name": "hypium-ut",
+        "workflow": "CI",
+        "run_number": 1709,
+        "run_id": 43400058186,
+        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43400058186",
+        "started_at": "2026-11-13T09:17:52Z"
+      }
     },
     {
       "id": 41,
@@ -117,7 +125,7 @@
       "name": "dm-cloud-flex-01",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -131,7 +139,7 @@
       "name": "dm-cloud-nodeut-01",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -145,7 +153,7 @@
       "name": "dm-cloud-nodeut-02",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -271,6 +279,7 @@
       ]
     }
   ],
+  "queued": [],
   "history": [
     {
       "at": "2026-11-13T09:13:19Z",
@@ -299,6 +308,35 @@
         "dm-cloud-flex-01": true,
         "dm-cloud-nodeut-01": true,
         "dm-cloud-nodeut-02": true
+      }
+    },
+    {
+      "at": "2026-11-13T09:41:13Z",
+      "s": {
+        "HwdeMacBook-Air-2": "online",
+        "digitalmate-main-windows-01": "offline",
+        "digitalmate-win-st-01": "online",
+        "digitalmate-win-st-02": "online",
+        "digitalmate-win-st-03": "online",
+        "digitalmate-win-st-04": "online",
+        "dm-cloud-codecheck-02": "online",
+        "dm-cloud-flex-01": "online",
+        "dm-cloud-nodeut-01": "online",
+        "dm-cloud-nodeut-02": "online",
+        "dm-hk-ci-01": "online",
+        "dm-hk-ci-02": "online",
+        "dm-hk-ci-03": "online",
+        "dm-hk-ci-04": "online",
+        "dm-hk-ci-05": "online",
+        "dm-hk-ci-06": "online",
+        "dm-hk-ci-07": "online",
+        "dm-hk-ci-08": "online"
+      },
+      "b": {
+        "digitalmate-win-st-02": true
+      },
+      "j": {
+        "digitalmate-win-st-02": "hypium-ut"
       }
     }
   ]
