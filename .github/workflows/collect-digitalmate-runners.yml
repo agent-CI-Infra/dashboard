@@ -4,9 +4,11 @@ name: Collect DigitalMate runners
 # site/data/runners.json on the imported `digitalmate` branch, then redeploy
 # the board. The Runners tab reads that file; it is not part of snapshot.json.
 #
-# Requires DIGITALMATE_TOKEN with read access to the repository's self-hosted
-# runners API (fine-grained: Self-hosted runners -> Read). On API errors the
-# job keeps the previously published data instead of overwriting it.
+# Collects per-runner current job (in-progress runs -> jobs -> runner_name) and
+# the queued jobs list. Requires DIGITALMATE_TOKEN with read access to the
+# repository's Actions APIs (fine-grained: Actions + Self-hosted runners ->
+# Read). On API errors the job keeps the previously published data instead of
+# overwriting it.
 on:
   schedule:
     # Every 15 minutes; the Runners tab renders the last 24 hours of samples.
@@ -44,7 +46,7 @@ jobs:
             echo 'skip=false' >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Fetch the runner fleet
+      - name: Fetch the runner fleet and running jobs
         id: fetch
         if: steps.token.outputs.skip != 'true'
         env:
@@ -57,6 +59,14 @@ jobs:
             echo 'skip=true' >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          gh api "repos/$repo/actions/runs?status=in_progress&per_page=20" > /tmp/runs-inprogress.json
+          gh api "repos/$repo/actions/runs?status=queued&per_page=20" > /tmp/runs-queued.json
+          for id in $(jq -r '.workflow_runs[].id // empty' /tmp/runs-inprogress.json); do
+            gh api "repos/$repo/actions/runs/$id/jobs?per_page=100" > "/tmp/jobs-$id.json"
+          done
+          for id in $(jq -r '.workflow_runs[].id // empty' /tmp/runs-queued.json); do
+            gh api "repos/$repo/actions/runs/$id/jobs?per_page=100" > "/tmp/qjobs-$id.json"
+          done
           echo 'skip=false' >> "$GITHUB_OUTPUT"
 
       - name: Build runners.json
@@ -68,6 +78,7 @@ jobs:
             git show origin/digitalmate:site/data/runners.json > /tmp/previous-runners.json
           fi
           python3 - <<'PY'
+          import glob
           import json
           from datetime import datetime, timezone
 
@@ -80,20 +91,56 @@ jobs:
               'digitalmate-win-st-04': {'machine': 'winbox · PC-20261103OHIZ', 'emulator': 'Mate 90 Pro B', 'device': '127.0.0.1:10002'},
           }
 
+          def load(path, default=None):
+              try:
+                  with open(path, encoding='utf-8') as handle:
+                      return json.load(handle)
+              except (OSError, ValueError):
+                  return default if default is not None else {}
+
           with open('/tmp/runners-api.json', encoding='utf-8') as handle:
               api = json.load(handle)
-          try:
-              with open('/tmp/previous-runners.json', encoding='utf-8') as handle:
-                  previous = json.load(handle)
-          except (OSError, ValueError):
-              previous = {}
+          previous = load('/tmp/previous-runners.json')
+          inprogress = load('/tmp/runs-inprogress.json').get('workflow_runs', [])
+          queued = load('/tmp/runs-queued.json').get('workflow_runs', [])
+
+          # Map runner -> the job it is currently executing.
+          jobs_by_runner = {}
+          for run in inprogress[:10]:
+              run_jobs = load('/tmp/jobs-%s.json' % run.get('id')).get('jobs', [])
+              for job in run_jobs:
+                  if job.get('status') == 'in_progress' and job.get('runner_name'):
+                      jobs_by_runner[job['runner_name']] = {
+                          'name': job.get('name'),
+                          'workflow': run.get('name'),
+                          'run_number': run.get('run_number'),
+                          'run_id': run.get('id'),
+                          'url': run.get('html_url'),
+                          'started_at': job.get('started_at'),
+                      }
+
+          # Queued jobs waiting for a runner.
+          queued_jobs = []
+          for run in queued[:10]:
+              for job in load('/tmp/qjobs-%s.json' % run.get('id')).get('jobs', []):
+                  if job.get('status') == 'queued':
+                      queued_jobs.append({
+                          'name': job.get('name'),
+                          'workflow': run.get('name'),
+                          'run_number': run.get('run_number'),
+                          'url': run.get('html_url'),
+                          'created_at': job.get('created_at'),
+                      })
+          queued_jobs = queued_jobs[:10]
 
           now = datetime.now(timezone.utc).isoformat(timespec='seconds').replace('+00:00', 'Z')
           fleet = []
           states = {}
           busy = {}
+          jobnames = {}
           for runner in sorted(api.get('runners', []), key=lambda item: item.get('name', '')):
               name = runner.get('name', '')
+              job = jobs_by_runner.get(name)
               entry = {
                   'id': runner.get('id'),
                   'name': name,
@@ -107,6 +154,9 @@ jobs:
                   ],
               }
               entry.update(MACHINE_META.get(name, {}))
+              if job:
+                  entry['job'] = job
+                  jobnames[name] = job.get('name')
               fleet.append(entry)
               states[name] = runner.get('status')
               if runner.get('busy'):
@@ -115,16 +165,18 @@ jobs:
           # Rolling availability history: same-state samples bump the last
           # entry instead of growing the list; keep ~7 days at 4 per hour.
           history = [entry for entry in previous.get('history', []) if isinstance(entry, dict)]
-          if history and history[-1].get('s') == states and history[-1].get('b') == busy:
+          same = history and history[-1].get('s') == states and history[-1].get('b') == busy and history[-1].get('j') == jobnames
+          if same:
               history[-1] = {**history[-1], 'at': now}
           else:
-              history.append({'at': now, 's': states, 'b': busy})
+              history.append({'at': now, 's': states, 'b': busy, 'j': jobnames})
           history = history[-672:]
 
           out = {
               'updatedAt': now,
               'source': 'openJiuwen-ai/DigitalMate',
               'runners': fleet,
+              'queued': queued_jobs,
               'history': history,
           }
           with open('/tmp/runners.json', 'w', encoding='utf-8') as handle:
@@ -132,7 +184,10 @@ jobs:
               handle.write('\n')
 
           def fingerprint(items):
-              return [(r.get('name'), r.get('status'), r.get('busy')) for r in items]
+              return [
+                  (r.get('name'), r.get('status'), r.get('busy'), (r.get('job') or {}).get('name'))
+                  for r in items
+              ]
 
           # Publish on state changes, plus an hourly heartbeat so the page can
           # tell a healthy fleet from a stopped collector.
@@ -144,7 +199,11 @@ jobs:
                   heartbeat_due = age.total_seconds() > 3600
               except ValueError:
                   heartbeat_due = True
-          changed = fingerprint(fleet) != fingerprint(previous.get('runners', [])) or heartbeat_due
+          changed = (
+              fingerprint(fleet) != fingerprint(previous.get('runners', []))
+              or len(previous.get('queued', [])) != len(queued_jobs)
+              or heartbeat_due
+          )
           with open('/tmp/changed', 'w', encoding='utf-8') as handle:
               handle.write('true' if changed else 'false')
           PY

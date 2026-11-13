@@ -133,6 +133,42 @@ h3 { font-size: 14.5px; margin: 0; font-weight: 600; }
 .cell.busy { background: var(--accent); }
 .cell.down { background: var(--fail); }
 .cell.na { background: var(--line-soft); }
+
+/* --- current job + queue --- */
+.meta.job { color: var(--ink); }
+.meta.job a { color: var(--accent); text-decoration: none; font-weight: 500; }
+.meta.job a:hover { text-decoration: underline; }
+.queued {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 12px 15px;
+  margin: 16px 0 0;
+}
+.queued h2 { font-size: 14px; margin: 0 0 6px; }
+.queued ul { margin: 0; padding-left: 18px; }
+.queued li { margin: 3px 0; font-size: 13px; }
+.queued a { color: var(--accent); text-decoration: none; }
+.queued a:hover { text-decoration: underline; }
+
+/* --- machine network speed --- */
+.netmon-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+.net-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 13px 15px;
+  min-width: 0;
+}
+.net-card h3 { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.spark-wrap { margin-top: 8px; overflow-x: auto; }
+.spark { display: block; width: max-content; min-width: 100%; }
+
 .legend {
   display: flex;
   flex-wrap: wrap;

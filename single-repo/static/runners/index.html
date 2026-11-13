@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>DigitalMate 自建 Runner 状态</title>
-    <link rel="stylesheet" href="style.css?v=20261113.1" />
+    <link rel="stylesheet" href="style.css?v=20261113.2" />
   </head>
   <body>
     <main class="page">
       <header class="head">
         <h1>自建 Runner 状态<span id="count" class="muted"></span></h1>
         <p class="muted small">
-          数据来自 GitHub Actions Runners API，由 Collect DigitalMate runners 工作流每 15 分钟采集，页面每分钟自动刷新。快照时间：<time id="updated">载入中…</time>
+          数据来自 GitHub Actions API（每 15 分钟采集）和两台 Windows 机器的 netmon 实测吞吐推送，页面每分钟自动刷新。快照：<time id="updated">载入中…</time>
         </p>
       </header>
 
@@ -20,6 +20,14 @@
       <p id="error" class="error" hidden></p>
 
       <section id="cards" class="cards" aria-label="Runner 当前状态"></section>
+
+      <section id="queued" class="queued" hidden></section>
+
+      <section class="block" aria-labelledby="net-title">
+        <h2 id="net-title">机器网速</h2>
+        <p class="muted small">两台 Windows 机器每 15 分钟推送的实测吞吐（netmon 每 5 秒采样汇总）。</p>
+        <div id="netmon" class="netmon-cards" aria-label="机器网速"></div>
+      </section>
 
       <section class="block" aria-labelledby="tl-title">
         <h2 id="tl-title">可用性时间线</h2>
@@ -33,6 +41,6 @@
         </p>
       </section>
     </main>
-    <script src="app.js?v=20261113.1"></script>
+    <script src="app.js?v=20261113.2"></script>
   </body>
 </html>
