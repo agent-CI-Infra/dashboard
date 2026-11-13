@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-12T18:34:29.962Z",
+  "updatedAt": "2026-11-13T07:12:59.567Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -295,6 +295,436 @@
     }
   ],
   "runs": [
+    {
+      "runId": 43328330535,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43328330535",
+      "createdAt": "2026-11-12T23:22:37Z",
+      "headSha": "34f3d1cca4b2",
+      "conclusion": "cancelled",
+      "st": {
+        "runId": "ST-1794527911790-a02f83",
+        "status": "passed",
+        "mode": "attachment-policy",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [],
+        "liveWire": [
+          {
+            "suite": "artifact",
+            "caseName": "artifact_receipt_required",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "business",
+            "caseName": "duplicate_downlink_idempotent",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "chunks",
+            "caseName": "protocol_chunk_boundary_reassembly",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "connection",
+            "caseName": "gateway_connection",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "forward",
+            "caseName": "protocol_unknown_event_forward_compat",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "identity",
+            "caseName": "protocol_invalid_task_identity",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "optional",
+            "caseName": "protocol_malformed_optional_fields",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          }
+        ],
+        "component": [
+          {
+            "suite": "attachment-policy",
+            "title": "本地附件策略",
+            "status": "passed",
+            "runId": "ST-1794527911790-a02f83",
+            "issues": [],
+            "cases": [
+              {
+                "name": "local_attachment_blocked_types",
+                "title": "拒绝的类型",
+                "status": "passed",
+                "elapsedMs": 36,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_image_containers",
+                "title": "图片容器",
+                "status": "passed",
+                "elapsedMs": 132,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_magic_mismatch",
+                "title": "魔数不符",
+                "status": "passed",
+                "elapsedMs": 38,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_size_limits",
+                "title": "大小限制",
+                "status": "passed",
+                "elapsedMs": 103,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_supported_controls",
+                "title": "支持的控件",
+                "status": "passed",
+                "elapsedMs": 485,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_preview_decode",
+                "title": "预览解码",
+                "status": "passed",
+                "elapsedMs": 16,
+                "detail": "Production upload policy and native files verified"
+              }
+            ],
+            "fixtures": []
+          },
+          {
+            "suite": "markdown",
+            "title": "Markdown 渲染",
+            "status": "passed",
+            "runId": "markdown-8b99eb7cc7a01b07eb15a9a9465bf6b3",
+            "issues": [],
+            "cases": [],
+            "fixtures": [
+              {
+                "name": "dash-value",
+                "title": "dash-value",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "three-dash-value",
+                "title": "three-dash-value",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "malformed-separator",
+                "title": "malformed-separator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "short-final-row",
+                "title": "short-final-row",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "open-final-pipe",
+                "title": "open-final-pipe",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "sole-operator",
+                "title": "sole-operator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "padded-operator",
+                "title": "padded-operator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "orphan-leading",
+                "title": "orphan-leading",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "orphan-trailing",
+                "title": "orphan-trailing",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "fenced-table",
+                "title": "fenced-table",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "fenced-operator",
+                "title": "fenced-operator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "comparison",
+                "title": "comparison",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "stream-pending",
+                "title": "stream-pending",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "stream-boundary",
+                "title": "stream-boundary",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-prose-period",
+                "title": "link-prose-period",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-markdown-period",
+                "title": "link-markdown-period",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-balanced-parens",
+                "title": "link-balanced-parens",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-brace-boundary",
+                "title": "link-brace-boundary",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-unmatched-open",
+                "title": "link-unmatched-open",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              }
+            ]
+          },
+          {
+            "suite": "session-proximity",
+            "title": "会话邻近契约",
+            "status": "passed",
+            "runId": "ST-1794527930078-e352c1",
+            "issues": [],
+            "cases": [
+              {
+                "name": "native_topic_projection",
+                "title": "主题投影",
+                "status": "passed",
+                "elapsedMs": 17,
+                "detail": "Native contract verified"
+              },
+              {
+                "name": "native_capacity_draft",
+                "title": "容量与草稿",
+                "status": "passed",
+                "elapsedMs": 42,
+                "detail": "Native contract verified"
+              },
+              {
+                "name": "native_capacity_controls",
+                "title": "容量与控件",
+                "status": "passed",
+                "elapsedMs": 4,
+                "detail": "Native contract verified"
+              }
+            ],
+            "fixtures": []
+          },
+          {
+            "suite": "suggestions",
+            "title": "建议协议与按钮",
+            "status": "passed",
+            "runId": "suggestions-1b2c8ff14a14149b8cb7e70def57d267",
+            "issues": [],
+            "cases": [],
+            "fixtures": [
+              {
+                "name": "shopping-inline-tail",
+                "title": "shopping-inline-tail",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "multiline-sources",
+                "title": "multiline-sources",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "sources-with-colon",
+                "title": "sources-with-colon",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "truncated-array",
+                "title": "truncated-array",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "fenced-example",
+                "title": "fenced-example",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "ordinary-next",
+                "title": "ordinary-next",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "unsupported-view",
+                "title": "unsupported-view",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "malformed-suggestion",
+                "title": "malformed-suggestion",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "deduplicated-limited",
+                "title": "deduplicated-limited",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              }
+            ]
+          }
+        ],
+        "cases": [
+          {
+            "name": "local_attachment_blocked_types",
+            "key": "local_attachment_blocked_types",
+            "title": "local_attachment_blocked_types",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 36,
+            "stage": "",
+            "detail": "Production upload policy and native files verified"
+          },
+          {
+            "name": "local_attachment_image_containers",
+            "key": "local_attachment_image_containers",
+            "title": "local_attachment_image_containers",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 132,
+            "stage": "",
+            "detail": "Production upload policy and native files verified"
+          },
+          {
+            "name": "local_attachment_magic_mismatch",
+            "key": "local_attachment_magic_mismatch",
+            "title": "local_attachment_magic_mismatch",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 38,
+            "stage": "",
+            "detail": "Production upload policy and native files verified"
+          },
+          {
+            "name": "local_attachment_size_limits",
+            "key": "local_attachment_size_limits",
+            "title": "local_attachment_size_limits",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 103,
+            "stage": "",
+            "detail": "Production upload policy and native files verified"
+          },
+          {
+            "name": "local_attachment_supported_controls",
+            "key": "local_attachment_supported_controls",
+            "title": "local_attachment_supported_controls",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 485,
+            "stage": "",
+            "detail": "Production upload policy and native files verified"
+          },
+          {
+            "name": "local_attachment_preview_decode",
+            "key": "local_attachment_preview_decode",
+            "title": "local_attachment_preview_decode",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 16,
+            "stage": "",
+            "detail": "Production upload policy and native files verified"
+          }
+        ]
+      }
+    },
     {
       "runId": 43195220740,
       "attempt": 1,
