@@ -1,0 +1,178 @@
+name: Collect DigitalMate runners
+
+# Snapshot the self-hosted runner fleet of openJiuwen-ai/DigitalMate into
+# site/data/runners.json on the imported `digitalmate` branch, then redeploy
+# the board. The Runners tab reads that file; it is not part of snapshot.json.
+#
+# Requires DIGITALMATE_TOKEN with read access to the repository's self-hosted
+# runners API (fine-grained: Self-hosted runners -> Read). On API errors the
+# job keeps the previously published data instead of overwriting it.
+on:
+  schedule:
+    # Every 15 minutes; the Runners tab renders the last 24 hours of samples.
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: collect-digitalmate-data
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Check source token
+        id: token
+        env:
+          TOKEN: ${{ secrets.DIGITALMATE_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo 'skip=true' >> "$GITHUB_OUTPUT"
+            echo '::warning::DIGITALMATE_TOKEN is not configured; skipping DigitalMate runners collection.'
+          else
+            echo 'skip=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch the runner fleet
+        id: fetch
+        if: steps.token.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.DIGITALMATE_TOKEN }}
+        run: |
+          set -euo pipefail
+          repo=openJiuwen-ai/DigitalMate
+          if ! gh api "repos/$repo/actions/runners?per_page=100" > /tmp/runners-api.json; then
+            echo '::warning::Runners API request failed (does DIGITALMATE_TOKEN have self-hosted runner read access?). Keeping the previously published data.'
+            echo 'skip=true' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo 'skip=false' >> "$GITHUB_OUTPUT"
+
+      - name: Build runners.json
+        if: steps.token.outputs.skip != 'true' && steps.fetch.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          git fetch origin digitalmate:refs/remotes/origin/digitalmate
+          if git cat-file -e origin/digitalmate:site/data/runners.json 2>/dev/null; then
+            git show origin/digitalmate:site/data/runners.json > /tmp/previous-runners.json
+          fi
+          python3 - <<'PY'
+          import json
+          from datetime import datetime, timezone
+
+          # Static fleet metadata; runners outside this map are still published,
+          # just without the machine columns.
+          MACHINE_META = {
+              'digitalmate-win-st-01': {'machine': 'winbox · PC-20261103OHIZ', 'emulator': 'Mate 90 Pro', 'device': '127.0.0.1:5555'},
+              'digitalmate-win-st-02': {'machine': 'winbox2 · PC-20261103SYCB', 'emulator': 'Mate 90 Pro', 'device': '127.0.0.1:5555'},
+              'digitalmate-win-st-03': {'machine': 'winbox2 · PC-20261103SYCB', 'emulator': 'Mate 90 Pro B', 'device': '127.0.0.1:10001'},
+              'digitalmate-win-st-04': {'machine': 'winbox · PC-20261103OHIZ', 'emulator': 'Mate 90 Pro B', 'device': '127.0.0.1:10002'},
+          }
+
+          with open('/tmp/runners-api.json', encoding='utf-8') as handle:
+              api = json.load(handle)
+          try:
+              with open('/tmp/previous-runners.json', encoding='utf-8') as handle:
+                  previous = json.load(handle)
+          except (OSError, ValueError):
+              previous = {}
+
+          now = datetime.now(timezone.utc).isoformat(timespec='seconds').replace('+00:00', 'Z')
+          fleet = []
+          states = {}
+          busy = {}
+          for runner in sorted(api.get('runners', []), key=lambda item: item.get('name', '')):
+              name = runner.get('name', '')
+              entry = {
+                  'id': runner.get('id'),
+                  'name': name,
+                  'os': runner.get('os'),
+                  'status': runner.get('status'),
+                  'busy': bool(runner.get('busy')),
+                  'labels': [
+                      label.get('name')
+                      for label in runner.get('labels', [])
+                      if isinstance(label, dict) and label.get('name')
+                  ],
+              }
+              entry.update(MACHINE_META.get(name, {}))
+              fleet.append(entry)
+              states[name] = runner.get('status')
+              if runner.get('busy'):
+                  busy[name] = True
+
+          # Rolling availability history: same-state samples bump the last
+          # entry instead of growing the list; keep ~7 days at 4 per hour.
+          history = [entry for entry in previous.get('history', []) if isinstance(entry, dict)]
+          if history and history[-1].get('s') == states and history[-1].get('b') == busy:
+              history[-1] = {**history[-1], 'at': now}
+          else:
+              history.append({'at': now, 's': states, 'b': busy})
+          history = history[-672:]
+
+          out = {
+              'updatedAt': now,
+              'source': 'openJiuwen-ai/DigitalMate',
+              'runners': fleet,
+              'history': history,
+          }
+          with open('/tmp/runners.json', 'w', encoding='utf-8') as handle:
+              json.dump(out, handle, ensure_ascii=False, indent=2)
+              handle.write('\n')
+
+          def fingerprint(items):
+              return [(r.get('name'), r.get('status'), r.get('busy')) for r in items]
+
+          # Publish on state changes, plus an hourly heartbeat so the page can
+          # tell a healthy fleet from a stopped collector.
+          heartbeat_due = True
+          previous_at = previous.get('updatedAt')
+          if previous_at:
+              try:
+                  age = datetime.now(timezone.utc) - datetime.fromisoformat(previous_at.replace('Z', '+00:00'))
+                  heartbeat_due = age.total_seconds() > 3600
+              except ValueError:
+                  heartbeat_due = True
+          changed = fingerprint(fleet) != fingerprint(previous.get('runners', [])) or heartbeat_due
+          with open('/tmp/changed', 'w', encoding='utf-8') as handle:
+              handle.write('true' if changed else 'false')
+          PY
+
+      - name: Update digitalmate branch
+        id: update
+        if: steps.token.outputs.skip != 'true' && steps.fetch.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          if [ "$(cat /tmp/changed)" != "true" ]; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            echo 'runners data unchanged'
+            exit 0
+          fi
+          git fetch origin digitalmate:refs/remotes/origin/digitalmate
+          git checkout -B digitalmate origin/digitalmate
+          mkdir -p site/data
+          cp /tmp/runners.json site/data/runners.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site/data/runners.json
+          git commit -m 'chore(digitalmate): update runner fleet status'
+          git pull --rebase origin digitalmate
+          git push origin HEAD:digitalmate
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+
+      - name: Deploy dashboard
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main
