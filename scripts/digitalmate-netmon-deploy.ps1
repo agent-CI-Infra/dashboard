@@ -14,9 +14,9 @@ Write-Output "[1] installed $dst"
 Unregister-ScheduledTask -TaskName 'DigitalMateNetMonPush' -Confirm:$false -ErrorAction SilentlyContinue
 $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument "-NoProfile -ExecutionPolicy Bypass -File $dst -Machine $Machine"
 $principal = New-ScheduledTaskPrincipal -UserId 'Administrator' -LogonType Interactive -RunLevel Highest
-$once = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) -RepetitionInterval (New-TimeSpan -Minutes 15) -RepetitionDuration ([TimeSpan]::MaxValue)
+$once = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) -RepetitionInterval (New-TimeSpan -Minutes 15) -RepetitionDuration (New-TimeSpan -Days 3650)
 $logon = New-ScheduledTaskTrigger -AtLogOn -User 'Administrator'
-$settings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit ([TimeSpan]::MaxValue)
+$settings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit ([TimeSpan]::Zero)
 Register-ScheduledTask -TaskName 'DigitalMateNetMonPush' -Action $action -Principal $principal -Trigger @($once, $logon) -Settings $settings -Force | Out-Null
 Write-Output "[2] registered DigitalMateNetMonPush (15 min repetition + logon trigger, no time limit)"
 
