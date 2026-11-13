@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/e2e-performance-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updated_at": "2026-11-12T01:50:20.418Z",
+  "updated_at": "2026-11-13T06:02:10.313Z",
   "cases": {
     "DM-WF-CHROME-01": {
       "id": "DM-WF-CHROME-01",
@@ -2367,82 +2367,92 @@
           "run_id": "nightly-43126221912-1",
           "commit": "69a2ebd05d84c2f9f085a0b835cabc84100070fc",
           "finished_at": "2026-11-12T00:57:52.171Z"
+        },
+        {
+          "date": "2026-11-13",
+          "status": "BLOCKED",
+          "query_ms": 143776,
+          "query_count": 1,
+          "duration_ms": 300729,
+          "run_id": "nightly-43369811435-1",
+          "commit": "1f807a79962bea8959f5dfa4d54dda42cc6338c2",
+          "finished_at": "2026-11-13T05:51:15.445Z"
         }
       ],
       "latest": {
         "id": "DM-WF-FILE-02",
         "title": "文件覆盖发布：单一卡片、最新内容与后台恢复",
         "mode": "single-turn",
-        "status": "COMPLETED",
-        "failure": null,
-        "started_at": "2026-11-12T00:53:23.780Z",
-        "finished_at": "2026-11-12T00:57:52.171Z",
-        "duration_ms": 268391,
+        "status": "BLOCKED",
+        "failure": "F02-original-path assert.observation 失败：Original source fields are missing: /firstPath, /path, /samePath",
+        "started_at": "2026-11-13T05:46:14.716Z",
+        "finished_at": "2026-11-13T05:51:15.445Z",
+        "duration_ms": 300729,
         "query_count": 1,
-        "query_ms": 74632,
-        "first_text_ms": 73739,
-        "display_ms": 75996,
+        "query_ms": 143776,
+        "first_text_ms": 141187,
+        "display_ms": 146741,
         "queries": [
           {
-            "started_at": "2026-11-12T00:54:02.343Z",
-            "task_id": "task-143e6bc1b5e34862ac0aa844ce1c3834",
-            "submission_id": "6928d6d7-28c9-4235-ae84-0c6c1388a9ba",
-            "duration_ms": 74632,
-            "first_text_ms": 73739,
-            "display_ms": 75996,
+            "started_at": "2026-11-13T05:46:58.173Z",
+            "task_id": "task-3c97838ecac64fb9bdd32347c0f8dfa1",
+            "submission_id": "3637c118-b942-4bdd-8096-73dfad57900d",
+            "duration_ms": 143776,
+            "first_text_ms": 141187,
+            "display_ms": 146741,
             "outcome": "completed",
-            "text_chars": 644,
+            "text_chars": 241,
             "request_bytes": 665,
-            "response_bytes": 8602451,
+            "response_bytes": 17126253,
             "stages": [
               {
                 "name": "tap",
-                "at_ms": 1794444842343,
+                "at_ms": 1794548818173,
                 "detail": null
               },
               {
                 "name": "queued",
-                "at_ms": 1794444842343,
+                "at_ms": 1794548818173,
                 "detail": null
               },
               {
                 "name": "dequeued",
-                "at_ms": 1794444842358,
+                "at_ms": 1794548818212,
                 "detail": null
               },
               {
                 "name": "wire_send",
-                "at_ms": 1794444842369,
+                "at_ms": 1794548818250,
                 "detail": "encode=0 send=1 attempt=1"
               },
               {
                 "name": "ack",
-                "at_ms": 1794444843238,
+                "at_ms": 1794548823509,
                 "detail": null
               },
               {
                 "name": "waiting",
-                "at_ms": 1794444863809,
+                "at_ms": 1794548869409,
                 "detail": "hitl"
               },
               {
                 "name": "first_text",
-                "at_ms": 1794444916082,
-                "detail": "chars=9"
+                "at_ms": 1794548959360,
+                "detail": "chars=4"
               },
               {
                 "name": "last_text",
-                "at_ms": 1794444916975,
-                "detail": "chars=644 events=29"
+                "at_ms": 1794548961949,
+                "detail": "chars=241 events=19"
               },
               {
                 "name": "task_done",
-                "at_ms": 1794444918339,
+                "at_ms": 1794548964914,
                 "detail": "completed"
               },
               {
                 "name": "display_done",
-                "at_ms": 1794444918339,
+                "at_ms": 1794548964914,
                 "detail": "no-reveal"
               }
             ]
@@ -2468,45 +2478,45 @@
             "measured": true
           }
         },
-        "step_count": 51,
+        "step_count": 52,
         "steps": [
           {
             "id": "S-start",
             "action": "app.coldStart",
             "status": "ok",
-            "started_at": "2026-11-12T00:53:23.780Z",
-            "duration_ms": 5031,
+            "started_at": "2026-11-13T05:46:14.716Z",
+            "duration_ms": 5357,
             "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
             "id": "S-reset",
             "action": "app.resetState",
             "status": "ok",
-            "started_at": "2026-11-12T00:53:28.811Z",
-            "duration_ms": 15557,
-            "detail": "已重置到初始状态（11-12 08:53:35.229 3912 3912 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=0 databases=0 tables=0 files=0 notifications=skipped room=room-428726e221654ed784d5d114996a911a）"
+            "started_at": "2026-11-13T05:46:20.073Z",
+            "duration_ms": 15761,
+            "detail": "已重置到初始状态（11-13 13:46:27.148 62300 62300 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=0 databases=0 tables=0 files=0 notifications=skipped room=room-14b8c03bf007492f856005fc5d08d6b3）"
           },
           {
             "id": "S00",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T00:53:44.368Z",
-            "duration_ms": 2100,
+            "started_at": "2026-11-13T05:46:35.834Z",
+            "duration_ms": 2020,
             "detail": "截图 00-before"
           },
           {
             "id": "F02-ready",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-12T00:53:46.468Z",
-            "duration_ms": 2551,
+            "started_at": "2026-11-13T05:46:37.854Z",
+            "duration_ms": 6996,
             "detail": null
           },
           {
             "id": "F02-cleanup",
             "action": "cloud.inject",
             "status": "ok",
-            "started_at": "2026-11-12T00:53:49.019Z",
+            "started_at": "2026-11-13T05:46:44.850Z",
             "duration_ms": 0,
             "detail": null
           },
@@ -2514,55 +2524,55 @@
             "id": "S01",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-12T00:53:49.019Z",
-            "duration_ms": 17117,
+            "started_at": "2026-11-13T05:46:44.850Z",
+            "duration_ms": 17188,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S02",
             "action": "approval.allow",
             "status": "skipped",
-            "started_at": "2026-11-12T00:54:06.136Z",
-            "duration_ms": 60463,
+            "started_at": "2026-11-13T05:47:02.038Z",
+            "duration_ms": 62673,
             "detail": "没有出现工具审批卡"
           },
           {
             "id": "S03",
             "action": "approval.allow",
             "status": "skipped",
-            "started_at": "2026-11-12T00:55:06.599Z",
-            "duration_ms": 6592,
+            "started_at": "2026-11-13T05:48:04.711Z",
+            "duration_ms": 6498,
             "detail": "没有出现工具审批卡"
           },
           {
             "id": "F02-confirmation",
             "action": "wait.optionCard",
             "status": "ok",
-            "started_at": "2026-11-12T00:55:13.191Z",
-            "duration_ms": 5167,
+            "started_at": "2026-11-13T05:48:11.209Z",
+            "duration_ms": 5257,
             "detail": null
           },
           {
             "id": "F02-pause",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-12T00:55:18.358Z",
-            "duration_ms": 6910,
+            "started_at": "2026-11-13T05:48:16.466Z",
+            "duration_ms": 5229,
             "detail": null
           },
           {
             "id": "F02-first",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-12T00:55:25.268Z",
-            "duration_ms": 3543,
+            "started_at": "2026-11-13T05:48:21.695Z",
+            "duration_ms": 11696,
             "detail": null
           },
           {
             "id": "F02-first-check",
             "action": "assert.observation",
             "status": "ok",
-            "started_at": "2026-11-12T00:55:28.811Z",
+            "started_at": "2026-11-13T05:48:33.391Z",
             "duration_ms": 1,
             "detail": "Source query fields match the declared conditions"
           },
@@ -2570,95 +2580,95 @@
             "id": "F02-continue",
             "action": "requirements.answer",
             "status": "ok",
-            "started_at": "2026-11-12T00:55:28.812Z",
-            "duration_ms": 12839,
+            "started_at": "2026-11-13T05:48:33.392Z",
+            "duration_ms": 12837,
             "detail": "Answered only the selected production interaction"
           },
           {
             "id": "F02-final-approval",
             "action": "approval.allow",
             "status": "skipped",
-            "started_at": "2026-11-12T00:55:41.651Z",
-            "duration_ms": 6297,
+            "started_at": "2026-11-13T05:48:46.229Z",
+            "duration_ms": 6489,
             "detail": "没有出现工具审批卡"
           },
           {
             "id": "S04",
             "action": "wait.turn.complete",
             "status": "ok",
-            "started_at": "2026-11-12T00:55:47.948Z",
-            "duration_ms": 14115,
+            "started_at": "2026-11-13T05:48:52.718Z",
+            "duration_ms": 35705,
             "detail": "完成行 0 → 0（new-text-any）"
           },
           {
             "id": "F02-before",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:02.063Z",
-            "duration_ms": 4718,
+            "started_at": "2026-11-13T05:49:28.423Z",
+            "duration_ms": 4736,
             "detail": null
           },
           {
             "id": "F02-task",
             "action": "assert.cloud",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:06.781Z",
-            "duration_ms": 2,
+            "started_at": "2026-11-13T05:49:33.159Z",
+            "duration_ms": 1,
             "detail": "All declared cloud conditions match source records"
           },
           {
             "id": "F02-final",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:06.783Z",
-            "duration_ms": 6145,
+            "started_at": "2026-11-13T05:49:33.160Z",
+            "duration_ms": 1592,
             "detail": null
           },
           {
             "id": "F02-final-check",
             "action": "assert.observation",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:12.928Z",
-            "duration_ms": 0,
+            "started_at": "2026-11-13T05:49:34.752Z",
+            "duration_ms": 1,
             "detail": "Source query fields match the declared conditions"
           },
           {
             "id": "S05",
             "action": "ui.hideKeyboard",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:12.928Z",
-            "duration_ms": 1567,
+            "started_at": "2026-11-13T05:49:34.753Z",
+            "duration_ms": 1532,
             "detail": "未发现可见的键盘窗口，无需收起"
           },
           {
             "id": "S06",
             "action": "scroll.down",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:14.495Z",
-            "duration_ms": 7521,
+            "started_at": "2026-11-13T05:49:36.285Z",
+            "duration_ms": 7727,
             "detail": "下滑 2 次"
           },
           {
             "id": "S07",
             "action": "wait.settled",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:22.016Z",
-            "duration_ms": 3051,
+            "started_at": "2026-11-13T05:49:44.012Z",
+            "duration_ms": 3090,
             "detail": null
           },
           {
             "id": "S08",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:25.067Z",
-            "duration_ms": 2006,
+            "started_at": "2026-11-13T05:49:47.102Z",
+            "duration_ms": 1870,
             "detail": "截图 01-single-card"
           },
           {
             "id": "S08-card-check",
             "action": "assert.ui",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:27.073Z",
+            "started_at": "2026-11-13T05:49:48.972Z",
             "duration_ms": 4,
             "detail": "All declared UI conditions match the original checkpoint hierarchy"
           },
@@ -2666,224 +2676,232 @@
             "id": "S09",
             "action": "tap.artifact",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:27.077Z",
-            "duration_ms": 3308,
-            "detail": "打开产物「novel-nightly-43126221912-1.txt」"
+            "started_at": "2026-11-13T05:49:48.976Z",
+            "duration_ms": 3364,
+            "detail": "打开产物「novel-nightly-43369811435-1.txt」"
           },
           {
             "id": "S10",
             "action": "wait.settled",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:30.385Z",
-            "duration_ms": 3140,
+            "started_at": "2026-11-13T05:49:52.340Z",
+            "duration_ms": 3133,
             "detail": null
           },
           {
             "id": "S11",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:33.525Z",
-            "duration_ms": 2005,
+            "started_at": "2026-11-13T05:49:55.473Z",
+            "duration_ms": 1909,
             "detail": "截图 02-latest-preview"
           },
           {
             "id": "S11-preview-check",
             "action": "assert.ui",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:35.530Z",
-            "duration_ms": 2,
+            "started_at": "2026-11-13T05:49:57.382Z",
+            "duration_ms": 4,
             "detail": "All declared UI conditions match the original checkpoint hierarchy"
           },
           {
             "id": "S12",
             "action": "ui.systemBack",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:35.532Z",
-            "duration_ms": 1959,
+            "started_at": "2026-11-13T05:49:57.386Z",
+            "duration_ms": 1963,
             "detail": "Sent one system Back key"
           },
           {
             "id": "S13",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:37.491Z",
-            "duration_ms": 1933,
+            "started_at": "2026-11-13T05:49:59.349Z",
+            "duration_ms": 1895,
             "detail": "截图 03-before-background"
           },
           {
             "id": "S13-card-check",
             "action": "assert.ui",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:39.424Z",
-            "duration_ms": 3,
+            "started_at": "2026-11-13T05:50:01.244Z",
+            "duration_ms": 2,
             "detail": "All declared UI conditions match the original checkpoint hierarchy"
           },
           {
             "id": "S14",
             "action": "app.background",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:39.427Z",
-            "duration_ms": 4510,
+            "started_at": "2026-11-13T05:50:01.246Z",
+            "duration_ms": 4514,
             "detail": "HarmonyOS HOME changed the actual focused application"
           },
           {
             "id": "S15",
             "action": "wait.sleep",
             "status": "ok",
-            "started_at": "2026-11-12T00:56:43.937Z",
-            "duration_ms": 30004,
+            "started_at": "2026-11-13T05:50:05.760Z",
+            "duration_ms": 30003,
             "detail": "等待 30000ms"
           },
           {
             "id": "S16",
             "action": "app.foreground",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:13.941Z",
-            "duration_ms": 3964,
+            "started_at": "2026-11-13T05:50:35.763Z",
+            "duration_ms": 3932,
             "detail": "已核对前台 App 和可见的对话输入框"
           },
           {
             "id": "S17",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:17.905Z",
-            "duration_ms": 1863,
+            "started_at": "2026-11-13T05:50:39.695Z",
+            "duration_ms": 1800,
             "detail": "截图 04-after-foreground"
           },
           {
             "id": "S17-card-check",
             "action": "assert.ui",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:19.768Z",
-            "duration_ms": 2,
+            "started_at": "2026-11-13T05:50:41.495Z",
+            "duration_ms": 3,
             "detail": "All declared UI conditions match the original checkpoint hierarchy"
           },
           {
             "id": "F02-after",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:19.770Z",
-            "duration_ms": 5217,
+            "started_at": "2026-11-13T05:50:41.498Z",
+            "duration_ms": 4705,
             "detail": null
           },
           {
             "id": "F02-binding",
             "action": "assert.cloud",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:24.987Z",
-            "duration_ms": 1,
+            "started_at": "2026-11-13T05:50:46.203Z",
+            "duration_ms": 2,
             "detail": "All declared cloud conditions match source records"
           },
           {
             "id": "S18",
             "action": "wait.sleep",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:24.988Z",
-            "duration_ms": 10002,
+            "started_at": "2026-11-13T05:50:46.205Z",
+            "duration_ms": 10004,
             "detail": "等待 10000ms"
           },
           {
             "id": "S19",
             "action": "wait.settled",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:34.990Z",
-            "duration_ms": 3074,
+            "started_at": "2026-11-13T05:50:56.209Z",
+            "duration_ms": 3176,
             "detail": null
           },
           {
             "id": "S20",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:38.064Z",
-            "duration_ms": 1872,
+            "started_at": "2026-11-13T05:50:59.385Z",
+            "duration_ms": 1819,
             "detail": "截图 05-after-resync"
           },
           {
             "id": "S20-card-check",
             "action": "assert.ui",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:39.936Z",
-            "duration_ms": 3,
+            "started_at": "2026-11-13T05:51:01.204Z",
+            "duration_ms": 5,
             "detail": "All declared UI conditions match the original checkpoint hierarchy"
           },
           {
             "id": "S21",
             "action": "tap.artifact",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:39.939Z",
-            "duration_ms": 3278,
-            "detail": "打开产物「novel-nightly-43126221912-1.txt」"
+            "started_at": "2026-11-13T05:51:01.209Z",
+            "duration_ms": 3397,
+            "detail": "打开产物「novel-nightly-43369811435-1.txt」"
           },
           {
             "id": "S22",
             "action": "wait.settled",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:43.217Z",
-            "duration_ms": 3096,
+            "started_at": "2026-11-13T05:51:04.606Z",
+            "duration_ms": 3140,
             "detail": null
           },
           {
             "id": "S23",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:46.313Z",
-            "duration_ms": 1945,
+            "started_at": "2026-11-13T05:51:07.746Z",
+            "duration_ms": 1947,
             "detail": "截图 06-restored-preview"
           },
           {
             "id": "S23-preview-check",
             "action": "assert.ui",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:48.258Z",
-            "duration_ms": 2,
+            "started_at": "2026-11-13T05:51:09.693Z",
+            "duration_ms": 1,
             "detail": "All declared UI conditions match the original checkpoint hierarchy"
           },
           {
             "id": "S24",
             "action": "ui.systemBack",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:48.260Z",
-            "duration_ms": 1950,
+            "started_at": "2026-11-13T05:51:09.694Z",
+            "duration_ms": 1924,
             "detail": "Sent one system Back key"
           },
           {
             "id": "S25",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:50.210Z",
-            "duration_ms": 1900,
+            "started_at": "2026-11-13T05:51:11.618Z",
+            "duration_ms": 1797,
             "detail": "截图 07-final-chat"
           },
           {
             "id": "S25-card-check",
             "action": "assert.ui",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:52.110Z",
-            "duration_ms": 4,
+            "started_at": "2026-11-13T05:51:13.415Z",
+            "duration_ms": 2,
             "detail": "All declared UI conditions match the original checkpoint hierarchy"
           },
           {
             "id": "F02-private",
             "action": "assert.archive",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:52.114Z",
-            "duration_ms": 57,
+            "started_at": "2026-11-13T05:51:13.417Z",
+            "duration_ms": 49,
             "detail": "Text evidence contains no detected credential or private-account patterns"
           },
           {
             "id": "F02-original-path",
             "action": "assert.observation",
+            "status": "failed",
+            "started_at": "2026-11-13T05:51:13.466Z",
+            "duration_ms": 1979,
+            "detail": "Original source fields are missing: /firstPath, /path, /samePath"
+          },
+          {
+            "id": "S-failure",
+            "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T00:57:52.171Z",
+            "started_at": "2026-11-13T05:51:15.445Z",
             "duration_ms": 0,
-            "detail": "Source query fields match the declared conditions"
+            "detail": null
           }
         ],
-        "screenshots": 8,
+        "screenshots": 9,
         "profiling_files": 1,
-        "run_id": "nightly-43126221912-1",
-        "commit": "69a2ebd05d84c2f9f085a0b835cabc84100070fc",
-        "generated_at": "2026-11-12T01:50:20.418Z"
+        "run_id": "nightly-43369811435-1",
+        "commit": "1f807a79962bea8959f5dfa4d54dda42cc6338c2",
+        "generated_at": "2026-11-13T06:02:10.313Z"
       }
     },
     "DM-WF-MATH-01": {
@@ -3356,6 +3374,16 @@
           "run_id": "nightly-43126221912-1",
           "commit": "69a2ebd05d84c2f9f085a0b835cabc84100070fc",
           "finished_at": "2026-11-12T01:16:19.028Z"
+        },
+        {
+          "date": "2026-11-13",
+          "status": "COMPLETED",
+          "query_ms": 99568,
+          "query_count": 2,
+          "duration_ms": 465218,
+          "run_id": "nightly-43369811435-1",
+          "commit": "1f807a79962bea8959f5dfa4d54dda42cc6338c2",
+          "finished_at": "2026-11-13T05:41:57.375Z"
         }
       ],
       "latest": {
@@ -3364,129 +3392,129 @@
         "mode": "multi-turn",
         "status": "COMPLETED",
         "failure": null,
-        "started_at": "2026-11-12T01:08:55.048Z",
-        "finished_at": "2026-11-12T01:16:19.028Z",
-        "duration_ms": 443980,
+        "started_at": "2026-11-13T05:34:12.157Z",
+        "finished_at": "2026-11-13T05:41:57.375Z",
+        "duration_ms": 465218,
         "query_count": 2,
-        "query_ms": 121425,
-        "first_text_ms": 120010,
-        "display_ms": 123391,
+        "query_ms": 99568,
+        "first_text_ms": 97025,
+        "display_ms": 101713,
         "queries": [
           {
-            "started_at": "2026-11-12T01:11:32.809Z",
-            "task_id": "task-8b9c93f38edb4b8987558c7533b97feb",
-            "submission_id": "4eab943c-13f8-482d-bf15-a8f8bb38eb70",
-            "duration_ms": 179049,
-            "first_text_ms": 177069,
-            "display_ms": 181059,
+            "started_at": "2026-11-13T05:37:37.704Z",
+            "task_id": "task-55ebe9ccd54c49ddaba923f0bde8ecff",
+            "submission_id": "4c101c90-998e-4356-b751-8e9333ffbdec",
+            "duration_ms": 105441,
+            "first_text_ms": 104567,
+            "display_ms": 107591,
             "outcome": "completed",
-            "text_chars": 301,
+            "text_chars": 283,
             "request_bytes": 359,
-            "response_bytes": 6278939,
+            "response_bytes": 6413649,
             "stages": [
               {
                 "name": "tap",
-                "at_ms": 1794445892809,
+                "at_ms": 1794548257704,
                 "detail": null
               },
               {
                 "name": "queued",
-                "at_ms": 1794445892810,
+                "at_ms": 1794548257705,
                 "detail": null
               },
               {
                 "name": "dequeued",
-                "at_ms": 1794445892824,
+                "at_ms": 1794548257746,
                 "detail": null
               },
               {
                 "name": "wire_send",
-                "at_ms": 1794445892836,
+                "at_ms": 1794548257783,
                 "detail": "encode=0 send=2 attempt=1"
               },
               {
                 "name": "ack",
-                "at_ms": 1794445894192,
+                "at_ms": 1794548259443,
                 "detail": null
               },
               {
                 "name": "first_text",
-                "at_ms": 1794446069878,
-                "detail": "chars=3"
+                "at_ms": 1794548362271,
+                "detail": "chars=1"
               },
               {
                 "name": "last_text",
-                "at_ms": 1794446071858,
-                "detail": "chars=301 events=59"
+                "at_ms": 1794548363145,
+                "detail": "chars=283 events=23"
               },
               {
                 "name": "task_done",
-                "at_ms": 1794446073868,
+                "at_ms": 1794548365295,
                 "detail": "completed"
               },
               {
                 "name": "display_done",
-                "at_ms": 1794446073868,
+                "at_ms": 1794548365295,
                 "detail": "no-reveal"
               }
             ]
           },
           {
-            "started_at": "2026-11-12T01:14:59.595Z",
-            "task_id": "task-31d2be9831ca4b329edc05a230decbfd",
-            "submission_id": "2eda6b58-5acb-4407-9d3f-5db8e5043c48",
-            "duration_ms": 63801,
-            "first_text_ms": 62950,
-            "display_ms": 65722,
+            "started_at": "2026-11-13T05:40:01.496Z",
+            "task_id": "task-abec5f543e0a426baa5d07d82984d08b",
+            "submission_id": "23159816-10d1-4a63-b3b8-180ae702e99d",
+            "duration_ms": 93694,
+            "first_text_ms": 89483,
+            "display_ms": 95834,
             "outcome": "completed",
-            "text_chars": 413,
+            "text_chars": 827,
             "request_bytes": 379,
-            "response_bytes": 6305792,
+            "response_bytes": 6439305,
             "stages": [
               {
                 "name": "tap",
-                "at_ms": 1794446099595,
+                "at_ms": 1794548401496,
                 "detail": null
               },
               {
                 "name": "queued",
-                "at_ms": 1794446099595,
+                "at_ms": 1794548401496,
                 "detail": null
               },
               {
                 "name": "dequeued",
-                "at_ms": 1794446099610,
+                "at_ms": 1794548401539,
                 "detail": null
               },
               {
                 "name": "wire_send",
-                "at_ms": 1794446099623,
-                "detail": "encode=0 send=2 attempt=1"
+                "at_ms": 1794548401577,
+                "detail": "encode=0 send=1 attempt=1"
               },
               {
                 "name": "ack",
-                "at_ms": 1794446101595,
+                "at_ms": 1794548403493,
                 "detail": null
               },
               {
                 "name": "first_text",
-                "at_ms": 1794446162545,
-                "detail": "chars=69"
+                "at_ms": 1794548490979,
+                "detail": "chars=11"
               },
               {
                 "name": "last_text",
-                "at_ms": 1794446163396,
-                "detail": "chars=413 events=77"
+                "at_ms": 1794548495190,
+                "detail": "chars=827 events=49"
               },
               {
                 "name": "task_done",
-                "at_ms": 1794446165317,
+                "at_ms": 1794548497194,
                 "detail": "completed"
               },
               {
                 "name": "display_done",
-                "at_ms": 1794446165317,
-                "detail": "no-reveal"
+                "at_ms": 1794548497330,
+                "detail": null
               }
             ]
           }
@@ -3517,199 +3545,199 @@
             "id": "S-start",
             "action": "app.coldStart",
             "status": "ok",
-            "started_at": "2026-11-12T01:08:55.048Z",
-            "duration_ms": 5089,
+            "started_at": "2026-11-13T05:34:12.157Z",
+            "duration_ms": 5123,
             "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
             "id": "S-reset",
             "action": "app.resetState",
             "status": "ok",
-            "started_at": "2026-11-12T01:09:00.137Z",
-            "duration_ms": 21121,
-            "detail": "已重置到初始状态（11-12 09:09:10.604 18615 18615 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-43903a6c1fe34703a165b956f1d39d4b）"
+            "started_at": "2026-11-13T05:34:17.280Z",
+            "duration_ms": 20956,
+            "detail": "已重置到初始状态（11-13 13:34:28.818 52743 52743 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-513e792b7391421d8dc9a1025088f8c7）"
           },
           {
             "id": "S-fresh",
             "action": "app.freshConversation",
             "status": "ok",
-            "started_at": "2026-11-12T01:09:21.258Z",
-            "duration_ms": 6495,
+            "started_at": "2026-11-13T05:34:38.236Z",
+            "duration_ms": 6209,
             "detail": "DigitalMate 单会话 Home（设置入口不作为新对话抽屉）"
           },
           {
             "id": "S00",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:09:27.753Z",
-            "duration_ms": 2007,
+            "started_at": "2026-11-13T05:34:44.445Z",
+            "duration_ms": 2110,
             "detail": "截图 00-before"
           },
           {
             "id": "S01",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-12T01:09:29.760Z",
-            "duration_ms": 17259,
+            "started_at": "2026-11-13T05:34:46.555Z",
+            "duration_ms": 18305,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S02",
             "action": "wait.turn.complete",
             "status": "ok",
-            "started_at": "2026-11-12T01:09:47.019Z",
-            "duration_ms": 17739,
+            "started_at": "2026-11-13T05:35:04.860Z",
+            "duration_ms": 36693,
             "detail": "完成行 0 → 0（new-text-any）"
           },
           {
             "id": "S02H",
             "action": "ui.hideKeyboard",
             "status": "ok",
-            "started_at": "2026-11-12T01:10:04.758Z",
-            "duration_ms": 4210,
+            "started_at": "2026-11-13T05:35:41.553Z",
+            "duration_ms": 3880,
             "detail": "键盘窗口已关闭"
           },
           {
             "id": "S03",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:10:08.968Z",
-            "duration_ms": 1888,
+            "started_at": "2026-11-13T05:35:45.433Z",
+            "duration_ms": 1807,
             "detail": "截图 01-memory-ack"
           },
           {
             "id": "S03W",
             "action": "wait.sleep",
             "status": "ok",
-            "started_at": "2026-11-12T01:10:10.856Z",
-            "duration_ms": 5008,
+            "started_at": "2026-11-13T05:35:47.240Z",
+            "duration_ms": 5003,
             "detail": "等待 5000ms"
           },
           {
             "id": "S04",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-12T01:10:15.864Z",
-            "duration_ms": 16788,
+            "started_at": "2026-11-13T05:35:52.243Z",
+            "duration_ms": 16695,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S05",
             "action": "wait.turn.complete",
             "status": "ok",
-            "started_at": "2026-11-12T01:10:32.652Z",
-            "duration_ms": 21035,
+            "started_at": "2026-11-13T05:36:08.938Z",
+            "duration_ms": 30535,
             "detail": "完成行 0 → 0（new-text-any）"
           },
           {
             "id": "S05H",
             "action": "ui.hideKeyboard",
             "status": "ok",
-            "started_at": "2026-11-12T01:10:53.687Z",
-            "duration_ms": 4306,
+            "started_at": "2026-11-13T05:36:39.473Z",
+            "duration_ms": 3940,
             "detail": "键盘窗口已关闭"
           },
           {
             "id": "S06",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:10:57.993Z",
-            "duration_ms": 1888,
+            "started_at": "2026-11-13T05:36:43.413Z",
+            "duration_ms": 1833,
             "detail": "截图 02-preference-updated"
           },
           {
             "id": "S06W",
             "action": "wait.sleep",
             "status": "ok",
-            "started_at": "2026-11-12T01:10:59.881Z",
-            "duration_ms": 5002,
+            "started_at": "2026-11-13T05:36:45.246Z",
+            "duration_ms": 5001,
             "detail": "等待 5000ms"
           },
           {
             "id": "G-before-room",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-12T01:11:04.883Z",
-            "duration_ms": 4711,
+            "started_at": "2026-11-13T05:36:50.247Z",
+            "duration_ms": 5845,
             "detail": null
           },
           {
             "id": "S07",
             "action": "conversation.switch",
             "status": "ok",
-            "started_at": "2026-11-12T01:11:09.594Z",
-            "duration_ms": 3032,
+            "started_at": "2026-11-13T05:36:56.092Z",
+            "duration_ms": 5730,
             "detail": null
           },
           {
             "id": "S07R",
             "action": "app.coldStart",
             "status": "ok",
-            "started_at": "2026-11-12T01:11:12.626Z",
-            "duration_ms": 5181,
+            "started_at": "2026-11-13T05:37:01.822Z",
+            "duration_ms": 4981,
             "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
             "id": "S08",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:11:17.807Z",
-            "duration_ms": 1619,
+            "started_at": "2026-11-13T05:37:06.803Z",
+            "duration_ms": 1540,
             "detail": "截图 03-new-session"
           },
           {
             "id": "S09",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-12T01:11:19.426Z",
-            "duration_ms": 17193,
+            "started_at": "2026-11-13T05:37:08.343Z",
+            "duration_ms": 33122,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S09A",
             "action": "approval.allow",
             "status": "skipped",
-            "started_at": "2026-11-12T01:11:36.619Z",
-            "duration_ms": 6475,
+            "started_at": "2026-11-13T05:37:41.465Z",
+            "duration_ms": 6560,
             "detail": "没有出现工具审批卡"
           },
           {
             "id": "S10",
             "action": "wait.turn.complete",
             "status": "ok",
-            "started_at": "2026-11-12T01:11:43.094Z",
-            "duration_ms": 173526,
+            "started_at": "2026-11-13T05:37:48.025Z",
+            "duration_ms": 99577,
             "detail": "完成行 0 → 0（new-text-any）"
           },
           {
             "id": "S10H",
             "action": "ui.hideKeyboard",
             "status": "ok",
-            "started_at": "2026-11-12T01:14:36.620Z",
-            "duration_ms": 4033,
+            "started_at": "2026-11-13T05:39:27.602Z",
+            "duration_ms": 4199,
             "detail": "键盘窗口已关闭"
           },
           {
             "id": "S11",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:14:40.653Z",
-            "duration_ms": 2010,
+            "started_at": "2026-11-13T05:39:31.801Z",
+            "duration_ms": 1977,
             "detail": "截图 04-recommendation"
           },
           {
             "id": "G-S11",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-12T01:14:42.663Z",
-            "duration_ms": 3669,
+            "started_at": "2026-11-13T05:39:33.778Z",
+            "duration_ms": 14703,
             "detail": null
           },
           {
             "id": "G-room-changed",
             "action": "assert.cloud",
             "status": "ok",
-            "started_at": "2026-11-12T01:14:46.332Z",
+            "started_at": "2026-11-13T05:39:48.481Z",
             "duration_ms": 1,
             "detail": "Deterministic assertions passed"
           },
@@ -3717,7 +3745,7 @@
             "id": "G-S11-relevance",
             "action": "assert.cloud",
             "status": "ok",
-            "started_at": "2026-11-12T01:14:46.333Z",
+            "started_at": "2026-11-13T05:39:48.482Z",
             "duration_ms": 1,
             "detail": "Deterministic assertions passed"
           },
@@ -3725,55 +3753,55 @@
             "id": "S12",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-12T01:14:46.334Z",
-            "duration_ms": 17062,
+            "started_at": "2026-11-13T05:39:48.483Z",
+            "duration_ms": 16846,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S12A",
             "action": "approval.allow",
             "status": "skipped",
-            "started_at": "2026-11-12T01:15:03.396Z",
-            "duration_ms": 6711,
+            "started_at": "2026-11-13T05:40:05.329Z",
+            "duration_ms": 6550,
             "detail": "没有出现工具审批卡"
           },
           {
             "id": "S13",
             "action": "wait.turn.complete",
             "status": "ok",
-            "started_at": "2026-11-12T01:15:10.107Z",
-            "duration_ms": 59255,
+            "started_at": "2026-11-13T05:40:11.879Z",
+            "duration_ms": 94712,
             "detail": "完成行 0 → 0（new-text-any）"
           },
           {
             "id": "S13H",
             "action": "ui.hideKeyboard",
             "status": "ok",
-            "started_at": "2026-11-12T01:16:09.362Z",
-            "duration_ms": 4101,
+            "started_at": "2026-11-13T05:41:46.591Z",
+            "duration_ms": 4138,
             "detail": "键盘窗口已关闭"
           },
           {
             "id": "S14",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:16:13.463Z",
-            "duration_ms": 1858,
+            "started_at": "2026-11-13T05:41:50.729Z",
+            "duration_ms": 1888,
             "detail": "截图 05-trip-plan"
           },
           {
             "id": "G-S14",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-12T01:16:15.321Z",
-            "duration_ms": 3700,
+            "started_at": "2026-11-13T05:41:52.617Z",
+            "duration_ms": 4753,
             "detail": null
           },
           {
             "id": "G-S14-relevance",
             "action": "assert.cloud",
             "status": "ok",
-            "started_at": "2026-11-12T01:16:19.021Z",
+            "started_at": "2026-11-13T05:41:57.370Z",
             "duration_ms": 1,
             "detail": "Deterministic assertions passed"
           },
@@ -3781,24 +3809,24 @@
             "id": "G-ui",
             "action": "assert.ui",
             "status": "ok",
-            "started_at": "2026-11-12T01:16:19.022Z",
-            "duration_ms": 5,
+            "started_at": "2026-11-13T05:41:57.371Z",
+            "duration_ms": 4,
             "detail": "Deterministic assertions passed"
           },
           {
             "id": "G-trace",
             "action": "assert.trace",
             "status": "ok",
-            "started_at": "2026-11-12T01:16:19.027Z",
-            "duration_ms": 1,
+            "started_at": "2026-11-13T05:41:57.375Z",
+            "duration_ms": 0,
             "detail": "Deterministic assertions passed"
           }
         ],
         "screenshots": 6,
         "profiling_files": 1,
-        "run_id": "nightly-43126221912-1",
-        "commit": "69a2ebd05d84c2f9f085a0b835cabc84100070fc",
-        "generated_at": "2026-11-12T01:50:20.418Z"
+        "run_id": "nightly-43369811435-1",
+        "commit": "1f807a79962bea8959f5dfa4d54dda42cc6338c2",
+        "generated_at": "2026-11-13T06:02:10.313Z"
       }
     },
     "DM-WF-QUOTE-01": {
@@ -7569,6 +7597,16 @@
           "run_id": "nightly-43126221912-1",
           "commit": "69a2ebd05d84c2f9f085a0b835cabc84100070fc",
           "finished_at": "2026-11-12T00:50:48.524Z"
+        },
+        {
+          "date": "2026-11-13",
+          "status": "COMPLETED",
+          "query_ms": null,
+          "query_count": 0,
+          "duration_ms": 248048,
+          "run_id": "nightly-43369811435-1",
+          "commit": "1f807a79962bea8959f5dfa4d54dda42cc6338c2",
+          "finished_at": "2026-11-13T05:46:12.188Z"
         }
       ],
       "latest": {
@@ -7577,9 +7615,9 @@
         "mode": "multi-turn",
         "status": "COMPLETED",
         "failure": null,
-        "started_at": "2026-11-12T00:49:02.566Z",
-        "finished_at": "2026-11-12T00:50:48.524Z",
-        "duration_ms": 105958,
+        "started_at": "2026-11-13T05:42:04.140Z",
+        "finished_at": "2026-11-13T05:46:12.188Z",
+        "duration_ms": 248048,
         "query_count": 0,
         "query_ms": null,
         "first_text_ms": null,
@@ -7611,95 +7649,95 @@
             "id": "S00",
             "action": "app.coldStart",
             "status": "ok",
-            "started_at": "2026-11-12T00:49:02.566Z",
-            "duration_ms": 5343,
+            "started_at": "2026-11-13T05:42:04.140Z",
+            "duration_ms": 5086,
             "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
             "id": "S01",
             "action": "app.resetState",
             "status": "ok",
-            "started_at": "2026-11-12T00:49:07.909Z",
-            "duration_ms": 18690,
-            "detail": "已重置到初始状态（11-12 08:49:18.206 63832 63832 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-cf0f764b20784a5b97dff883ca52d9f4）"
+            "started_at": "2026-11-13T05:42:09.226Z",
+            "duration_ms": 166711,
+            "detail": "已重置到初始状态（11-13 13:42:25.107 59019 59019 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-531bda3a736646eebbc916dc5f98fccf）"
           },
           {
             "id": "S02",
             "action": "app.freshConversation",
             "status": "ok",
-            "started_at": "2026-11-12T00:49:26.599Z",
-            "duration_ms": 6520,
+            "started_at": "2026-11-13T05:44:55.937Z",
+            "duration_ms": 5777,
             "detail": "DigitalMate 单会话 Home（设置入口不作为新对话抽屉）"
           },
           {
             "id": "S03",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T00:49:33.119Z",
-            "duration_ms": 2110,
+            "started_at": "2026-11-13T05:45:01.714Z",
+            "duration_ms": 1969,
             "detail": "截图 03-checkpoint"
           },
           {
             "id": "S04",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-12T00:49:35.229Z",
-            "duration_ms": 16921,
+            "started_at": "2026-11-13T05:45:03.683Z",
+            "duration_ms": 16373,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S05",
             "action": "chat.draft",
             "status": "ok",
-            "started_at": "2026-11-12T00:49:52.150Z",
-            "duration_ms": 6953,
+            "started_at": "2026-11-13T05:45:20.056Z",
+            "duration_ms": 6792,
             "detail": "已输入草稿并保留键盘，未点击发送"
           },
           {
             "id": "S06",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T00:49:59.103Z",
-            "duration_ms": 1951,
+            "started_at": "2026-11-13T05:45:26.848Z",
+            "duration_ms": 1988,
             "detail": "截图 06-checkpoint"
           },
           {
             "id": "C01-busy",
             "action": "assert.busy",
             "status": "ok",
-            "started_at": "2026-11-12T00:50:01.054Z",
-            "duration_ms": 2,
+            "started_at": "2026-11-13T05:45:28.836Z",
+            "duration_ms": 4,
             "detail": "Compared the actual conversation activity state"
           },
           {
             "id": "C01-before",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-12T00:50:01.056Z",
-            "duration_ms": 1996,
+            "started_at": "2026-11-13T05:45:28.840Z",
+            "duration_ms": 1961,
             "detail": null
           },
           {
             "id": "C01-original",
             "action": "assert.cloud",
             "status": "ok",
-            "started_at": "2026-11-12T00:50:03.052Z",
-            "duration_ms": 2,
+            "started_at": "2026-11-13T05:45:30.801Z",
+            "duration_ms": 1,
             "detail": "All declared cloud conditions match source records"
           },
           {
             "id": "S07",
             "action": "app.kill",
             "status": "ok",
-            "started_at": "2026-11-12T00:50:03.054Z",
-            "duration_ms": 516,
+            "started_at": "2026-11-13T05:45:30.802Z",
+            "duration_ms": 613,
             "detail": "Stopped only this App and confirmed that its PID no longer exists; no application data was cleared"
           },
           {
             "id": "C01-process-gone",
             "action": "assert.observation",
             "status": "ok",
-            "started_at": "2026-11-12T00:50:03.570Z",
+            "started_at": "2026-11-13T05:45:31.415Z",
             "duration_ms": 1,
             "detail": "Source query fields match the declared conditions"
           },
@@ -7707,39 +7745,39 @@
             "id": "S08",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T00:50:03.571Z",
-            "duration_ms": 2078,
+            "started_at": "2026-11-13T05:45:31.416Z",
+            "duration_ms": 2123,
             "detail": "截图 08-checkpoint"
           },
           {
             "id": "S09",
             "action": "app.relaunch",
             "status": "ok",
-            "started_at": "2026-11-12T00:50:05.649Z",
-            "duration_ms": 4961,
+            "started_at": "2026-11-13T05:45:33.539Z",
+            "duration_ms": 5356,
             "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
             "id": "S10",
             "action": "wait.turn.complete",
             "status": "ok",
-            "started_at": "2026-11-12T00:50:10.610Z",
-            "duration_ms": 24906,
+            "started_at": "2026-11-13T05:45:38.895Z",
+            "duration_ms": 21779,
             "detail": "完成行 0 → 0（new-text-any）"
           },
           {
             "id": "S11",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T00:50:35.516Z",
-            "duration_ms": 2111,
+            "started_at": "2026-11-13T05:46:00.674Z",
+            "duration_ms": 2154,
             "detail": "截图 11-checkpoint"
           },
           {
             "id": "C01-draft",
             "action": "assert.draft",
             "status": "ok",
-            "started_at": "2026-11-12T00:50:37.627Z",
+            "started_at": "2026-11-13T05:46:02.828Z",
             "duration_ms": 3,
             "detail": "Compared the complete native draft text without trimming"
           },
@@ -7747,23 +7785,23 @@
             "id": "C01-after",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-12T00:50:37.630Z",
-            "duration_ms": 6415,
+            "started_at": "2026-11-13T05:46:02.831Z",
+            "duration_ms": 4734,
             "detail": null
           },
           {
             "id": "C01-no-replay",
             "action": "assert.cloud",
             "status": "ok",
-            "started_at": "2026-11-12T00:50:44.045Z",
-            "duration_ms": 4430,
+            "started_at": "2026-11-13T05:46:07.565Z",
+            "duration_ms": 4567,
             "detail": "All declared cloud conditions match source records"
           },
           {
             "id": "C01-exact-result-expanded",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T00:50:48.475Z",
+            "started_at": "2026-11-13T05:46:12.132Z",
             "duration_ms": null,
             "detail": null
           },
@@ -7771,24 +7809,24 @@
             "id": "C01-exact-result",
             "action": "assert.reply",
             "status": "ok",
-            "started_at": "2026-11-12T00:50:44.048Z",
-            "duration_ms": 4433,
+            "started_at": "2026-11-13T05:46:07.567Z",
+            "duration_ms": 4570,
             "detail": "Compared the restored reply body with the actual cloud result"
           },
           {
             "id": "E5-private",
             "action": "assert.archive",
             "status": "ok",
-            "started_at": "2026-11-12T00:50:48.481Z",
-            "duration_ms": 43,
+            "started_at": "2026-11-13T05:46:12.137Z",
+            "duration_ms": 51,
             "detail": "Text evidence contains no detected credential or private-account patterns"
           }
         ],
         "screenshots": 5,
         "profiling_files": 1,
-        "run_id": "nightly-43126221912-1",
-        "commit": "69a2ebd05d84c2f9f085a0b835cabc84100070fc",
-        "generated_at": "2026-11-12T01:50:20.418Z"
+        "run_id": "nightly-43369811435-1",
+        "commit": "1f807a79962bea8959f5dfa4d54dda42cc6338c2",
+        "generated_at": "2026-11-13T06:02:10.313Z"
       }
     },
     "DM-WF-FILE-03": {
@@ -9687,6 +9725,16 @@
           "run_id": "nightly-43126221912-1",
           "commit": "69a2ebd05d84c2f9f085a0b835cabc84100070fc",
           "finished_at": "2026-11-12T01:20:42.938Z"
+        },
+        {
+          "date": "2026-11-13",
+          "status": "BLOCKED",
+          "query_ms": null,
+          "query_count": 0,
+          "duration_ms": 218860,
+          "run_id": "nightly-43369811435-1",
+          "commit": "1f807a79962bea8959f5dfa4d54dda42cc6338c2",
+          "finished_at": "2026-11-13T06:02:10.075Z"
         }
       ],
       "latest": {
@@ -9694,10 +9742,10 @@
         "title": "结构化卡片等待时追加消息",
         "mode": "multi-turn",
         "status": "BLOCKED",
-        "failure": "S10 requirements.answer 失败：question-card-progress 超时（30000ms）：false",
-        "started_at": "2026-11-12T01:17:56.548Z",
-        "finished_at": "2026-11-12T01:20:42.938Z",
-        "duration_ms": 166390,
+        "failure": "S05 wait.optionCard 失败：[SETUP_FAIL] Original question controls remain outside the viewport after bounded UI scroll",
+        "started_at": "2026-11-13T05:58:31.215Z",
+        "finished_at": "2026-11-13T06:02:10.075Z",
+        "duration_ms": 218860,
         "query_count": 0,
         "query_ms": null,
         "first_text_ms": null,
@@ -9723,118 +9771,70 @@
             "measured": true
           }
         },
-        "step_count": 13,
+        "step_count": 7,
         "steps": [
           {
             "id": "S00",
             "action": "app.coldStart",
             "status": "ok",
-            "started_at": "2026-11-12T01:17:56.549Z",
-            "duration_ms": 5230,
+            "started_at": "2026-11-13T05:58:31.215Z",
+            "duration_ms": 5417,
             "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
             "id": "S01",
             "action": "app.resetState",
             "status": "ok",
-            "started_at": "2026-11-12T01:18:01.779Z",
-            "duration_ms": 15755,
-            "detail": "已重置到初始状态（11-12 09:18:08.572 26614 26614 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-ce9bbbc613904119a4c9aef588745483）"
+            "started_at": "2026-11-13T05:58:36.632Z",
+            "duration_ms": 159055,
+            "detail": "已重置到初始状态（11-13 13:58:45.806 7195 7195 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-8b5e755c76a74569937064f5ad146b27）"
           },
           {
             "id": "S02",
             "action": "app.freshConversation",
             "status": "ok",
-            "started_at": "2026-11-12T01:18:17.534Z",
-            "duration_ms": 6824,
+            "started_at": "2026-11-13T06:01:15.687Z",
+            "duration_ms": 5824,
             "detail": "DigitalMate 单会话 Home（设置入口不作为新对话抽屉）"
           },
           {
             "id": "S03",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:18:24.358Z",
-            "duration_ms": 2097,
+            "started_at": "2026-11-13T06:01:21.511Z",
+            "duration_ms": 1955,
             "detail": "截图 03-checkpoint"
           },
           {
             "id": "S04",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-12T01:18:26.455Z",
-            "duration_ms": 17755,
+            "started_at": "2026-11-13T06:01:23.466Z",
+            "duration_ms": 16396,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S05",
             "action": "wait.optionCard",
-            "status": "ok",
-            "started_at": "2026-11-12T01:18:44.210Z",
-            "duration_ms": 49797,
-            "detail": null
-          },
-          {
-            "id": "S06",
-            "action": "snapshot",
-            "status": "ok",
-            "started_at": "2026-11-12T01:19:34.007Z",
-            "duration_ms": 1851,
-            "detail": "截图 06-checkpoint"
-          },
-          {
-            "id": "G-baseline",
-            "action": "cloud.inspect",
-            "status": "ok",
-            "started_at": "2026-11-12T01:19:35.858Z",
-            "duration_ms": 4692,
-            "detail": null
-          },
-          {
-            "id": "S07",
-            "action": "chat.sendWhileBusy",
-            "status": "ok",
-            "started_at": "2026-11-12T01:19:40.550Z",
-            "duration_ms": 11559,
-            "detail": "One additional message sent through the enabled send control while a real turn was active"
-          },
-          {
-            "id": "S08",
-            "action": "ui.hideKeyboard",
-            "status": "ok",
-            "started_at": "2026-11-12T01:19:52.109Z",
-            "duration_ms": 4191,
-            "detail": "键盘窗口已关闭"
-          },
-          {
-            "id": "S09",
-            "action": "snapshot",
-            "status": "ok",
-            "started_at": "2026-11-12T01:19:56.300Z",
-            "duration_ms": 2036,
-            "detail": "截图 08-checkpoint"
-          },
-          {
-            "id": "S10",
-            "action": "requirements.answer",
             "status": "failed",
-            "started_at": "2026-11-12T01:19:58.336Z",
-            "duration_ms": 44602,
-            "detail": "question-card-progress 超时（30000ms）：false"
+            "started_at": "2026-11-13T06:01:39.862Z",
+            "duration_ms": 30213,
+            "detail": "[SETUP_FAIL] Original question controls remain outside the viewport after bounded UI scroll"
           },
           {
             "id": "S-failure",
             "action": "snapshot",
-            "status": "ok",
-            "started_at": "2026-11-12T01:20:42.938Z",
+            "status": "failed",
+            "started_at": "2026-11-13T06:02:10.075Z",
             "duration_ms": 0,
-            "detail": null
+            "detail": "截屏 99-failure 失败：未知错误"
           }
         ],
-        "screenshots": 4,
-        "profiling_files": 1,
-        "run_id": "nightly-43126221912-1",
-        "commit": "69a2ebd05d84c2f9f085a0b835cabc84100070fc",
-        "generated_at": "2026-11-12T01:50:20.418Z"
+        "screenshots": 1,
+        "profiling_files": 0,
+        "run_id": "nightly-43369811435-1",
+        "commit": "1f807a79962bea8959f5dfa4d54dda42cc6338c2",
+        "generated_at": "2026-11-13T06:02:10.313Z"
       }
     },
     "DM-WF-QUOTE-02": {
@@ -11187,6 +11187,16 @@
           "run_id": "nightly-43126221912-1",
           "commit": "69a2ebd05d84c2f9f085a0b835cabc84100070fc",
           "finished_at": "2026-11-12T01:28:59.667Z"
+        },
+        {
+          "date": "2026-11-13",
+          "status": "BLOCKED",
+          "query_ms": 48327,
+          "query_count": 1,
+          "duration_ms": 113567,
+          "run_id": "nightly-43369811435-1",
+          "commit": "1f807a79962bea8959f5dfa4d54dda42cc6338c2",
+          "finished_at": "2026-11-13T05:58:28.728Z"
         }
       ],
       "latest": {
@@ -11195,69 +11205,69 @@
         "mode": "multi-turn",
         "status": "BLOCKED",
         "failure": "S09 artifact.download 失败：[SETUP_FAIL] A live system Save picker controller is required before opening the download menu",
-        "started_at": "2026-11-12T01:27:13.385Z",
-        "finished_at": "2026-11-12T01:28:59.667Z",
-        "duration_ms": 106282,
+        "started_at": "2026-11-13T05:56:35.161Z",
+        "finished_at": "2026-11-13T05:58:28.728Z",
+        "duration_ms": 113567,
         "query_count": 1,
-        "query_ms": 37724,
-        "first_text_ms": 37351,
-        "display_ms": 41482,
+        "query_ms": 48327,
+        "first_text_ms": 47842,
+        "display_ms": 52985,
         "queries": [
           {
-            "started_at": "2026-11-12T01:27:58.988Z",
-            "task_id": "task-b980530284d84d3ebd5ec72841e2673a",
-            "submission_id": "e3327307-c4fe-442b-ae2a-06e7ca44e03f",
-            "duration_ms": 37724,
-            "first_text_ms": 37351,
-            "display_ms": 41482,
+            "started_at": "2026-11-13T05:57:26.171Z",
+            "task_id": "task-04a476ef1b934a8ba44e6d0ec497bf33",
+            "submission_id": "cca86713-6252-4311-b7ef-ed3a5af87ca5",
+            "duration_ms": 48327,
+            "first_text_ms": 47842,
+            "display_ms": 52985,
             "outcome": "completed",
-            "text_chars": 98,
+            "text_chars": 100,
             "request_bytes": 418,
-            "response_bytes": 4975191,
+            "response_bytes": 6436764,
             "stages": [
               {
                 "name": "tap",
-                "at_ms": 1794446878988,
+                "at_ms": 1794549446171,
                 "detail": null
               },
               {
                 "name": "queued",
-                "at_ms": 1794446878988,
+                "at_ms": 1794549446171,
                 "detail": null
               },
               {
                 "name": "dequeued",
-                "at_ms": 1794446879004,
+                "at_ms": 1794549446216,
                 "detail": null
               },
               {
                 "name": "wire_send",
-                "at_ms": 1794446879016,
-                "detail": "encode=0 send=2 attempt=1"
+                "at_ms": 1794549446253,
+                "detail": "encode=0 send=1 attempt=1"
               },
               {
                 "name": "ack",
-                "at_ms": 1794446880284,
+                "at_ms": 1794549449238,
                 "detail": null
               },
               {
                 "name": "first_text",
-                "at_ms": 1794446916339,
-                "detail": "chars=2"
+                "at_ms": 1794549494013,
+                "detail": "chars=40"
               },
               {
                 "name": "last_text",
-                "at_ms": 1794446916712,
-                "detail": "chars=98 events=8"
+                "at_ms": 1794549494498,
+                "detail": "chars=100 events=4"
               },
               {
                 "name": "task_done",
-                "at_ms": 1794446920470,
+                "at_ms": 1794549499156,
                 "detail": "completed"
               },
               {
                 "name": "display_done",
-                "at_ms": 1794446920470,
+                "at_ms": 1794549499156,
                 "detail": "no-reveal"
               }
             ]
@@ -11289,96 +11299,96 @@
             "id": "S00",
             "action": "app.coldStart",
             "status": "ok",
-            "started_at": "2026-11-12T01:27:13.385Z",
-            "duration_ms": 5011,
+            "started_at": "2026-11-13T05:56:35.161Z",
+            "duration_ms": 4987,
             "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
             "id": "S01",
             "action": "app.resetState",
             "status": "ok",
-            "started_at": "2026-11-12T01:27:18.396Z",
-            "duration_ms": 18436,
-            "detail": "已重置到初始状态（11-12 09:27:27.600 36270 36270 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=6 databases=1 tables=0 files=3 notifications=skipped room=room-8a43d0610930427488eb8f0ea9e78eda）"
+            "started_at": "2026-11-13T05:56:40.148Z",
+            "duration_ms": 23580,
+            "detail": "已重置到初始状态（11-13 13:56:51.053 5535 5535 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-6cd5fe45676a4ac590b858d992bc6c5f）"
           },
           {
             "id": "S02",
             "action": "app.freshConversation",
             "status": "ok",
-            "started_at": "2026-11-12T01:27:36.832Z",
-            "duration_ms": 6604,
+            "started_at": "2026-11-13T05:57:03.728Z",
+            "duration_ms": 6654,
             "detail": "DigitalMate 单会话 Home（设置入口不作为新对话抽屉）"
           },
           {
             "id": "S03",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:27:43.436Z",
-            "duration_ms": 1934,
+            "started_at": "2026-11-13T05:57:10.382Z",
+            "duration_ms": 2023,
             "detail": "截图 00-before"
           },
           {
             "id": "S04",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-12T01:27:45.370Z",
-            "duration_ms": 17532,
+            "started_at": "2026-11-13T05:57:12.405Z",
+            "duration_ms": 17562,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S05",
             "action": "wait.turn.complete",
             "status": "ok",
-            "started_at": "2026-11-12T01:28:02.902Z",
-            "duration_ms": 47245,
+            "started_at": "2026-11-13T05:57:29.967Z",
+            "duration_ms": 49481,
             "detail": "完成行 0 → 0（new-text-any）"
           },
           {
             "id": "S06",
             "action": "wait.text",
             "status": "ok",
-            "started_at": "2026-11-12T01:28:50.147Z",
-            "duration_ms": 1239,
+            "started_at": "2026-11-13T05:58:19.448Z",
+            "duration_ms": 1175,
             "detail": null
           },
           {
             "id": "S07",
             "action": "ui.hideKeyboard",
             "status": "ok",
-            "started_at": "2026-11-12T01:28:51.386Z",
-            "duration_ms": 4227,
+            "started_at": "2026-11-13T05:58:20.623Z",
+            "duration_ms": 4262,
             "detail": "键盘窗口已关闭"
           },
           {
             "id": "S08",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:28:55.613Z",
-            "duration_ms": 1986,
+            "started_at": "2026-11-13T05:58:24.885Z",
+            "duration_ms": 1867,
             "detail": "截图 01-docx"
           },
           {
             "id": "S09",
             "action": "artifact.download",
             "status": "failed",
-            "started_at": "2026-11-12T01:28:57.599Z",
-            "duration_ms": 2068,
+            "started_at": "2026-11-13T05:58:26.752Z",
+            "duration_ms": 1976,
             "detail": "[SETUP_FAIL] A live system Save picker controller is required before opening the download menu"
           },
           {
             "id": "S-failure",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:28:59.667Z",
+            "started_at": "2026-11-13T05:58:28.728Z",
             "duration_ms": 0,
             "detail": null
           }
         ],
         "screenshots": 3,
         "profiling_files": 1,
-        "run_id": "nightly-43126221912-1",
-        "commit": "69a2ebd05d84c2f9f085a0b835cabc84100070fc",
-        "generated_at": "2026-11-12T01:50:20.418Z"
+        "run_id": "nightly-43369811435-1",
+        "commit": "1f807a79962bea8959f5dfa4d54dda42cc6338c2",
+        "generated_at": "2026-11-13T06:02:10.313Z"
       }
     },
     "DM-WF-SKL-02": {
@@ -12207,6 +12217,16 @@
           "run_id": "nightly-43126221912-1",
           "commit": "69a2ebd05d84c2f9f085a0b835cabc84100070fc",
           "finished_at": "2026-11-12T01:42:05.549Z"
+        },
+        {
+          "date": "2026-11-13",
+          "status": "BLOCKED",
+          "query_ms": 73518,
+          "query_count": 2,
+          "duration_ms": 310441,
+          "run_id": "nightly-43369811435-1",
+          "commit": "1f807a79962bea8959f5dfa4d54dda42cc6338c2",
+          "finished_at": "2026-11-13T05:56:28.806Z"
         }
       ],
       "latest": {
@@ -12214,130 +12234,130 @@
         "title": "在途切会话不串显",
         "mode": "multi-turn",
         "status": "BLOCKED",
-        "failure": "SW-wait-A-completion-in-B wait.text 失败：text(已完成 · 会话 A E2E-nightly-43126221912-1-A) 超时（180000ms）：条件未成立",
-        "started_at": "2026-11-12T01:37:00.684Z",
-        "finished_at": "2026-11-12T01:42:05.549Z",
-        "duration_ms": 304865,
+        "failure": "SW-wait-A-completion-in-B wait.text 失败：text(已完成 · 会话 A E2E-nightly-43369811435-1-A) 超时（180000ms）：条件未成立",
+        "started_at": "2026-11-13T05:51:18.365Z",
+        "finished_at": "2026-11-13T05:56:28.806Z",
+        "duration_ms": 310441,
         "query_count": 2,
-        "query_ms": 46076,
-        "first_text_ms": 5409,
-        "display_ms": 9856,
+        "query_ms": 73518,
+        "first_text_ms": 56162,
+        "display_ms": 75777,
         "queries": [
           {
-            "started_at": "2026-11-12T01:37:49.459Z",
-            "task_id": "task-41cf527a4cd24747b5d1117814273b3f",
-            "submission_id": "25460379-c696-4c46-aed3-3e3e35e18f35",
-            "duration_ms": 36435,
-            "first_text_ms": 10791,
-            "display_ms": 16330,
+            "started_at": "2026-11-13T05:52:10.697Z",
+            "task_id": "task-76b9f7b5cefb43ba83b0624ea25d9aac",
+            "submission_id": "8f92618e-36ee-411d-b3e9-5926fa7b1c35",
+            "duration_ms": 137215,
+            "first_text_ms": 102590,
+            "display_ms": 139677,
             "outcome": "completed",
-            "text_chars": 5828,
-            "request_bytes": 398,
-            "response_bytes": 4993442,
+            "text_chars": 16105,
+            "request_bytes": 399,
+            "response_bytes": 15052904,
             "stages": [
               {
                 "name": "tap",
-                "at_ms": 1794447469459,
+                "at_ms": 1794549130697,
                 "detail": null
               },
               {
                 "name": "queued",
-                "at_ms": 1794447469459,
+                "at_ms": 1794549130697,
                 "detail": null
               },
               {
                 "name": "dequeued",
-                "at_ms": 1794447469475,
+                "at_ms": 1794549130739,
                 "detail": null
               },
               {
                 "name": "wire_send",
-                "at_ms": 1794447469486,
+                "at_ms": 1794549130776,
                 "detail": "encode=0 send=1 attempt=1"
               },
               {
                 "name": "ack",
-                "at_ms": 1794447470671,
+                "at_ms": 1794549133434,
                 "detail": null
               },
               {
                 "name": "first_text",
-                "at_ms": 1794447480250,
+                "at_ms": 1794549233287,
                 "detail": "chars=1"
               },
               {
-                "name": "display_done",
-                "at_ms": 1794447485789,
-                "detail": null
-              },
-              {
                 "name": "last_text",
-                "at_ms": 1794447505894,
-                "detail": "chars=5828 events=1318"
+                "at_ms": 1794549267912,
+                "detail": "chars=16105 events=178"
               },
               {
                 "name": "task_done",
-                "at_ms": 1794447564980,
+                "at_ms": 1794549270374,
                 "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1794549270374,
+                "detail": "no-reveal"
               }
             ]
           },
           {
-            "started_at": "2026-11-12T01:38:25.903Z",
-            "task_id": "task-41cf527a4cd24747b5d1117814273b3f",
-            "submission_id": "fbe0f5ba-aeda-4195-8804-235dcd840e60",
-            "duration_ms": 55717,
-            "first_text_ms": 26,
-            "display_ms": 3382,
+            "started_at": "2026-11-13T05:52:47.498Z",
+            "task_id": "task-7fa2018c5985481f87b33caedf6fe177",
+            "submission_id": "a76bde8e-6716-42bb-99f1-92095d4cf967",
+            "duration_ms": 9820,
+            "first_text_ms": 9733,
+            "display_ms": 11876,
             "outcome": "completed",
-            "text_chars": 13268,
+            "text_chars": 27,
             "request_bytes": 340,
-            "response_bytes": 1251527,
+            "response_bytes": 2145188,
             "stages": [
               {
                 "name": "tap",
-                "at_ms": 1794447505903,
+                "at_ms": 1794549167498,
                 "detail": null
               },
               {
                 "name": "queued",
-                "at_ms": 1794447505903,
+                "at_ms": 1794549167498,
                 "detail": null
               },
               {
                 "name": "dequeued",
-                "at_ms": 1794447505918,
+                "at_ms": 1794549167541,
+                "detail": null
+              },
+              {
+                "name": "wire_send",
+                "at_ms": 1794549167579,
+                "detail": "encode=0 send=1 attempt=1"
+              },
+              {
+                "name": "ack",
+                "at_ms": 1794549171196,
                 "detail": null
               },
               {
                 "name": "first_text",
-                "at_ms": 1794447505929,
-                "detail": "chars=4"
-              },
-              {
-                "name": "wire_send",
-                "at_ms": 1794447505930,
-                "detail": "encode=0 send=3 attempt=1"
-              },
-              {
-                "name": "ack",
-                "at_ms": 1794447509263,
-                "detail": null
-              },
-              {
-                "name": "display_done",
-                "at_ms": 1794447509285,
-                "detail": null
+                "at_ms": 1794549177231,
+                "detail": "chars=3"
               },
               {
                 "name": "last_text",
-                "at_ms": 1794447561620,
-                "detail": "chars=13268 events=2448"
+                "at_ms": 1794549177318,
+                "detail": "chars=27 events=4"
               },
               {
                 "name": "task_done",
-                "at_ms": 1794447564980,
+                "at_ms": 1794549179374,
                 "detail": "completed"
+              },
+              {
+                "name": "display_done",
+                "at_ms": 1794549179374,
+                "detail": "no-reveal"
               }
             ]
           }
@@ -12368,240 +12388,240 @@
             "id": "S00",
             "action": "app.coldStart",
             "status": "ok",
-            "started_at": "2026-11-12T01:37:00.684Z",
-            "duration_ms": 5521,
+            "started_at": "2026-11-13T05:51:18.365Z",
+            "duration_ms": 5099,
             "detail": "已冷启动 App（等价于点击桌面图标）"
           },
           {
             "id": "S01",
             "action": "app.resetState",
             "status": "ok",
-            "started_at": "2026-11-12T01:37:06.205Z",
-            "duration_ms": 18260,
-            "detail": "已重置到初始状态（11-12 09:37:14.489 45723 45723 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-2a0b5867c4ee435bb32eed45d007d90e）"
+            "started_at": "2026-11-13T05:51:23.464Z",
+            "duration_ms": 23700,
+            "detail": "已重置到初始状态（11-13 13:51:38.206 1123 1123 I A00000/com.jiuwen.digitalmate/AgentReset: agent reset finished: stores=7 databases=1 tables=0 files=3 notifications=skipped room=room-472f5c4c8e664a989aae2de324d0a98c）"
           },
           {
             "id": "S02",
             "action": "app.freshConversation",
             "status": "ok",
-            "started_at": "2026-11-12T01:37:24.465Z",
-            "duration_ms": 6624,
+            "started_at": "2026-11-13T05:51:47.164Z",
+            "duration_ms": 5881,
             "detail": "DigitalMate 单会话 Home（设置入口不作为新对话抽屉）"
           },
           {
             "id": "S03",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:37:31.089Z",
-            "duration_ms": 1996,
+            "started_at": "2026-11-13T05:51:53.045Z",
+            "duration_ms": 1777,
             "detail": "截图 03-checkpoint"
           },
           {
             "id": "S04",
             "action": "conversation.switch",
             "status": "ok",
-            "started_at": "2026-11-12T01:37:33.085Z",
-            "duration_ms": 3090,
+            "started_at": "2026-11-13T05:51:54.822Z",
+            "duration_ms": 3070,
             "detail": null
           },
           {
             "id": "S06",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-12T01:37:36.175Z",
-            "duration_ms": 17240,
+            "started_at": "2026-11-13T05:51:57.892Z",
+            "duration_ms": 16625,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S07",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:37:53.415Z",
-            "duration_ms": 1799,
+            "started_at": "2026-11-13T05:52:14.517Z",
+            "duration_ms": 2005,
             "detail": "截图 06-checkpoint"
           },
           {
             "id": "SW-A-before",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-12T01:37:55.214Z",
-            "duration_ms": 4340,
+            "started_at": "2026-11-13T05:52:16.522Z",
+            "duration_ms": 5277,
             "detail": null
           },
           {
             "id": "SW-A-running",
             "action": "assert.cloud",
             "status": "ok",
-            "started_at": "2026-11-12T01:37:59.554Z",
-            "duration_ms": 2,
+            "started_at": "2026-11-13T05:52:21.799Z",
+            "duration_ms": 1,
             "detail": "All declared cloud conditions match source records"
           },
           {
             "id": "SW-pre-switch",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:37:59.556Z",
-            "duration_ms": 1855,
+            "started_at": "2026-11-13T05:52:21.800Z",
+            "duration_ms": 1907,
             "detail": "截图 sw-pre-switch"
           },
           {
             "id": "SW-A-busy",
             "action": "assert.busy",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:01.411Z",
-            "duration_ms": 5,
+            "started_at": "2026-11-13T05:52:23.707Z",
+            "duration_ms": 1,
             "detail": "Compared the actual conversation activity state"
           },
           {
             "id": "S08",
             "action": "conversation.switch",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:01.416Z",
-            "duration_ms": 4703,
+            "started_at": "2026-11-13T05:52:23.708Z",
+            "duration_ms": 4668,
             "detail": null
           },
           {
             "id": "SW-B-before",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:06.119Z",
-            "duration_ms": 4644,
+            "started_at": "2026-11-13T05:52:28.376Z",
+            "duration_ms": 4108,
             "detail": null
           },
           {
             "id": "SW-distinct-rooms",
             "action": "assert.cloud",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:10.763Z",
-            "duration_ms": 3,
+            "started_at": "2026-11-13T05:52:32.484Z",
+            "duration_ms": 1,
             "detail": "All declared cloud conditions match source records"
           },
           {
             "id": "S09",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:10.766Z",
-            "duration_ms": 2076,
+            "started_at": "2026-11-13T05:52:32.485Z",
+            "duration_ms": 2043,
             "detail": "截图 08-checkpoint"
           },
           {
             "id": "SW-B-idle",
             "action": "assert.busy",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:12.842Z",
-            "duration_ms": 4,
+            "started_at": "2026-11-13T05:52:34.528Z",
+            "duration_ms": 2,
             "detail": "Compared the actual conversation activity state"
           },
           {
             "id": "SW-B-no-A",
             "action": "assert.ui",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:12.846Z",
-            "duration_ms": 3,
+            "started_at": "2026-11-13T05:52:34.530Z",
+            "duration_ms": 2,
             "detail": "All declared UI conditions match the original checkpoint hierarchy"
           },
           {
             "id": "S10",
             "action": "chat.send",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:12.849Z",
-            "duration_ms": 16881,
+            "started_at": "2026-11-13T05:52:34.532Z",
+            "duration_ms": 16890,
             "detail": "已发出（第 1 次生效）"
           },
           {
             "id": "S11",
             "action": "wait.turn.complete",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:29.730Z",
-            "duration_ms": 11496,
+            "started_at": "2026-11-13T05:52:51.422Z",
+            "duration_ms": 11448,
             "detail": "完成行 0 → 0（new-text-any）"
           },
           {
             "id": "SW-B-complete",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:41.226Z",
-            "duration_ms": 8600,
+            "started_at": "2026-11-13T05:53:02.870Z",
+            "duration_ms": 9548,
             "detail": null
           },
           {
             "id": "SW-B-own-task",
             "action": "assert.cloud",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:49.826Z",
-            "duration_ms": 3,
+            "started_at": "2026-11-13T05:53:12.418Z",
+            "duration_ms": 1,
             "detail": "All declared cloud conditions match source records"
           },
           {
             "id": "SW-A-active-after-B",
             "action": "cloud.inspect",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:49.829Z",
-            "duration_ms": 1030,
+            "started_at": "2026-11-13T05:53:12.419Z",
+            "duration_ms": 1889,
             "detail": null
           },
           {
             "id": "SW-overlap",
             "action": "assert.observation",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:50.859Z",
-            "duration_ms": 0,
+            "started_at": "2026-11-13T05:53:14.308Z",
+            "duration_ms": 1,
             "detail": "Source query fields match the declared conditions"
           },
           {
             "id": "S12",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:50.859Z",
-            "duration_ms": 1912,
+            "started_at": "2026-11-13T05:53:14.309Z",
+            "duration_ms": 1988,
             "detail": "截图 11-checkpoint"
           },
           {
             "id": "SW-B-still-no-A",
             "action": "assert.ui",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:52.771Z",
-            "duration_ms": 5,
+            "started_at": "2026-11-13T05:53:16.297Z",
+            "duration_ms": 3,
             "detail": "All declared UI conditions match the original checkpoint hierarchy"
           },
           {
             "id": "SW-open-completion-notices",
             "action": "tap.id",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:52.776Z",
-            "duration_ms": 5185,
+            "started_at": "2026-11-13T05:53:16.300Z",
+            "duration_ms": 5106,
             "detail": "点击id「digitalmate-live-activity」"
           },
           {
             "id": "SW-open-reminders",
             "action": "tap.id",
             "status": "ok",
-            "started_at": "2026-11-12T01:38:57.961Z",
-            "duration_ms": 5229,
+            "started_at": "2026-11-13T05:53:21.406Z",
+            "duration_ms": 5171,
             "detail": "点击id「digitalmate-tab-reminders」"
           },
           {
             "id": "SW-wait-A-completion-in-B",
             "action": "wait.text",
             "status": "failed",
-            "started_at": "2026-11-12T01:39:03.190Z",
-            "duration_ms": 182359,
-            "detail": "text(已完成 · 会话 A E2E-nightly-43126221912-1-A) 超时（180000ms）：条件未成立"
+            "started_at": "2026-11-13T05:53:26.577Z",
+            "duration_ms": 182228,
+            "detail": "text(已完成 · 会话 A E2E-nightly-43369811435-1-A) 超时（180000ms）：条件未成立"
           },
           {
             "id": "S-failure",
             "action": "snapshot",
             "status": "ok",
-            "started_at": "2026-11-12T01:42:05.549Z",
-            "duration_ms": 0,
+            "started_at": "2026-11-13T05:56:28.805Z",
+            "duration_ms": 1,
             "detail": null
           }
         ],
         "screenshots": 6,
         "profiling_files": 1,
-        "run_id": "nightly-43126221912-1",
-        "commit": "69a2ebd05d84c2f9f085a0b835cabc84100070fc",
-        "generated_at": "2026-11-12T01:50:20.418Z"
+        "run_id": "nightly-43369811435-1",
+        "commit": "1f807a79962bea8959f5dfa4d54dda42cc6338c2",
+        "generated_at": "2026-11-13T06:02:10.313Z"
       }
     },
     "DM-WF-TIMEOUT-01": {
@@ -13294,6 +13314,16 @@
           "run_id": "nightly-43126221912-1",
           "commit": "69a2ebd05d84c2f9f085a0b835cabc84100070fc",
           "finished_at": "2026-11-12T00:50:49.932Z"
+        },
+        {
+          "date": "2026-11-13",
+          "status": "BLOCKED",
+          "query_ms": null,
+          "query_count": 0,
+          "duration_ms": 0,
+          "run_id": "nightly-43369811435-1",
+          "commit": "1f807a79962bea8959f5dfa4d54dda42cc6338c2",
+          "finished_at": "2026-11-13T05:56:32.844Z"
         }
       ],
       "latest": {
@@ -13302,8 +13332,8 @@
         "mode": "multi-turn",
         "status": "BLOCKED",
         "failure": "Live test controls unavailable: cloud.inject; no business actions were attempted",
-        "started_at": "2026-11-12T00:50:49.932Z",
-        "finished_at": "2026-11-12T00:50:49.932Z",
+        "started_at": "2026-11-13T05:56:32.844Z",
+        "finished_at": "2026-11-13T05:56:32.844Z",
         "duration_ms": 0,
         "query_count": 0,
         "query_ms": null,
@@ -13336,16 +13366,16 @@
             "id": "S-setup",
             "action": "environment",
             "status": "failed",
-            "started_at": "2026-11-12T00:50:49.932Z",
+            "started_at": "2026-11-13T05:56:32.844Z",
             "duration_ms": 0,
             "detail": "Live test controls unavailable: cloud.inject; no business actions were attempted"
           }
         ],
         "screenshots": 0,
         "profiling_files": 0,
-        "run_id": "nightly-43126221912-1",
-        "commit": "69a2ebd05d84c2f9f085a0b835cabc84100070fc",
-        "generated_at": "2026-11-12T01:50:20.418Z"
+        "run_id": "nightly-43369811435-1",
+        "commit": "1f807a79962bea8959f5dfa4d54dda42cc6338c2",
+        "generated_at": "2026-11-13T06:02:10.313Z"
       }
     }
   }
