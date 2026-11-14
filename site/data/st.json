@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-13T07:12:59.567Z",
+  "updatedAt": "2026-11-14T06:57:59.545Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -295,6 +295,472 @@
     }
   ],
   "runs": [
+    {
+      "runId": 43526817215,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43526817215",
+      "createdAt": "2026-11-13T23:23:58Z",
+      "headSha": "72416ff0d211",
+      "conclusion": "failure",
+      "st": {
+        "runId": "ST-1794613590375-6c38f7",
+        "status": "passed",
+        "mode": "attachment-policy",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [],
+        "liveWire": [
+          {
+            "suite": "artifact",
+            "caseName": "artifact_receipt_required",
+            "status": "failed",
+            "nativeStatus": "failed",
+            "issues": [
+              "Native selected case did not pass",
+              "Exact real artifact matrix and restoration required",
+              "All five current independent owned roots required",
+              "Exactly five original production submissions required",
+              "Independent durable users are not unique"
+            ]
+          },
+          {
+            "suite": "business",
+            "caseName": "duplicate_downlink_idempotent",
+            "status": "failed",
+            "nativeStatus": "failed",
+            "issues": [
+              "A required owned frame or response was not forwarded before Native closed",
+              "Native selected case did not pass",
+              "Actual owned original was not delivered exactly three times",
+              "Delivered bytes differ from the actual upstream original",
+              "Native receipt identity/parse/application counts differ"
+            ]
+          },
+          {
+            "suite": "chunks",
+            "caseName": "protocol_chunk_boundary_reassembly",
+            "status": "blocked",
+            "nativeStatus": "failed",
+            "issues": [
+              "A required owned frame or response was not forwarded before Native closed",
+              "Exact current chunk mode and available provenance required",
+              "Owned actual source and Native request identities differ",
+              "Full unchanged current single-execution source and canonical final required",
+              "All five semantic boundaries and interior 2/3/4-byte UTF-8 splits required"
+            ]
+          },
+          {
+            "suite": "connection",
+            "caseName": "gateway_connection",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "forward",
+            "caseName": "protocol_unknown_event_forward_compat",
+            "status": "failed",
+            "nativeStatus": "failed",
+            "issues": [
+              "A required owned frame or response was not forwarded before Native closed",
+              "Native selected case did not pass",
+              "Exact current live compatibility mode required",
+              "Native/current real task identity differs",
+              "Complete current owned original event bytes required"
+            ]
+          },
+          {
+            "suite": "identity",
+            "caseName": "protocol_invalid_task_identity",
+            "status": "failed",
+            "nativeStatus": "failed",
+            "issues": [
+              "A required owned frame or response was not forwarded before Native closed",
+              "Native selected case did not pass",
+              "Current owned actual event provenance required",
+              "Every required identity variant and canonical restoration must actually be delivered",
+              "Actual live writes differ from declared identity variants"
+            ]
+          },
+          {
+            "suite": "optional",
+            "caseName": "protocol_malformed_optional_fields",
+            "status": "failed",
+            "nativeStatus": "failed",
+            "issues": [
+              "A required owned frame or response was not forwarded before Native closed",
+              "Native selected case did not pass",
+              "Exact current live compatibility mode required",
+              "Native/current real task identity differs",
+              "Complete current owned original event bytes required"
+            ]
+          }
+        ],
+        "component": [
+          {
+            "suite": "attachment-policy",
+            "title": "本地附件策略",
+            "status": "passed",
+            "runId": "ST-1794613590375-6c38f7",
+            "issues": [],
+            "cases": [
+              {
+                "name": "local_attachment_blocked_types",
+                "title": "拒绝的类型",
+                "status": "passed",
+                "elapsedMs": 93,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_image_containers",
+                "title": "图片容器",
+                "status": "passed",
+                "elapsedMs": 112,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_magic_mismatch",
+                "title": "魔数不符",
+                "status": "passed",
+                "elapsedMs": 50,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_size_limits",
+                "title": "大小限制",
+                "status": "passed",
+                "elapsedMs": 334,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_supported_controls",
+                "title": "支持的控件",
+                "status": "passed",
+                "elapsedMs": 783,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_preview_decode",
+                "title": "预览解码",
+                "status": "passed",
+                "elapsedMs": 20,
+                "detail": "Production upload policy and native files verified"
+              }
+            ],
+            "fixtures": []
+          },
+          {
+            "suite": "markdown",
+            "title": "Markdown 渲染",
+            "status": "passed",
+            "runId": "markdown-f40e3a8229e371187f2245b0088f7e73",
+            "issues": [],
+            "cases": [],
+            "fixtures": [
+              {
+                "name": "dash-value",
+                "title": "dash-value",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "three-dash-value",
+                "title": "three-dash-value",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "malformed-separator",
+                "title": "malformed-separator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "short-final-row",
+                "title": "short-final-row",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "open-final-pipe",
+                "title": "open-final-pipe",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "sole-operator",
+                "title": "sole-operator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "padded-operator",
+                "title": "padded-operator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "orphan-leading",
+                "title": "orphan-leading",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "orphan-trailing",
+                "title": "orphan-trailing",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "fenced-table",
+                "title": "fenced-table",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "fenced-operator",
+                "title": "fenced-operator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "comparison",
+                "title": "comparison",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "stream-pending",
+                "title": "stream-pending",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "stream-boundary",
+                "title": "stream-boundary",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-prose-period",
+                "title": "link-prose-period",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-markdown-period",
+                "title": "link-markdown-period",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-balanced-parens",
+                "title": "link-balanced-parens",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-brace-boundary",
+                "title": "link-brace-boundary",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-unmatched-open",
+                "title": "link-unmatched-open",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              }
+            ]
+          },
+          {
+            "suite": "session-proximity",
+            "title": "会话邻近契约",
+            "status": "passed",
+            "runId": "ST-1794613609063-d3a0fd",
+            "issues": [],
+            "cases": [
+              {
+                "name": "native_topic_projection",
+                "title": "主题投影",
+                "status": "passed",
+                "elapsedMs": 5,
+                "detail": "Native contract verified"
+              },
+              {
+                "name": "native_capacity_draft",
+                "title": "容量与草稿",
+                "status": "passed",
+                "elapsedMs": 40,
+                "detail": "Native contract verified"
+              },
+              {
+                "name": "native_capacity_controls",
+                "title": "容量与控件",
+                "status": "passed",
+                "elapsedMs": 6,
+                "detail": "Native contract verified"
+              }
+            ],
+            "fixtures": []
+          },
+          {
+            "suite": "suggestions",
+            "title": "建议协议与按钮",
+            "status": "passed",
+            "runId": "suggestions-a01faaacfef9dc4854bfd8fe71482672",
+            "issues": [],
+            "cases": [],
+            "fixtures": [
+              {
+                "name": "shopping-inline-tail",
+                "title": "shopping-inline-tail",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "multiline-sources",
+                "title": "multiline-sources",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "sources-with-colon",
+                "title": "sources-with-colon",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "truncated-array",
+                "title": "truncated-array",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "fenced-example",
+                "title": "fenced-example",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "ordinary-next",
+                "title": "ordinary-next",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "unsupported-view",
+                "title": "unsupported-view",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "malformed-suggestion",
+                "title": "malformed-suggestion",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "deduplicated-limited",
+                "title": "deduplicated-limited",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              }
+            ]
+          }
+        ],
+        "cases": [
+          {
+            "name": "local_attachment_blocked_types",
+            "key": "local_attachment_blocked_types",
+            "title": "local_attachment_blocked_types",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 93,
+            "stage": "",
+            "detail": "Production upload policy and native files verified"
+          },
+          {
+            "name": "local_attachment_image_containers",
+            "key": "local_attachment_image_containers",
+            "title": "local_attachment_image_containers",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 112,
+            "stage": "",
+            "detail": "Production upload policy and native files verified"
+          },
+          {
+            "name": "local_attachment_magic_mismatch",
+            "key": "local_attachment_magic_mismatch",
+            "title": "local_attachment_magic_mismatch",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 50,
+            "stage": "",
+            "detail": "Production upload policy and native files verified"
+          },
+          {
+            "name": "local_attachment_size_limits",
+            "key": "local_attachment_size_limits",
+            "title": "local_attachment_size_limits",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 334,
+            "stage": "",
+            "detail": "Production upload policy and native files verified"
+          },
+          {
+            "name": "local_attachment_supported_controls",
+            "key": "local_attachment_supported_controls",
+            "title": "local_attachment_supported_controls",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 783,
+            "stage": "",
+            "detail": "Production upload policy and native files verified"
+          },
+          {
+            "name": "local_attachment_preview_decode",
+            "key": "local_attachment_preview_decode",
+            "title": "local_attachment_preview_decode",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 20,
+            "stage": "",
+            "detail": "Production upload policy and native files verified"
+          }
+        ]
+      }
+    },
     {
       "runId": 43328330535,
       "attempt": 1,
