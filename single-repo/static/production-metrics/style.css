@@ -2098,5 +2098,9 @@ h1 {
 
 .cloud-trace-list { margin: 12px 0; }
 .cloud-trace-list > summary { cursor: pointer; font-weight: 600; color: #334155; padding: 7px 0; }
+.cloud-trace-groups { max-height: 520px; overflow-y: auto; }
+.cloud-trace-day h4 { position: sticky; top: 0; z-index: 1; margin: 0; padding: 9px 8px; background: var(--panel); color: var(--ink); font-size: 13px; }
+.cloud-trace-day h4 span { margin-left: 8px; color: var(--muted); font-size: 12px; font-weight: 400; }
+.cloud-trace-day .table-wrap { max-height: none; overflow-x: auto; }
 
 .trace-empty { margin: 0; padding: 12px; color: #64748b; font-size: 12px; }

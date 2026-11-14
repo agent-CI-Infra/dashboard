@@ -1749,7 +1749,7 @@
   }
 
   // ------------------------------------------------------------ shell
-  const DIGITALMATE_TABS = { 'production-metrics': './production-metrics/index.html?v=20261114.1#models', 'test-matrix': './test-matrix/index.html', bench: './bench/index.html', runners: './runners/index.html' };
+  const DIGITALMATE_TABS = { 'production-metrics': './production-metrics/index.html?v=20261114.2#models', 'test-matrix': './test-matrix/index.html', bench: './bench/index.html', runners: './runners/index.html' };
   const activeTab = () => {
     const requested = location.hash.slice(1);
     const known = [...document.querySelectorAll('#tabs [data-tab]')].some(tab => (!tab.hidden || (!STATE.snap && DIGITALMATE_TABS[requested])) && tab.dataset.tab === requested);
