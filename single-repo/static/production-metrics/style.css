@@ -871,6 +871,7 @@ h1 {
 
 .range-picker {
   display: inline-flex;
+  align-items: center;
   padding: 2px;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -880,12 +881,13 @@ h1 {
 .floating-range {
   position: fixed;
   right: max(16px, env(safe-area-inset-right));
-  bottom: max(16px, env(safe-area-inset-bottom));
+  top: max(16px, env(safe-area-inset-top));
   z-index: 50;
   box-shadow: 0 4px 18px rgba(31, 35, 40, 0.18);
 }
 
 .embedded-metrics .floating-range { display: none; }
+.floating-range-label { padding: 0 6px 0 8px; color: var(--muted); font-size: 12px; font-weight: 600; white-space: nowrap; }
 
 .range-btn {
   appearance: none;
@@ -2011,6 +2013,7 @@ h1 {
 @media (max-width: 600px) { .trace-row { grid-template-columns: 90px minmax(60px, 1fr) 65px; } .trace-select-label { display: grid; } }
 
 .data-freshness { margin: 0 0 12px; color: #64748b; font-size: 13px; }
+.trace-scope { margin: 0 0 6px; color: var(--ink); font-size: 13px; }
 
 .env-metric-guide {
   display: flex;
