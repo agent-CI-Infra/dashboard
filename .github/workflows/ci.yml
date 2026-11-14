@@ -42,6 +42,7 @@ jobs:
         run: |
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts -p 'test_sfs_trajectory_archive.py' -v
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts -p 'test_collect_production*traces.py' -v
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts -p 'test_production_sfs_freshness.py' -v
           node --test scripts/trajectory-archive.test.mjs scripts/production-detailed-trace.test.mjs
 
       - name: Run tests
