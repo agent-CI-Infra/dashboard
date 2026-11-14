@@ -256,12 +256,23 @@
       postHeight()
       return
     }
+    // Distinguish "idle, nothing to download" from "downloading slowly":
+    // the 5-minute average only counts when a worker is actually active.
+    const active = (data.minutes || []).filter((m) => (Number(m.down) || 0) > 51200)
+    const lastActive = active[active.length - 1]
+    const busy = (Number(data.downAvg5m) || 0) > 51200 || (Number(data.workersNow) || 0) > 0
+    const speed = busy
+      ? `近 5 分钟：下行 ${bps(data.downAvg5m)}（峰值 ${bps(data.downPeak5m)}）· 上行 ${bps(data.upAvg5m)}`
+      : '近 5 分钟：无下载活动（runner 空闲）'
+    const tail = lastActive
+      ? `最近下载活动 ${esc(lastActive.t)} · 下行 ${bps(lastActive.down)}`
+      : '过去一小时无下载活动'
     el.innerHTML = `
       <h3>${esc(machine)} <span class="muted small">${esc(data.host || '')}</span></h3>
-      <p class="meta">近 5 分钟：下行 ${bps(data.downAvg5m)}（峰值 ${bps(data.downPeak5m)}）· 上行 ${bps(data.upAvg5m)}</p>
+      <p class="meta">${speed}</p>
       <p class="meta">当前 worker ${esc(data.workersNow ?? '-')} 个 · 连接本地代理 ${esc(data.proxyConns ?? '-')} 条</p>
       <div class="spark-wrap">${spark(data.minutes)}</div>
-      <p class="meta small">机器每 15 分钟推送 · 更新于 ${ago(data.updatedAt)}</p>`
+      <p class="meta small">${tail} · 机器每 15 分钟推送 · 更新于 ${ago(data.updatedAt)}</p>`
     postHeight()
   }
 
