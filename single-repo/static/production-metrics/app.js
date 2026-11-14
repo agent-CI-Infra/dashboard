@@ -3526,7 +3526,8 @@ function slowTraceCandidates(doc) {
       }
     }
   }
-  return [...byId.values()].sort((a, b) => (b.gateway ?? -1) - (a.gateway ?? -1));
+  return [...byId.values()].sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))
+    || (b.gateway ?? -1) - (a.gateway ?? -1));
 }
 
 function traceRows(item, display = 'native') {
@@ -3674,8 +3675,16 @@ function renderRequestTraces(doc) {
   const note = cloudCount ? `${coverage} 当前范围共 ${cloudCount} 条云侧慢请求${traceCollection ? '' : '或超时请求'}。`
     : `${coverage} 当前范围没有可用的云侧慢请求明细。${state.localTrace ? '下方历史样例不属于当前榜单。' : ''}`;
   const cloudRows = candidates.map((item, index) => ({item, index})).filter(({item}) => item.scope === 'cloud');
-  const table = cloudRows.length ? `<details class="cloud-trace-list" open><summary>云侧慢请求列表（展示 ${cloudRows.length} 条）</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>开始时间</th><th class="num">云侧耗时</th><th>轨迹数据</th><th>request_id</th><th>轨迹</th></tr></thead><tbody>${cloudRows.map(({item,index}) => `<tr><td>${esc(item.start_time ? fmtDateTime(item.start_time) : item.date)}</td><td class="num">${fmtDuration(item.gateway)}</td><td>${Array.isArray(item.native_trajectory?.spans) ? `${fmtCount(item.native_trajectory.spans.length + 1)} 个原生跨度` : Array.isArray(item.tool_events) && item.tool_events.length ? `${fmtCount(item.tool_events.length)} 个工具事件` : '—'}</td><td class="run-id">${esc(item.request_id)}</td><td><button type="button" class="trace-link" data-cloud-select="${index}">查看轨迹</button></td></tr>`).join('')}</tbody></table></div></details>` : '';
-  picker.innerHTML = `<p class="trace-scope"><strong>筛选范围：</strong>${esc(cloudTraceRangeLabel(state.rangeDays, today, completeThrough))}</p><p class="data-freshness">${esc(note)}</p>` + table + (candidates.length ? `<label class="trace-select-label" for="trace-select">选择云侧请求 <select id="trace-select">${candidates.map((item, index) => `<option value="${index}"${traceKey(item) === state.traceId ? ' selected' : ''}>${item.scope === 'local' ? '本地云侧历史样例 · Issue #1031（不受时间筛选）' : '云侧慢请求'} · ${esc(item.start_time ? fmtDateTime(item.start_time) : item.date)} · ${esc(fmtDuration(item.gateway))}${item.scope === 'cloud' ? ` · ${esc(item.request_id)}` : ''}</option>`).join('')}</select></label>` : '');
+  const groups = new Map();
+  for (const row of cloudRows) {
+    if (!groups.has(row.item.date)) groups.set(row.item.date, []);
+    groups.get(row.item.date).push(row);
+  }
+  const table = cloudRows.length ? `<details class="cloud-trace-list" open><summary>云侧慢请求列表（${fmtCount(cloudRows.length)} 条 · 按日期分组）</summary><div class="cloud-trace-groups">${[...groups].map(([date, rows]) => `<section class="cloud-trace-day" data-trace-day="${esc(date)}"><h4>${esc(date)} <span>${fmtCount(rows.length)} 条 · 按耗时排序</span></h4><div class="table-wrap"><table class="history-table"><thead><tr><th>开始时间</th><th class="num">云侧耗时</th><th>轨迹数据</th><th>request_id</th><th>轨迹</th></tr></thead><tbody>${rows.map(({item,index}) => `<tr><td>${esc(item.start_time ? fmtDateTime(item.start_time) : item.date)}</td><td class="num">${fmtDuration(item.gateway)}</td><td>${Array.isArray(item.native_trajectory?.spans) ? `${fmtCount(item.native_trajectory.spans.length + 1)} 个原生跨度` : Array.isArray(item.tool_events) && item.tool_events.length ? `${fmtCount(item.tool_events.length)} 个工具事件` : '—'}</td><td class="run-id">${esc(item.request_id)}</td><td><button type="button" class="trace-link" data-cloud-select="${index}">查看轨迹</button></td></tr>`).join('')}</tbody></table></div></section>`).join('')}</div></details>` : '';
+  const option = ({item, index}) => `<option value="${index}"${traceKey(item) === state.traceId ? ' selected' : ''}>${item.scope === 'local' ? '本地云侧历史样例 · Issue #1031（不受时间筛选）' : '云侧慢请求'} · ${esc(item.start_time ? fmtDateTime(item.start_time) : item.date)} · ${esc(fmtDuration(item.gateway))}${item.scope === 'cloud' ? ` · ${esc(item.request_id)}` : ''}</option>`;
+  const options = [...groups].map(([date, rows]) => `<optgroup label="${esc(date)}">${rows.map(option).join('')}</optgroup>`).join('')
+    + candidates.map((item, index) => ({item, index})).filter(({item}) => item.scope === 'local').map(option).join('');
+  picker.innerHTML = `<p class="trace-scope"><strong>筛选范围：</strong>${esc(cloudTraceRangeLabel(state.rangeDays, today, completeThrough))}</p><p class="data-freshness">${esc(note)}</p>` + table + (candidates.length ? `<label class="trace-select-label" for="trace-select">选择云侧请求 <select id="trace-select">${options}</select></label>` : '');
   result.innerHTML = traceHtml(candidates.find((item) => traceKey(item) === state.traceId));
 }
 

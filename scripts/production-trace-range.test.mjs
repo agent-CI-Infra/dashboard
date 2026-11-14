@@ -74,3 +74,29 @@ test('fallback daily snapshots are filtered with the same range', () => {
   context.render(doc);
   assert.deepEqual(Array.from(context.state.traceCandidates, row=>row.request_id), ['new']);
 });
+
+test('slow requests and their selector are grouped newest day first and sorted within each day', () => {
+  const context = vm.createContext({});
+  const setup = `const state={rangeDays:0,history:{}}; const nodes={'trace-picker':{},'trace-result':{}}; const $=(id)=>nodes[id];
+    const todayShanghai=()=> '2026-11-14'; const historyCompleteThrough=()=> '2026-11-13';
+    const fmtCount=String, fmtDateTime=String, fmtDuration=String, esc=String, traceHtml=()=>'';`;
+  vm.runInContext(setup + rangeCode
+    + extract('function slowTraceCandidates(doc)', 'function traceRows(')
+    + extract('function availableTraceCandidates(', "$('request-traces').addEventListener('change'")
+    + ';globalThis.render=renderRequestTraces;globalThis.nodes=nodes;globalThis.state=state;', context);
+  const doc = {days:[
+    {date:'2026-11-12',anomaly:{latency:{slow_requests:[{request_id:'old-slowest',gateway:9000}]}}},
+    {date:'2026-11-14',anomaly:{latency:{slow_requests:[{request_id:'today-fast',gateway:1000},{request_id:'today-slow',gateway:2000}]}}},
+    {date:'2026-11-13',anomaly:{latency:{slow_requests:[{request_id:'yesterday',gateway:3000}]}}},
+  ]};
+  context.render(doc);
+  assert.deepEqual(Array.from(context.state.traceCandidates, row=>row.request_id),
+    ['today-slow', 'today-fast', 'yesterday', 'old-slowest']);
+  const html = context.nodes['trace-picker'].innerHTML;
+  const datePositions = ['2026-11-14','2026-11-13','2026-11-12'].map(date=>html.indexOf(`data-trace-day="${date}"`));
+  assert.ok(datePositions[0] >= 0 && datePositions[0] < datePositions[1] && datePositions[1] < datePositions[2]);
+  assert.match(html, /2026-11-14 <span>2 条 · 按耗时排序/);
+  assert.match(html, /<optgroup label="2026-11-14">/);
+  assert.match(html, /data-cloud-select="0"/);
+  assert.equal(context.state.traceId, 'cloud:today-slow');
+});
