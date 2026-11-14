@@ -8,8 +8,10 @@ on:
         default: false
         type: boolean
   schedule:
-    # Hourly target; GitHub may delay or skip scheduled runs.
-    - cron: '10 * * * *'
+    # Two opportunities per hour: the freshness check below avoids duplicate
+    # SFS reads when the earlier scheduled collection already succeeded.
+    # GitHub may still delay or skip either scheduled run.
+    - cron: '10,40 * * * *'
 permissions:
   contents: write
   actions: write
@@ -28,7 +30,28 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Check whether SFS data needs refresh
+        id: freshness
+        run: |
+          set -euo pipefail
+          # Manual runs, including validation-only runs, always collect.
+          if [ '${{ github.event_name }}' != 'schedule' ]; then
+            echo 'collect=true' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          mkdir -p /tmp/cloud-metrics
+          git fetch origin digitalmate:refs/remotes/origin/digitalmate
+          if git show origin/digitalmate:site/data/env-request-latency-daily.json > /tmp/cloud-metrics/freshness.json; then
+            due=$(python3 scripts/production_sfs_freshness.py /tmp/cloud-metrics/freshness.json)
+          else
+            due=true
+          fi
+          echo "collect=$due" >> "$GITHUB_OUTPUT"
+          if [ "$due" = false ]; then
+            echo 'Recent SFS snapshot exists; skipping redundant scheduled read.'
+          fi
       - name: Collect cloud-side aggregates
+        if: steps.freshness.outputs.collect == 'true'
         env:
           ADX_TOKEN: ${{ secrets.ADX_TOKEN }}
           SFS_SSH_PRIVATE_KEY: ${{ secrets.SFS_SSH_PRIVATE_KEY }}
@@ -66,7 +89,7 @@ jobs:
             --next-state /tmp/cloud-metrics/trajectory-archive-state.json \
             --metrics /tmp/cloud-metrics/env-request-latency-daily.json
       - name: Publish aggregate to the DigitalMate data branch
-        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.validate_only }}
+        if: ${{ steps.freshness.outputs.collect == 'true' && (github.event_name != 'workflow_dispatch' || !inputs.validate_only) }}
         id: update
         run: |
           set -euo pipefail

@@ -2,7 +2,7 @@
 
 ## Full native trajectory archive
 
-The hourly cloud collection also runs `scripts/collect-sfs-trajectory-archive.py`.
+The cloud collection has two scheduled opportunities per hour and also runs `scripts/collect-sfs-trajectory-archive.py`. Scheduled runs skip the read when a successful SFS snapshot is less than 50 minutes old; manual runs always collect. GitHub may delay or skip scheduled events, so this is a freshness target rather than a guarantee.
 It enumerates all native stores in the console-authorized workspace allowlist,
 independently of slow-request selection and process-log correlation. Workspace
 authorization still uses the existing console/log fingerprint mapping; unresolved
