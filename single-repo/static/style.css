@@ -74,16 +74,18 @@ main { padding: 18px 20px 40px; max-width: 1500px; margin: 0 auto; }
 .production-floating-range {
   position: fixed;
   right: max(16px, env(safe-area-inset-right));
-  bottom: max(16px, env(safe-area-inset-bottom));
+  top: 72px;
   z-index: 50;
   display: flex;
-  padding: 2px;
+  align-items: center;
+  padding: 4px;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--surface-2);
   box-shadow: 0 4px 18px rgba(31, 35, 40, 0.18);
 }
 .production-floating-range[hidden] { display: none; }
+.production-range-label { padding: 0 6px 0 8px; color: var(--ink-2); font-size: 12px; font-weight: 600; white-space: nowrap; }
 .production-floating-range button {
   border: 0;
   border-radius: 999px;

@@ -10,13 +10,15 @@ test('embedded range control synchronizes with its own frame and rejects other s
   assert.ok(start >= 0 && end > start);
   const handlers = {}, sent = [];
   const buttons = [0, 1, 7, 30].map((n) => ({dataset:{productionRange:String(n)}, disabled:false, setAttribute(k,v){this[k]=v;}}));
-  const range = {hidden:true, addEventListener(_name,cb){handlers.click=cb;}, querySelectorAll(){return buttons;}};
+  const range = {hidden:true, style:{}, addEventListener(_name,cb){handlers.click=cb;}, querySelectorAll(){return buttons;}};
   const frame = {contentWindow:{postMessage(data,origin){sent.push({data,origin});}}, addEventListener(_name,cb){handlers.load=cb;}};
+  const topbar = {getBoundingClientRect(){return {bottom:84};}};
   const context = vm.createContext({
-    document:{querySelector(selector){return selector === '#tab-production-metrics iframe' ? frame : range;}},
+    document:{querySelector(selector){return selector === '#tab-production-metrics iframe' ? frame : selector === '.topbar' ? topbar : range;}},
     window:{addEventListener(name,cb){handlers[name]=cb;}}, location:{origin:'https://example.test'}
   });
   vm.runInContext(source.slice(start,end), context);
+  assert.equal(range.style.top, '92px');
   handlers.message({origin:'https://other.test', source:frame.contentWindow, data:{type:'production-metrics-range-state',range:1}});
   assert.equal(range.hidden,true);
   handlers.message({origin:'https://example.test', source:{}, data:{type:'production-metrics-range-state',range:1}});

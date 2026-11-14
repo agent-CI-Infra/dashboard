@@ -76,7 +76,7 @@ test('cloud candidates take priority and do not include model calls',()=>{
 test('published production trace collection is rendered as cloud requests',()=>{
  const ctx=vm.createContext({});
  const a=src.indexOf('function slowTraceCandidates(doc)'), b=src.indexOf("$('request-traces').addEventListener('change'",a);
- const setup=`const state={rangeDays:1}; const nodes={'trace-picker':{},'trace-result':{}}; const $=(id)=>nodes[id]; const todayShanghai=()=> '2026-11-10'; const historyCompleteThrough=()=> '2026-11-09'; const cloudScopedDays=(rows)=>rows.filter(r=>r.date==='2026-11-10'); const fmtCount=String; const fmtDateTime=String; const fmtDuration=(n)=>n+'ms'; const esc=String;`;
+ const setup=`const state={rangeDays:1}; const nodes={'trace-picker':{},'trace-result':{}}; const $=(id)=>nodes[id]; const todayShanghai=()=> '2026-11-10'; const historyCompleteThrough=()=> '2026-11-09'; const cloudTraceScopedDays=(rows)=>rows.filter(r=>r.date==='2026-11-10'); const cloudTraceRangeLabel=()=> '2026-11-10'; const fmtCount=String; const fmtDateTime=String; const fmtDuration=(n)=>n+'ms'; const esc=String;`;
  vm.runInContext(setup+src.slice(a,b)+';globalThis.render=renderRequestTraces;globalThis.nodes=nodes;',ctx);
  const traces={schema:'digitalmate/cloud-traces@1',generated_at:'2026-11-10T12:00:00Z',read_log_count:2,binding_count:3,days:[{date:'2026-11-10',anomaly:{latency:{slow_requests:[{request_id:'digitalmate-test',gateway:1000}]},timeouts:{requests:[]}}}]};
  ctx.render({cloud_trace_collection:traces});

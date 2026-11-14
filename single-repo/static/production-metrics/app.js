@@ -3526,7 +3526,7 @@ function slowTraceCandidates(doc) {
       }
     }
   }
-  return [...byId.values()].sort((a, b) => (b.gateway ?? -1) - (a.gateway ?? -1)).slice(0, 200);
+  return [...byId.values()].sort((a, b) => (b.gateway ?? -1) - (a.gateway ?? -1));
 }
 
 function traceRows(item, display = 'native') {
@@ -3650,23 +3650,32 @@ function renderRequestTraces(doc) {
   // Keep its coverage explicit; do not mix rows from different populations.
   const publishedTraces = doc?.cloud_trace_collection;
   const traceCollection = state.localCloudTraces || (publishedTraces?.schema === 'digitalmate/cloud-traces@1' ? publishedTraces : null);
-  const localDays = traceCollection?.days;
-  const source = Array.isArray(localDays) ? {...traceCollection, days: cloudScopedDays(localDays, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history))} : doc;
+  const today = todayShanghai();
+  const completeThrough = historyCompleteThrough(state.history);
+  const sourceCollection = Array.isArray(traceCollection?.days) ? traceCollection : (doc || {});
+  const source = { ...sourceCollection,
+    days: cloudTraceScopedDays(sourceCollection.days, state.rangeDays, today, completeThrough) };
   const candidates = availableTraceCandidates(source, state.localTrace);
   const cloudCount = candidates.filter((item) => item.scope === 'cloud').length;
   state.traceCandidates = candidates;
   const traceKey = (item) => `${item.scope}:${item.request_id}`;
   if (!state.traceTouched || !candidates.some((item) => traceKey(item) === state.traceId)) {
-    state.traceId = candidates.length ? traceKey(candidates[0]) : '';
+    const next = candidates[0];
+    const nextId = next ? traceKey(next) : '';
+    if (state.traceId !== nextId) {
+      state.traceDisplay = 'native';
+      state.traceFilter = next?.native_trajectory ? 'all' : 'tools';
+    }
+    state.traceId = nextId;
   }
   const coverage = traceCollection
     ? `${cloudCollectionLabel(traceCollection)}只读采集于 ${fmtDateTime(traceCollection.generated_at)}：${fmtCount(traceCollection.read_log_count)} / ${fmtCount(traceCollection.binding_count)} 个绑定读取到日志；排名仅覆盖已读取日志中的已结束请求，工具明细可能不完整。`
     : '生产快照采集数据';
   const note = cloudCount ? `${coverage} 当前范围共 ${cloudCount} 条云侧慢请求${traceCollection ? '' : '或超时请求'}。`
     : `${coverage} 当前范围没有可用的云侧慢请求明细。${state.localTrace ? '下方历史样例不属于当前榜单。' : ''}`;
-  const cloudRows = candidates.map((item, index) => ({item, index})).filter(({item}) => item.scope === 'cloud').slice(0, 20);
+  const cloudRows = candidates.map((item, index) => ({item, index})).filter(({item}) => item.scope === 'cloud');
   const table = cloudRows.length ? `<details class="cloud-trace-list" open><summary>云侧慢请求列表（展示 ${cloudRows.length} 条）</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>开始时间</th><th class="num">云侧耗时</th><th>轨迹数据</th><th>request_id</th><th>轨迹</th></tr></thead><tbody>${cloudRows.map(({item,index}) => `<tr><td>${esc(item.start_time ? fmtDateTime(item.start_time) : item.date)}</td><td class="num">${fmtDuration(item.gateway)}</td><td>${Array.isArray(item.native_trajectory?.spans) ? `${fmtCount(item.native_trajectory.spans.length + 1)} 个原生跨度` : Array.isArray(item.tool_events) && item.tool_events.length ? `${fmtCount(item.tool_events.length)} 个工具事件` : '—'}</td><td class="run-id">${esc(item.request_id)}</td><td><button type="button" class="trace-link" data-cloud-select="${index}">查看轨迹</button></td></tr>`).join('')}</tbody></table></div></details>` : '';
-  picker.innerHTML = `<p class="data-freshness">${esc(note)}</p>` + table + (candidates.length ? `<label class="trace-select-label" for="trace-select">选择云侧请求 <select id="trace-select">${candidates.map((item, index) => `<option value="${index}"${traceKey(item) === state.traceId ? ' selected' : ''}>${item.scope === 'local' ? '本地云侧历史样例 · Issue #1031（不受时间筛选）' : '云侧慢请求'} · ${esc(item.start_time ? fmtDateTime(item.start_time) : item.date)} · ${esc(fmtDuration(item.gateway))}${item.scope === 'cloud' ? ` · ${esc(item.request_id)}` : ''}</option>`).join('')}</select></label>` : '');
+  picker.innerHTML = `<p class="trace-scope"><strong>筛选范围：</strong>${esc(cloudTraceRangeLabel(state.rangeDays, today, completeThrough))}</p><p class="data-freshness">${esc(note)}</p>` + table + (candidates.length ? `<label class="trace-select-label" for="trace-select">选择云侧请求 <select id="trace-select">${candidates.map((item, index) => `<option value="${index}"${traceKey(item) === state.traceId ? ' selected' : ''}>${item.scope === 'local' ? '本地云侧历史样例 · Issue #1031（不受时间筛选）' : '云侧慢请求'} · ${esc(item.start_time ? fmtDateTime(item.start_time) : item.date)} · ${esc(fmtDuration(item.gateway))}${item.scope === 'cloud' ? ` · ${esc(item.request_id)}` : ''}</option>`).join('')}</select></label>` : '');
   result.innerHTML = traceHtml(candidates.find((item) => traceKey(item) === state.traceId));
 }
 
@@ -3855,6 +3864,20 @@ function cloudScopedDays(days, rangeDays, today, completeThrough = null) {
   return inRange(eligible, rangeDays, end);
 }
 
+// The slow-request list is a list of individual observations, not a headline
+// aggregate. "All" includes the current partial day; bounded historical
+// ranges still match the complete-day window shown on the model card.
+function cloudTraceScopedDays(days, rangeDays, today, completeThrough = null) {
+  return cloudScopedDays(days, rangeDays, today, Number(rangeDays) === 0 ? today : completeThrough);
+}
+
+function cloudTraceRangeLabel(rangeDays, today, completeThrough = null) {
+  if (Number(rangeDays) === 0) return `全部可用日期（含 ${today} 截至采集的数据）`;
+  if (Number(rangeDays) === 1) return `${today}（当天截至采集）`;
+  const end = completeThrough || today;
+  return `${addDays(end, -(Number(rangeDays) - 1))} 至 ${end}（按完整日）`;
+}
+
 function renderEnv() {
   const target = $('env-latency');
   if (!target) return;
@@ -3868,7 +3891,7 @@ function renderEnv() {
   // Match the model summary's completed-day anchor; Today still shows today.
   // Historical rows with incomplete coverage remain visible and labelled.
   const scoped = { ...daily, days: cloudScopedDays(all, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history)).map(cloudDisplayRow) };
-  renderRequestTraces(scoped);
+  renderRequestTraces(daily);
   const latestObserved = scoped.days.at(-1)?.observed_at;
   const snapshotTime = daily.generated_at || daily.updated_at;
   const ageStamp = latestObserved || snapshotTime;

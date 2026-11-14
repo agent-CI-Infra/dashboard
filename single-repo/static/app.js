@@ -1749,7 +1749,7 @@
   }
 
   // ------------------------------------------------------------ shell
-  const DIGITALMATE_TABS = { 'production-metrics': './production-metrics/index.html#models', 'test-matrix': './test-matrix/index.html', bench: './bench/index.html', runners: './runners/index.html' };
+  const DIGITALMATE_TABS = { 'production-metrics': './production-metrics/index.html?v=20261114.1#models', 'test-matrix': './test-matrix/index.html', bench: './bench/index.html', runners: './runners/index.html' };
   const activeTab = () => {
     const requested = location.hash.slice(1);
     const known = [...document.querySelectorAll('#tabs [data-tab]')].some(tab => (!tab.hidden || (!STATE.snap && DIGITALMATE_TABS[requested])) && tab.dataset.tab === requested);
@@ -2076,6 +2076,17 @@
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { clearTimeout(STATE.pollTimer); load(); } });
   const productionFrame = document.querySelector('#tab-production-metrics iframe');
   const floatingRange = document.querySelector('#production-floating-range');
+  const productionTopbar = document.querySelector('.topbar');
+  const positionProductionRange = () => {
+    if (floatingRange && productionTopbar) {
+      floatingRange.style.top = `${Math.ceil(productionTopbar.getBoundingClientRect().bottom) + 8}px`;
+    }
+  };
+  positionProductionRange();
+  window.addEventListener('resize', positionProductionRange);
+  if (productionTopbar && typeof ResizeObserver === 'function') {
+    new ResizeObserver(positionProductionRange).observe(productionTopbar);
+  }
   productionFrame?.addEventListener('load', () => productionFrame.contentWindow?.postMessage({type:'production-metrics-range-request'}, location.origin));
   floatingRange?.addEventListener('click', (event) => {
     const button = event.target.closest('[data-production-range]');
