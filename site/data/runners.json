@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-14T20:40:08Z",
+  "updatedAt": "2026-11-15T00:25:46Z",
   "source": "openJiuwen-ai/DigitalMate",
   "runners": [
     {
@@ -35,7 +35,7 @@
       "name": "digitalmate-win-st-01",
       "os": "Windows",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "Windows",
@@ -47,22 +47,14 @@
       ],
       "machine": "winbox · PC-20261103OHIZ",
       "emulator": "Mate 90 Pro",
-      "device": "127.0.0.1:5555",
-      "job": {
-        "name": "hypium-ut",
-        "workflow": "CI",
-        "run_number": 2143,
-        "run_id": 43635732420,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43635732420",
-        "started_at": "2026-11-14T20:06:54Z"
-      }
+      "device": "127.0.0.1:5555"
     },
     {
       "id": 34,
       "name": "digitalmate-win-st-02",
       "os": "Windows",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "Windows",
@@ -72,22 +64,14 @@
       ],
       "machine": "winbox2 · PC-20261103SYCB",
       "emulator": "Mate 90 Pro",
-      "device": "127.0.0.1:5555",
-      "job": {
-        "name": "st",
-        "workflow": "pr-ready",
-        "run_number": 2047,
-        "run_id": 43638231839,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43638231839",
-        "started_at": "2026-11-14T20:39:09Z"
-      }
+      "device": "127.0.0.1:5555"
     },
     {
       "id": 41,
       "name": "digitalmate-win-st-03",
       "os": "Windows",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "Windows",
@@ -97,22 +81,14 @@
       ],
       "machine": "winbox2 · PC-20261103SYCB",
       "emulator": "Mate 90 Pro B",
-      "device": "127.0.0.1:10001",
-      "job": {
-        "name": "hypium-ut",
-        "workflow": "CI",
-        "run_number": 2144,
-        "run_id": 43636131060,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43636131060",
-        "started_at": "2026-11-14T20:11:15Z"
-      }
+      "device": "127.0.0.1:10001"
     },
     {
       "id": 42,
       "name": "digitalmate-win-st-04",
       "os": "Windows",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "Windows",
@@ -122,15 +98,7 @@
       ],
       "machine": "winbox · PC-20261103OHIZ",
       "emulator": "Mate 90 Pro B",
-      "device": "127.0.0.1:10002",
-      "job": {
-        "name": "hypium-ut",
-        "workflow": "CI",
-        "run_number": 2139,
-        "run_id": 43634706015,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43634706015",
-        "started_at": "2026-11-14T19:55:58Z"
-      }
+      "device": "127.0.0.1:10002"
     },
     {
       "id": 25,
@@ -149,14 +117,22 @@
       "name": "dm-cloud-flex-01",
       "os": "Linux",
       "status": "online",
-      "busy": false,
+      "busy": true,
       "labels": [
         "self-hosted",
         "X64",
         "Linux",
         "dm-nodeut",
         "dm-utility"
-      ]
+      ],
+      "job": {
+        "name": "gate-report",
+        "workflow": "CI",
+        "run_number": 2192,
+        "run_id": 43654273334,
+        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43654273334",
+        "started_at": "2026-11-15T00:24:44Z"
+      }
     },
     {
       "id": 26,
@@ -177,22 +153,14 @@
       "name": "dm-cloud-nodeut-02",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
         "Linux",
         "dm-nodeut",
         "dm-utility"
-      ],
-      "job": {
-        "name": "gate-report",
-        "workflow": "CI",
-        "run_number": 2145,
-        "run_id": 43638217237,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43638217237",
-        "started_at": "2026-11-14T20:39:09Z"
-      }
+      ]
     },
     {
       "id": 32,
@@ -311,22 +279,7 @@
       ]
     }
   ],
-  "queued": [
-    {
-      "name": "hypium-ut",
-      "workflow": "CI",
-      "run_number": 2146,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43638346710",
-      "created_at": "2026-11-14T20:36:00Z"
-    },
-    {
-      "name": "st",
-      "workflow": "pr-ready",
-      "run_number": 2053,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43638346539",
-      "created_at": "2026-11-14T20:36:00Z"
-    }
-  ],
+  "queued": [],
   "history": [
     {
       "at": "2026-11-13T09:13:19Z",
@@ -608,6 +561,35 @@
         "digitalmate-win-st-03": "hypium-ut",
         "digitalmate-win-st-04": "hypium-ut",
         "dm-cloud-nodeut-02": "gate-report"
+      }
+    },
+    {
+      "at": "2026-11-15T00:25:46Z",
+      "s": {
+        "HwdeMacBook-Air-2": "online",
+        "digitalmate-main-windows-01": "offline",
+        "digitalmate-win-st-01": "online",
+        "digitalmate-win-st-02": "online",
+        "digitalmate-win-st-03": "online",
+        "digitalmate-win-st-04": "online",
+        "dm-cloud-codecheck-02": "online",
+        "dm-cloud-flex-01": "online",
+        "dm-cloud-nodeut-01": "online",
+        "dm-cloud-nodeut-02": "online",
+        "dm-hk-ci-01": "online",
+        "dm-hk-ci-02": "online",
+        "dm-hk-ci-03": "online",
+        "dm-hk-ci-04": "online",
+        "dm-hk-ci-05": "online",
+        "dm-hk-ci-06": "online",
+        "dm-hk-ci-07": "online",
+        "dm-hk-ci-08": "online"
+      },
+      "b": {
+        "dm-cloud-flex-01": true
+      },
+      "j": {
+        "dm-cloud-flex-01": "gate-report"
       }
     }
   ]
