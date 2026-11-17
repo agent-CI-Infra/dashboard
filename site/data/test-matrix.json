@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/test-matrix@1",
- "generatedAt": "2026-11-16T19:53:52.860Z",
+ "generatedAt": "2026-11-17T04:12:42.358Z",
  "source": {
   "repository": "openJiuwen-ai/DigitalMate",
-  "main": "660c45fa",
+  "main": "e05ca334",
   "refs": [
    {
     "label": "test/st-complete-coverage",
@@ -30,17 +30,17 @@
   "e2e": 27
  },
  "nightly": {
-  "createdAt": "2026-11-15T22:38:48Z",
-  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43770444337",
+  "createdAt": "2026-11-17T01:45:02Z",
+  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43997920879",
   "jobs": {
-   "Update HK DigitalMate (latest main)": "failure",
-   "DigitalMate ST (Windows)": "failure",
+   "Update HK DigitalMate (latest main)": "success",
    "Finalize archived REMINDER evidence": "skipped",
-   "Bench (full)": "skipped",
-   "E2E (${{ (inputs.e2e_case || 'all') }})": "skipped",
+   "DigitalMate ST (Windows)": "failure",
+   "E2E (all)": "cancelled",
+   "Bench (full) / Bench (all)": "cancelled",
    "DigitalMate ST live-wire (Windows)": "failure",
-   "Nightly report": "failure",
-   "DigitalMate ST component (Windows)": "failure"
+   "DigitalMate ST component (Windows)": "failure",
+   "Nightly report": "success"
   }
  },
  "statusLabels": {
@@ -83,25 +83,25 @@
  "summary": {
   "layers": {
    "UT": {
-    "cases": 245,
-    "tests": 3024,
+    "cases": 247,
+    "tests": 3053,
     "byStatus": {
-     "ci_lane": 245
+     "ci_lane": 247
     },
     "bySuite": {},
     "byImpl": {
-     "main": 245
+     "main": 247
     }
    },
    "UT-Server": {
-    "cases": 396,
-    "tests": 5608,
+    "cases": 400,
+    "tests": 5632,
     "byStatus": {
-     "ci_lane": 396
+     "ci_lane": 400
     },
     "bySuite": {},
     "byImpl": {
-     "main": 396
+     "main": 400
     }
    },
    "REG": {
@@ -293,6 +293,27 @@
    "title": "a2ui",
    "module": "a2ui",
    "file": "tests/unit/a2ui-home-session-reset.test.mjs",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "ut.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 3,
+   "layer": "UT",
+   "id": "a2ui-location-flow.test.mjs",
+   "title": "a2ui",
+   "module": "a2ui",
+   "file": "tests/unit/a2ui-location-flow.test.mjs",
    "impl": "main",
    "status": "ci_lane",
    "lane": "ut.yml"
@@ -1925,7 +1946,28 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 18,
+   "tests": 2,
+   "layer": "UT",
+   "id": "device-location-answer-display.test.mjs",
+   "title": "device",
+   "module": "device",
+   "file": "tests/unit/device-location-answer-display.test.mjs",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "ut.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 25,
    "layer": "UT",
    "id": "device-permissions.test.mjs",
    "title": "device",
@@ -2660,7 +2702,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 16,
+   "tests": 17,
    "layer": "UT",
    "id": "digitalmate-hive-choice-card.test.mjs",
    "title": "digitalmate",
@@ -4298,7 +4340,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 9,
+   "tests": 15,
    "layer": "UT",
    "id": "local-capabilities-navigation.test.mjs",
    "title": "local",
@@ -4382,7 +4424,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 9,
+   "tests": 10,
    "layer": "UT",
    "id": "local-location-containment.test.mjs",
    "title": "local",
@@ -4508,7 +4550,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 7,
+   "tests": 16,
    "layer": "UT",
    "id": "location-card-flow.test.mjs",
    "title": "location",
@@ -9674,6 +9716,27 @@
    "evidence": null,
    "issue": null,
    "note": "",
+   "tests": 8,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_hive_bee_tools.py",
+   "title": "test_hive_bee_tools",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_hive_bee_tools.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
    "tests": 12,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_hive_bee_unavailable_release.py",
@@ -9701,6 +9764,27 @@
    "title": "test_hive_bee_unavailable_terminal",
    "module": "services/agent_bridge",
    "file": "harness/personal-agent/services/agent_bridge/tests/test_hive_bee_unavailable_terminal.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 6,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_hive_beebou_agentcore.py",
+   "title": "test_hive_beebou_agentcore",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_hive_beebou_agentcore.py",
    "impl": "main",
    "status": "ci_lane",
    "lane": "server-regression.yml"
@@ -10178,6 +10262,27 @@
    "evidence": null,
    "issue": null,
    "note": "",
+   "tests": 4,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_hive_follows_lineage.py",
+   "title": "test_hive_follows_lineage",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_hive_follows_lineage.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
    "tests": 5,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_hive_gateway_home.py",
@@ -10520,6 +10625,27 @@
    "title": "test_hive_owned_bee_config",
    "module": "services/agent_bridge",
    "file": "harness/personal-agent/services/agent_bridge/tests/test_hive_owned_bee_config.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 6,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_hive_profile_log.py",
+   "title": "test_hive_profile_log",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_hive_profile_log.py",
    "impl": "main",
    "status": "ci_lane",
    "lane": "server-regression.yml"
