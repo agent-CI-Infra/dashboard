@@ -1060,6 +1060,106 @@ function envSummary(doc) {
   </section>`;
 }
 
+const PREFIX_CACHE_SOURCES = { beebou: 'Beebou', bees: 'Bees', workswarm: 'WorkSwarm' };
+const PREFIX_CACHE_COHORTS = { first_observed: '首个可见调用', returning: '已见会话', unknown: '会话未知' };
+
+function summarizePrefixCache(groups) {
+  const totals = { calls: 0, known: 0, input_tokens: 0, cache_read_tokens: 0, miss_eligible: 0, near_miss: 0 };
+  const histogram = new Map();
+  for (const group of groups) {
+    for (const key of Object.keys(totals)) totals[key] += group[key];
+    for (const [bin, count] of group.histogram) histogram.set(bin, (histogram.get(bin) || 0) + count);
+  }
+  const bins = [...histogram.entries()].sort((a, b) => a[0] - b[0]);
+  const percentile = (q) => {
+    if (!totals.known) return null;
+    const rank = Math.ceil(q * totals.known);
+    let count = 0;
+    for (const [bin, size] of bins) {
+      count += size;
+      if (count >= rank) return bin / 1000;
+    }
+    return null;
+  };
+  return { ...totals,
+    rate: Number.isSafeInteger(totals.input_tokens) && totals.input_tokens > 0
+      ? totals.cache_read_tokens / totals.input_tokens : null,
+    p50: percentile(.5), p95: percentile(.95),
+    missRate: totals.miss_eligible ? totals.near_miss / totals.miss_eligible : null };
+}
+
+function prefixCachePanel(doc, range, today, completeThrough) {
+  const title = '<h3>模型前缀缓存命中率</h3>';
+  if (doc?.schema !== 'digitalmate/prefix-cache-daily@1') {
+    return `<section class="env-anomaly">${title}<p class="empty">等待现网缓存用量采集。</p></section>`;
+  }
+  const days = cloudScopedDays(doc.days, range, today, completeThrough);
+  const coverage = Object.entries(PREFIX_CACHE_SOURCES).map(([source, name]) => {
+    const counts = doc.coverage?.[source];
+    const incomplete = counts?.incomplete ? `，未读全 ${fmtCount(counts.incomplete)} 个` : '';
+    return `${name} ${fmtCount(counts?.with_calls)} / ${fmtCount(doc.workspaces)}${incomplete}`;
+  }).join(' · ');
+  const details = `<p class="data-freshness">最近采集 ${esc(fmtDateTime(doc.observed_at))} · 有调用记录的工作区 ${coverage}</p>`;
+  if (!days.length) {
+    return `<section class="env-anomaly">${title}<p class="empty">所选日期没有缓存用量样本。</p>${details}</section>`;
+  }
+  const groups = days.flatMap((day) => day.groups);
+  const overall = summarizePrefixCache(groups);
+  const pct = (ratio) => Number.isFinite(ratio) ? fmtPercent(100 * ratio) : '—';
+  const quantiles = (stats) => `${pct(stats.p50)} / ${pct(stats.p95)}`;
+  const misses = (stats) => stats.miss_eligible
+    ? `${fmtCount(stats.near_miss)} / ${fmtCount(stats.miss_eligible)}（${pct(stats.missRate)}）` : '—';
+  const samples = (stats) => `${fmtCount(stats.known)} / ${fmtCount(stats.calls)}`;
+
+  const grouped = new Map();
+  for (const row of groups) {
+    const key = JSON.stringify([row.source, row.model, row.cohort]);
+    if (!grouped.has(key)) grouped.set(key, []);
+    grouped.get(key).push(row);
+  }
+  const breakdown = [...grouped.values()].sort((a, b) => {
+    const key = (group) => [group[0].source, group[0].model, group[0].cohort].join(' ');
+    return key(a).localeCompare(key(b));
+  }).map((group) => {
+    const { source, model, cohort } = group[0];
+    const stats = summarizePrefixCache(group);
+    return `<tr><td>${PREFIX_CACHE_SOURCES[source]}</td><td>${esc(model || '未知')}</td><td>${PREFIX_CACHE_COHORTS[cohort]}</td>
+      <td>${pct(stats.rate)}</td><td>${quantiles(stats)}</td><td>${misses(stats)}</td><td>${samples(stats)}</td></tr>`;
+  }).join('');
+  const daily = [...days].reverse().flatMap((day) => Object.entries(PREFIX_CACHE_SOURCES).map(([source, name]) => {
+    const rows = day.groups.filter((group) => group.source === source);
+    if (!rows.length) return '';
+    const stats = summarizePrefixCache(rows);
+    const sessions = day.sessions?.[source];
+    const watch = day.watch?.[source];
+    const watchLabels = {
+      spike: '<strong class="failed">近零命中突增</strong>',
+      within_baseline: '基线内',
+      incomplete: '日志未读全',
+    };
+    const alert = watchLabels[watch?.status] || '基线样本不足';
+    const watchCounts = watch?.eligible ? ` · ${fmtCount(watch.near_miss)} / ${fmtCount(watch.eligible)}` : '';
+    return `<tr><td title="${esc(fmtDateTime(day.observed_at))}">${esc(day.date)}${day.retained ? '（保留样本）' : day.date === today ? '（部分日）' : ''}</td><td>${name}</td>
+      <td>${pct(stats.rate)}</td><td>${misses(stats)}</td><td>${samples(stats)}</td>
+      <td>${fmtCount(sessions?.known)} · ${pct(sessions?.p50)} / ${pct(sessions?.p95)}</td><td>${alert}${watchCounts}</td></tr>`;
+  })).join('');
+
+  return `<section class="env-anomaly">${title}${details}
+    <div class="summary model-summary env-summary">
+      <div class="stat-card"><div class="stat-label">加权命中率</div><div class="stat-value">${pct(overall.rate)}</div><div class="stat-hint">命中 Token ÷ 有效样本的输入 Token</div></div>
+      <div class="stat-card"><div class="stat-label">单次命中率 P50 / P95</div><div class="stat-value combo">${quantiles(overall)}</div><div class="stat-hint">按 0.1 个百分点分桶</div></div>
+      <div class="stat-card"><div class="stat-label">近零命中 / 可判定</div><div class="stat-value combo">${misses(overall)}</div><div class="stat-hint">命中率 ≤ 1%，输入 ≥ 1,024 Token</div></div>
+      <div class="stat-card"><div class="stat-label">已知 / 已观测调用</div><div class="stat-value combo">${samples(overall)}</div><div class="stat-hint">缺失或无效 ${fmtCount(overall.calls - overall.known)} 次</div></div>
+    </div>
+    <details class="env-call-detail"><summary>按链路、模型与会话拆分</summary><div class="table-wrap"><table class="history-table">
+      <thead><tr><th>链路</th><th>模型</th><th>会话</th><th>加权命中率</th><th>单次 P50 / P95</th><th>近零命中 / 可判定</th><th>已知 / 已观测</th></tr></thead><tbody>${breakdown}</tbody>
+    </table></div><p class="chart-note">首个可见调用以当前保留日志为准，可能来自已有会话。</p></details>
+    <details class="env-call-detail" open><summary>每日会话统计与异常看护</summary><div class="table-wrap"><table class="history-table">
+      <thead><tr><th>北京时间</th><th>链路</th><th>加权命中率</th><th>近零命中 / 可判定</th><th>已知 / 已观测</th><th>有效会话数 · 累计命中率 P50 / P95</th><th>已见会话看护</th></tr></thead><tbody>${daily}</tbody>
+    </table></div><p class="chart-note">会话累计以单日有效用量计算。已见会话的近零命中次数和比例同时超过过去 7 天基线时标记突增。</p></details>
+  </section>`;
+}
+
 // Outlier analysis. A metric's own same-day P95 would always put about 5% of
 // the day outside it, so the threshold is the pooled P95 of the previous seven
 // complete days. The table shows how many samples exceed that baseline per
@@ -3816,10 +3916,24 @@ async function loadEnvLatency() {
   }
   const freshDaily = newestEnvDaily(candidates);
   state.envRefreshFailed = !freshDaily;
-  state.envDaily = freshDaily || state.envDaily || null;
+  // The freshest latency producer may not carry the independent SFS cache sample.
+  const prefixCache = newestPrefixCache(candidates, state.envDaily?.prefix_cache);
+  state.envDaily = freshDaily ? { ...freshDaily, prefix_cache: prefixCache } : state.envDaily || null;
   // The per-environment GateWay / WorkSwarm table is parked for now; the daily
   // charts carry the same measurements in a more readable form.
   renderEnv();
+}
+
+function newestPrefixCache(candidates, previous) {
+  let newest = previous;
+  for (const doc of candidates) {
+    if (doc?.schema !== 'digitalmate/env-request-latency-daily@1' || doc.env !== 'adx-jiuwen') continue;
+    const cache = doc.prefix_cache;
+    if (cache?.schema !== 'digitalmate/prefix-cache-daily@1' || !Array.isArray(cache.days)) continue;
+    const observed = Date.parse(cache.observed_at);
+    if (Number.isFinite(observed) && (!newest || observed > Date.parse(newest.observed_at))) newest = cache;
+  }
+  return newest;
 }
 
 // Pick the freshest valid cloud-side daily document. A legacy per-environment
@@ -3917,7 +4031,8 @@ function renderEnv() {
     answerPartial > 0 && `答案历史仅扫描近期会话，${fmtCount(answerPartial)} 个工作区可能不完整`,
   ].filter(Boolean);
   const freshness = `<div class="env-data-notes" aria-label="数据说明"><div><strong>数据更新</strong><span>${timeText} · 定时采集，并非实时流</span></div>${warnings.length ? `<div><strong>数据限制</strong><span>${warnings.join('；')}。</span></div>` : ''}<div><strong>覆盖标记</strong><span>* 表示部分日或日志覆盖不全。</span></div></div>`;
-  target.innerHTML = `${freshness}${envSummary(scoped)}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
+  const prefixCache = prefixCachePanel(daily.prefix_cache, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history));
+  target.innerHTML = `${freshness}${envSummary(scoped)}${prefixCache}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
   refineCharts(target);
 }
 

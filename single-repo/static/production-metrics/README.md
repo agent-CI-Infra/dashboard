@@ -1,5 +1,48 @@
 # DigitalMate production metrics view
 
+## Model prefix-cache coverage
+
+The hourly SFS collection reads Beebou's workspace
+`beebou-prefix-cache.jsonl` and the existing `context_usage.jsonl` files of
+the owned Bee and WorkSwarm runtimes. It reads the active file and up to three
+rotations of each source. The reader deduplicates calls by ID within each
+workspace and source. Conflicting observations for one call are excluded and
+counted. Only daily aggregates, coverage counts and model labels are published
+under `prefix_cache` in `env-request-latency-daily.json`. The raw records and
+workspace, call and session identifiers stay on the mount.
+
+- A known call has positive input tokens and an authoritative, integral cache
+  read count in the inclusive range 0 to input tokens. The weighted hit rate is
+  the sum of cache reads divided by the sum of input tokens of known calls.
+  Calls missing either count appear in the observed population with unavailable
+  rates. Explicit zero cache reads remain valid.
+- The single-call distribution uses nearest-rank percentiles over 0.1
+  percentage-point buckets. The near-zero count covers known calls of at least
+  1,024 input tokens with a hit rate at or below 1%. Its denominator is known
+  calls meeting that input-size floor.
+- A session contributes its daily token-weighted rate to the session
+  distribution. The first observed call marks the start of that session's
+  visible evidence in the retained logs. The session may predate the window.
+- The watch compares returning-session near-zero counts and proportions
+  separately for Beebou, Bees and WorkSwarm. A day flags a spike when both
+  exceed every qualifying day in the preceding seven Shanghai calendar days.
+  The compared day and each baseline day require at least 20 eligible calls,
+  and the baseline needs at least three days. Incomplete reads are ineligible
+  for the comparison.
+
+The snapshot keeps up to 30 Shanghai calendar days. When rotation leaves a
+smaller daily population, the larger previous sample remains labelled with its
+original observation time. The board reports workspaces with visible call
+records and workspaces whose reads exceeded a limit or failed. Days without
+matching logs show no sample. Collection uses at most 512 MiB and targets a
+60-second read budget per run. Existing latency metrics keep their own sample
+population.
+
+The regression suite replays both wire formats with cold, continuing,
+near-zero, short and missing observations, then checks the dashboard in
+Chromium. Current provider hit rates and the effect of actual context
+compression require production observations.
+
 ## Full native trajectory archive
 
 The cloud workflow has two scheduled triggers per hour. The existing NetMon

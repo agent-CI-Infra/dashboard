@@ -300,6 +300,8 @@ def main():
         output = inventory()
     elif command.get('mode') == 'collect':
         output = run_collector(command['names'], command['source'])
+        if command.get('prefix_cache'):
+            output['prefix_cache'] = collect_prefix_cache(command['names'], path_for)
     else:
         raise ValueError('invalid operation')
     json.dump(output, sys.stdout, ensure_ascii=False)

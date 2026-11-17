@@ -29,6 +29,15 @@ class SfsTests(unittest.TestCase):
                 sfs.ssh_operation({'mode': 'inventory'})
         self.assertNotIn('PRIVATE', str(error.exception))
 
+    def test_prefix_cache_is_loaded_only_for_the_production_sfs_collection(self):
+        with patch.dict(os.environ, {'SFS_SSH_KEY_FILE': 'key', 'SFS_KNOWN_HOSTS_FILE': 'hosts'}), \
+             patch.object(sfs.subprocess, 'run', return_value=SimpleNamespace(returncode=0, stdout='{}')) as run:
+            sfs.ssh_operation({'mode': 'collect', 'prefix_cache': True})
+        program = json.loads(run.call_args.kwargs['input'])['source']
+        namespace = {'__name__': 'sfs_test'}
+        exec(compile(program, '<sfs_test>', 'exec'), namespace)
+        self.assertEqual(namespace['collect_prefix_cache']([], namespace['path_for'])['days'], [])
+
     def test_coverage_below_threshold_is_rejected(self):
         with patch.object(sfs, 'select_workspaces', return_value=([], 100, {})):
             with patch.object(sfs.collector, 'collect_workspaces', return_value={'binding_count': 100, 'read_log_count': 94}):

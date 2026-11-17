@@ -9,6 +9,8 @@ import subprocess
 import sys
 import urllib.request
 
+from production_prefix_cache import retain_prefix_cache
+
 HERE = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location('production_kube', HERE / 'collect-production-kube-traces.py')
 collector = importlib.util.module_from_spec(spec)
@@ -33,7 +35,10 @@ def ssh_operation(payload, *, remote_source=None):
         args += ['-J', os.environ['SFS_SSH_JUMP']]
     args += ['root@190.92.232.35', command]
     try:
-        command_data = json.dumps({'source': remote_source or collector.REMOTE, 'payload': payload}).encode('utf-8')
+        source = remote_source or collector.REMOTE
+        if payload.get('prefix_cache'):
+            source = (HERE / 'production_prefix_cache.py').read_text(encoding='utf-8') + '\n' + source
+        command_data = json.dumps({'source': source, 'payload': payload}).encode('utf-8')
         result = subprocess.run(args, input=command_data, capture_output=True, timeout=900, check=False)
     except (OSError, subprocess.TimeoutExpired) as error:
         raise RuntimeError('SFS SSH collection failed') from error
@@ -89,7 +94,7 @@ def select_workspaces():
 
 
 def collect():
-    result = collector.collect_workspaces(ssh_operation, *select_workspaces())
+    result = collector.collect_workspaces(ssh_operation, *select_workspaces(), prefix_cache=True)
     count, read = result.get('binding_count'), result.get('read_log_count')
     if type(count) is not int or type(read) is not int or count <= 0 or read / count < 0.95:
         raise RuntimeError('SFS coverage below 95%; previous snapshot retained')
@@ -106,7 +111,11 @@ def main():
     previous = json.loads(Path(sys.argv[2]).read_text(encoding='utf-8'))
     if previous.get('schema') != 'digitalmate/env-request-latency-daily@1' or previous.get('env') != 'adx-jiuwen':
         raise SystemExit('invalid production seed; previous snapshot retained')
-    result = cloud.with_workspace_traces(previous, collect())
+    traces = collect()
+    prefix_cache = traces.pop('prefix_cache', None)
+    result = cloud.with_workspace_traces(previous, traces)
+    if prefix_cache is not None:
+        result['prefix_cache'] = retain_prefix_cache(previous.get('prefix_cache'), prefix_cache)
     Path(sys.argv[1]).write_text(json.dumps(result, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     print('SFS collection complete; sanitized aggregate prepared', file=sys.stderr)
 
