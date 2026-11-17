@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-17T00:13:10Z",
+  "updatedAt": "2026-11-17T08:08:41Z",
   "source": "openJiuwen-ai/DigitalMate",
   "runners": [
     {
@@ -71,7 +71,7 @@
       "name": "digitalmate-win-st-03",
       "os": "Windows",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "Windows",
@@ -81,22 +81,14 @@
       ],
       "machine": "winbox2 · PC-20261103SYCB",
       "emulator": "Mate 90 Pro B",
-      "device": "127.0.0.1:10001",
-      "job": {
-        "name": "hypium-ut",
-        "workflow": "CI",
-        "run_number": 2609,
-        "run_id": 43985638204,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43985638204",
-        "started_at": "2026-11-17T00:12:15Z"
-      }
+      "device": "127.0.0.1:10001"
     },
     {
       "id": 42,
       "name": "digitalmate-win-st-04",
       "os": "Windows",
       "status": "online",
-      "busy": false,
+      "busy": true,
       "labels": [
         "self-hosted",
         "Windows",
@@ -106,7 +98,15 @@
       ],
       "machine": "winbox · PC-20261103OHIZ",
       "emulator": "Mate 90 Pro B",
-      "device": "127.0.0.1:10002"
+      "device": "127.0.0.1:10002",
+      "job": {
+        "name": "hypium-ut",
+        "workflow": "CI",
+        "run_number": 2768,
+        "run_id": 44042846670,
+        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44042846670",
+        "started_at": "2026-11-17T07:58:42Z"
+      }
     },
     {
       "id": 25,
@@ -125,14 +125,22 @@
       "name": "dm-cloud-flex-01",
       "os": "Linux",
       "status": "online",
-      "busy": false,
+      "busy": true,
       "labels": [
         "self-hosted",
         "X64",
         "Linux",
         "dm-nodeut",
         "dm-utility"
-      ]
+      ],
+      "job": {
+        "name": "gate-report",
+        "workflow": "CI",
+        "run_number": 2769,
+        "run_id": 44043082692,
+        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44043082692",
+        "started_at": "2026-11-17T08:06:45Z"
+      }
     },
     {
       "id": 26,
@@ -167,7 +175,7 @@
       "name": "dm-hk-ci-01",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -175,15 +183,7 @@
         "dm-codecheck",
         "dm-nodeut",
         "dm-architecture"
-      ],
-      "job": {
-        "name": "node-ut",
-        "workflow": "CI",
-        "run_number": 2609,
-        "run_id": 43985638204,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43985638204",
-        "started_at": "2026-11-17T00:12:16Z"
-      }
+      ]
     },
     {
       "id": 33,
@@ -205,7 +205,7 @@
       "name": "dm-hk-ci-03",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -213,15 +213,7 @@
         "dm-codecheck",
         "dm-nodeut",
         "dm-architecture"
-      ],
-      "job": {
-        "name": "architecture-conformance",
-        "workflow": "CI",
-        "run_number": 2609,
-        "run_id": 43985638204,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43985638204",
-        "started_at": "2026-11-17T00:12:15Z"
-      }
+      ]
     },
     {
       "id": 36,
@@ -257,22 +249,14 @@
       "name": "dm-hk-ci-06",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
         "Linux",
         "dm-codecheck",
         "dm-nodeut"
-      ],
-      "job": {
-        "name": "ArkTS Code Check",
-        "workflow": "Code Check",
-        "run_number": 3088,
-        "run_id": 43985638296,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/43985638296",
-        "started_at": "2026-11-17T00:12:04Z"
-      }
+      ]
     },
     {
       "id": 39,
@@ -774,6 +758,37 @@
         "dm-hk-ci-01": "node-ut",
         "dm-hk-ci-03": "architecture-conformance",
         "dm-hk-ci-06": "ArkTS Code Check"
+      }
+    },
+    {
+      "at": "2026-11-17T08:08:41Z",
+      "s": {
+        "HwdeMacBook-Air-2": "online",
+        "digitalmate-main-windows-01": "offline",
+        "digitalmate-win-st-01": "online",
+        "digitalmate-win-st-02": "online",
+        "digitalmate-win-st-03": "online",
+        "digitalmate-win-st-04": "online",
+        "dm-cloud-codecheck-02": "online",
+        "dm-cloud-flex-01": "online",
+        "dm-cloud-nodeut-01": "online",
+        "dm-cloud-nodeut-02": "online",
+        "dm-hk-ci-01": "online",
+        "dm-hk-ci-02": "online",
+        "dm-hk-ci-03": "online",
+        "dm-hk-ci-04": "online",
+        "dm-hk-ci-05": "online",
+        "dm-hk-ci-06": "online",
+        "dm-hk-ci-07": "online",
+        "dm-hk-ci-08": "online"
+      },
+      "b": {
+        "digitalmate-win-st-04": true,
+        "dm-cloud-flex-01": true
+      },
+      "j": {
+        "digitalmate-win-st-04": "hypium-ut",
+        "dm-cloud-flex-01": "gate-report"
       }
     }
   ]
