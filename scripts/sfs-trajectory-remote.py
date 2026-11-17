@@ -4,10 +4,12 @@ An observed-stable copy is NOT an atomic snapshot. This distinction is part
 of the wire protocol, archive and UI. All output is content-free projection.
 """
 import shutil
+import stat
 import tempfile
 import time
 
-ARCHIVE_PAGE = 2000
+ARCHIVE_PAGE = 16000
+ARCHIVE_RUN_ROWS = 100000
 ARCHIVE_DB_BYTES = 256 * 1024 * 1024
 ARCHIVE_RUN_BYTES = 1024 * 1024 * 1024
 ARCHIVE_SECONDS = 480
@@ -47,7 +49,9 @@ def archive_inventory(names):
 
 def archive_stamp(path):
     try:
-        s = path.stat()
+        s = path.stat(follow_symlinks=False)
+        if not stat.S_ISREG(s.st_mode):
+            raise ValueError('unsafe source file')
         return (s.st_dev, s.st_ino, s.st_size, s.st_mtime_ns, s.st_ctime_ns)
     except FileNotFoundError:
         return None
@@ -55,9 +59,50 @@ def archive_stamp(path):
 
 def archive_signature(db):
     files = [db] + [Path(str(db) + suffix) for suffix in ('-wal', '-shm', '-journal')]
-    if any(p.is_symlink() for p in files):
-        raise ValueError('unsafe file')
     return [archive_stamp(p) for p in files]
+
+
+def archive_file_hash(path, size, target=None):
+    digest = hashlib.sha256()
+    flags = os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0) | getattr(os, 'O_BINARY', 0)
+    with os.fdopen(os.open(path, flags), 'rb') as source:
+        remaining = size
+        while remaining:
+            block = source.read(min(1024 * 1024, remaining))
+            if not block:
+                return None
+            remaining -= len(block)
+            digest.update(block)
+            if target is not None:
+                target.write(block)
+        if source.read(1):
+            return None
+    return digest.digest()
+
+
+def copy_archive_image(db, local, before):
+    files = [(db, local, before[0][2])]
+    if before[1] is not None:
+        files.append((Path(str(db) + '-wal'), Path(str(local) + '-wal'), before[1][2]))
+    # SQLite rebuilds the WAL index in the private directory. SHM never contains
+    # durable records. Read the main file and WAL twice to detect concurrent changes.
+    hashes = []
+    for path, copy, size in files:
+        with copy.open('xb') as target:
+            hashes.append(archive_file_hash(path, size, target))
+    if any(digest is None or archive_file_hash(path, size) != digest
+           for (path, _, size), digest in zip(files, hashes, strict=True)):
+        return None
+    if archive_signature(db) != before:
+        return None
+    if len(files) == 1:
+        return hashes[0].hex()
+    _, wal, wal_size = files[1]
+    if wal_size:
+        with wal.open('rb') as handle:
+            if wal_size < 32 or handle.read(4) not in (b'\x37\x7f\x06\x82', b'\x37\x7f\x06\x83'):
+                raise ValueError('invalid WAL header')
+    return hashlib.sha256(b'wal-pair\0' + b''.join(hashes)).hexdigest()
 
 
 def archive_label(blob):
@@ -77,7 +122,7 @@ def archive_label(blob):
     return 'event', '其他阶段'
 
 
-def archive_page(local, key, after):
+def archive_page(local, key, after, limit):
     rows, invalid, cursor = [], 0, after
     with contextlib.closing(sqlite3.connect(local.as_uri() + '?mode=ro', uri=True, timeout=1)) as con:
         con.execute('PRAGMA query_only=ON')
@@ -92,10 +137,10 @@ def archive_page(local, key, after):
             FROM trajectory_current_records c LEFT JOIN otlp_span_records a
             ON a.trace_id=c.trace_id AND a.span_id=c.span_id
             WHERE c.rowid>? ORDER BY c.rowid LIMIT ?''',
-            (MAX_NATIVE_PAYLOAD, after, ARCHIVE_PAGE + 1))
+            (MAX_NATIVE_PAYLOAD, after, limit + 1))
         more = False
         for i, record in enumerate(query):
-            if i == ARCHIVE_PAGE:
+            if i == limit:
                 more = True
                 break
             rowid, trace, span, parent, rid, lifecycle, start, end, error, raw = record
@@ -123,67 +168,48 @@ def archive_collect(command):
     last = command.get('last_database', '')
     ordered = sorted(inventory)
     ordered = [k for k in ordered if k > last] + [k for k in ordered if k <= last]
-    updates, consumed = {}, 0
+    updates, consumed, rows_read = {}, 0, 0
     started = time.monotonic()
     for key in ordered:
-        if time.monotonic() - started > ARCHIVE_SECONDS or consumed >= ARCHIVE_RUN_BYTES:
+        if time.monotonic() - started > ARCHIVE_SECONDS or consumed >= ARCHIVE_RUN_BYTES or rows_read >= ARCHIVE_RUN_ROWS:
             break
         db = inventory[key]
-        last = key
         try:
             before = archive_signature(db)
+            size = sum(s[2] for s in before[:2] if s is not None)
+            if consumed and size <= ARCHIVE_DB_BYTES and consumed + size > ARCHIVE_RUN_BYTES:
+                break
+            last = key
             if not before[0]:
                 updates[key] = {'status': 'missing'}
                 continue
-            if any(before[1:]):
-                updates[key] = {'status': 'active_sidecars'}
+            if before[3]:
+                updates[key] = {'status': 'rollback_journal'}
                 continue
-            if before[0][2] > ARCHIVE_DB_BYTES:
+            if size > ARCHIVE_DB_BYTES:
                 updates[key] = {'status': 'size_limit'}
                 continue
-            consumed += before[0][2]
+            consumed += size
             with tempfile.TemporaryDirectory(prefix='sfs-archive-') as folder:
                 local = Path(folder) / 'copy.sqlite3'
                 if local.resolve().is_relative_to(Path('/mnt/sfs')):
                     raise ValueError('temporary directory cannot be on SFS')
-                # Bounded copy; detect growth without allocating the database in memory.
-                h = hashlib.sha256()
-                with db.open('rb') as source, local.open('wb') as target:
-                    remaining = before[0][2]
-                    while remaining:
-                        block = source.read(min(1024 * 1024, remaining))
-                        if not block:
-                            break
-                        remaining -= len(block)
-                        h.update(block)
-                        target.write(block)
-                    if remaining or source.read(1):
-                        updates[key] = {'status': 'changing'}
-                        continue
-                second = hashlib.sha256()
-                with db.open('rb') as source:
-                    remaining = before[0][2]
-                    while remaining:
-                        block = source.read(min(1024 * 1024, remaining))
-                        if not block:
-                            break
-                        remaining -= len(block)
-                        second.update(block)
-                    grew = bool(source.read(1))
-                if remaining or grew or h.digest() != second.digest() or before != archive_signature(db):
+                version = copy_archive_image(db, local, before)
+                if version is None:
                     updates[key] = {'status': 'changing'}
                     continue
-                version = h.hexdigest()
                 old = states.get(key, {})
                 if old.get('version') == version and old.get('done'):
                     updates[key] = {'status': 'observed_stable', 'unchanged': True}
                     continue
                 after = old.get('cursor', 0) if old.get('version') == version else 0
-                page = archive_page(local, key, after)
+                page = archive_page(local, key, after, min(ARCHIVE_PAGE, ARCHIVE_RUN_ROWS - rows_read))
+                rows_read += len(page['rows']) + page['invalid']
                 updates[key] = dict(page, version=version, status='observed_stable')
         except (sqlite3.Error, OSError, ValueError, TypeError):
             # Never publish paths, session ids, SQL errors or raw content.
             updates[key] = {'status': 'read_error'}
+            last = key
     return {'inventory': sorted(inventory), 'inventory_errors': failures,
             'updates': updates, 'last_database': last}
 

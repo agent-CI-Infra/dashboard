@@ -265,8 +265,7 @@ def main():
         raise ValueError('invalid previous archive')
     if args.previous.exists():
         shutil.copytree(args.previous, args.output, dirs_exist_ok=True)
-    sfs.collector.kube_operation = sfs.ssh_operation
-    names, count, errors = sfs.collector.select_workspaces()
+    names, count, errors = sfs.select_workspaces()
     remote = sfs.collector.REMOTE.rsplit("\nif __name__", 1)[0] + '\n' + (HERE / 'sfs-trajectory-remote.py').read_text(encoding='utf-8')
     cursors = {key: {field: value[field] for field in ('version', 'cursor', 'done') if field in value}
                for key, value in state.get('databases', {}).items()}

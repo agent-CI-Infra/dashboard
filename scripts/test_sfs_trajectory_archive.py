@@ -1,4 +1,5 @@
 import copy
+import contextlib
 import datetime as dt
 import hashlib
 import importlib.util
@@ -177,6 +178,33 @@ class ArchiveTests(unittest.TestCase):
         for private in ('SECRET', self.name, 'c'*32):
             self.assertNotIn(private, public)
 
+    def test_committed_wal_rows_are_archived_without_opening_or_changing_the_source(self):
+        db = self.make_db()
+        wal, shm = (Path(str(db) + suffix) for suffix in ('-wal', '-shm'))
+        baseline = db.read_bytes()
+        real_connect = remote.sqlite3.connect
+
+        def guarded_connect(database, *args, **kwargs):
+            self.assertNotIn(self.root.as_uri(), str(database))
+            return real_connect(database, *args, **kwargs)
+
+        with contextlib.closing(real_connect(db)) as writer:
+            writer.execute('PRAGMA wal_autocheckpoint=0')
+            writer.execute("""INSERT INTO trajectory_current_records
+                SELECT ?, span_id, parent_span_id, ?, lifecycle,
+                       start_time_unix_nano, end_time_unix_nano, has_error, raw_json
+                FROM trajectory_current_records""", ('d' * 32, 'digitalmate-wal-request'))
+            writer.commit()
+            self.assertEqual(db.read_bytes(), baseline)
+            before = (wal.read_bytes(), shm.read_bytes())
+            with patch.object(remote.sqlite3, 'connect', side_effect=guarded_connect):
+                self.merge(self.collect())
+            self.assertEqual(db.read_bytes(), baseline)
+            self.assertEqual((wal.read_bytes(), shm.read_bytes()), before)
+            self.assertEqual(self.index['coverage']['observed_databases'], 1)
+            self.assertEqual(self.index['coverage']['archived_spans'], 6)
+            self.assertIn('digitalmate-wal-request', [entry['request_id'] for entry in self.index['traces']])
+
     def test_resume_pages_and_unchanged_database_is_not_duplicated(self):
         self.make_db(spans=7)
         with patch.object(remote, 'ARCHIVE_PAGE', 3):
@@ -212,11 +240,11 @@ class ArchiveTests(unittest.TestCase):
         self.assertEqual(self.index['coverage']['archived_spans'],7)
         page = json.loads((self.output / self.index['traces'][0]['pages'][0]).read_text(encoding='utf-8'))
         self.assertTrue(all(r['error'] for r in page['spans']))
-        Path(str(db)+'-wal').write_bytes(b'active')
+        Path(str(db)+'-journal').write_bytes(b'active')
         self.merge(self.collect())
         self.assertEqual(self.index['coverage']['archived_spans'],7)
         self.assertEqual(self.index['coverage']['pending_databases'],1)
-        self.assertEqual(self.index['coverage']['statuses']['active_sidecars'],1)
+        self.assertEqual(self.index['coverage']['statuses']['rollback_journal'],1)
 
     def test_inventory_has_no_64_database_cap(self):
         for i in range(70):

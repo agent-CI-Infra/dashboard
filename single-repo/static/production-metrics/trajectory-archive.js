@@ -11,7 +11,7 @@ export function selectTraces(traces, query, lifecycle, day = '') {
 export function coverageText(doc) {
   const c = doc.coverage || {};
   const states = c.statuses || {};
-  return `每小时增量采集 · 最近运行 ${formatTime(doc.generated_at)}。授权工作区 ${c.authorized_workspaces ?? 0}/${c.bindings ?? 0}；发现 ${c.discovered_databases ?? 0} 个库，本轮观察校验通过且已读完 ${c.observed_databases ?? 0} 个，待采或待重试 ${c.pending_databases ?? 0} 个（WAL 等辅助文件存在 ${states.active_sidecars ?? 0}，读取失败 ${states.read_error ?? 0}，大小超限 ${states.size_limit ?? 0}，复制中变化 ${states.changing ?? 0}）。授权映射失败 ${Object.values(c.scope_errors || {}).reduce((a,b)=>a+b,0)}，目录错误 ${c.inventory_errors ?? 0}，未再发现 ${c.not_seen_databases ?? 0}，无效记录 ${c.invalid_records ?? 0}。累计归档 ${c.archived_traces ?? 0} 条轨迹、${c.archived_spans ?? 0} 个跨度。只读文件副本一致性未经写入端确认，不代表全量无遗漏；历史结果保留原采集时间。`;
+  return `每小时增量采集 · 最近更新 ${formatTime(doc.generated_at)}。授权工作区 ${c.authorized_workspaces ?? 0}/${c.bindings ?? 0}，已读完 ${c.observed_databases ?? 0}/${c.discovered_databases ?? 0} 个库，待采或待重试 ${c.pending_databases ?? 0} 个（回滚日志或旧版侧文件跳过 ${(states.rollback_journal ?? 0) + (states.active_sidecars ?? 0)}，读取失败 ${states.read_error ?? 0}，大小超限 ${states.size_limit ?? 0}，复制中变化 ${states.changing ?? 0}）。授权映射失败 ${Object.values(c.scope_errors || {}).reduce((a,b)=>a+b,0)}，目录错误 ${c.inventory_errors ?? 0}，未再发现 ${c.not_seen_databases ?? 0}，无效记录 ${c.invalid_records ?? 0}。累计归档 ${c.archived_traces ?? 0} 条轨迹、${c.archived_spans ?? 0} 个跨度。只读文件副本一致性未经写入端确认，不代表全量无遗漏，历史结果保留原采集时间。`;
 }
 const formatTime = value => value ? new Date(value).toLocaleString('zh-CN', {timeZone:'Asia/Shanghai', hour12:false}) : '未知';
 const duration = value => Number.isFinite(value) ? `${(value / 1000).toFixed(3)} 秒` : '—';

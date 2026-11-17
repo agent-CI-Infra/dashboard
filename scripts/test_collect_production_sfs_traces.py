@@ -30,11 +30,30 @@ class SfsTests(unittest.TestCase):
         self.assertNotIn('PRIVATE', str(error.exception))
 
     def test_coverage_below_threshold_is_rejected(self):
-        with patch.object(sfs.collector, 'collect', return_value={'binding_count': 100, 'read_log_count': 94}):
-            with self.assertRaisesRegex(RuntimeError, 'coverage'):
-                sfs.collect()
-        with patch.object(sfs.collector, 'collect', return_value={'binding_count': 100, 'read_log_count': 95}):
-            self.assertEqual(sfs.collect()['collection_source'], 'production_sfs_ssh')
+        with patch.object(sfs, 'select_workspaces', return_value=([], 100, {})):
+            with patch.object(sfs.collector, 'collect_workspaces', return_value={'binding_count': 100, 'read_log_count': 94}):
+                with self.assertRaisesRegex(RuntimeError, 'coverage'):
+                    sfs.collect()
+            with patch.object(sfs.collector, 'collect_workspaces', return_value={'binding_count': 100, 'read_log_count': 95}):
+                self.assertEqual(sfs.collect()['collection_source'], 'production_sfs_ssh')
+
+    def test_declared_production_volume_resolves_without_a_log_download(self):
+        name = 'digitalmate-w-' + 'a' * 64
+
+        def binding(volumes, tenant='jiuwen'):
+            return {'binding': {'scope': {'tenant': tenant, 'template': 'digitalmate',
+                                          'template_ref': {'alias': 'production'}},
+                                'current': {'environment_id': 'environment'}, 'volumes': volumes}}
+
+        direct = binding({'digitalmate-workspace-sfs-' + name: 'volume-uuid'})
+        legacy = binding({})
+        other_tenant = binding({'digitalmate-workspace-sfs-w-' + 'c' * 64: 'other'}, tenant='test')
+        earlier_name = 'w-' + 'b' * 64
+        with patch.object(sfs.collector.traces, 'TOKEN', 'configured'), \
+             patch.object(sfs.collector.traces, 'binding_list', return_value=[direct, legacy, direct, other_tenant]), \
+             patch.object(sfs.collector, 'match_workspaces_from_logs', return_value=({earlier_name}, {})) as fallback:
+            self.assertEqual(sfs.select_workspaces(), ([name, earlier_name], 3, {'duplicate_workspace': 1}))
+        fallback.assert_called_once_with([legacy], sfs.ssh_operation)
 
 if __name__ == '__main__':
     unittest.main()
