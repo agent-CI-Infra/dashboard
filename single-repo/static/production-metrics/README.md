@@ -2,28 +2,33 @@
 
 ## Full native trajectory archive
 
-The cloud collection has two scheduled opportunities per hour and also runs `scripts/collect-sfs-trajectory-archive.py`. Scheduled runs skip the read when a successful SFS snapshot is less than 50 minutes old; manual runs always collect. GitHub may delay or skip scheduled events, so this is a freshness target rather than a guarantee.
-It enumerates all native stores in the console-authorized workspace allowlist,
-independently of slow-request selection and process-log correlation. Workspace
-authorization still uses the existing console/log fingerprint mapping; unresolved
-bindings are counted as scope errors, never silently included.
+The cloud workflow has two scheduled triggers per hour. The existing NetMon
+publishers provide a second trigger through
+`.github/workflows/refresh-digitalmate-sfs.yml` on the `digitalmate` branch.
+That workflow checks freshness on each NetMon push and dispatches collection
+or Pages deployment when an hour is missing. Scheduled runs and dispatches
+with `refresh_if_due=true` share an hourly archive check. A manual run can
+force a refresh. The NetMon trigger uses the repository workflow token.
 
-The SSH reader never opens SQLite on SFS. It copies at most 256 MiB per database
-to a private temporary directory outside SFS, checks two complete file hashes and
-file/sidecar metadata, and runs SQLite `quick_check` on the copy. Any existing
-WAL, SHM or journal defers that database. These checks provide an
-**observed-stable diagnostic copy, not an atomic snapshot**. NFS caching and
-concurrent writers prevent a strict completeness guarantee. The archive always
-publishes `consistency: unconfirmed` and `complete: false`. A writer-owned or
-storage snapshot protocol is required before claiming guaranteed completeness.
+The reader enumerates native stores in the current DigitalMate production
+bindings. The console's provisioned SFS volume ID supplies the workspace
+directory. Older bindings use the log fingerprint lookup. Unresolved bindings
+appear in the archive's coverage report.
 
-Each database page contains at most 2,000 spans. The byte-image hash and rowid
-cursor bind consecutive pages to one generation; changes discard staged pages
-and restart that database. A round-robin cursor, 480-second processing budget and
-1 GiB source-byte budget defer work across hourly runs instead of truncating the
-inventory. Oversized files, read failures, active sidecars, invalid records and
-missing databases remain explicit. Collection frequency cannot recover data
-already deleted by the source retention policy.
+The archive reader copies the main database and its WAL to a private temporary
+directory outside SFS. It checks two complete hashes of each source file and
+verifies the file and sidecar metadata, then runs SQLite `quick_check` on the copy.
+SQLite rebuilds the WAL index locally. A rollback journal or changes during
+copying defer the database for a later run. The archive reports
+`consistency: unconfirmed` and `complete: false` because the source can change
+between observations.
+
+Each database batch contains up to 16,000 spans. The hash of the database image
+and the rowid cursor bind consecutive batches to one generation. A change
+restarts that database's scan. Each run scans up to 100,000 rows and can copy
+up to 256 MiB per database and 1 GiB across databases within 480 seconds. The
+round-robin cursor resumes deferred work in the next run. Published coverage
+includes size limits, failures, retries, and invalid records.
 
 Only sanitized labels, validated request identifiers, opaque trace keys, span
 relationships, lifecycle and timing leave the host. No raw databases, prompts,

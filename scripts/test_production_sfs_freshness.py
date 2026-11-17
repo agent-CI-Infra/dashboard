@@ -10,28 +10,29 @@ from production_sfs_freshness import collection_due
 
 class SfsFreshnessTest(unittest.TestCase):
     def setUp(self):
-        self.now = dt.datetime(2026, 11, 14, 4, 0, tzinfo=dt.timezone.utc)
+        self.now = dt.datetime(2026, 11, 14, 4, 40, tzinfo=dt.timezone.utc)
 
-    def snapshot(self, stamp, source='production_sfs_ssh'):
-        return {'cloud_trace_collection': {'collection_source': source, 'generated_at': stamp,
-                                           'binding_count': 100, 'read_log_count': 95}}
+    def snapshot(self, stamp, schema='digitalmate/trajectory-archive@1'):
+        return {'schema': schema, 'generated_at': stamp,
+                'coverage': {'bindings': 100, 'authorized_workspaces': 95,
+                             'discovered_databases': 100, 'observed_databases': 95}}
 
-    def test_recent_success_skips_redundant_sfs_read(self):
-        self.assertFalse(collection_due(self.snapshot('2026-11-14T03:11:00Z'), now=self.now))
-        self.assertTrue(collection_due(self.snapshot('2026-11-14T03:10:00Z'), now=self.now))
+    def test_same_hour_success_skips_redundant_sfs_read(self):
+        self.assertFalse(collection_due(self.snapshot('2026-11-14T12:00:00+08:00'), now=self.now))
+        self.assertTrue(collection_due(self.snapshot('2026-11-14T03:59:30Z'), now=self.now))
 
     def test_missing_invalid_future_or_other_source_retries(self):
-        for snapshot in (None, {}, self.snapshot('invalid'), self.snapshot('2026-11-14T03:50:00'),
-                         self.snapshot('2026-11-14T04:01:00Z'),
-                         self.snapshot('2026-11-14T03:59:00Z', 'kubernetes_shared_workspace')):
+        for snapshot in (None, {}, self.snapshot('invalid'), self.snapshot('2026-11-14T04:20:00'),
+                         self.snapshot('2026-11-14T04:41:00Z'), self.snapshot('2026-11-14T04:30:00Z', 'other')):
             with self.subTest(snapshot=snapshot):
                 self.assertTrue(collection_due(snapshot, now=self.now))
 
     def test_incomplete_coverage_retries_even_if_recent(self):
-        for count, read in ((100, 94), (0, 0), (100, 101), (None, None)):
-            snapshot = self.snapshot('2026-11-14T03:59:00Z')
-            snapshot['cloud_trace_collection'].update(binding_count=count, read_log_count=read)
-            with self.subTest(count=count, read=read):
+        for bindings, authorized, observed in ((100, 94, 90), (0, 0, 0), (100, 101, 95),
+                                               (None, None, None), (100, 100, 0)):
+            snapshot = self.snapshot('2026-11-14T04:20:00Z')
+            snapshot['coverage'].update(bindings=bindings, authorized_workspaces=authorized, observed_databases=observed)
+            with self.subTest(coverage=snapshot['coverage']):
                 self.assertTrue(collection_due(snapshot, now=self.now))
 
     def test_cli_returns_true_for_missing_snapshot(self):

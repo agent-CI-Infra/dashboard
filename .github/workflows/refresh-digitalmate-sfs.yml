@@ -1,0 +1,58 @@
+name: Check hourly DigitalMate SFS sync
+
+on:
+  push:
+    branches: [digitalmate]
+    paths: ['site/data/netmon/*.json']
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: digitalmate-sfs-freshness
+  cancel-in-progress: false
+
+jobs:
+  check:
+    if: github.ref == 'refs/heads/digitalmate'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Refresh a stale archive or Pages deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          index="$RUNNER_TEMP/digitalmate-sfs-index.json"
+          pages="https://agent-ci-infra.github.io/dashboard/boards/openJiuwen-ai/digitalmate/data/trajectory-archive/index.json"
+          if curl --fail --silent --show-error --connect-timeout 10 --max-time 25 \
+                "$pages?check=$GITHUB_RUN_ID" > "$index" &&
+             [ "$(python3 scripts/production_sfs_freshness.py "$index")" = false ]; then
+            echo 'The online SFS archive is current for this hour.'
+            exit 0
+          fi
+
+          gh api -H 'Accept: application/vnd.github.raw+json' \
+            "repos/$GITHUB_REPOSITORY/contents/site/data/trajectory-archive/index.json?ref=digitalmate" > "$index"
+          workflow=deploy.yml
+          if [ "$(python3 scripts/production_sfs_freshness.py "$index")" = true ]; then
+            workflow=collect-cloud-request-metrics.yml
+          fi
+          active=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow "$workflow" --branch main \
+            --limit 20 --json status --jq 'any(.[]; .status | IN("queued","in_progress","requested","waiting","pending"))')
+          if [ "$active" = true ]; then
+            echo "$workflow is already queued or running."
+            exit 0
+          fi
+
+          inputs=()
+          if [ "$workflow" = collect-cloud-request-metrics.yml ]; then
+            inputs=(-f refresh_if_due=true)
+          fi
+          gh workflow run "$workflow" --repo "$GITHUB_REPOSITORY" --ref main "${inputs[@]}"

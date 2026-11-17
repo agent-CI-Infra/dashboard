@@ -7,10 +7,13 @@ on:
         required: false
         default: false
         type: boolean
+      refresh_if_due:
+        description: Collect only if this hour has no published SFS archive
+        required: false
+        default: false
+        type: boolean
   schedule:
-    # Two opportunities per hour: the freshness check below avoids duplicate
-    # SFS reads when the earlier scheduled collection already succeeded.
-    # GitHub may still delay or skip either scheduled run.
+    # These two triggers allow one successful collection per hour.
     - cron: '10,40 * * * *'
 permissions:
   contents: write
@@ -32,16 +35,19 @@ jobs:
           python-version: '3.12'
       - name: Check whether SFS data needs refresh
         id: freshness
+        env:
+          REFRESH_IF_DUE: ${{ inputs.refresh_if_due }}
+          VALIDATE_ONLY: ${{ inputs.validate_only }}
         run: |
           set -euo pipefail
-          # Manual runs, including validation-only runs, always collect.
-          if [ '${{ github.event_name }}' != 'schedule' ]; then
+          # An operator or a validation run can always request a fresh snapshot.
+          if [ "$VALIDATE_ONLY" = true ] || { [ "$GITHUB_EVENT_NAME" = workflow_dispatch ] && [ "$REFRESH_IF_DUE" != true ]; }; then
             echo 'collect=true' >> "$GITHUB_OUTPUT"
             exit 0
           fi
           mkdir -p /tmp/cloud-metrics
           git fetch origin digitalmate:refs/remotes/origin/digitalmate
-          if git show origin/digitalmate:site/data/env-request-latency-daily.json > /tmp/cloud-metrics/freshness.json; then
+          if git show origin/digitalmate:site/data/trajectory-archive/index.json > /tmp/cloud-metrics/freshness.json; then
             due=$(python3 scripts/production_sfs_freshness.py /tmp/cloud-metrics/freshness.json)
           else
             due=true
@@ -50,7 +56,7 @@ jobs:
           if [ "$due" = false ]; then
             echo 'Recent SFS snapshot exists; skipping redundant scheduled read.'
           fi
-      - name: Collect cloud-side aggregates
+      - name: Collect SFS trajectory archive and cloud metrics
         if: steps.freshness.outputs.collect == 'true'
         env:
           ADX_TOKEN: ${{ secrets.ADX_TOKEN }}
@@ -76,9 +82,15 @@ jobs:
           git fetch origin digitalmate:refs/remotes/origin/digitalmate
           git show origin/digitalmate:site/data/env-request-latency-daily.json \
             > /tmp/cloud-metrics/previous.json
-          python3 scripts/collect-production-sfs-traces.py \
-            /tmp/cloud-metrics/env-request-latency-daily.json \
-            /tmp/cloud-metrics/previous.json
+          metrics_args=()
+          if python3 scripts/collect-production-sfs-traces.py \
+              /tmp/cloud-metrics/env-request-latency-daily.json \
+              /tmp/cloud-metrics/previous.json; then
+            metrics_args=(--metrics /tmp/cloud-metrics/env-request-latency-daily.json)
+          else
+            echo '::warning::Cloud log collection failed; retaining the prior cloud metrics.'
+            cp /tmp/cloud-metrics/previous.json /tmp/cloud-metrics/env-request-latency-daily.json
+          fi
           # Persistent cursor and archive are restored together. Raw SFS files
           # never leave the SSH host; only allowlisted timing fields are sent.
           git worktree add --detach /tmp/cloud-metrics/seed origin/digitalmate
@@ -87,7 +99,7 @@ jobs:
             --previous /tmp/cloud-metrics/seed/site/data/trajectory-archive \
             --output /tmp/cloud-metrics/trajectory-archive \
             --next-state /tmp/cloud-metrics/trajectory-archive-state.json \
-            --metrics /tmp/cloud-metrics/env-request-latency-daily.json
+            "${metrics_args[@]}"
       - name: Publish aggregate to the DigitalMate data branch
         if: ${{ steps.freshness.outputs.collect == 'true' && (github.event_name != 'workflow_dispatch' || !inputs.validate_only) }}
         id: update

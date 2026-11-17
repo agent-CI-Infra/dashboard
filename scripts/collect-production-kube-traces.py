@@ -77,14 +77,8 @@ def fingerprint(item):
         return None, 'unavailable'
 
 
-def select_workspaces():
-    if not traces.TOKEN:
-        raise RuntimeError('ADX_TOKEN is required to select production bindings')
-    inventory = kube_operation({'mode': 'inventory'})
-    bindings = [item for item in traces.binding_list()
-                if (item.get('binding') or {}).get('scope', {}).get('tenant') == 'jiuwen']
-    if not bindings:
-        raise RuntimeError('no production bindings')
+def match_workspaces_from_logs(bindings, operation):
+    inventory = operation({'mode': 'inventory'})
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
         fingerprints = list(pool.map(fingerprint, bindings))
     names, errors = set(), collections.Counter()
@@ -100,15 +94,25 @@ def select_workspaces():
             errors['duplicate_workspace'] += 1
             continue
         names.add(candidates[0])
+    return names, errors
+
+
+def select_workspaces():
+    if not traces.TOKEN:
+        raise RuntimeError('ADX_TOKEN is required to select production bindings')
+    bindings = [item for item in traces.binding_list()
+                if (item.get('binding') or {}).get('scope', {}).get('tenant') == 'jiuwen']
+    if not bindings:
+        raise RuntimeError('no production bindings')
+    names, errors = match_workspaces_from_logs(bindings, kube_operation)
     if not names:
         raise RuntimeError('no unambiguous production workspaces')
     return sorted(names), len(bindings), errors
 
 
-def collect():
-    names, binding_count, errors = select_workspaces()
+def collect_workspaces(operation, names, binding_count, errors):
     source = (HERE / 'collect-production-workspace-traces.py').read_text(encoding='utf-8')
-    result = kube_operation({'mode': 'collect', 'names': names, 'source': source})
+    result = operation({'mode': 'collect', 'names': names, 'source': source})
     result['binding_count'] = binding_count
     result['errors'] = dict(collections.Counter(result.get('errors', {})) + errors)
     result['collection_source'] = 'kubernetes_shared_workspace'
@@ -117,6 +121,10 @@ def collect():
             day['partial'] = True
             day['telemetry_partial'] = True
     return result
+
+
+def collect():
+    return collect_workspaces(kube_operation, *select_workspaces())
 
 
 def main():
