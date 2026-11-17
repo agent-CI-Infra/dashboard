@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 from gsb.github import GitHubError
-from publish import export_site, publish, publish_batch, deployment_for, ROOT
+from publish import export_site, publish, publish_batch, slim_for_site, deployment_for, ROOT
 
 
 class DeploymentTests(unittest.TestCase):
@@ -124,7 +124,7 @@ class PublishingTests(unittest.TestCase):
         (self.site/'.env').write_text('private local file')
         self.assertEqual(publish(GH(),self.site,'example/board'),'new-commit')
         files=calls[0][2]['tree']
-        self.assertEqual({f['path'] for f in files},{'site/'+p for p in ('index.html','app.js','style.css','board.js','board-local.js','gitcode-sync.js','real-e2e.html','real-e2e.js','e2e-report.html','data/snapshot.json','.nojekyll')})
+        self.assertEqual({f['path'] for f in files},{'site/'+p for p in ('index.html','app.js','style.css','board.js','board-local.js','gitcode-sync.js','real-e2e.html','real-e2e.js','e2e-report.html','data/snapshot.json','data/details.json','.nojekyll')})
         self.assertEqual(calls[0][2]['base_tree'],'existing-source-tree')
         self.assertTrue(calls[2][1].endswith('/git/refs/heads/main'))
         self.assertEqual(calls[1][2]['parents'],['old'])
@@ -142,7 +142,7 @@ class PublishingTests(unittest.TestCase):
                 return ({'sha':'new'},None,200)
         publish(GH(),self.site,'example/board',data_only=True)
         paths={entry['path'] for entry in calls[0][2]['tree']}
-        self.assertEqual(paths,{'site/data/snapshot.json'})
+        self.assertEqual(paths,{'site/data/snapshot.json','site/data/details.json'})
 
     def test_credential_in_content_prevents_remote_write(self):
         class GH:
@@ -225,3 +225,87 @@ class PublishingTests(unittest.TestCase):
             token=''
             def get(self,path): return {'private':True}
         with self.assertRaises(ValueError): publish(GH(),self.site,'example/private')
+
+
+class SlimForSiteTests(unittest.TestCase):
+    """snapshot.json ships sections only; bodies move to data/details.json."""
+
+    @staticmethod
+    def full_doc():
+        issue = {'number': 1, 'title': 'i', 'body': 'issue body'}
+        closed = {'number': 2, 'title': 'c', 'body': 'closed body'}
+        pr = {'number': 3, 'title': 'p', 'body': 'pr body'}
+        merged = {'number': 4, 'title': 'm', 'body': 'merged body'}
+        unmerged = {'number': 5, 'title': 'u', 'body': 'unmerged body'}
+        wrap = lambda value: {'status': 'ok', 'data': value, 'notes': [], 'error': None}
+        return {
+            'generated_at': '2026-01-01T00:00:00Z',
+            'issues': {'items': [issue], 'closed_recent': [closed]},
+            'prs': {'items': [pr], 'recent_merged': [merged], 'recent_closed_unmerged': [unmerged]},
+            'sections': {'issues': wrap({'items': [dict(issue)], 'closed_recent': [dict(closed)]}),
+                         'prs': wrap({'items': [dict(pr)], 'recent_merged': [dict(merged)],
+                                      'recent_closed_unmerged': [dict(unmerged)]})},
+            'details': {'issue:9': {'body': 'kept', 'cross_references': []}},
+        }
+
+    def test_slim_removes_flat_duplicates_and_moves_bodies_to_details(self):
+        doc = self.full_doc()
+        details = slim_for_site(doc)
+        self.assertNotIn('issues', doc)
+        self.assertNotIn('prs', doc)
+        self.assertNotIn('details', doc)
+        for section in ('issues', 'prs'):
+            data = doc['sections'][section]['data']
+            for rows in data.values():
+                for row in rows:
+                    self.assertNotIn('body', row)
+        self.assertEqual(details['issue:9']['body'], 'kept')
+        self.assertEqual(details['issue:1']['body'], 'issue body')
+        self.assertEqual(details['issue:2']['body'], 'closed body')
+        self.assertEqual(details['pr:3']['body'], 'pr body')
+        self.assertEqual(details['pr:4']['body'], 'merged body')
+        self.assertEqual(details['pr:5']['body'], 'unmerged body')
+
+    def test_slim_rebuilds_details_when_the_full_export_path_omits_them(self):
+        # project.extend_project publishes an empty details dict while bodies
+        # still ride on the rows; slim_for_site recovers them either way.
+        doc = self.full_doc()
+        doc['details'] = {}
+        details = slim_for_site(doc)
+        self.assertEqual(details['issue:1']['body'], 'issue body')
+        self.assertEqual(details['pr:4']['body'], 'merged body')
+
+    def test_already_slim_document_returns_none_and_keeps_details_committed(self):
+        slim = self.full_doc()
+        details = slim_for_site(slim)
+        self.assertIsNotNone(details)
+        # A quiet republish re-reads the slim file: no details key, no bodies.
+        self.assertIsNone(slim_for_site(slim))
+
+    def test_export_site_writes_the_details_file(self):
+        with tempfile.TemporaryDirectory() as temp:
+            out = Path(temp)
+            doc = self.full_doc()
+            details = slim_for_site(doc)
+            export_site(out, doc, details)
+            written = json.loads((out / 'data/details.json').read_text(encoding='utf-8'))
+            self.assertEqual(written['pr:3']['body'], 'pr body')
+            snapshot = json.loads((out / 'data/snapshot.json').read_text(encoding='utf-8'))
+            self.assertNotIn('issues', snapshot)
+            self.assertNotIn('body', snapshot['sections']['issues']['data']['items'][0])
+
+    def test_publish_batch_accepts_the_details_file(self):
+        calls = []
+        class GH:
+            token = ''
+            def get(self, path):
+                if '/git/commits/' in path: return {'tree': {'sha': 'base-tree'}}
+                return {'object': {'sha': 'a' * 40}} if '/git/' in path else {'private': False}
+            def _url(self, path, _): return path
+            def _request(self, method, path, body):
+                calls.append((method, path, body))
+                return ({'sha': 'new'}, None, 200)
+        files = {'site/data/snapshot.json': '{}', 'site/data/details.json': '{}', '.sync/state.json': '{}'}
+        publish_batch(GH(), 'example/board', 'board/acme/widget', 'a' * 40, files, data_only=True)
+        self.assertEqual({entry['path'] for entry in calls[0][2]['tree']},
+                         {'site/data/snapshot.json', 'site/data/details.json', '.sync/state.json'})
