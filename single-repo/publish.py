@@ -45,7 +45,38 @@ def ensure_public_repository(gh, repository, *, role="repository"):
         raise ValueError(f"{role} must be public; the publishing target is a public Pages repository")
 
 
-def export_site(output, snapshot):
+def slim_for_site(doc):
+    """Strip publish-only duplication at the site boundary, in place.
+
+    The in-memory document keeps flat ``issues``/``prs`` (they feed the board
+    payload and details extraction), but every site reader goes through
+    ``sections`` instead, so shipping both doubles snapshot.json. Issue and PR
+    bodies only serve the drawer, which reads ``data/details.json``. Returns
+    the details to publish, or None when the document already is slim so a
+    quiet republish never wipes the committed details.json.
+    """
+    detail_lists = {"issues": ("items", "closed_recent"),
+                    "prs": ("items", "recent_merged", "recent_closed_unmerged")}
+    had_details = isinstance(doc.get("details"), dict)
+    details = doc.pop("details", {}) if had_details else {}
+    found_bodies = False
+    sections = doc.get("sections") or {}
+    for kind, keys in detail_lists.items():
+        data = ((sections.get(kind) or {}).get("data") or {})
+        for key in keys:
+            for row in data.get(key) or []:
+                body = row.pop("body", None)
+                if body:
+                    found_bodies = True
+                    details.setdefault(f"{kind[:-1]}:{row['number']}", {"body": body, "cross_references": []})
+    if not had_details and not found_bodies:
+        return None
+    doc.pop("issues", None)
+    doc.pop("prs", None)
+    return details
+
+
+def export_site(output, snapshot, details=None):
     output = Path(output)
     output.mkdir(parents=True, exist_ok=True)
     for name in STATIC_FILES:
@@ -55,6 +86,10 @@ def export_site(output, snapshot):
     tmp = target.with_suffix(".tmp")
     tmp.write_text(json.dumps(snapshot, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     tmp.replace(target)
+    details_target = output / "data/details.json"
+    tmp = details_target.with_suffix(".tmp")
+    tmp.write_text(json.dumps(details or {}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    tmp.replace(details_target)
     (output / ".nojekyll").write_text("")
 
 
@@ -68,7 +103,7 @@ def publish(gh, site, repository, branch="main", *, source_token=None, data_only
     # source files and workflows; the bot's Contents token changes only site/.
     old = gh.get(prefix + "/git/ref/heads/" + branch)["object"]["sha"]
     base_tree = gh.get(prefix + "/git/commits/" + old)["tree"]["sha"]
-    files = [*STATIC_FILES, "data/snapshot.json", ".nojekyll", *([SYNC_DATA] if (Path(site) / SYNC_DATA).exists() else [])]
+    files = [*STATIC_FILES, "data/snapshot.json", "data/details.json", ".nojekyll", *([SYNC_DATA] if (Path(site) / SYNC_DATA).exists() else [])]
     if data_only:
         files = [name for name in files if name.startswith("data/")]
     tree = [{"path": "site/" + p, "mode": "100644", "type": "blob", "content": (Path(site) / p).read_text(encoding="utf-8")} for p in files]
@@ -117,7 +152,7 @@ def publish_batch(gh, repository, branch, base, files, *, source_token=None, dat
     if gh.get(prefix + "/git/ref/heads/" + branch)["object"]["sha"] != base:
         raise ValueError("publication conflict; retry from latest checkout")
     for path, content in files.items():
-        allowed = path in {"site/" + x for x in (*STATIC_FILES, "data/snapshot.json", ".nojekyll", SYNC_DATA)} or path in {".sync/state.json", ".sync/aggregate.json", ".sync/supplements.json", ".sync/tagged.json", ".sync/coverage.json", ".sync/coverage-sources.json"} or re.fullmatch(r"site/data/history/(manifest\.json|(?:index|records|catalog)/(?:issues|prs|runs|releases)/[0-9]{12}\.json)", path) or re.fullmatch(r"site/data/e2e/(?:index|[0-9]{1,20})\.json", path)
+        allowed = path in {"site/" + x for x in (*STATIC_FILES, "data/snapshot.json", "data/details.json", ".nojekyll", SYNC_DATA)} or path in {".sync/state.json", ".sync/aggregate.json", ".sync/supplements.json", ".sync/tagged.json", ".sync/coverage.json", ".sync/coverage-sources.json"} or re.fullmatch(r"site/data/history/(manifest\.json|(?:index|records|catalog)/(?:issues|prs|runs|releases)/[0-9]{12}\.json)", path) or re.fullmatch(r"site/data/e2e/(?:index|[0-9]{1,20})\.json", path)
         # None deletes a file; only E2E run records are ever removed.
         if content is None and not path.startswith("site/data/e2e/"):
             raise ValueError("unsafe public file")
@@ -191,7 +226,11 @@ def main():
             snapshot = build_project(gh, args.repo, settings)
         if deployment:
             snapshot["deployment"] = deployment
-        export_site(args.output, snapshot)
+        # One slimming pass feeds both the local export and the branch commit;
+        # site_details is None for an already-slim quiet republish, and then the
+        # committed details.json must stay untouched.
+        site_details = slim_for_site(snapshot)
+        export_site(args.output, snapshot, site_details)
         result = {"ok": True, "repo": args.repo, "generated_at": snapshot["generated_at"]}
         sync_doc = gitcode_sync.load(os.environ.get("GSB_GITCODE_SYNC_FILE"), ROOT / "site" / SYNC_DATA, snapshot["generated_at"])
         if sync_doc is not None:
@@ -209,6 +248,8 @@ def main():
                 files = sync.files()
                 files.update({"site/" + name: (Path(args.output) / name).read_text() for name in (*STATIC_FILES, ".nojekyll")})
                 files["site/data/snapshot.json"] = encode(snapshot)
+                if site_details is not None:
+                    files["site/data/details.json"] = encode(site_details)
                 if sync_doc is not None:
                     files["site/" + SYNC_DATA] = gitcode_sync.encode(sync_doc)
                 if records:

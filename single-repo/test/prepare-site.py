@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from publish import export_site
+from publish import export_site, slim_for_site
 
 root=Path(__file__).resolve().parents[1]
 time='2026-09-20T12:00:00Z'
@@ -207,7 +207,8 @@ doc['line_sections']={'legacy':dict(ci=wrap(legacy_ci),tests=wrap(legacy_tests))
                       'release':dict(ci=wrap(swarm_ci),tests=wrap(swarm_tests))}
 doc['board']=BoardStore(cfg,persist=False).payload(doc)
 doc['details']={'issue:1':dict(body=item['body'],cross_references=[]),'pr:3':dict(body=pr['body'],cross_references=[])}
-export_site(root/'.e2e/site/github-status-board',doc)
+site_details = slim_for_site(doc)
+export_site(root/'.e2e/site/github-status-board',doc,site_details)
 # E2E run records through the real collector and Pages attachment, offline: yesterday's
 # collection read histories across multiple runs and branch lines. An expired
 # artifact disappears; fork and oversized artifacts have no hosted HTML.
@@ -296,7 +297,8 @@ shutil.rmtree(checkout,ignore_errors=True)
 empty=json.loads(json.dumps(doc));empty['quality']['runs']=[];empty['releases']=[];empty['issues']=None;empty['prs']=None;empty['notices']=[{'message':'GitHub 数据不可读取，结果未知。'}]
 empty['sections']={k:dict(status='error',data=None,notes=[],error=dict(kind='error',message='结果未知')) for k in empty['sections']}
 empty['board']['items']=[];empty['details']={};empty['line_sections']={}
-export_site(root/'.e2e/site/empty',empty)
+empty_details = slim_for_site(empty)
+export_site(root/'.e2e/site/empty',empty,empty_details)
 
 # GitCode sync page: a bot response with failures, divergence, a hostile title and
 # credential-shaped error text, passed through the same public_document() as publish.py.
