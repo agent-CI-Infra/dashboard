@@ -307,7 +307,7 @@
   async function initGaia() {
     const pick = await loadGaiaRuns()
     if (!pick) {
-      await initGaia()
+      renderGaia(await loadGaia())
       return
     }
     const sel = $('#gaia-run')
@@ -558,7 +558,7 @@
         : `最近 ${runs.length} 次运行`
       renderLatest(runs)
       renderTables(runs)
-      renderGaia(await loadGaia())
+      await initGaia()
       lastRuns = runs
       renderChart(runs)
     } catch (err) {
