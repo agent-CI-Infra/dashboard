@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-18T00:01:46Z",
+  "updatedAt": "2026-11-18T07:14:23Z",
   "source": "openJiuwen-ai/DigitalMate",
   "runners": [
     {
@@ -71,7 +71,7 @@
       "name": "digitalmate-win-st-03",
       "os": "Windows",
       "status": "online",
-      "busy": false,
+      "busy": true,
       "labels": [
         "self-hosted",
         "Windows",
@@ -81,7 +81,15 @@
       ],
       "machine": "winbox2 · PC-20261103SYCB",
       "emulator": "Mate 90 Pro B",
-      "device": "127.0.0.1:10001"
+      "device": "127.0.0.1:10001",
+      "job": {
+        "name": "st",
+        "workflow": "pr-ready",
+        "run_number": 3614,
+        "run_id": 44257108414,
+        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44257108414",
+        "started_at": "2026-11-18T07:12:50Z"
+      }
     },
     {
       "id": 42,
@@ -826,6 +834,35 @@
       },
       "b": {},
       "j": {}
+    },
+    {
+      "at": "2026-11-18T07:14:23Z",
+      "s": {
+        "HwdeMacBook-Air-2": "online",
+        "digitalmate-main-windows-01": "offline",
+        "digitalmate-win-st-01": "online",
+        "digitalmate-win-st-02": "online",
+        "digitalmate-win-st-03": "online",
+        "digitalmate-win-st-04": "online",
+        "dm-cloud-codecheck-02": "online",
+        "dm-cloud-flex-01": "online",
+        "dm-cloud-nodeut-01": "online",
+        "dm-cloud-nodeut-02": "online",
+        "dm-hk-ci-01": "online",
+        "dm-hk-ci-02": "online",
+        "dm-hk-ci-03": "online",
+        "dm-hk-ci-04": "online",
+        "dm-hk-ci-05": "online",
+        "dm-hk-ci-06": "online",
+        "dm-hk-ci-07": "online",
+        "dm-hk-ci-08": "online"
+      },
+      "b": {
+        "digitalmate-win-st-03": true
+      },
+      "j": {
+        "digitalmate-win-st-03": "st"
+      }
     }
   ]
 }
