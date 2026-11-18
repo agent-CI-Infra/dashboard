@@ -22,7 +22,199 @@ tr.ok td:nth-child(6){color:var(--ok)}tr.bad td:nth-child(6){color:var(--bad)}tr
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}
 </style></head><body><main>
 <a href="../../../">← DigitalMate 看板</a>
-<h1>GAIA validation 165 · 全量（两轮）</h1>
+<h1>GAIA validation 165 · 全量（三轮）</h1>
+<div id="nullius-run"><h2>2026-11-18 · Nullius 标准 · 容器后端（新增）</h2>
+<p class="meta">2026-11-18 21:01 → 22:02 (Asia/Shanghai) · 单 trial · 4 并发 · <code>digitalmate@hive-workspace-pr699 (nullius agent/digitalmate cbe4441)</code> · 模型 <code>DeepSeek-V4.1-Flash-1017</code><br>Nullius standard（本机 Docker container 后端，每题独立容器 + relay，非 k8s bench 后端）· 4 并发 · 无轮次/时长上限调整</p>
+<p class="note" style="border-left:3px solid var(--skip);padding-left:10px">⚠ 本轮由 <b>Nullius</b> 在自己的机器上跑（每题独立容器 + relay），<b>不是</b>下面两轮所用的 k8s / Hive 后端。模型、harness、后端都不同，<b>只可与上方各列纵向对照，不可横向相减</b>。</p>
+<h3>与上方各轮并排（同口径三列）</h3><table><thead><tr><th>口径</th><th class="num">封盘基线</th><th class="num">Hive 2026-11-17</th><th class="num">Nullius 本轮</th><th>分母说明</th></tr></thead><tbody>
+<tr><td>raw</td><td class="num">95/165 = 57.6%</td><td class="num">见上</td><td class="num"><b>55/165 = 33.3%</b></td><td>全部 165 条</td></tr>
+<tr><td>answered</td><td class="num">95/131 = 72.5%</td><td class="num">见上</td><td class="num"><b>55/156 = 35.3%</b></td><td>排除 agent 异常退出的</td></tr>
+<tr><td><b>scorable</b></td><td class="num"><b>95/129 = 73.6%</b></td><td class="num">见上</td><td class="num"><b>55/139 = 39.6%</b></td><td>真正给出 FINAL ANSWER 并判过的</td></tr>
+</tbody></table>
+<p class="note">本轮 scorable <b>39.6%</b>：84 条给出 FINAL ANSWER 但答错，17 条没产出 FINAL ANSWER，9 条 agent 异常退出。</p>
+<h3>失败构成</h3><table><thead><tr><th>原因</th><th class="num">条数</th><th>归属</th></tr></thead><tbody>
+<tr class="bad"><td>格式正确但答错</td><td class="num">84</td><td>产品：缺检索能力（本版本工具集无 web 搜索）</td></tr>
+<tr class="bad"><td>未产出 FINAL ANSWER</td><td class="num">17</td><td>产品：回合长度 / 轮次上限</td></tr>
+<tr class="bad"><td>agent 非零退出</td><td class="num">9</td><td>产品：运行时异常</td></tr>
+<tr class="ok"><td>通过</td><td class="num">55</td><td>—</td></tr></tbody></table>
+<h3>按难度 / 能力类型</h3><table><thead><tr><th>分组</th><th class="num">任务</th><th class="num">通过</th><th class="num">raw</th></tr></thead><tbody>
+<tr><td>L1</td><td class="num">53</td><td class="num">22/53</td><td class="num">41.5%</td></tr>
+<tr><td>L2</td><td class="num">86</td><td class="num">29/86</td><td class="num">33.7%</td></tr>
+<tr><td>L3</td><td class="num">26</td><td class="num">4/26</td><td class="num">15.4%</td></tr>
+<tr><td>工具/检索</td><td class="num">154</td><td class="num">48/154</td><td class="num">31.2%</td></tr>
+<tr><td>纯推理</td><td class="num">11</td><td class="num">7/11</td><td class="num">63.6%</td></tr>
+</tbody></table>
+<h3>逐条结果（165）</h3><table><thead><tr><th>task</th><th>难度</th><th>类型</th><th class="num">调用</th><th>附件</th><th>结果</th><th>归因</th><th class="num">时长</th></tr></thead><tbody>
+<tr class="ok"><td class="mono">GAIA-VAL-0011B22D84-51</td><td>L1</td><td>工具/检索</td><td class="num">5</td><td>否</td><td>PASS</td><td>通过</td><td class="num">62.6s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-07219A1054-41</td><td>L1</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">31.3s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-11C528DB7A-39</td><td>L1</td><td>纯推理</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">32.6s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-3708984F08-47</td><td>L1</td><td>纯推理</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">26.0s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-4C0671AE2B-132</td><td>L1</td><td>纯推理</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">45.1s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-5020BF00DE-38</td><td>L1</td><td>工具/检索</td><td class="num">4</td><td>是</td><td>PASS</td><td>通过</td><td class="num">35.6s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-657C0B7A24-19</td><td>L1</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">24.4s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-6DEF26BCB1-102</td><td>L1</td><td>工具/检索</td><td class="num">5</td><td>否</td><td>PASS</td><td>通过</td><td class="num">39.5s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-7651063B3B-62</td><td>L1</td><td>工具/检索</td><td class="num">24</td><td>是</td><td>PASS</td><td>通过</td><td class="num">132.3s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-7F6A897E4E-142</td><td>L1</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">38.1s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-7FA94505D5-165</td><td>L1</td><td>工具/检索</td><td class="num">6</td><td>是</td><td>PASS</td><td>通过</td><td class="num">38.1s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-80EC9B4C82-68</td><td>L1</td><td>工具/检索</td><td class="num">31</td><td>是</td><td>PASS</td><td>通过</td><td class="num">348.4s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-81A0445FD7-52</td><td>L1</td><td>纯推理</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">26.9s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-82744E88BD-98</td><td>L1</td><td>工具/检索</td><td class="num">5</td><td>否</td><td>PASS</td><td>通过</td><td class="num">62.3s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-9A9939E37E-30</td><td>L1</td><td>纯推理</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">25.0s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-A52DE90201-120</td><td>L1</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>PASS</td><td>通过</td><td class="num">71.5s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-AA08CE4275-127</td><td>L1</td><td>纯推理</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">28.4s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-AEA19E1240-27</td><td>L1</td><td>纯推理</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">25.9s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-C7901B3FAA-73</td><td>L1</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>PASS</td><td>通过</td><td class="num">28.5s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-D7E53FDFC5-83</td><td>L1</td><td>工具/检索</td><td class="num">24</td><td>是</td><td>PASS</td><td>通过</td><td class="num">114.0s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-F1D4AD9200-109</td><td>L1</td><td>工具/检索</td><td class="num">27</td><td>是</td><td>PASS</td><td>通过</td><td class="num">109.7s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-F84B22DEEE-53</td><td>L1</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">51.5s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-0DBC463817-45</td><td>L1</td><td>工具/检索</td><td class="num">9</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">109.4s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-101099D484-129</td><td>L1</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">64.7s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-1209A07B75-60</td><td>L1</td><td>纯推理</td><td class="num">8</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">195.3s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-181F440C5B-118</td><td>L1</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">66.0s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-19A91D036C-03</td><td>L1</td><td>工具/检索</td><td class="num">7</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">47.4s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-1E45184CA4-43</td><td>L1</td><td>纯推理</td><td class="num">3</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">25.4s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-1EC061A758-134</td><td>L1</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">70.7s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-25E51F6E0C-105</td><td>L1</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">47.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-276C2128BE-95</td><td>L1</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">43.9s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-2EBC03D723-157</td><td>L1</td><td>纯推理</td><td class="num">4</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">84.7s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-3248DAFEBE-77</td><td>L1</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">55.1s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-3B34793BC1-88</td><td>L1</td><td>工具/检索</td><td class="num">18</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">257.5s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-45A1354F9F-141</td><td>L1</td><td>工具/检索</td><td class="num">7</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">93.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-5623FA6A49-85</td><td>L1</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">24.7s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-68D8C180B7-32</td><td>L1</td><td>纯推理</td><td class="num">4</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">57.5s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-711BE2880D-26</td><td>L1</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">55.4s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-73359C3C9B-148</td><td>L1</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">82.8s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-921471B367-24</td><td>L1</td><td>工具/检索</td><td class="num">14</td><td>是</td><td>FAIL</td><td>agent 非零退出</td><td class="num">70.8s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-990560951F-107</td><td>L1</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">44.0s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-A211CA9123-80</td><td>L1</td><td>工具/检索</td><td class="num">7</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">146.7s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-A4D73860E1-130</td><td>L1</td><td>工具/检索</td><td class="num">14</td><td>是</td><td>FAIL</td><td>agent 非零退出</td><td class="num">102.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-A5B1D849ED-149</td><td>L1</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">38.6s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-A6E94A2087-55</td><td>L1</td><td>工具/检索</td><td class="num">7</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">87.7s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-A86A4B2583-48</td><td>L1</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">63.9s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-AAFC75BE15-133</td><td>L1</td><td>工具/检索</td><td class="num">14</td><td>是</td><td>FAIL</td><td>agent 非零退出</td><td class="num">101.9s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-B814760A42-63</td><td>L1</td><td>工具/检索</td><td class="num">7</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">77.1s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-C5AEB3BB24-106</td><td>L1</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">53.7s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-D042FCBBD7-123</td><td>L1</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">39.9s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-EB29DF1928-97</td><td>L1</td><td>工具/检索</td><td class="num">14</td><td>是</td><td>FAIL</td><td>agent 非零退出</td><td class="num">105.7s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-FBC662574B-115</td><td>L1</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">75.1s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-FC9A8F003C-100</td><td>L1</td><td>工具/检索</td><td class="num">28</td><td>是</td><td>FAIL</td><td>格式正确·答错</td><td class="num">130.5s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-080C932322-117</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>是</td><td>PASS</td><td>通过</td><td class="num">85.4s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-0B2B5CCA0D-33</td><td>L2</td><td>工具/检索</td><td class="num">22</td><td>是</td><td>PASS</td><td>通过</td><td class="num">97.8s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-15E7E53E32-92</td><td>L2</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">27.8s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-1EF9086C3C-58</td><td>L2</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>PASS</td><td>通过</td><td class="num">48.9s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-1F6FAEF601-86</td><td>L2</td><td>工具/检索</td><td class="num">31</td><td>是</td><td>PASS</td><td>通过</td><td class="num">166.2s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-27E32B79BD-35</td><td>L2</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>PASS</td><td>通过</td><td class="num">46.3s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-2E86EB36BB-14</td><td>L2</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>PASS</td><td>通过</td><td class="num">65.0s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-32E31F12C5-82</td><td>L2</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">40.3s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-3B8D15686E-49</td><td>L2</td><td>工具/检索</td><td class="num">17</td><td>是</td><td>PASS</td><td>通过</td><td class="num">91.8s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-3F9B8F9B1B-108</td><td>L2</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">39.1s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-43328C34C2-10</td><td>L2</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>PASS</td><td>通过</td><td class="num">43.8s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-436C1CCFAF-113</td><td>L2</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>PASS</td><td>通过</td><td class="num">71.7s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-5137B172B1-42</td><td>L2</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">29.3s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-5C90240729-143</td><td>L2</td><td>工具/检索</td><td class="num">5</td><td>否</td><td>PASS</td><td>通过</td><td class="num">41.2s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-5F2435C261-122</td><td>L2</td><td>工具/检索</td><td class="num">24</td><td>是</td><td>PASS</td><td>通过</td><td class="num">141.3s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-66C45D6516-161</td><td>L2</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">39.6s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-79E0DC9413-28</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>PASS</td><td>通过</td><td class="num">57.5s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-808D0F9765-57</td><td>L2</td><td>工具/检索</td><td class="num">21</td><td>是</td><td>PASS</td><td>通过</td><td class="num">134.4s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-8E8069BF53-69</td><td>L2</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">32.9s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-94B3A7F13B-137</td><td>L2</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">40.9s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-9E89F5E5D3-56</td><td>L2</td><td>工具/检索</td><td class="num">5</td><td>否</td><td>PASS</td><td>通过</td><td class="num">46.3s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-AAB770948B-150</td><td>L2</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">34.8s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-ACCD8C55CC-36</td><td>L2</td><td>工具/检索</td><td class="num">5</td><td>是</td><td>PASS</td><td>通过</td><td class="num">38.6s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-BC465F6E94-07</td><td>L2</td><td>工具/检索</td><td class="num">21</td><td>是</td><td>PASS</td><td>通过</td><td class="num">97.1s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-BD164F61BB-84</td><td>L2</td><td>工具/检索</td><td class="num">16</td><td>是</td><td>PASS</td><td>通过</td><td class="num">75.0s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-C4A291F8C9-34</td><td>L2</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">38.0s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-CE3E72BFAF-71</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>是</td><td>PASS</td><td>通过</td><td class="num">39.4s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-D0BA87D8A5-159</td><td>L2</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">32.2s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-F380D34D76-155</td><td>L2</td><td>工具/检索</td><td class="num">7</td><td>是</td><td>PASS</td><td>通过</td><td class="num">36.5s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-00E41B8243-93</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">64.3s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-05BA3443E9-11</td><td>L2</td><td>工具/检索</td><td class="num">22</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">211.6s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-0AA7FA9594-02</td><td>L2</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">90.9s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-0ADCC66D41-116</td><td>L2</td><td>工具/检索</td><td class="num">14</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">288.5s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-0AFF695182-31</td><td>L2</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">67.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-0E0AAC2B6C-46</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">58.1s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-1C5FF3A097-128</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">87.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-26C86B72C3-74</td><td>L2</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">38.9s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-2A5EFDC06C-29</td><td>L2</td><td>工具/检索</td><td class="num">14</td><td>是</td><td>FAIL</td><td>agent 非零退出</td><td class="num">80.7s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-2F9BFC5C11-09</td><td>L2</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">41.7s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-354D112679-138</td><td>L2</td><td>工具/检索</td><td class="num">7</td><td>是</td><td>FAIL</td><td>格式正确·答错</td><td class="num">85.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-38ED7AFFA7-162</td><td>L2</td><td>工具/检索</td><td class="num">36</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">193.6s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-3D38D72518-111</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">53.8s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-4484670E7A-22</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">78.4s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-48A2737299-13</td><td>L2</td><td>工具/检索</td><td class="num">15</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">96.4s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-4F164F8D5F-104</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">43.0s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-580F524581-153</td><td>L2</td><td>工具/检索</td><td class="num">15</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">81.9s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-582E34C083-72</td><td>L2</td><td>工具/检索</td><td class="num">5</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">102.4s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-61C9DB5B8E-20</td><td>L2</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">85.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-651F9850BD-65</td><td>L2</td><td>工具/检索</td><td class="num">7</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">101.5s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-71AD8A6F0F-90</td><td>L2</td><td>工具/检索</td><td class="num">8</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">144.7s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-73EF6F232F-12</td><td>L2</td><td>工具/检索</td><td class="num">5</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">128.8s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-795843D739-140</td><td>L2</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">43.4s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-7A968F11CA-78</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">75.0s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-7B3247F387-152</td><td>L2</td><td>工具/检索</td><td class="num">8</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">74.4s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-7BCB25921A-163</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">49.9s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-7CACA654BB-114</td><td>L2</td><td>工具/检索</td><td class="num">9</td><td>是</td><td>FAIL</td><td>格式正确·答错</td><td class="num">94.4s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-835D524565-23</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">46.3s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-8621E9AB49-06</td><td>L2</td><td>工具/检索</td><td class="num">5</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">41.6s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-8A931BE013-110</td><td>L2</td><td>工具/检索</td><td class="num">8</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">157.1s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-900D36A41A-79</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">59.4s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-917C306D17-119</td><td>L2</td><td>工具/检索</td><td class="num">5</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">58.0s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-92084AD36F-145</td><td>L2</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">27.0s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-922C7C2EB3-18</td><td>L2</td><td>工具/检索</td><td class="num">9</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">62.1s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-9927621865-135</td><td>L2</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">46.1s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-997E451EA4-146</td><td>L2</td><td>工具/检索</td><td class="num">9</td><td>是</td><td>FAIL</td><td>格式正确·答错</td><td class="num">66.4s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-A24CD0D463-147</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">63.5s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-A55674DE71-96</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>是</td><td>FAIL</td><td>格式正确·答错</td><td class="num">71.5s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-AF8D367FA4-21</td><td>L2</td><td>工具/检索</td><td class="num">21</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">115.3s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-AFC60AC21C-04</td><td>L2</td><td>工具/检索</td><td class="num">5</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">83.5s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-B8EC94EF58-136</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">49.3s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-BA905972AF-131</td><td>L2</td><td>工具/检索</td><td class="num">12</td><td>是</td><td>FAIL</td><td>格式正确·答错</td><td class="num">87.6s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-C82F0D2523-158</td><td>L2</td><td>工具/检索</td><td class="num">19</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">74.9s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-CDE2FC18E5-17</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">57.5s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-CE4328EFD6-151</td><td>L2</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">66.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-D0D36F0E9E-08</td><td>L2</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">52.8s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-D4047A9677-75</td><td>L2</td><td>工具/检索</td><td class="num">7</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">96.0s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-D514CB126F-81</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">82.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-D946934A71-44</td><td>L2</td><td>工具/检索</td><td class="num">7</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">98.7s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-DECF274A1E-16</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">82.1s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-E424150204-164</td><td>L2</td><td>工具/检索</td><td class="num">8</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">135.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-E61841D06E-66</td><td>L2</td><td>工具/检索</td><td class="num">35</td><td>是</td><td>FAIL</td><td>agent 非零退出</td><td class="num">625.1s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-F1DD5ECD95-25</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">70.8s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-F805C6EA41-160</td><td>L2</td><td>工具/检索</td><td class="num">14</td><td>是</td><td>FAIL</td><td>agent 非零退出</td><td class="num">87.3s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-FBC1201B32-67</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">132.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-FDF9B4148A-126</td><td>L2</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">104.0s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-FFAAA609A8-50</td><td>L2</td><td>工具/检索</td><td class="num">23</td><td>是</td><td>FAIL</td><td>格式正确·答错</td><td class="num">225.1s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-2FE3E922F4-154</td><td>L3</td><td>工具/检索</td><td class="num">3</td><td>否</td><td>PASS</td><td>通过</td><td class="num">30.1s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-54C09F1F93-99</td><td>L3</td><td>工具/检索</td><td class="num">15</td><td>否</td><td>PASS</td><td>通过</td><td class="num">159.4s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-7DC365C283-103</td><td>L3</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>PASS</td><td>通过</td><td class="num">71.5s</td></tr>
+<tr class="ok"><td class="mono">GAIA-VAL-FD54682820-139</td><td>L3</td><td>工具/检索</td><td class="num">22</td><td>是</td><td>PASS</td><td>通过</td><td class="num">112.8s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-1452E0A5C2-54</td><td>L3</td><td>工具/检索</td><td class="num">7</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">55.5s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-14E82626D2-01</td><td>L3</td><td>工具/检索</td><td class="num">7</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">76.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-177595B1E9-40</td><td>L3</td><td>工具/检索</td><td class="num">26</td><td>是</td><td>FAIL</td><td>格式正确·答错</td><td class="num">194.9s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-1DFBF5E057-144</td><td>L3</td><td>工具/检索</td><td class="num">8</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">95.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-56E3996E7C-125</td><td>L3</td><td>工具/检索</td><td class="num">15</td><td>是</td><td>FAIL</td><td>agent 非零退出</td><td class="num">168.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-601807D0A1-121</td><td>L3</td><td>工具/检索</td><td class="num">11</td><td>是</td><td>FAIL</td><td>格式正确·答错</td><td class="num">72.9s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-7072F2B615-15</td><td>L3</td><td>工具/检索</td><td class="num">8</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">162.9s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-7511E4BEF5-91</td><td>L3</td><td>工具/检索</td><td class="num">8</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">93.6s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-8A0A2DA816-124</td><td>L3</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">119.6s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-903D4B8158-87</td><td>L3</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">105.1s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-9907C9D945-112</td><td>L3</td><td>工具/检索</td><td class="num">6</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">49.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-BC6470EAA0-59</td><td>L3</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">66.6s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-C672647A15-101</td><td>L3</td><td>工具/检索</td><td class="num">14</td><td>是</td><td>FAIL</td><td>agent 非零退出</td><td class="num">70.4s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-C7826A08C7-05</td><td>L3</td><td>工具/检索</td><td class="num">4</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">63.4s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-CC26476DA4-94</td><td>L3</td><td>工具/检索</td><td class="num">6</td><td>是</td><td>FAIL</td><td>格式正确·答错</td><td class="num">79.4s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-D438B83566-37</td><td>L3</td><td>工具/检索</td><td class="num">8</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">189.9s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-E27FCD4049-61</td><td>L3</td><td>工具/检索</td><td class="num">10</td><td>是</td><td>FAIL</td><td>格式正确·答错</td><td class="num">99.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-E2E53DB716-70</td><td>L3</td><td>工具/检索</td><td class="num">5</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">73.5s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-F194BD939A-156</td><td>L3</td><td>工具/检索</td><td class="num">7</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">135.0s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-F4E4A88C05-64</td><td>L3</td><td>工具/检索</td><td class="num">19</td><td>否</td><td>FAIL</td><td>格式正确·答错</td><td class="num">218.3s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-F61011CDC2-89</td><td>L3</td><td>工具/检索</td><td class="num">7</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">121.2s</td></tr>
+<tr class="bad"><td class="mono">GAIA-VAL-FA182D1263-76</td><td>L3</td><td>工具/检索</td><td class="num">5</td><td>否</td><td>FAIL</td><td>未产出 FINAL ANSWER</td><td class="num">80.8s</td></tr>
+</tbody></table>
+<p class="note">数据：<a href="nullius-gaia-165-20261118.json">nullius-gaia-165-20261118.json</a> · 只有 task id、bucket、耗时与 GAIA 标注，无题目/答案/对话。latency p50 70.8s / p95 193.6s。</p>
+<hr style="border:0;border-top:1px solid var(--line);margin:34px 0 8px">
+</div>
+
 <div id="hive-run"><h2>2026-11-17 · Hive Home 协议（本轮）</h2>
 <p class="meta" id="hive-meta">加载中…</p>
 <p class="note" style="border-left:3px solid var(--skip);padding-left:10px">⚠ 本轮与下方封盘基线<b>不同源</b>（镜像 / 客户端 / 协议三项都不同）。三列分母各不相同，<b>只允许纵向同列对比，不允许横向跨列相减</b>。</p>
