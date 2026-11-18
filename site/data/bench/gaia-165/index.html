@@ -22,7 +22,56 @@ tr.ok td:nth-child(6){color:var(--ok)}tr.bad td:nth-child(6){color:var(--bad)}tr
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}
 </style></head><body><main>
 <a href="../../../">← DigitalMate 看板</a>
-<h1>GAIA validation 165 · 全量</h1>
+<h1>GAIA validation 165 · 全量（两轮）</h1>
+<div id="hive-run"><h2>2026-11-17 · Hive Home 协议（本轮）</h2>
+<p class="meta" id="hive-meta">加载中…</p>
+<p class="note" style="border-left:3px solid var(--skip);padding-left:10px">⚠ 本轮与下方封盘基线<b>不同源</b>（镜像 / 客户端 / 协议三项都不同）。三列分母各不相同，<b>只允许纵向同列对比，不允许横向跨列相减</b>。</p>
+<div id="hive-body"></div>
+<hr style="border:0;border-top:1px solid var(--line);margin:34px 0 8px">
+<h2>封盘基线 · 2026-11-11 · legacy 协议（以下为原页面）</h2></div>
+<script>
+(function(){
+  var S={pass:'通过',wrong:'格式正确·答错',prose:'未按格式作答',no_bee_reply:'派单无回（Bee 运行时）',reply_failed:'回合失败',no_reply:'无响应'};
+  var B={pass:'ok',wrong:'bad',prose:'bad',no_bee_reply:'bad',reply_failed:'bad',no_reply:'bad'};
+  fetch('run-hive-20261117.json').then(function(r){return r.json()}).then(function(d){
+    var t=d.tasks,n=t.length,p=t.filter(function(x){return x.v==='PASS'}).length;
+    var mk=t.filter(function(x){return x.v==='PASS'||x.k==='wrong'||x.k==='prose'?false:x.k==='wrong'}).length;
+    var m=d.meta;
+    document.getElementById('hive-meta').innerHTML='2026-11-17 18:34 → 19:21 (Asia/Shanghai) · 单 trial · 4 副本并行（各自独立工作区）· 协议 <code>'+m.protocol+'</code> · 每任务上限 '+m.cap+'<br>client <code>'+m.client+'</code> · image tag <code>'+m.image_tag+'</code> · 实际拉取 digest <code>'+m.image_digest+'</code>';
+    var answered=t.filter(function(x){return x.k==='pass'||x.k==='wrong'||x.k==='prose'}).length;
+    var scorable=t.filter(function(x){return x.k==='pass'||x.k==='wrong'}).length;
+    function pc(a,b){return b?(a/b*100).toFixed(1)+'%':'—'}
+    var h='<h3>与封盘基线并排（三列口径）</h3><table><thead><tr><th>口径</th><th class="num">封盘基线</th><th class="num">本轮 Hive</th><th>分母说明</th></tr></thead><tbody>';
+    h+='<tr><td>raw</td><td class="num">95/165 = 57.6%</td><td class="num"><b>'+p+'/165 = '+pc(p,165)+'</b></td><td>全部 165 条任务</td></tr>';
+    h+='<tr><td>answered</td><td class="num">95/131 = 72.5%</td><td class="num"><b>'+p+'/'+answered+' = '+pc(p,answered)+'</b></td><td>给出任何文本的（本轮的判分作答 + 散文作答）</td></tr>';
+    h+='<tr><td><b>scorable</b></td><td class="num"><b>95/129 = 73.6%</b></td><td class="num"><b>'+p+'/'+scorable+' = '+pc(p,scorable)+'</b></td><td>带 <code>Final answer:</code> 行且真正判过；<b>不含</b>散文作答</td></tr>';
+    h+='</tbody></table><p class="note">Headline：scorable <b>73.6% → '+pc(p,scorable)+'</b>（'+(pc(p,scorable))+'）。raw 一列含产品没给回答的任务，answered 一列把散文算作答，三者不可混用，也不可跨列相减。</p>';
+    var cnt={};t.forEach(function(x){cnt[x.k]=(cnt[x.k]||0)+1});
+    h+='<h3>失败构成（互不重叠，修复路径不同）</h3><table><thead><tr><th>原因</th><th class="num">条数</th><th>归属 / 修复路径</th></tr></thead><tbody>';
+    [['no_bee_reply','派单后 Bee 永不回','产品运行时：Bee-only runtime 退出后 Run 无法收敛（#1832）'],
+     ['reply_failed','Beebou 回合失败','产品：回合级失败'],
+     ['no_reply','完全无响应','产品：回合超时'],
+     ['prose','未按格式作答（题面已要求最后一行）','产品：输出约束 / 指令遵循'],
+     ['wrong','格式正确但答错','产品：缺检索与读文件能力']].forEach(function(r){
+      h+='<tr class="bad"><td>'+r[1]+'</td><td class="num">'+(cnt[r[0]]||0)+'</td><td>'+r[2]+'</td></tr>'});
+    h+='<tr class="ok"><td>通过</td><td class="num">'+p+'</td><td>—</td></tr></tbody></table>';
+    h+='<p class="note">「未按格式」与「格式正确但答错」必须分开计数：前者靠输出约束能修，后者只能补检索能力。</p>';
+    h+='<h3>按难度 / 能力类型</h3><table><thead><tr><th>分组</th><th class="num">任务</th><th class="num">通过</th><th class="num">raw</th></tr></thead><tbody>';
+    [['lv','Level'],['t','能力类型']].forEach(function(g){
+      var vals={};t.forEach(function(x){vals[x[g[0]]]=1});
+      Object.keys(vals).sort().forEach(function(v){
+        var sel=t.filter(function(x){return String(x[g[0]])===String(v)}),pp=sel.filter(function(x){return x.v==='PASS'}).length;
+        h+='<tr><td>'+(g[0]==='lv'?'L'+v:v)+'</td><td class="num">'+sel.length+'</td><td class="num">'+pp+'/'+sel.length+'</td><td class="num">'+pc(pp,sel.length)+'</td></tr>'});
+    });
+    h+='</tbody></table><h3>逐条结果（165）</h3><table><thead><tr><th>task</th><th>难度</th><th>类型</th><th class="num">步数</th><th>附件</th><th>结果</th><th>归因</th><th class="num">时长</th></tr></thead><tbody>';
+    t.slice().sort(function(a,b){return (a.lv-b.lv)||(a.v===b.v?0:a.v==='PASS'?-1:1)||a.i.localeCompare(b.i)}).forEach(function(x){
+      h+='<tr class="'+B[x.k]+'"><td class="mono">'+x.i+'</td><td>L'+x.lv+'</td><td>'+x.t+'</td><td class="num">'+(x.s==null?'—':x.s)+'</td><td>'+(x.f?'是':'否')+'</td><td>'+x.v+'</td><td>'+S[x.k]+'</td><td class="num">'+(x.ms?(x.ms/1000).toFixed(1)+'s':'—')+'</td></tr>'});
+    h+='</tbody></table><p class="note">数据：<a href="run-hive-20261117.json">run-hive-20261117.json</a> · 逐条 transcript 与 grader 输出保存在 bench-ops，未发布。</p>';
+    document.getElementById('hive-body').innerHTML=h;
+  }).catch(function(e){document.getElementById('hive-body').textContent='数据加载失败：'+e;});
+})();
+</script>
+
 <p class="meta">2026-11-10 21:34 → 2026-11-11 08:09 (Asia/Shanghai) · 单 trial · 集群内专用后端 · tag <code>sealed/gaia-98e13bf8</code></p>
 <p class="meta">swr.ap-southeast-1.myhuaweicloud.com/openjiuwen-online-test/digitalmate@sha256:b8e327b774f9ba22e3c0cc2ecc9006c51796602f1bc161bc99dde7adedfb8efe</p>
 
