@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-15T02:05:53.916Z",
+  "updatedAt": "2026-11-18T17:01:17.913Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -295,6 +295,158 @@
     }
   ],
   "runs": [
+    {
+      "runId": 44347574174,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44347574174",
+      "createdAt": "2026-11-18T16:28:07Z",
+      "headSha": "71bb1ee07b51",
+      "conclusion": "failure",
+      "st": {
+        "runId": "ST-1795019308403-59c76b",
+        "status": "failed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "reset_detached_recovery [failed]: [ASSERT_MISMATCH] A submission/answer/reset was duplicated or a recovery send was missing"
+        ],
+        "liveWire": [],
+        "component": [],
+        "cases": [
+          {
+            "name": "real_model_text_reply",
+            "key": "text",
+            "title": "文本回复",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 8253,
+            "stage": "validate-text",
+            "detail": "Reply marker verified"
+          },
+          {
+            "name": "real_model_txt_download_and_content",
+            "key": "text-file",
+            "title": "文本生成 TXT 并下载",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 16309,
+            "stage": "validate-file",
+            "detail": "Downloaded TXT exact content verified: ST-1795019308403-59c76b.txt"
+          },
+          {
+            "name": "real_model_multi_turn",
+            "key": "multi",
+            "title": "三轮对话与上下文更新",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 42813,
+            "stage": "validate-context",
+            "detail": "Three turns retained the random code and updated quantity"
+          },
+          {
+            "name": "real_model_file_to_text",
+            "key": "file-text",
+            "title": "上传文件并提取文本",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 11129,
+            "stage": "validate-file-text",
+            "detail": "Uploaded source was referenced and hidden fixture values extracted"
+          },
+          {
+            "name": "real_model_file_to_file",
+            "key": "file-file",
+            "title": "上传 CSV 并生成转换文件",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 24345,
+            "stage": "validate-file",
+            "detail": "Real CSV uploaded, transformed, downloaded and both rows checked"
+          },
+          {
+            "name": "real_model_structured_choice",
+            "key": "choice",
+            "title": "结构化选项回答并继续任务",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 11095,
+            "stage": "validate-choice",
+            "detail": "Real pending question, selected B through product answer flow, same task resumed and verified"
+          },
+          {
+            "name": "session_isolation_parallel",
+            "key": "session-isolation-parallel",
+            "title": "双会话并发隔离",
+            "coverageId": "CON-01",
+            "status": "passed",
+            "elapsedMs": 13071,
+            "stage": "parallel-verify-history",
+            "detail": "Two real concurrent room submissions (shared transport); B completed first; each durable history and event-driven production projection contained only its own marker"
+          },
+          {
+            "name": "reset_detached_recovery",
+            "key": "reset-detached-recovery",
+            "title": "独立房间 reset/detached 与真实断链恢复",
+            "coverageId": "REC-03",
+            "status": "failed",
+            "elapsedMs": 46705,
+            "stage": "wait-task",
+            "detail": "[ASSERT_MISMATCH] A submission/answer/reset was duplicated or a recovery send was missing"
+          },
+          {
+            "name": "attachment_metadata_conflict",
+            "key": "attachment-metadata-conflict",
+            "title": "附件元数据冲突与真实云端对照",
+            "coverageId": "ATT-01",
+            "status": "passed",
+            "elapsedMs": 14588,
+            "stage": "wait-task",
+            "detail": "Extension/magic rejection had zero socket calls; derived MIME, complete PNG and hidden TXT value verified against real cloud"
+          },
+          {
+            "name": "attachment_corrupt_recovery",
+            "key": "attachment-corrupt-recovery",
+            "title": "损坏图片与文本恢复",
+            "coverageId": "ATT-02",
+            "status": "passed",
+            "elapsedMs": 16738,
+            "stage": "wait-task",
+            "detail": "Zero-byte, wrong-signature and truncated PNG paths checked; same-room text completed afterwards"
+          },
+          {
+            "name": "attachment_image_understanding",
+            "key": "attachment-image-understanding",
+            "title": "真实华为 HDR/MPF 相机 JPG 原图识别",
+            "coverageId": "ATT-03",
+            "status": "passed",
+            "elapsedMs": 25297,
+            "stage": "wait-task",
+            "detail": "Real Huawei HDR/MPF JPEG uploaded through the production helper and recognized as HONOR"
+          },
+          {
+            "name": "skill_default_generation",
+            "key": "skill-default-generation",
+            "title": "默认生成技能：Word / Excel / PPT / PDF 各交付一个文件",
+            "coverageId": "SKL-01",
+            "status": "passed",
+            "elapsedMs": 199846,
+            "stage": "wait-task",
+            "detail": "Default generation skills verified: Word, Excel, PPT and PDF each delivered one artifact (4 turns)"
+          },
+          {
+            "name": "skill_default_parsing",
+            "key": "skill-default-parsing",
+            "title": "默认解析技能：文本 PDF 提取与 CSV 对账单合计",
+            "coverageId": "SKL-02",
+            "status": "passed",
+            "elapsedMs": 49325,
+            "stage": "wait-task",
+            "detail": "Default parsing skills verified: text PDF extraction and CSV statement total returned every expected marker (2 turns)"
+          }
+        ]
+      }
+    },
     {
       "runId": 43646577627,
       "attempt": 1,
