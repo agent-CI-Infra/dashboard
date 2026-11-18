@@ -35,7 +35,6 @@ tr.ok td:nth-child(6){color:var(--ok)}tr.bad td:nth-child(6){color:var(--bad)}tr
   var B={pass:'ok',wrong:'bad',prose:'bad',no_bee_reply:'bad',reply_failed:'bad',no_reply:'bad'};
   fetch('run-hive-20261117.json').then(function(r){return r.json()}).then(function(d){
     var t=d.tasks,n=t.length,p=t.filter(function(x){return x.v==='PASS'}).length;
-    var mk=t.filter(function(x){return x.v==='PASS'||x.k==='wrong'||x.k==='prose'?false:x.k==='wrong'}).length;
     var m=d.meta;
     document.getElementById('hive-meta').innerHTML='2026-11-17 18:34 → 19:21 (Asia/Shanghai) · 单 trial · 4 副本并行（各自独立工作区）· 协议 <code>'+m.protocol+'</code> · 每任务上限 '+m.cap+'<br>client <code>'+m.client+'</code> · image tag <code>'+m.image_tag+'</code> · 实际拉取 digest <code>'+m.image_digest+'</code>';
     var answered=t.filter(function(x){return x.k==='pass'||x.k==='wrong'||x.k==='prose'}).length;
@@ -45,7 +44,7 @@ tr.ok td:nth-child(6){color:var(--ok)}tr.bad td:nth-child(6){color:var(--bad)}tr
     h+='<tr><td>raw</td><td class="num">95/165 = 57.6%</td><td class="num"><b>'+p+'/165 = '+pc(p,165)+'</b></td><td>全部 165 条任务</td></tr>';
     h+='<tr><td>answered</td><td class="num">95/131 = 72.5%</td><td class="num"><b>'+p+'/'+answered+' = '+pc(p,answered)+'</b></td><td>给出任何文本的（本轮的判分作答 + 散文作答）</td></tr>';
     h+='<tr><td><b>scorable</b></td><td class="num"><b>95/129 = 73.6%</b></td><td class="num"><b>'+p+'/'+scorable+' = '+pc(p,scorable)+'</b></td><td>带 <code>Final answer:</code> 行且真正判过；<b>不含</b>散文作答</td></tr>';
-    h+='</tbody></table><p class="note">Headline：scorable <b>73.6% → '+pc(p,scorable)+'</b>（'+(pc(p,scorable))+'）。raw 一列含产品没给回答的任务，answered 一列把散文算作答，三者不可混用，也不可跨列相减。</p>';
+    h+='</tbody></table><p class="note">Headline：scorable <b>73.6% → '+pc(p,scorable)+'</b>（'+(scorable?('−'+(73.6-p/scorable*100).toFixed(1)+' pt'):'—')+'）。raw 一列含产品没给回答的任务，answered 一列把散文算作答，三者不可混用，也不可跨列相减。</p>';
     var cnt={};t.forEach(function(x){cnt[x.k]=(cnt[x.k]||0)+1});
     h+='<h3>失败构成（互不重叠，修复路径不同）</h3><table><thead><tr><th>原因</th><th class="num">条数</th><th>归属 / 修复路径</th></tr></thead><tbody>';
     [['no_bee_reply','派单后 Bee 永不回','产品运行时：Bee-only runtime 退出后 Run 无法收敛（#1832）'],
