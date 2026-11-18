@@ -1,0 +1,31 @@
+{
+ "runs": [
+  {
+   "id": "nullius",
+   "label": "2026-11-18 · Nullius 标准 · 容器后端（最新）",
+   "file": "nullius-gaia-165-20261118.json",
+   "window": "2026-11-18 21:01 → 2026-11-18 22:02 (Asia/Shanghai)",
+   "note": "Nullius · 单 trial · 4 并发 · DeepSeek-V4.1-Flash-1017",
+   "raw": "55/165",
+   "rate": 0.333
+  },
+  {
+   "id": "baseline",
+   "label": "2026-11-11 · 封盘基线 · legacy 协议",
+   "file": "gaia-165.json",
+   "window": "2026-11-10 21:34 → 2026-11-11 08:09 (Asia/Shanghai)",
+   "note": "k8s 专用后端 · 单 trial",
+   "raw": "95/165",
+   "rate": 0.576
+  },
+  {
+   "id": "hive",
+   "label": "2026-11-17 · Hive Home 协议",
+   "file": "hive-20261117-v2.json",
+   "window": "2026-11-17 18:34 → 19:21 (Asia/Shanghai)",
+   "note": "Hive Home · 4 副本并行",
+   "raw": "17/165",
+   "rate": 0.103
+  }
+ ]
+}
