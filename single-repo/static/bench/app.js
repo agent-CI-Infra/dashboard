@@ -319,6 +319,10 @@
       try {
         const res = await fetch(pick.base + run.file, { cache: 'no-store' })
         if (!res.ok) throw new Error(run.file + ' ' + res.status)
+        const det = $('#gaia-details')
+        if (det && det.open) det.open = false      // a stale table must not survive a switch
+        const table = $('#gaia-tasks')
+        if (table) table.innerHTML = ''
         renderGaia(await res.json())
         const meta = $('#gaia-meta')
         if (meta) meta.textContent = [run.window, run.note].filter(Boolean).join(' · ')
