@@ -8,6 +8,8 @@ on:
       - scripts/collect-production-kube-traces.py
       - scripts/kube-workspace-remote.py
       - scripts/collect-cloud-request-metrics.py
+      - scripts/collect-sfs-trajectory-archive.py
+      - scripts/sfs-trajectory-remote.py
   workflow_dispatch:
     inputs:
       validate_only:

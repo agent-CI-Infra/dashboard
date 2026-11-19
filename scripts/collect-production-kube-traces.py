@@ -116,6 +116,9 @@ def collect_workspaces(operation, names, binding_count, errors):
     result['binding_count'] = binding_count
     result['errors'] = dict(collections.Counter(result.get('errors', {})) + errors)
     result['collection_source'] = 'kubernetes_shared_workspace'
+    if 'request_inventory' in result:
+        result['request_inventory'].update(binding_count=binding_count, read_log_count=result['read_log_count'],
+                                           errors=result['errors'])
     if result['errors']:
         for day in result.get('request_daily_metrics', []):
             day['partial'] = True

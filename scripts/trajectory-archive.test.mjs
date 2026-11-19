@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {selectTraces, coverageText, detailPath, spanBar, PAGE_SIZE} from '../single-repo/static/production-metrics/trajectory-archive.js';
+import {selectTraces, coverageText, detailPath, spanBar, reconciliationHtml, PAGE_SIZE} from '../single-repo/static/production-metrics/trajectory-archive.js';
 
 test('full archive search covers non-slow requests and every page', () => {
   const rows=Array.from({length:251},(_,i)=>({key:String(i),request_id:`digitalmate-${i}`,lifecycle:'final',start_time:'2026-11-11T17:00:00Z'}));
@@ -24,4 +24,49 @@ test('timeline clips numeric intervals and only uses fixed colors', () => {
   assert.match(html,/left:50%;width:50%/);
   assert.equal(spanBar({start_ms:NaN,duration_ms:1},100),'');
   assert.doesNotMatch(spanBar({start_ms:0,duration_ms:1,kind:'evil'},100),/evil/);
+});
+
+test('reconciliation shows missing requests even when there is no archived row', () => {
+  const time = '2026-11-18T16:00:00Z';
+  const doc = {
+    traces: [{request_id: 'digitalmate-present', request_ids: [], key: 'a'.repeat(64), start_time: time}],
+    request_reconciliation: {
+      schema: 'digitalmate/request-reconciliation@1', state: 'available',
+      window: {start: '2026-11-13', end: '2026-11-19'}, binding_count: 194, read_log_count: 193,
+      request_observed_at: time, archive_observed_at: time, errors: {missing: 1},
+      requests: [
+        {request_id: 'digitalmate-present', start_time: time, match_state: 'matched', log_state: 'finished', native_lifecycle: 'final'},
+        {request_id: 'digitalmate-missing', start_time: time, match_state: 'missing', log_state: 'unfinished'},
+        {request_id: 'digitalmate-pending', start_time: time, match_state: 'pending_archive', log_state: 'finished'},
+      ],
+    },
+  };
+  const html = reconciliationHtml(doc, '', '2026-11-19');
+  assert.match(html, /请求日志 3 条/);
+  assert.match(html, /已结束 2，未见结束日志 1/);
+  assert.match(html, /未归档 1/);
+  assert.match(html, /等待采集 1/);
+  assert.match(html, /工作区日志覆盖 193\/194 · 部分覆盖/);
+  assert.match(html, /digitalmate-missing/);
+  assert.match(reconciliationHtml(doc, 'digitalmate-missing'), /请求日志 1 条/);
+  assert.doesNotMatch(reconciliationHtml(doc, 'digitalmate-missing'), /digitalmate-pending/);
+  assert.match(reconciliationHtml(doc, '', '2026-11-12'), /超出逐请求日志对账范围/);
+  assert.match(reconciliationHtml({}), /尚未采集/);
+});
+
+test('reconciliation escapes identifiers and retains pending requests beyond one page', () => {
+  const time = '2026-11-19T01:00:00Z';
+  const doc = {traces: [], request_reconciliation: {
+    schema: 'digitalmate/request-reconciliation@1', state: 'available',
+    window: {start: '2026-11-19', end: '2026-11-19'},
+    binding_count: 1, read_log_count: 1, errors: {},
+    requests: Array.from({length: 101}, (_, number) => ({
+      request_id: `digitalmate-${number}<script>`, start_time: time,
+      log_state: 'unfinished', match_state: 'missing',
+    })),
+  }};
+  const html = reconciliationHtml(doc);
+  assert.match(html, /digitalmate-100&lt;script&gt;/);
+  assert.doesNotMatch(html, /<script>/);
+  assert.match(html, /未归档 101/);
 });
