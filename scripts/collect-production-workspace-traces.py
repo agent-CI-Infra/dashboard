@@ -702,6 +702,11 @@ def request_anomalies(grouped, telemetry, observed_at, incomplete=False, today=N
     return result
 
 
+def slow_trace_count(population):
+    """Daily diagnostic rows: rounded-up 10%, at least 10 when available."""
+    return min(population, max((population + 9) // 10, 10))
+
+
 def collect():
     if not TOKEN:
         raise SystemExit('ADX_TOKEN required')
@@ -761,8 +766,8 @@ def collect():
         if not records or date < trace_cutoff:
             continue
         records.sort(key=lambda item:item[2]['gateway'],reverse=True)
-        slow_count = math.ceil(len(records) * .05)
-        slow = records[:min(slow_count, 50)]
+        slow_count = slow_trace_count(len(records))
+        slow = records[:slow_count]
         chosen.extend(slow)
         days.append({'date': date, 'anomaly': {'latency': {'n':len(records),'slow_count':slow_count,
             'slow_requests':[row for _,_,row in slow]}, 'timeouts': anomalies[date]['timeouts']}})
@@ -796,7 +801,9 @@ def collect():
               'answer_workspaces_complete':answer_coverage['complete'],
               'answer_workspaces_partial':answer_coverage['partial'],
               'native_trace_count':native_count,
-              'trace_request_limit':MAX_TRACE_REQUESTS,'days':days}
+              'trace_request_limit':MAX_TRACE_REQUESTS,
+              'slow_trace_sampling': {'ratio': .1, 'minimum': 10, 'population': 'finished_gateway_requests'},
+              'days':days}
     print('output: days',len(days),'slow requests',sum(len(d['anomaly']['latency']['slow_requests']) for d in days),
           'requests with tool events',sum(bool(row.get('tool_events')) for d in days for row in d['anomaly']['latency']['slow_requests']),flush=True)
     return output

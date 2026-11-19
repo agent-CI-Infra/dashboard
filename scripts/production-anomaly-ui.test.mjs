@@ -33,6 +33,15 @@ const day = (date, n, outliers, max, threshold) => ({ date, partial: true, anoma
   cohort: { normal: n - outliers, outliers, phases: { first_token: { normal: { n: n - outliers, mean: 10 }, outlier: { n: outliers, mean: max / 2 } } } },
 } });
 
+test('expanded diagnostic samples do not enlarge the anomaly fallback tail', () => {
+  const html = ctx.render({days:[{date:'2026-11-19'}], cloud_trace_collection:{days:[{
+    date:'2026-11-19', anomaly:{latency:{n:16,slow_count:10,slow_requests:
+      Array.from({length:10},(_,i)=>({request_id:`quota-${i}`,gateway:i+1}))}},
+  }]}});
+  assert.match(html,/quota-9/);
+  assert.doesNotMatch(html,/quota-8/);
+});
+
 test('anomaly cards use the full selected range and weighted phase populations', () => {
   const days = [day('2026-11-10', 100, 20, 1000, 100), day('2026-11-11', 10, 1, 200, 200)];
   const out = ctx.summary(days);
