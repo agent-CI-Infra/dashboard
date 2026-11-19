@@ -4,6 +4,9 @@
 #trajectory-archive select { border: 1px solid var(--border, #dce1e9); border-radius: 6px; background: var(--card, #fff); color: inherit; padding: 8px; }
 #trajectory-archive td { vertical-align: middle; }
 #archive-detail { margin-top: 24px; }
+.archive-reconciliation { margin: 16px 0; }
+.archive-reconciliation-details summary { cursor: pointer; }
+.archive-reconciliation-details .table-wrap { max-height: 400px; overflow: auto; }
 .archive-track { display: block; position: relative; height: 14px; min-width: 160px; background: #8593a71a; border-radius: 3px; }
 .archive-bar { display: block; position: absolute; height: 100%; min-width: 2px; border-radius: 3px; }
 @media (max-width: 700px) { #archive-form { flex-wrap: wrap; } #archive-form input[type=search] { flex-basis: 100%; } }

@@ -16,6 +16,7 @@ sfs = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(sfs)
 SCHEMA = 'digitalmate/trajectory-archive@1'
 DETAIL_PAGE = 500
+CST = dt.timezone(dt.timedelta(hours=8))
 
 
 def write_json(path, data):
@@ -251,6 +252,104 @@ def attach_archived_profiles(metrics, index, output):
     return metrics
 
 
+def reconcile_requests(metrics, index):
+    """Join every observed request start to the archive, including unfinished requests.
+
+    These are workspace dispatch logs. Requests rejected before workspace dispatch
+    require an ingress log source, so this inventory cannot assert global coverage.
+    """
+    collection = metrics.get('cloud_trace_collection') or {}
+    inventory = collection.get('request_inventory') or {}
+    unavailable = {'state': 'unavailable', 'reason': 'request_inventory_unavailable'}
+    if (inventory.get('schema') != 'digitalmate/request-inventory@1'
+            or inventory.get('source') != 'workspace_request_logs'
+            or inventory.get('generated_at') != collection.get('generated_at')):
+        return unavailable
+    window = inventory.get('window') or {}
+    try:
+        first, last = dt.date.fromisoformat(window['start']), dt.date.fromisoformat(window['end'])
+        if first > last or (last - first).days >= sfs.collector.traces.TRACE_DAYS:
+            return unavailable
+    except (KeyError, TypeError, ValueError):
+        return unavailable
+    requests, invalid = [], 0
+    for row in inventory.get('requests', []):
+        try:
+            start = dt.datetime.fromisoformat(row['start_time'])
+            if (not start.tzinfo or not sfs.collector.traces.REQUEST_ID.fullmatch(row['request_id'])
+                    or row['log_state'] not in ('finished', 'unfinished', 'inconsistent')):
+                raise ValueError('invalid request')
+            date = start.astimezone(CST).date()
+            if not first <= date <= last:
+                continue
+            projected = {key: row[key] for key in ('request_id', 'start_time', 'log_state')}
+            if 'end_time' in row:
+                end = dt.datetime.fromisoformat(row['end_time'])
+                if not end.tzinfo:
+                    raise ValueError('invalid end time')
+                projected['end_time'] = row['end_time']
+            if row.get('stream_status') in ('normal', 'exception', 'cancelled', 'unknown'):
+                projected['stream_status'] = row['stream_status']
+            projected['date'] = date.isoformat()
+            requests.append(projected)
+        except (KeyError, TypeError, ValueError):
+            invalid += 1
+    counts = collections.Counter(row['request_id'] for row in requests)
+    by_request = collections.defaultdict(list)
+    for entry in index['traces']:
+        for rid in set(entry.get('request_ids', [])) | {entry.get('request_id')}:
+            if rid:
+                by_request[rid].append(entry)
+    coverage = index['coverage']
+    archive_pending = bool(coverage['pending_databases'] or coverage['scope_errors']
+                           or coverage['inventory_errors'] or coverage['invalid_records'])
+    for row in requests:
+        candidates = by_request[row['request_id']]
+        row['match_state'] = 'pending_archive' if archive_pending else 'missing'
+        if counts[row['request_id']] > 1 or len(candidates) > 1:
+            row['match_state'] = 'ambiguous'
+        elif candidates:
+            entry = candidates[0]
+            row.update(trace_key=entry['key'], native_lifecycle=entry['lifecycle'],
+                       native_observed_at=entry['observed_at'])
+            row['match_state'] = 'timing_conflict'
+            try:
+                start = dt.datetime.fromisoformat(row['start_time'])
+                native_start = dt.datetime.fromisoformat(entry['start_time'])
+                offset = (native_start - start).total_seconds() * 1000
+                within_end = True
+                if row.get('end_time'):
+                    end = dt.datetime.fromisoformat(row['end_time'])
+                    finish = native_start + dt.timedelta(milliseconds=entry['duration_ms'])
+                    within_end = finish <= end + dt.timedelta(milliseconds=2)
+                if (entry.get('request_id') == row['request_id'] and offset >= -2
+                        and within_end and row['log_state'] in ('finished', 'unfinished')):
+                    row['match_state'] = 'matched'
+            except (KeyError, TypeError, ValueError, OverflowError):
+                pass
+    days = collections.defaultdict(collections.Counter)
+    for row in requests:
+        day = days[row['date']]
+        day['logged_requests'] += 1
+        day['logged_' + row['log_state']] += 1
+        day[row['match_state']] += 1
+    for entry in index['traces']:
+        date = dt.datetime.fromisoformat(entry['start_time']).astimezone(CST).date()
+        if first <= date <= last:
+            day = days[date.isoformat()]
+            day['archived_traces'] += 1
+            ids = set(entry.get('request_ids', [])) | {entry.get('request_id')}
+            if not any(rid in counts for rid in ids):
+                day['native_only'] += 1
+    return {'schema': 'digitalmate/request-reconciliation@1', 'state': 'available',
+            'source': inventory['source'], 'request_observed_at': inventory['generated_at'],
+            'archive_observed_at': index['generated_at'], 'window': window,
+            'binding_count': inventory['binding_count'], 'read_log_count': inventory['read_log_count'],
+            'errors': inventory['errors'], 'invalid_requests': invalid,
+            'days': [{'date': date, **values} for date, values in sorted(days.items())],
+            'requests': sorted(requests, key=lambda row: (row['start_time'], row['request_id']), reverse=True)}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--state', type=Path, required=True)
@@ -274,11 +373,19 @@ def main():
     state, index = merge_batch(state, previous, batch, args.output,
                                {'bindings': count, 'authorized_workspaces': len(names), 'errors': dict(errors)}, now)
     write_json(args.next_state, state)
+    index['request_reconciliation'] = {'state': 'unavailable', 'reason': 'fresh_request_logs_unavailable'}
     if args.metrics:
-        metrics = attach_archived_profiles(load_json(args.metrics, {}), index, args.output)
+        metrics = load_json(args.metrics, {})
+        index['request_reconciliation'] = reconcile_requests(metrics, index)
+        metrics = attach_archived_profiles(metrics, index, args.output)
         write_json(args.metrics, metrics)
         print(json.dumps({'archived_profiles_linked': metrics['cloud_trace_collection']['archived_native_trace_count'],
                           'archive_link_errors': metrics['cloud_trace_collection']['archive_link_errors']}))
+    write_json(args.output / 'index.json', index)
+    reconciliation = index['request_reconciliation']
+    print(json.dumps({'request_reconciliation': {key: reconciliation[key]
+                      for key in ('state', 'days', 'read_log_count', 'binding_count', 'invalid_requests')
+                      if key in reconciliation}}, ensure_ascii=False))
     print(json.dumps(index['coverage'], ensure_ascii=False))
 
 

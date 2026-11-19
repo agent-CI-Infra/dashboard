@@ -193,7 +193,7 @@ def download_log(query):
             raise ValueError('incomplete log response')
 
 
-def read_log(item):
+def read_log(item, *, request_inventory=None):
     query = query_for(item)
     files = listing(query, 'workswarm')
     logfile = next((f for f in files if f.get('name') == 'process.log' and f.get('type') == 'file'), None)
@@ -258,7 +258,16 @@ def read_log(item):
         if marker and span[3] is None and marker.group(1) == 'chat.delta':
             span[3] = ts
     result = []
+    inventory = []
+    trace_cutoff = today - dt.timedelta(days=TRACE_DAYS - 1)
     for rid, (start, end, first, answer, stream_status) in requests.items():
+        if start is not None and trace_cutoff <= dt.datetime.fromtimestamp(start, CST).date() <= today:
+            observed = {'request_id': rid, 'start_time': dt.datetime.fromtimestamp(start, UTC).isoformat(),
+                        'log_state': 'unfinished', 'stream_status': stream_status or 'unknown'}
+            if end is not None:
+                observed['end_time'] = dt.datetime.fromtimestamp(end, UTC).isoformat()
+                observed['log_state'] = 'finished' if end >= start else 'inconsistent'
+            inventory.append(observed)
         if start is None or end is None or end < start:
             continue
         date = dt.datetime.fromtimestamp(start, CST).date()
@@ -287,6 +296,8 @@ def read_log(item):
             if rid in by_id:
                 values['timeout_requests'][rid] = anomaly_request(by_id[rid])
     read_network(query, files, usage, today)
+    if request_inventory is not None:
+        request_inventory.extend(inventory)
     return query, result, 'ok', dict(usage)
 
 
@@ -698,9 +709,11 @@ def collect():
     if not items:
         raise SystemExit('no production bindings')
     snapshots, problems = [], {}
+    inventories = {index: [] for index in range(len(items))}
     usage_by_day = {}
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
-        future_map = {pool.submit(read_log, item): idx for idx, item in enumerate(items)}
+        future_map = {pool.submit(read_log, item, request_inventory=inventories[idx]): idx
+                      for idx, item in enumerate(items)}
         for count, future in enumerate(concurrent.futures.as_completed(future_map), 1):
             idx = future_map[future]
             try:
@@ -773,6 +786,11 @@ def collect():
             row.pop('_native_correlation_conflict', None)
     output = {'schema':'digitalmate/cloud-traces@1','generated_at':generated_at,
               'request_daily_metrics':daily_metrics,
+              'request_inventory': {'schema': 'digitalmate/request-inventory@1',
+                  'generated_at': generated_at, 'source': 'workspace_request_logs',
+                  'window': {'start': trace_cutoff, 'end': dt.datetime.now(CST).date().isoformat()},
+                  'binding_count': len(items), 'read_log_count': len(snapshots), 'errors': problems,
+                  'requests': [row for idx, _, _ in snapshots for row in inventories[idx]]},
               'binding_count':len(items),'read_log_count':len(snapshots),'errors':problems,
               'detail_workspaces_complete':details_ok,'detail_workspaces_partial':details_failed,
               'answer_workspaces_complete':answer_coverage['complete'],
