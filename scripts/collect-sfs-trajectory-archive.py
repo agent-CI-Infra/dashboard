@@ -322,6 +322,11 @@ def reconcile_requests(metrics, index):
                     end = dt.datetime.fromisoformat(row['end_time'])
                     finish = native_start + dt.timedelta(milliseconds=entry['duration_ms'])
                     within_end = finish <= end + dt.timedelta(milliseconds=2)
+                    # Cancellation closes the request stream before native cleanup finishes.
+                    if row.get('stream_status') == 'cancelled' and native_start <= end:
+                        within_end = True
+                        if finish > end:
+                            row['cancel_tail_ms'] = round((finish - end).total_seconds() * 1000, 3)
                 if (entry.get('request_id') == row['request_id'] and offset >= -2
                         and within_end and row['log_state'] in ('finished', 'unfinished')):
                     row['match_state'] = 'matched'
@@ -333,6 +338,8 @@ def reconcile_requests(metrics, index):
         day['logged_requests'] += 1
         day['logged_' + row['log_state']] += 1
         day[row['match_state']] += 1
+        if row.get('cancel_tail_ms') and row['match_state'] == 'matched':
+            day['matched_cancel_tail'] += 1
     for entry in index['traces']:
         date = dt.datetime.fromisoformat(entry['start_time']).astimezone(CST).date()
         if first <= date <= last:

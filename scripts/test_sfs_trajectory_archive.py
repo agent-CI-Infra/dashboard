@@ -336,6 +336,21 @@ class RequestReconciliationTests(unittest.TestCase):
         self.index['coverage']['pending_databases'] = 1
         data = archive.reconcile_requests(self.metrics, self.index)
         self.assertEqual(data['requests'][0]['match_state'], 'pending_archive')
+
+    def test_cancelled_stream_can_end_before_native_cleanup_without_losing_its_link(self):
+        self.trace['duration_ms'] = 2500
+        for status in ('normal', 'unknown', 'cancelled'):
+            self.request['stream_status'] = status
+            data = archive.reconcile_requests(self.metrics, self.index)
+            row = data['requests'][0]
+            expected = 'matched' if status == 'cancelled' else 'timing_conflict'
+            self.assertEqual(row['match_state'], expected)
+            if status == 'cancelled':
+                self.assertEqual(row['cancel_tail_ms'], 501)
+                self.assertEqual(data['days'][0]['matched_cancel_tail'], 1)
+        self.trace['start_time'] = '2026-11-18T16:00:03+00:00'
+        row = archive.reconcile_requests(self.metrics, self.index)['requests'][0]
+        self.assertEqual(row['match_state'], 'timing_conflict')
         self.assertNotIn('missing', data['days'][0])
 
     def test_reused_id_conflicting_root_and_wrong_time_never_become_matched(self):

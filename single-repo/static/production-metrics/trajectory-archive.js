@@ -39,7 +39,7 @@ export function reconciliationHtml(doc, query = '', day = '') {
   const ended = requests.filter(row => row.log_state === 'finished').length;
   const unfinished = requests.filter(row => row.log_state === 'unfinished').length;
   const attention = requests.filter(row => row.match_state !== 'matched'
-    || (row.log_state === 'finished' && row.native_lifecycle !== 'final'));
+    || row.cancel_tail_ms > 0 || (row.log_state === 'finished' && row.native_lifecycle !== 'final'));
   const names = {missing: '未归档轨迹', pending_archive: '等待轨迹采集补齐', ambiguous: '请求 ID 关联不唯一', timing_conflict: '请求与轨迹时间待核对'};
   const interval = day || `${data.window.start} 至 ${data.window.end}`;
   const partial = data.read_log_count < data.binding_count || Object.values(data.errors || {}).some(value => value > 0) || data.invalid_requests > 0;
@@ -52,7 +52,10 @@ export function reconciliationHtml(doc, query = '', day = '') {
           <tr>
             <td>${escape(formatTime(row.start_time))}</td>
             <td>${escape(row.request_id)}</td>
-            <td>${escape(row.match_state === 'matched' ? `已关联 · ${statusNames[row.native_lifecycle] || '状态待确认'}` : names[row.match_state] || '待核对')}</td>
+            <td>${escape(row.match_state === 'matched'
+              ? row.cancel_tail_ms > 0 ? `已关联 · 取消后收尾 ${(row.cancel_tail_ms / 1000).toFixed(3)} 秒`
+                : `已关联 · ${statusNames[row.native_lifecycle] || '状态待确认'}`
+              : names[row.match_state] || '待核对')}</td>
             <td>${row.trace_key ? `<button type="button" data-archive-key="${escape(row.trace_key)}">查看轨迹</button>` : ''}</td>
           </tr>`).join('')}
         </tbody>
