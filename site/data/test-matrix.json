@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/test-matrix@1",
- "generatedAt": "2026-11-19T02:50:53.684Z",
+ "generatedAt": "2026-11-19T12:13:12.675Z",
  "source": {
   "repository": "openJiuwen-ai/DigitalMate",
-  "main": "decd0a60",
+  "main": "ca6c13bd",
   "refs": [
    {
     "label": "test/st-complete-coverage",
@@ -84,7 +84,7 @@
   "layers": {
    "UT": {
     "cases": 265,
-    "tests": 3284,
+    "tests": 3293,
     "byStatus": {
      "ci_lane": 265
     },
@@ -94,14 +94,14 @@
     }
    },
    "UT-Server": {
-    "cases": 442,
-    "tests": 5975,
+    "cases": 443,
+    "tests": 5992,
     "byStatus": {
-     "ci_lane": 442
+     "ci_lane": 443
     },
     "bySuite": {},
     "byImpl": {
-     "main": 442
+     "main": 443
     }
    },
    "REG": {
@@ -2325,7 +2325,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 37,
+   "tests": 42,
    "layer": "UT",
    "id": "digitalmate-composer-send.test.mjs",
    "title": "digitalmate",
@@ -3459,7 +3459,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 17,
+   "tests": 20,
    "layer": "UT",
    "id": "digitalmate-session-proximity.test.mjs",
    "title": "digitalmate",
@@ -3984,7 +3984,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 16,
+   "tests": 17,
    "layer": "UT",
    "id": "digitalmate-waiting-reply.test.mjs",
    "title": "digitalmate",
@@ -10221,7 +10221,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 7,
+   "tests": 8,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_hive_bee_product_search.py",
    "title": "test_hive_bee_product_search",
@@ -10872,7 +10872,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 5,
+   "tests": 6,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_hive_connector_accounts.py",
    "title": "test_hive_connector_accounts",
@@ -11628,7 +11628,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 7,
+   "tests": 8,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_hive_mail_read_authority.py",
    "title": "test_hive_mail_read_authority",
@@ -11739,6 +11739,27 @@
    "title": "test_hive_owned_bee_config",
    "module": "services/agent_bridge",
    "file": "harness/personal-agent/services/agent_bridge/tests/test_hive_owned_bee_config.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 14,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_hive_place_lookup.py",
+   "title": "test_hive_place_lookup",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_hive_place_lookup.py",
    "impl": "main",
    "status": "ci_lane",
    "lane": "server-regression.yml"
@@ -17092,7 +17113,7 @@
    "status": "no_result",
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 31,
+   "steps": 33,
    "scoreCriteria": 0
   },
   {
@@ -17267,7 +17288,7 @@
    "status": "no_result",
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 15,
+   "steps": 16,
    "scoreCriteria": 0
   },
   {
@@ -17392,7 +17413,7 @@
    "status": "no_result",
    "progress": "",
    "lane": "nightly.yml · E2E (real device)",
-   "steps": 64,
+   "steps": 68,
    "scoreCriteria": 0
   },
   {
