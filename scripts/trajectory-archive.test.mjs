@@ -70,3 +70,16 @@ test('reconciliation escapes identifiers and retains pending requests beyond one
   assert.doesNotMatch(html, /<script>/);
   assert.match(html, /未归档 101/);
 });
+
+test('cancelled requests show native cleanup after the stream has closed', () => {
+  const time = '2026-11-19T01:00:00Z';
+  const html = reconciliationHtml({traces: [], request_reconciliation: {
+    schema: 'digitalmate/request-reconciliation@1', state: 'available',
+    window: {start: '2026-11-19', end: '2026-11-19'}, binding_count: 1, read_log_count: 1,
+    requests: [{request_id: 'digitalmate-cancelled', start_time: time, log_state: 'finished',
+      native_lifecycle: 'final', match_state: 'matched', cancel_tail_ms: 712.836}],
+  }});
+  assert.match(html, /已关联 1/);
+  assert.match(html, /取消后收尾 0.713 秒/);
+  assert.match(html, /关联待确认 0/);
+});
