@@ -110,9 +110,12 @@ def select_workspaces():
     return sorted(names), len(bindings), errors
 
 
-def collect_workspaces(operation, names, binding_count, errors):
+def collect_workspaces(operation, names, binding_count, errors, *, prefix_cache=False):
     source = (HERE / 'collect-production-workspace-traces.py').read_text(encoding='utf-8')
-    result = operation({'mode': 'collect', 'names': names, 'source': source})
+    command = {'mode': 'collect', 'names': names, 'source': source}
+    if prefix_cache:
+        command['prefix_cache'] = True
+    result = operation(command)
     result['binding_count'] = binding_count
     result['errors'] = dict(collections.Counter(result.get('errors', {})) + errors)
     result['collection_source'] = 'kubernetes_shared_workspace'
