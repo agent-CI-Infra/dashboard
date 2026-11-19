@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/test-matrix@1",
- "generatedAt": "2026-11-19T12:13:12.675Z",
+ "generatedAt": "2026-11-19T21:00:29.501Z",
  "source": {
   "repository": "openJiuwen-ai/DigitalMate",
-  "main": "ca6c13bd",
+  "main": "b63d0621",
   "refs": [
    {
     "label": "test/st-complete-coverage",
@@ -94,14 +94,14 @@
     }
    },
    "UT-Server": {
-    "cases": 443,
-    "tests": 5992,
+    "cases": 444,
+    "tests": 6003,
     "byStatus": {
-     "ci_lane": 443
+     "ci_lane": 444
     },
     "bySuite": {},
     "byImpl": {
-     "main": 443
+     "main": 444
     }
    },
    "REG": {
@@ -10221,7 +10221,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 8,
+   "tests": 10,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_hive_bee_product_search.py",
    "title": "test_hive_bee_product_search",
@@ -10269,6 +10269,27 @@
    "title": "test_hive_bee_runtime_local_tools",
    "module": "services/agent_bridge",
    "file": "harness/personal-agent/services/agent_bridge/tests/test_hive_bee_runtime_local_tools.py",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "server-regression.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 3,
+   "layer": "UT-Server",
+   "id": "services/agent_bridge/tests/test_hive_bee_scheduler_queue_progress.py",
+   "title": "test_hive_bee_scheduler_queue_progress",
+   "module": "services/agent_bridge",
+   "file": "harness/personal-agent/services/agent_bridge/tests/test_hive_bee_scheduler_queue_progress.py",
    "impl": "main",
    "status": "ci_lane",
    "lane": "server-regression.yml"
@@ -11418,7 +11439,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 3,
+   "tests": 4,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_hive_home_quote_frames.py",
    "title": "test_hive_home_quote_frames",
@@ -11502,7 +11523,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 16,
+   "tests": 21,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_hive_home_trial.py",
    "title": "test_hive_home_trial",
