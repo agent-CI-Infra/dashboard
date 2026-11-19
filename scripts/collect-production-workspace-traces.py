@@ -25,6 +25,10 @@ UTC = dt.timezone.utc
 CST = dt.timezone(dt.timedelta(hours=8))
 MAX_LOG = 200_000_000
 MAX_HISTORY = 8_000_000
+MAX_NETWORK_LOG = 8_000_000
+MAX_NETWORK_BYTES = 32_000_000
+NETWORK_FILE = re.compile(r'^client-network-(\d{4}-\d{2}-\d{2})\.jsonl$')
+NETWORK_BUCKETS = ('uplink_send', 'downlink_first_text', 'downlink_terminal')
 MAX_SESSIONS = 25
 MAX_TRACE_REQUESTS = 100
 SUMMARY_DAYS = 30
@@ -39,7 +43,8 @@ USAGE_FIELDS = {key: re.compile(r"['\"]" + key + r"['\"]\s*:\s*([+-]?(?:\d+(?:\.
 
 def new_usage():
     return {'events': 0, 'input': 0, 'output': 0, 'total': 0,
-            'input_samples': 0, 'output_samples': 0, 'total_samples': 0, 'tpot_pairs': []}
+            'input_samples': 0, 'output_samples': 0, 'total_samples': 0, 'tpot_pairs': [],
+            'network': {key: [] for key in NETWORK_BUCKETS}, 'network_partial': False}
 
 
 def record_usage(usage, line):
@@ -78,12 +83,16 @@ def fetch(path, params, *, download=False):
             with OPENER.open(req, timeout=30) as response:
                 if download:
                     length = int(response.headers.get('Content-Length', '0'))
-                    limit = MAX_HISTORY if str(params.get('path', '')).endswith('history.jsonl') else MAX_LOG
+                    filename = str(params.get('path', '')).rsplit('/', 1)[-1]
+                    limit = (MAX_HISTORY if filename == 'history.jsonl' else
+                             MAX_NETWORK_LOG if NETWORK_FILE.fullmatch(filename) else MAX_LOG)
                     if length > limit:
                         raise ValueError('file exceeds bound')
                     body = response.read(limit + 1)
                     if len(body) > limit:
                         raise ValueError('file exceeds bound')
+                    if length and len(body) != length:
+                        raise ValueError('incomplete file response')
                     return body.decode('utf-8', 'replace')
                 return json.load(response)
         except urllib.error.HTTPError as error:
@@ -255,7 +264,94 @@ def read_log(item):
         if 'first_token' in row and 'answer_first' in row and row['answer_first'] >= row['first_token']:
             row['react'] = round(row['answer_first'] - row['first_token'], 1)
         result.append(row)
+    read_network(query, files, usage, today)
     return query, result, 'ok', dict(usage)
+
+
+def read_network(query, files, usage, today):
+    """Pool only clock-validated bridge samples; keep identities private and local.
+
+    The bridge verifies downlink frame pairs before emitting this schema. File
+    dates use the writer's timezone; the record's aware timestamp decides the
+    Shanghai day. Coverage snapshots are cumulative counters, never samples.
+    """
+    first = today - dt.timedelta(days=SUMMARY_DAYS - 1)
+    candidates = []
+    for item in files:
+        match = NETWORK_FILE.fullmatch(str(item.get('name', '')))
+        if not match or item.get('type') != 'file':
+            continue
+        try:
+            date = dt.date.fromisoformat(match.group(1))
+        except ValueError:
+            continue
+        if first - dt.timedelta(days=1) <= date <= today + dt.timedelta(days=1):
+            candidates.append(item)
+    seen, filenames, used, partial = set(), set(), 0, False
+    for item in sorted(candidates, key=lambda item: item['name'], reverse=True):
+        name, size = item['name'], item.get('size')
+        if name in filenames:
+            continue
+        filenames.add(name)
+        if (len(filenames) > SUMMARY_DAYS + 2 or type(size) is not int
+                or size < 0 or size > MAX_NETWORK_LOG or used + size > MAX_NETWORK_BYTES):
+            partial = True
+            continue
+        try:
+            data = fetch('/api/workspace-files', {**query, 'path': 'workswarm/' + name,
+                                                 'action': 'download'}, download=True)
+            used += len(data.encode('utf-8'))
+            if used > MAX_NETWORK_BYTES:
+                partial = True
+                break
+        except (OSError, ValueError, urllib.error.HTTPError):
+            partial = True
+            continue
+        for line in data.splitlines():
+            if len(line) > 8192:
+                continue
+            try:
+                row = json.loads(line)
+                if (not isinstance(row, dict) or row.get('schema') != 'digitalmate-client-network@1'
+                        or row.get('kind') != 'sample' or row.get('bucket') not in NETWORK_BUCKETS):
+                    continue
+                value, error, offset = row.get('ms'), row.get('clock_error_ms'), row.get('clock_offset_ms')
+                if (type(value) is not int or not 0 <= value <= 120_000
+                        or type(error) is not int or not 0 <= error <= 50
+                        or type(offset) is not int or abs(offset) > 86_400_000):
+                    continue
+                timestamp = dt.datetime.fromisoformat(row['t'].replace('Z', '+00:00'))
+                if timestamp.tzinfo is None:
+                    continue
+                day = timestamp.astimezone(CST).date()
+                if not first <= day <= today:
+                    continue
+                rid, bucket = row.get('request_id'), row['bucket']
+                if not isinstance(rid, str) or not 0 < len(rid) <= 200:
+                    continue
+                identity = (bucket, rid)
+                if bucket != 'uplink_send':
+                    task = row.get('task_id') or (rid if row.get('surface') == 'hive_home_response' else None)
+                    execution = row.get('execution_id', '')
+                    server, received = row.get('server_at_ms'), row.get('client_received_at_ms')
+                    if (not isinstance(task, str) or not 0 < len(task) <= 200
+                            or not isinstance(execution, str) or len(execution) > 200
+                            or type(server) is not int or type(received) is not int
+                            or not 0 <= server <= 4_102_444_800_000
+                            or not 0 <= received <= 4_102_444_800_000
+                            or received - offset - server != value):
+                        continue
+                    identity = (bucket, task, execution, server)
+                if identity in seen:
+                    continue
+                seen.add(identity)
+                usage.setdefault(day.isoformat(), new_usage())['network'][bucket].append(value)
+            except (ValueError, TypeError, KeyError, AttributeError, OverflowError):
+                continue
+    if partial:
+        usage.setdefault(today.isoformat(), new_usage())
+        for day in usage.values():
+            day['network_partial'] = True
 
 
 def read_native_trajectory(query, correlation):
@@ -439,6 +535,15 @@ def request_daily_metrics(records, date, generated_at, incomplete, usage=None):
     statuses = collections.Counter(row.get('gateway_stream_status', 'unknown') for _, _, row in records)
     observed = statuses['normal'] + statuses['exception']
     usage = usage or new_usage()
+    network = {}
+    for key in NETWORK_BUCKETS:
+        values = sorted(usage.get('network', {}).get(key, []))
+        network[key] = ({'n': len(values), 'sum': sum(values),
+                         'mean': round(sum(values) / len(values), 1),
+                         'p50': values[math.ceil(.5 * len(values)) - 1],
+                         'p95': values[math.ceil(.95 * len(values)) - 1],
+                         'histogram': metric_histogram([(value, 1) for value in values])}
+                        if values else {'n': 0})
     pairs = sorted(usage['tpot_pairs'])
     weight = sum(w for _, w in pairs)
     safe_weight = weight if weight <= 2**53 - 1 else None
@@ -462,6 +567,7 @@ def request_daily_metrics(records, date, generated_at, incomplete, usage=None):
             'observed_at': generated_at, 'telemetry_observed_at': generated_at,
             'telemetry_partial': incomplete or date == dt.datetime.now(CST).date().isoformat(),
             'source': 'workspace_request_logs',
+            **network, 'network_partial': incomplete or usage.get('network_partial', False),
             'model_usage_events': usage['events'], 'tokens': tokens, 'tpot': tpot,
             'gateway_stream': {'normal': statuses['normal'], 'exception': statuses['exception'],
                                'cancelled': statuses['cancelled'], 'unknown': statuses['unknown'],
@@ -492,6 +598,9 @@ def collect():
                         for key in ('events', 'input', 'output', 'total', 'input_samples', 'output_samples', 'total_samples'):
                             pooled[key] += values[key]
                         pooled['tpot_pairs'].extend(values['tpot_pairs'])
+                        for key in NETWORK_BUCKETS:
+                            pooled['network'][key].extend(values.get('network', {}).get(key, []))
+                        pooled['network_partial'] |= values.get('network_partial', False)
                 else: problems[status] = problems.get(status, 0) + 1
             except Exception as error:
                 category = 'http_' + str(error.code) if isinstance(error, urllib.error.HTTPError) else type(error).__name__
