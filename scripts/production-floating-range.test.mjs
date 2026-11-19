@@ -3,6 +3,29 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
 
+test('global range emits the same diagnostic window to the archive', () => {
+  const source=readFileSync(new URL('../single-repo/static/production-metrics/app.js',import.meta.url),'utf8');
+  const extract=(start,end)=>source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start)));
+  const emitted=[], sent=[];
+  const state={rangeDays:1,history:{}};
+  const context=vm.createContext({state, todayShanghai:()=> '2026-11-19',historyCompleteThrough:()=> '2026-11-18',
+    document:{querySelectorAll:()=>[],dispatchEvent(event){emitted.push(event.detail);}},
+    CustomEvent:class {constructor(type,options){this.type=type;this.detail=options.detail;}},
+    window:{parent:{postMessage(value){sent.push(value);}}},location:{origin:'https://example.test'},
+  });
+  vm.runInContext(extract('function addDays(date, days)', 'function weekSeries(days)')
+    + extract('function cloudTraceWindow(', 'function cloudTraceRangeLabel(')
+    + extract('function syncRangeButtons(', 'function currentModelDays()')
+    + ';globalThis.sync=syncRangeButtons;',context);
+  for (const [range,start,end] of [[1,'2026-11-19','2026-11-19'],[7,'2026-11-12','2026-11-18'],
+    [30,'2026-10-20','2026-11-18'],[0,'','2026-11-19']]) {
+    state.rangeDays=range;
+    context.sync(false);
+    assert.deepEqual({...emitted.at(-1)}, {range,start,end});
+    assert.equal(sent.at(-1).range,range);
+  }
+});
+
 test('embedded range control synchronizes with its own frame and rejects other senders', () => {
   const source = readFileSync(new URL('../single-repo/static/app.js', import.meta.url), 'utf8');
   const start = source.indexOf("  const productionFrame = document.querySelector('#tab-production-metrics iframe');");

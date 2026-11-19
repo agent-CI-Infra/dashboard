@@ -32,6 +32,8 @@ test('production script releases invalidate the shell bundle and embedded page c
   const frameVersion = shellCode.match(/'production-metrics': '\.\/production-metrics\/index\.html\?v=([^'#&]+)#models'/)[1];
   assert.equal(frameVersion, version, 'the iframe URL must change with its script release');
   assert.equal(shellVersion, version, 'the shell must load the bundle containing the new iframe URL');
+  assert.equal(frame.match(/src="trajectory-archive\.js\?v=([^"&]+)"/)[1], version,
+    'the archive module and its range-event producer must release together');
 });
 
 test('all three network cards stay visible without valid samples', () => {

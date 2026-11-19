@@ -1167,11 +1167,14 @@ function envAnomaly(doc) {
     if (row.anomaly) return row;
     const trace = traceDays.get(row.date)?.anomaly?.latency;
     if (!(trace?.n > 0)) return row;
-    const slow = Array.isArray(trace.slow_requests) ? trace.slow_requests : [];
+    // The diagnostic picker can retain more rows than the anomaly tail.
+    const slowCount = Math.ceil(trace.n * .05);
+    const slow = (Array.isArray(trace.slow_requests) ? trace.slow_requests : [])
+      .filter(item => Number.isFinite(item?.gateway)).sort((a, b) => b.gateway - a.gateway).slice(0, slowCount);
     const maximum = slow.filter((item) => Number.isFinite(item?.gateway))
       .reduce((best, item) => !best || item.gateway > best.gateway ? item : best, null);
     return { ...row, anomaly: { available: false, source: 'kubernetes_slow_sample',
-      latency: { ...trace, max_ms: maximum?.gateway, max_request: maximum }, timeouts: {} } };
+      latency: { ...trace, slow_count: slowCount, slow_requests: slow, max_ms: maximum?.gateway, max_request: maximum }, timeouts: {} } };
   });
   const summary = summarizeCloudAnomalies(rows);
   const anchor = summary ? { date: `${summary.window_start} 至 ${summary.window_end}`, partial: summary.partial, anomaly: summary } : null;
@@ -3183,6 +3186,11 @@ function syncRangeButtons(disabled = false) {
   if (window.parent !== window) {
     window.parent.postMessage({ type: 'production-metrics-range-state', range: state.rangeDays, disabled }, location.origin);
   }
+  if (typeof CustomEvent === 'function') {
+    document.dispatchEvent(new CustomEvent('production-metrics-range-change', {
+      detail: cloudTraceWindow(state.rangeDays, todayShanghai(), historyCompleteThrough(state.history)),
+    }));
+  }
 }
 
 function currentModelDays() {
@@ -3737,8 +3745,11 @@ function renderRequestTraces(doc) {
   const coverage = traceCollection
     ? `${cloudCollectionLabel(traceCollection)}只读采集于 ${fmtDateTime(traceCollection.generated_at)}：${fmtCount(traceCollection.read_log_count)} / ${fmtCount(traceCollection.binding_count)} 个绑定读取到日志；排名仅覆盖已读取日志中的已结束请求，工具明细可能不完整。`
     : '生产快照采集数据';
-  const note = cloudCount ? `${coverage} 当前范围共 ${cloudCount} 条云侧慢请求${traceCollection ? '' : '或超时请求'}。`
-    : `${coverage} 当前范围没有可用的云侧慢请求明细。${state.localTrace ? '下方历史样例不属于当前榜单。' : ''}`;
+  const sampling = traceCollection?.slow_trace_sampling;
+  const samplingNote = sampling?.ratio === .1 && sampling?.minimum === 10
+    ? ' 每日按已读取日志中的已结束云侧请求数取 10%（向上取整），至少 10 条；不足 10 条时全部展示，按耗时降序选取。' : '';
+  const note = (cloudCount ? `${coverage} 当前范围共 ${cloudCount} 条云侧慢请求${traceCollection ? '' : '或超时请求'}。`
+    : `${coverage} 当前范围没有可用的云侧慢请求明细。${state.localTrace ? '下方历史样例不属于当前榜单。' : ''}`) + samplingNote;
   const cloudRows = candidates.map((item, index) => ({item, index})).filter(({item}) => item.scope === 'cloud');
   const groups = new Map();
   for (const row of cloudRows) {
@@ -3945,6 +3956,12 @@ function cloudTraceScopedDays(days, rangeDays, today, completeThrough = null) {
   return cloudScopedDays(days, rangeDays, today, Number(rangeDays) === 0 ? today : completeThrough);
 }
 
+function cloudTraceWindow(rangeDays, today, completeThrough = null) {
+  const range = [0, 1, 7, 30].includes(Number(rangeDays)) ? Number(rangeDays) : 0;
+  const end = range === 0 || range === 1 ? today : (completeThrough || today);
+  return { range, start: range ? addDays(end, -(range - 1)) : '', end };
+}
+
 function cloudTraceRangeLabel(rangeDays, today, completeThrough = null) {
   if (Number(rangeDays) === 0) return `全部可用日期（含 ${today} 截至采集的数据）`;
   if (Number(rangeDays) === 1) return `${today}（当天截至采集）`;
@@ -4092,6 +4109,7 @@ window.addEventListener('message', (event) => {
     if (button && !button.disabled) button.click();
   }
 });
+document.addEventListener('production-metrics-range-request', () => syncRangeButtons(!state.history));
 
 $('model-trends').addEventListener('click', (event) => {
   const latency = event.target.closest('[data-latency-layer]');

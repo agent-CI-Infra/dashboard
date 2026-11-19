@@ -54,7 +54,7 @@ class ProductionTraceTests(unittest.TestCase):
         self.assertEqual(len(inventory['requests']), 101)
         self.assertEqual(inventory['window']['end'], today.isoformat())
         self.assertEqual(inventory['source'], 'workspace_request_logs')
-        self.assertEqual(len(result['days'][0]['anomaly']['latency']['slow_requests']), 6)
+        self.assertEqual(len(result['days'][0]['anomaly']['latency']['slow_requests']), 11)
 
     def test_daily_metrics_use_every_finished_request_without_leaking_ids(self):
         rows = [(0, {}, {'gateway': 100.0, 'first_token': 20.0, 'request_id': 'secret-id'}),

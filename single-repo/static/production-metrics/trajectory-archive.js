@@ -2,10 +2,16 @@
 export const PAGE_SIZE = 50;
 const escape = value => String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 const statusNames = {final:'已结束', running:'运行中', abandoned:'已中断', pending_descendants:'子跨度待补齐', root_unresolved:'根跨度待确认'};
-export function selectTraces(traces, query, lifecycle, day = '') {
+export function traceDay(value) {
+  const stamp = Date.parse(value);
+  return Number.isFinite(stamp) ? new Date(stamp + 8 * 60 * 60 * 1000).toISOString().slice(0, 10) : '';
+}
+export function selectTraces(traces, query, lifecycle, day = '', period = {}) {
   const needle = query.trim().toLowerCase();
   return traces.filter(row => (!lifecycle || row.lifecycle === lifecycle)
-    && (!day || new Date(row.start_time).toLocaleDateString('sv-SE', {timeZone:'Asia/Shanghai'}) === day)
+    && (!day || traceDay(row.start_time) === day)
+    && (!period.start || traceDay(row.start_time) >= period.start)
+    && (!period.end || (traceDay(row.start_time) && traceDay(row.start_time) <= period.end))
     && (!needle || [row.request_id, row.key, row.trace_key, ...(row.request_ids || [])].some(id => String(id || '').toLowerCase().includes(needle))));
 }
 export function coverageText(doc) {
@@ -20,19 +26,18 @@ export function detailPath(path) {
   return path;
 }
 
-export function reconciliationHtml(doc, query = '', day = '') {
+export function reconciliationHtml(doc, query = '', day = '', period = {}) {
   const data = doc.request_reconciliation;
   if (data?.schema !== 'digitalmate/request-reconciliation@1' || data.state !== 'available') {
     return '<p class="muted">请求日志对账尚未采集，等待下一次成功采集更新。</p>';
   }
-  if (day && (day < data.window.start || day > data.window.end)) {
+  const start = [data.window.start, period.start, day].filter(Boolean).sort().at(-1);
+  const end = [data.window.end, period.end, day].filter(Boolean).sort()[0];
+  if (start > end) {
     return '<p class="muted">该日期超出逐请求日志对账范围，历史原生轨迹可继续查看。</p>';
   }
-  const requests = selectTraces(data.requests, query, '', day);
-  const traces = selectTraces(doc.traces, query, '', day).filter(row => {
-    const date = new Date(row.start_time).toLocaleDateString('sv-SE', {timeZone: 'Asia/Shanghai'});
-    return date >= data.window.start && date <= data.window.end;
-  });
+  const requests = selectTraces(data.requests, query, '', day, {start, end});
+  const traces = selectTraces(doc.traces, query, '', day, {start, end});
   const loggedIds = new Set(data.requests.map(row => row.request_id));
   const nativeOnly = traces.filter(row => ![row.request_id, ...(row.request_ids || [])].some(id => loggedIds.has(id))).length;
   const count = state => requests.filter(row => row.match_state === state).length;
@@ -41,7 +46,7 @@ export function reconciliationHtml(doc, query = '', day = '') {
   const attention = requests.filter(row => row.match_state !== 'matched'
     || row.cancel_tail_ms > 0 || (row.log_state === 'finished' && row.native_lifecycle !== 'final'));
   const names = {missing: '未归档轨迹', pending_archive: '等待轨迹采集补齐', ambiguous: '请求 ID 关联不唯一', timing_conflict: '请求与轨迹时间待核对'};
-  const interval = day || `${data.window.start} 至 ${data.window.end}`;
+  const interval = start === end ? start : `${start} 至 ${end}`;
   const partial = data.read_log_count < data.binding_count || Object.values(data.errors || {}).some(value => value > 0) || data.invalid_requests > 0;
   const detail = attention.length ? `
     <details class="archive-reconciliation-details">
@@ -83,11 +88,12 @@ export function spanBar(span, total) {
   return `<span class="archive-track"><span class="archive-bar" style="left:${left}%;width:${width}%;background:${color}"></span></span>`;
 }
 
-async function startArchive() {
+export async function startArchive() {
   const host = document.getElementById('trajectory-archive');
   if (!host) return;
   const base = new URL('../data/trajectory-archive/', location.href);
   let doc, page = 0, selected = '', requestGeneration = 0;
+  let period = {}, periodKey = '';
   const get = async path => {
     const res = await fetch(new URL(path, base), {cache:'no-store'});
     if (!res.ok) throw new Error('archive unavailable');
@@ -97,9 +103,15 @@ async function startArchive() {
   };
   host.innerHTML = '<div class="card-head"><h2>全部原生轨迹</h2><span class="muted">按已落库轨迹归档 · 每页 50 条</span></div><p class="data-freshness" id="archive-coverage">正在读取全量采集状态…</p><form id="archive-form" class="lookup-form"><input id="archive-query" type="search" placeholder="搜索请求 ID 或轨迹编号" aria-label="搜索全部轨迹"><input id="archive-day" type="date" aria-label="按北京时间日期筛选"><select id="archive-lifecycle" aria-label="轨迹状态"><option value="">全部状态</option><option value="final">已结束</option><option value="running">运行中</option><option value="abandoned">已中断</option><option value="pending_descendants">子跨度待补齐</option><option value="root_unresolved">根跨度待确认</option></select><button type="submit">查询</button></form><div id="archive-reconciliation" aria-live="polite"></div><div id="archive-list"></div><div id="archive-detail" aria-live="polite"></div>';
   const node = id => host.querySelector(`#${id}`);
+  function clearDetail() {
+    selected = '';
+    ++requestGeneration;
+    node('archive-detail').innerHTML = '';
+  }
   function render() {
-    const filtered = selectTraces(doc.traces, node('archive-query').value, node('archive-lifecycle').value, node('archive-day').value);
-    node('archive-reconciliation').innerHTML = reconciliationHtml(doc, node('archive-query').value, node('archive-day').value);
+    const filtered = selectTraces(doc.traces, node('archive-query').value, node('archive-lifecycle').value, node('archive-day').value, period);
+    node('archive-reconciliation').innerHTML = reconciliationHtml(doc, node('archive-query').value, node('archive-day').value, period);
+    if (selected && !filtered.some(row => row.key === selected)) clearDetail();
     page = Math.min(page, Math.max(0, Math.ceil(filtered.length / PAGE_SIZE) - 1));
     const rows = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
     node('archive-list').innerHTML = `<p class="muted">符合筛选 ${filtered.length} 条 / 累计归档 ${doc.traces.length} 条 · 第 ${page + 1} / ${Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))} 页</p><div class="table-wrap"><table class="history-table"><thead><tr><th>开始时间（北京时间）</th><th>状态</th><th>跨度</th><th>原生耗时</th><th>请求 / 轨迹</th><th></th></tr></thead><tbody>${rows.map(r => `<tr><td>${escape(formatTime(r.start_time))}</td><td>${escape(statusNames[r.lifecycle] || '未知')}</td><td>${r.span_count}</td><td>${escape(duration(r.duration_ms))}</td><td>${escape(r.request_id || r.request_ids?.join(', ') || r.key.slice(0,16))}</td><td><button type="button" data-archive-key="${escape(r.key)}">查看轨迹</button></td></tr>`).join('')}</tbody></table></div>${rows.length ? '' : '<p class="empty">暂无匹配的归档轨迹。请结合上方采集覆盖率判断，不能据此断定源端没有轨迹。</p>'}<div class="trajectory-toolbar"><button type="button" data-archive-page="-1" ${page === 0 ? 'disabled' : ''}>上一页</button><button type="button" data-archive-page="1" ${(page + 1) * PAGE_SIZE >= filtered.length ? 'disabled' : ''}>下一页</button></div>`;
@@ -120,6 +132,22 @@ async function startArchive() {
     }
   }
   node('archive-form').addEventListener('submit', event => {event.preventDefault(); if (doc) {page = 0; render();}});
+  document.addEventListener('production-metrics-range-change', event => {
+    const value = event.detail;
+    if (![0, 1, 7, 30].includes(value?.range) || !/^\d{4}-\d{2}-\d{2}$/.test(value.end)
+        || (value.start && !/^\d{4}-\d{2}-\d{2}$/.test(value.start))) return;
+    const key = JSON.stringify(value);
+    if (key === periodKey) return;
+    periodKey = key;
+    period = {start: value.start || '', end: value.end};
+    node('archive-day').min = period.start;
+    node('archive-day').max = period.end;
+    node('archive-day').value = value.range === 1 ? period.end : '';
+    page = 0;
+    clearDetail();
+    if (doc) render();
+  });
+  document.dispatchEvent(new CustomEvent('production-metrics-range-request'));
   host.addEventListener('click', event => {
     const target = event.target.closest('button');
     if (!target || target.disabled || !doc) return;

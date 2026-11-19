@@ -1,6 +1,105 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {selectTraces, coverageText, detailPath, spanBar, reconciliationHtml, PAGE_SIZE} from '../single-repo/static/production-metrics/trajectory-archive.js';
+import {selectTraces, traceDay, startArchive, coverageText, detailPath, spanBar, reconciliationHtml, PAGE_SIZE} from '../single-repo/static/production-metrics/trajectory-archive.js';
+
+test('archive dates use Shanghai boundaries and intersect global and manual filters', () => {
+  const rows = ['2026-10-01T00:00:00Z', '2026-11-12T00:00:00Z', '2026-11-18T15:59:59Z',
+    '2026-11-18T16:00:00Z', '2026-11-19T16:00:00Z', 'invalid'].map(start_time => ({start_time}));
+  assert.equal(traceDay(rows[2].start_time), '2026-11-18');
+  assert.equal(traceDay(rows[3].start_time), '2026-11-19');
+  assert.deepEqual(selectTraces(rows, '', '', '', {start:'2026-11-19', end:'2026-11-19'}), [rows[3]]);
+  assert.deepEqual(selectTraces(rows, '', '', '', {start:'2026-11-12', end:'2026-11-18'}), rows.slice(1, 3));
+  assert.deepEqual(selectTraces(rows, '', '', '2026-11-19', {start:'2026-11-12', end:'2026-11-18'}), []);
+  assert.deepEqual(selectTraces(rows, '', '', '', {end:'2026-11-19'}), rows.slice(0, 4));
+});
+
+test('reconciliation counts use the intersection of the selected range and retained logs', () => {
+  const requests = ['2026-11-13', '2026-11-18', '2026-11-19'].map((day, i) => ({
+    request_id:`request-${i}`, start_time:`${day}T00:00:00Z`, match_state:'matched', log_state:'finished', native_lifecycle:'final',
+  }));
+  const doc = {traces:[...requests, {request_id:'native-only', start_time:'2026-11-19T00:00:00Z'}], request_reconciliation:{
+    schema:'digitalmate/request-reconciliation@1', state:'available', requests,
+    window:{start:'2026-11-13',end:'2026-11-19'}, read_log_count:1, binding_count:1,
+  }};
+  const today = reconciliationHtml(doc, '', '', {start:'2026-11-19',end:'2026-11-19'});
+  assert.match(today, /请求日志 1 条/);
+  assert.match(today, /仅见轨迹 1/);
+  assert.match(today, /对账范围 2026-11-19\s/);
+  const week = reconciliationHtml(doc, '', '', {start:'2026-11-12',end:'2026-11-18'});
+  assert.match(week, /请求日志 2 条/);
+  assert.match(week, /仅见轨迹 0/);
+  assert.match(week, /对账范围 2026-11-13 至 2026-11-18/);
+  assert.match(reconciliationHtml(doc, '', '', {end:'2026-11-12'}), /超出逐请求日志对账范围/);
+});
+
+test('range replay before fetch, pagination, refresh and pending details stay in sync', async t => {
+  const element = () => ({value:'', min:'', max:'', content:'', handlers:{},
+    set innerHTML(value){this.content=value;}, get innerHTML(){return this.content;},
+    set textContent(value){this.content=value;}, get textContent(){return this.content;},
+    addEventListener(name, handler){this.handlers[name]=handler;},
+  });
+  const nodes = Object.fromEntries(['coverage','query','day','lifecycle','form','reconciliation','list','detail'].map(id=>[`archive-${id}`,element()]));
+  const host = {...element(), querySelector(selector){return nodes[selector.slice(1)];}};
+  const events = new EventTarget();
+  events.getElementById = () => host;
+  const period = (range, start, end='2026-11-19') => events.dispatchEvent(new CustomEvent('production-metrics-range-change', {detail:{range,start,end}}));
+  events.addEventListener('production-metrics-range-request', () => period(1, '2026-11-19'));
+  const traces = Array.from({length:60}, (_, i) => ({request_id:`yesterday-${i}`, key:`y-${i}`, start_time:'2026-11-18T00:00:00Z', lifecycle:'final', pages:[]}));
+  const key = 'a'.repeat(64);
+  traces.push({request_id:'today', key, start_time:'2026-11-18T16:00:00Z', lifecycle:'final', pages:[`traces/${key}/0.json`]});
+  traces.push({request_id:'older', key:'older', start_time:'2026-11-01T00:00:00Z', pages:[]});
+  traces.push({request_id:'oldest', key:'oldest', start_time:'2026-10-01T00:00:00Z', pages:[]});
+  const doc = {schema:'digitalmate/trajectory-archive@1', traces, request_reconciliation:{
+    schema:'digitalmate/request-reconciliation@1', state:'available',
+    window:{start:'2026-11-13',end:'2026-11-19'}, requests:traces.slice(0,61),
+  }};
+  let resolveIndex, resolveDetail, refresh;
+  const first = new Promise(resolve=>{resolveIndex=resolve;});
+  const detail = new Promise(resolve=>{resolveDetail=resolve;});
+  let firstFetch=true;
+  const overrides = {document:events, location:{href:'https://example.test/production-metrics/index.html'},
+    setInterval(callback){refresh=callback;return 1;},
+    fetch:async url => ({ok:true, json:()=>url.pathname.endsWith('/index.json') ? (firstFetch ? (firstFetch=false,first) : doc) : detail}),
+  };
+  for (const [name,value] of Object.entries(overrides)) {
+    const old=Object.getOwnPropertyDescriptor(globalThis,name);
+    Object.defineProperty(globalThis,name,{configurable:true,writable:true,value});
+    t.after(()=>old ? Object.defineProperty(globalThis,name,old) : delete globalThis[name]);
+  }
+  const starting=startArchive();
+  assert.equal(nodes['archive-day'].value,'2026-11-19', 'initial range must replay before the index arrives');
+  resolveIndex(doc);
+  await starting;
+  assert.match(nodes['archive-list'].innerHTML,/符合筛选 1 条/);
+  assert.match(nodes['archive-reconciliation'].innerHTML,/请求日志 1 条/);
+  const click = dataset => host.handlers.click({target:{closest:()=>({dataset})}});
+  click({archiveKey:key});
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(nodes['archive-detail'].textContent,'正在读取轨迹…');
+  period(7,'2026-11-12','2026-11-18');
+  assert.equal(nodes['archive-day'].value,'');
+  assert.equal(nodes['archive-day'].min,'2026-11-12');
+  assert.equal(nodes['archive-day'].max,'2026-11-18');
+  assert.match(nodes['archive-list'].innerHTML,/符合筛选 60 条/);
+  assert.match(nodes['archive-reconciliation'].innerHTML,/请求日志 60 条/);
+  resolveDetail({...doc,key,offset:0,total:1,spans:[]});
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(nodes['archive-detail'].innerHTML,'', 'late detail must not restore an out-of-range request');
+  click({archivePage:'1'});
+  assert.match(nodes['archive-list'].innerHTML,/第 2 \/ 2 页/);
+  period(30,'2026-10-20','2026-11-18');
+  assert.match(nodes['archive-list'].innerHTML,/符合筛选 61 条.*第 1 \/ 2 页/);
+  period(0,'');
+  assert.equal(nodes['archive-day'].min,'');
+  assert.match(nodes['archive-list'].innerHTML,/符合筛选 63 条/);
+  nodes['archive-day'].value='2026-11-18';
+  nodes['archive-form'].handlers.submit({preventDefault(){}});
+  await refresh();
+  assert.match(nodes['archive-list'].innerHTML,/符合筛选 60 条/);
+  period(1,'2026-11-19');
+  assert.equal(nodes['archive-day'].value,'2026-11-19');
+  assert.match(nodes['archive-list'].innerHTML,/符合筛选 1 条/);
+});
 
 test('full archive search covers non-slow requests and every page', () => {
   const rows=Array.from({length:251},(_,i)=>({key:String(i),request_id:`digitalmate-${i}`,lifecycle:'final',start_time:'2026-11-11T17:00:00Z'}));
