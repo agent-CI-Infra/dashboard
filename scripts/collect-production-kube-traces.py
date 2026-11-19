@@ -121,6 +121,9 @@ def collect_workspaces(operation, names, binding_count, errors):
             day['partial'] = True
             day['telemetry_partial'] = True
             day['network_partial'] = True
+            if isinstance(day.get('anomaly'), dict):
+                day['anomaly']['partial'] = True
+                day['anomaly']['baseline']['partial'] = True
     return result
 
 
