@@ -954,6 +954,7 @@ function summarizeCloudWindow(rows) {
     telemetry_partial: rows.some((row) => row.telemetry_partial), window_days: rows.length,
     window_start: rows[0].date, window_end: rows[rows.length - 1].date };
   result.current_sample_days = rows.filter((row) => row.current_sample_used).length;
+  result.network_partial = rows.some((row) => row.network_partial);
   for (const key of ['gateway', 'first_token', 'answer_first', 'answer_first_history', 'react', 'tool', 'tpot', 'uplink_send', 'downlink_first_text', 'downlink_terminal']) {
     result[key] = aggregateCloudMetric(rows, key);
   }
@@ -997,6 +998,7 @@ function envSummary(doc) {
   if (!rows.length) return '';
   const anchor = summarizeCloudWindow(rows);
   const seconds = (value) => fmtSecondsBare(value);
+  const milliseconds = (value) => Number.isFinite(value) && value >= 0 ? value.toFixed(1).replace(/\.0$/, '') : '—';
   const formatted = (metric, field, formatter) => `${metric?.approx && field !== 'mean' && Number.isFinite(metric?.[field]) ? '≈' : ''}${formatter(metric?.[field])}`;
   const workspaceMetrics = anchor.source === 'workspace_request_logs' || Number.isFinite(anchor.model_usage_events);
   const rateValue = workspaceMetrics ? anchor.gateway_stream?.exception_rate : anchor.failure_rate;
@@ -1031,6 +1033,19 @@ function envSummary(doc) {
   const answerTile = requestTile('answer_first', '答案首吐字', '网关受理 → 首个答案 chat.delta · 网关实测');
   const answerEstimateTile = requestTile('answer_first_history', '答案首吐字（历史估算）', '会话回答段起点估算 · 非网关转发时间，不纳入实测');
   const reactTile = requestTile('react', 'ReAct 阶段', '网关首文本 → 网关首答案 · 同一请求配对');
+  const networkTiles = [
+    ['uplink_send', '端到云', '上行时延', '端侧发出请求 → 云侧 Bridge 收到请求'],
+    ['downlink_first_text', '云到端', '首段文字下行', '云侧 Bridge 发出首段文字 → 端侧收到'],
+    ['downlink_terminal', '云到端', '结束帧下行', '云侧 Bridge 发出结束帧 → 端侧收到'],
+  ].map(([key, direction, label, hint]) => {
+    const metric = anchor[key];
+    const count = metric?.n > 0 ? `${fmtCount(metric.n)} 个有效样本` : '所选范围无有效样本 · 等待已校时样本';
+    return `<div class="stat-card network-card" data-metric="${key}">
+      <div class="stat-label">${direction}<strong>${label}</strong> 平均 / P50 / P95（ms）</div>
+      <div class="stat-value combo">${formatted(metric, 'mean', milliseconds)} / ${formatted(metric, 'p50', milliseconds)} / ${formatted(metric, 'p95', milliseconds)}</div>
+      <div class="stat-hint">${count} · 覆盖 ${fmtCount(metric?.days)} / ${fmtCount(anchor.window_days)} 天${anchor.network_partial ? ' · 采集部分覆盖' : ''} · ${hint} · 校时误差 ≤ 50 ms；下行仅计已配对帧</div>
+    </div>`;
+  }).join('');
   const rangeNote = `${esc(anchor.window_start)} 至 ${esc(anchor.window_end)} · ${fmtCount(anchor.window_days)} 个有数据的日期${anchor.partial ? ' · 含部分覆盖' : ''}${anchor.current_sample_days ? ` · ${fmtCount(anchor.current_sample_days)} 天使用当前可读日志样本` : ''}`;
   return `<div class="env-data-notes env-range-notes"><div><strong>统计范围</strong><span>${rangeNote}</span></div><div><strong>汇总口径</strong><span>均值按样本数或输出 Token 加权；多日分位数仅在可合并分布完整时显示，≈ 表示近似。</span></div></div><section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
     <div class="stat-card">
@@ -1047,6 +1062,7 @@ function envSummary(doc) {
     ${answerTile}
     ${answerEstimateTile}
     ${reactTile}
+    ${networkTiles}
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>TPOT</strong> 平均 / P50 / P95（ms/token）</div>
       <div class="stat-value combo">${formatted(anchor.tpot, 'mean', fmtTpotBare)} / ${formatted(anchor.tpot, 'p50', fmtTpotBare)} / ${formatted(anchor.tpot, 'p95', fmtTpotBare)}</div>

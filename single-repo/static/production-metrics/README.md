@@ -90,7 +90,11 @@ Bumping `metrics_version` rebuilds the retained window once so every day carries
 
 ## Cloud-side one-way network metrics
 
-`uplink_send`, `downlink_first_text`, and `downlink_terminal` carry client-observed one-way latency (`n`, `mean`, `p50`, `p95`, milliseconds) in each daily row. They are emitted by a later gateway instrumentation release, so until that release is deployed every day reports `n: 0` and the cards say the metric is waiting for instrumentation. The collector and aggregator already carry the keys and buckets; adding the release's log parsing and the daily trend charts remains for that release.
+`uplink_send`, `downlink_first_text`, and `downlink_terminal` carry client-observed one-way latency (`n`, `sum`, `mean`, `p50`, `p95`, `histogram`, milliseconds) in each daily row. The three headline cards summarize the selected range, weighted by valid sample counts; multi-day percentiles merge bounded histograms and are marked approximate. Missing measurements show a dash and zero sample coverage.
+
+The production SFS/Kubernetes collector and console reader parse `workswarm/client-network-YYYY-MM-DD.jsonl` with schema `digitalmate-client-network@1`. The Bridge instrumentation must be deployed and `DIGITALMATE_NETWORK_METRICS_ENABLED=true` for measurements to appear. Uplink measures phone request send to Bridge receipt. Downlink measures Bridge first-text or terminal frame send to phone receipt; a Home reply can belong to both buckets. These are transport samples, including RPCs, rather than counts of completed Agent turns.
+
+The producer applies the measured phone-minus-Bridge clock offset and verifies the exact downlink frame before writing a sample. Collection accepts only samples with clock error at most 50 ms and one-way duration from 0 to 120 seconds; downlink arithmetic must match the recorded offset and timestamps. Cumulative coverage records are ignored. Uplink samples are deduplicated by request ID and downlink samples by bucket, task/execution and frame timestamp, within each workspace. Record timestamps determine the Shanghai day, independently of the writer's file timezone. Each file is bounded to 8 MB and each workspace to 32 MB over the retained 30-day window. Unreadable or oversized optional files mark network coverage partial without discarding the request log metrics. Only aggregates and histograms are published; raw frame timestamps, network sample IDs and clock offsets remain private. These samples do not estimate RTT/2 or include cloud Agent execution time.
 
 ## Outlier analysis
 

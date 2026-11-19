@@ -277,10 +277,14 @@ def run_collector(names, source):
                 yield line.decode('utf-8', 'replace')
 
     def fetch(_endpoint, params, *, download=False):
-        if not download or not params.get('path', '').endswith('/history.jsonl'):
+        relative = params.get('path', '')
+        network = re.fullmatch(r'workswarm/client-network-\d{4}-\d{2}-\d{2}\.jsonl', relative)
+        if not download or not (relative.endswith('/history.jsonl') or network):
             raise ValueError('unexpected workspace operation')
-        path = path_for(params['name'], params['path'])
-        limit = namespace['MAX_HISTORY']
+        path = path_for(params['name'], relative)
+        limit = namespace['MAX_NETWORK_LOG'] if network else namespace['MAX_HISTORY']
+        if not path.is_file() or path.stat().st_size > limit:
+            raise ValueError('file exceeds bound')
         with path.open('rb') as handle:
             body = handle.read(limit + 1)
         if len(body) > limit:
