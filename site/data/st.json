@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-18T17:01:17.913Z",
+  "updatedAt": "2026-11-19T23:58:31.540Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -295,6 +295,436 @@
     }
   ],
   "runs": [
+    {
+      "runId": "local-release113-20261120-001752",
+      "attempt": 1,
+      "url": "",
+      "createdAt": "2026-11-19T17:51:00Z",
+      "headSha": "270e47f5b4af",
+      "conclusion": "failure",
+      "st": {
+        "runId": "ST-local-release113-20261120",
+        "status": "failed",
+        "mode": "business",
+        "runner": "local",
+        "machine": "HwdeMacBook-Air-2 (macOS, emulator 127.0.0.1:5555)",
+        "issues": [
+          "local run: release 270e47f5b + composer test patch + ST_HIVE_HOME=true",
+          "live backend: HK digitalmate-nightly @sha256:03906e11 (Hive Home)"
+        ],
+        "liveWire": [
+          {
+            "suite": "connection",
+            "caseName": "gateway_connection",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          }
+        ],
+        "component": [
+          {
+            "suite": "attachment-policy",
+            "title": "本地附件策略",
+            "status": "passed",
+            "runId": "ST-1795099399318-c5be72",
+            "issues": [],
+            "cases": [
+              {
+                "name": "local_attachment_blocked_types",
+                "title": "拒绝的类型",
+                "status": "passed",
+                "elapsedMs": 42,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_image_containers",
+                "title": "图片容器",
+                "status": "passed",
+                "elapsedMs": 109,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_magic_mismatch",
+                "title": "魔数不符",
+                "status": "passed",
+                "elapsedMs": 26,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_size_limits",
+                "title": "大小限制",
+                "status": "passed",
+                "elapsedMs": 68,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_supported_controls",
+                "title": "支持的控件",
+                "status": "passed",
+                "elapsedMs": 179,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_preview_decode",
+                "title": "预览解码",
+                "status": "passed",
+                "elapsedMs": 11,
+                "detail": "Production upload policy and native files verified"
+              }
+            ],
+            "fixtures": []
+          },
+          {
+            "suite": "markdown",
+            "title": "Markdown 渲染",
+            "status": "passed",
+            "runId": "markdown-4213120706ab964dfc396709792aaa69",
+            "issues": [],
+            "cases": [],
+            "fixtures": [
+              {
+                "name": "dash-value",
+                "title": "dash-value",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "three-dash-value",
+                "title": "three-dash-value",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "malformed-separator",
+                "title": "malformed-separator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "short-final-row",
+                "title": "short-final-row",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "open-final-pipe",
+                "title": "open-final-pipe",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "sole-operator",
+                "title": "sole-operator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "padded-operator",
+                "title": "padded-operator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "orphan-leading",
+                "title": "orphan-leading",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "orphan-trailing",
+                "title": "orphan-trailing",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "fenced-table",
+                "title": "fenced-table",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "fenced-operator",
+                "title": "fenced-operator",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "comparison",
+                "title": "comparison",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "stream-pending",
+                "title": "stream-pending",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "stream-boundary",
+                "title": "stream-boundary",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-prose-period",
+                "title": "link-prose-period",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-markdown-period",
+                "title": "link-markdown-period",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-balanced-parens",
+                "title": "link-balanced-parens",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-brace-boundary",
+                "title": "link-brace-boundary",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-unmatched-open",
+                "title": "link-unmatched-open",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Parser contract and native rendered text verified"
+              }
+            ]
+          },
+          {
+            "suite": "session-proximity",
+            "title": "会话邻近契约",
+            "status": "passed",
+            "runId": "ST-1795099410579-947118",
+            "issues": [],
+            "cases": [
+              {
+                "name": "native_topic_projection",
+                "title": "主题投影",
+                "status": "passed",
+                "elapsedMs": 2,
+                "detail": "Native contract verified"
+              },
+              {
+                "name": "native_capacity_draft",
+                "title": "容量与草稿",
+                "status": "passed",
+                "elapsedMs": 16,
+                "detail": "Native contract verified"
+              },
+              {
+                "name": "native_capacity_controls",
+                "title": "容量与控件",
+                "status": "passed",
+                "elapsedMs": 1,
+                "detail": "Native contract verified"
+              }
+            ],
+            "fixtures": []
+          },
+          {
+            "suite": "suggestions",
+            "title": "建议协议与按钮",
+            "status": "failed",
+            "runId": "suggestions-8a67d6addd420e335f2c8fbc4548fe81",
+            "issues": [
+              "Hypium did not report exactly one passing test.",
+              "Missing, stale or incomplete report.",
+              "Missing, duplicated or failed cases."
+            ],
+            "cases": [],
+            "fixtures": [
+              {
+                "name": "shopping-inline-tail",
+                "title": "shopping-inline-tail",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "inline-protocol-tail",
+                "title": "inline-protocol-tail",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "multiline-sources",
+                "title": "multiline-sources",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "sources-with-colon",
+                "title": "sources-with-colon",
+                "status": "failed",
+                "elapsedMs": null,
+                "detail": "expect  equals 帮我列一份明天下午去超市买菜的采购清单"
+              }
+            ]
+          }
+        ],
+        "cases": [
+          {
+            "name": "real_model_text_reply",
+            "key": "text",
+            "title": "文本回复",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 9158,
+            "stage": "validate-text",
+            "detail": "Reply marker verified"
+          },
+          {
+            "name": "real_model_txt_download_and_content",
+            "key": "text-file",
+            "title": "文本生成 TXT 并下载",
+            "coverageId": "",
+            "status": "failed",
+            "elapsedMs": 86287,
+            "stage": "find-artifact",
+            "detail": "Expected one active output artifact belonging to this task: ST-1795099108055-611624.txt; hive exact-name records=0, projected=0, same-task=0, raw-active=0"
+          },
+          {
+            "name": "real_model_multi_turn",
+            "key": "multi",
+            "title": "三轮对话与上下文更新",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": 19661,
+            "stage": "validate-context",
+            "detail": "Three turns retained the random code and updated quantity"
+          },
+          {
+            "name": "real_model_file_to_text",
+            "key": "file-text",
+            "title": "上传文件并提取文本",
+            "coverageId": "",
+            "status": "failed",
+            "elapsedMs": 12873,
+            "stage": "validate-file-text",
+            "detail": "expect true, actualValue is false"
+          },
+          {
+            "name": "real_model_file_to_file",
+            "key": "file-file",
+            "title": "上传 CSV 并生成转换文件",
+            "coverageId": "",
+            "status": "failed",
+            "elapsedMs": 78641,
+            "stage": "find-artifact",
+            "detail": "Expected one active output artifact belonging to this task: ST-1795099108055-611624-amount.csv; hive exact-name records=0, projected=0, same-task=0, raw-active=0"
+          },
+          {
+            "name": "real_model_structured_choice",
+            "key": "choice",
+            "title": "结构化选项回答并继续任务",
+            "coverageId": "",
+            "status": "failed",
+            "elapsedMs": 13727,
+            "stage": "wait-hive-reply",
+            "detail": "NO_STRUCTURED_INTERACTION: task completed without a real pending question; backend ask-tool support/trigger is required"
+          },
+          {
+            "name": "session_isolation_parallel",
+            "key": "session-isolation-parallel",
+            "title": "双会话并发隔离",
+            "coverageId": "CON-01",
+            "status": "failed",
+            "elapsedMs": 600003,
+            "stage": "parallel-wait",
+            "detail": "Case deadline exceeded at parallel-wait; remote tasks not cancelled/resubmitted"
+          },
+          {
+            "name": "reset_detached_recovery",
+            "key": "reset-detached-recovery",
+            "title": "独立房间 reset/detached 与真实断链恢复",
+            "coverageId": "REC-03",
+            "status": "blocked",
+            "elapsedMs": 116,
+            "stage": "create-isolated-room",
+            "detail": "[SETUP_FAIL] Reset requires this run's newly created empty room; shared Home is forbidden"
+          },
+          {
+            "name": "attachment_metadata_conflict",
+            "key": "attachment-metadata-conflict",
+            "title": "附件元数据冲突与真实云端对照",
+            "coverageId": "ATT-01",
+            "status": "failed",
+            "elapsedMs": 107692,
+            "stage": "wait-hive-reply",
+            "detail": "[ASSERT_MISMATCH] live model did not extract the hidden TXT value"
+          },
+          {
+            "name": "attachment_corrupt_recovery",
+            "key": "attachment-corrupt-recovery",
+            "title": "损坏图片与文本恢复",
+            "coverageId": "ATT-02",
+            "status": "passed",
+            "elapsedMs": 11827,
+            "stage": "wait-hive-reply",
+            "detail": "Zero-byte, wrong-signature and truncated PNG paths checked; same-room text completed afterwards"
+          },
+          {
+            "name": "attachment_image_understanding",
+            "key": "attachment-image-understanding",
+            "title": "真实华为 HDR/MPF 相机 JPG 原图识别",
+            "coverageId": "ATT-03",
+            "status": "passed",
+            "elapsedMs": 5363,
+            "stage": "wait-hive-reply",
+            "detail": "Real Huawei HDR/MPF JPEG uploaded through the production helper and recognized as HONOR"
+          },
+          {
+            "name": "skill_default_generation",
+            "key": "skill-default-generation",
+            "title": "默认生成技能：Word / Excel / PPT / PDF 各交付一个文件",
+            "coverageId": "SKL-01",
+            "status": "failed",
+            "elapsedMs": 29994,
+            "stage": "wait-hive-reply",
+            "detail": "[ASSERT_MISMATCH] docx-pro: expected exactly one artifact named ST-1795100525359-e6e94f-GEN.docx, got 0; xlsx: expected exactly one artifact named ST-1795100525359-e6e94f-GEN.xlsx, got 0; pptx-generator: expected exactly one artifact named ST-1795100525359-e6e94f-GEN.pptx, got 0; pdf: expected exact"
+          },
+          {
+            "name": "skill_default_parsing",
+            "key": "skill-default-parsing",
+            "title": "默认解析技能：文本 PDF 提取与 CSV 对账单合计",
+            "coverageId": "SKL-02",
+            "status": "failed",
+            "elapsedMs": 30912,
+            "stage": "wait-hive-reply",
+            "detail": "[ASSERT_MISMATCH] financial-document-parser: marker ST-1795100525359-e6e94f-FIN missing from reply; financial-document-parser: expected value 150.00 missing from reply"
+          }
+        ]
+      }
+    },
     {
       "runId": 44347574174,
       "attempt": 1,
