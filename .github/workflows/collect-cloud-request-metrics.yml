@@ -1,5 +1,13 @@
 name: Collect DigitalMate cloud request metrics
 on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/collect-production-workspace-traces.py
+      - scripts/collect-production-sfs-traces.py
+      - scripts/collect-production-kube-traces.py
+      - scripts/kube-workspace-remote.py
+      - scripts/collect-cloud-request-metrics.py
   workflow_dispatch:
     inputs:
       validate_only:
@@ -41,7 +49,7 @@ jobs:
         run: |
           set -euo pipefail
           # An operator or a validation run can always request a fresh snapshot.
-          if [ "$VALIDATE_ONLY" = true ] || { [ "$GITHUB_EVENT_NAME" = workflow_dispatch ] && [ "$REFRESH_IF_DUE" != true ]; }; then
+          if [ "$GITHUB_EVENT_NAME" = push ] || [ "$VALIDATE_ONLY" = true ] || { [ "$GITHUB_EVENT_NAME" = workflow_dispatch ] && [ "$REFRESH_IF_DUE" != true ]; }; then
             echo 'collect=true' >> "$GITHUB_OUTPUT"
             exit 0
           fi

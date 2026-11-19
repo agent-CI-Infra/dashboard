@@ -47,6 +47,21 @@ def new_usage():
             'network': {key: [] for key in NETWORK_BUCKETS}, 'network_partial': False}
 
 
+def record_timeout(usage, line):
+    """Recognize explicit failure events, never a timeout word in a user message."""
+    if not ('llm_call_error' in line or '[MessageHandler] Stream 异常:' in line):
+        return
+    if not re.search(r'\b(?:timeouterror|timeout|timed out|deadline exceeded)\b', line, re.I):
+        return
+    usage['timeout_events'] = usage.get('timeout_events', 0) + 1
+    match = REQ.search(line)
+    rid = match.group(1) if match else None
+    if rid and REQUEST_ID.fullmatch(rid):
+        usage.setdefault('timeout_requests', {}).setdefault(rid, {'request_id': rid})
+    else:
+        usage['timeout_unlinked'] = usage.get('timeout_unlinked', 0) + 1
+
+
 def record_usage(usage, line):
     usage['events'] += 1
     values = {}
@@ -196,6 +211,8 @@ def read_log(item):
         if ts is None or ts < cutoff:
             continue
         day = dt.datetime.fromtimestamp(ts, CST).date()
+        if day <= today and ('llm_call_error' in line or '[MessageHandler] Stream 异常:' in line):
+            record_timeout(usage.setdefault(day.isoformat(), new_usage()), line)
         if day <= today and "[JiuWenSwarmDeepAdapter] llm_usage chunk: type='llm_usage'" in line:
             # These events have no stable invocation ID in the deployed image.
             # Publish their count as records, never as deduplicated calls.
@@ -264,6 +281,11 @@ def read_log(item):
         if 'first_token' in row and 'answer_first' in row and row['answer_first'] >= row['first_token']:
             row['react'] = round(row['answer_first'] - row['first_token'], 1)
         result.append(row)
+    by_id = {row['request_id']: row for row in result}
+    for values in usage.values():
+        for rid in values.get('timeout_requests', {}):
+            if rid in by_id:
+                values['timeout_requests'][rid] = anomaly_request(by_id[rid])
     read_network(query, files, usage, today)
     return query, result, 'ok', dict(usage)
 
@@ -577,6 +599,98 @@ def request_daily_metrics(records, date, generated_at, incomplete, usage=None):
             'answer_first_history': summary('answer_first_history_ms')}
 
 
+def anomaly_value(row, field):
+    if field == 'answer_tail':
+        end, answer = anomaly_value(row, 'gateway'), anomaly_value(row, 'answer_first')
+        return end - answer if end is not None and answer is not None and answer <= end else None
+    value = row.get(field)
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+        return None
+    return value if field == 'gateway' or value <= row.get('gateway', -1) else None
+
+
+def anomaly_request(row):
+    result = {key: row[key] for key in ('request_id', 'date', 'start_time') if key in row}
+    for key in ('gateway', 'first_token', 'answer_first', 'react'):
+        value = anomaly_value(row, key)
+        if value is not None:
+            result[key] = value
+    return result
+
+
+def request_anomalies(grouped, telemetry, observed_at, incomplete=False, today=None):
+    """Analyse all observed requests on the workspace, publishing aggregates only.
+
+    Closed calendar days can have incomplete workspace coverage. Keep those
+    samples usable and explicitly scoped to readable logs; requiring every
+    binding to be readable would suppress the baseline indefinitely.
+    """
+    today = today or dt.datetime.now(CST).date()
+    cutoff = (today - dt.timedelta(days=TRACE_DAYS - 1)).isoformat()
+    rows = {day: [item[2] for item in records] for day, records in grouped.items()}
+    result = {}
+    for day in sorted(set(grouped) | set(telemetry)):
+        current = rows.get(day, [])
+        first = (dt.date.fromisoformat(day) - dt.timedelta(days=7)).isoformat()
+        refs = [date for date in sorted(rows) if first <= date < day and date < today.isoformat() and rows[date]]
+        baseline = [row for date in refs for row in rows[date]]
+        metrics = {}
+        for key in ('gateway', 'first_token', 'answer_first', 'react'):
+            values = [v for row in current if (v := anomaly_value(row, key)) is not None]
+            previous = sorted(v for row in baseline if (v := anomaly_value(row, key)) is not None)
+            metric = {'n': len(values), 'baseline_n': len(previous)}
+            if len(previous) >= 20:
+                threshold = previous[math.ceil(.95 * len(previous)) - 1]
+                count = sum(value > threshold for value in values)
+                metric.update(baseline_p95=threshold, outliers=count if values else None,
+                              rate=count / len(values) if values else None)
+            else:
+                metric['insufficient_baseline'] = True
+            metrics[key] = metric
+        ordered = sorted(current, key=lambda row: row['gateway'], reverse=True)
+        slow_count = math.ceil(len(ordered) * .05)
+        recent = day >= cutoff
+        latency = {'n': len(current), 'max_ms': ordered[0]['gateway'] if ordered else None,
+                   'max_request': anomaly_request(ordered[0]) if ordered and recent else None,
+                   'slow_count': slow_count, 'details_retained': recent,
+                   'slow_requests': [anomaly_request(row) for row in ordered[:min(slow_count, 50)]] if recent else []}
+        usage = telemetry.get(day, {})
+        known, unlinked = usage.get('timeout_count', 0), usage.get('timeout_unlinked', 0)
+        timeouts = {'count': known if not unlinked else None, 'identified': known,
+                    'records': usage.get('timeout_events', 0), 'unlinked_records': unlinked,
+                    'source': 'workspace_error_logs',
+                    'requests': sorted(usage.get('timeout_rows', []), key=lambda row: row.get('gateway', -1), reverse=True)[:50] if recent else []}
+        available = 'baseline_p95' in metrics['gateway']
+        record = {'available': available, 'source': 'workspace_request_logs', 'observed_at': observed_at,
+                  'partial': incomplete or day == today.isoformat(),
+                  'baseline': {'from': refs[0] if refs else None, 'to': refs[-1] if refs else None,
+                               'days': len(refs), 'min_samples': 20, 'scope': 'readable_logs',
+                               'partial': incomplete},
+                  'metrics': metrics, 'latency': latency, 'timeouts': timeouts, 'error_categories': {}}
+        if available:
+            threshold = metrics['gateway']['baseline_p95']
+            normal = [row for row in current if row['gateway'] <= threshold]
+            outlier = [row for row in current if row['gateway'] > threshold]
+            phases = {}
+            for phase in ('gateway', 'first_token', 'react', 'answer_tail'):
+                phases[phase] = {}
+                for name, members in (('normal', normal), ('outlier', outlier)):
+                    values = [v for row in members if (v := anomaly_value(row, phase)) is not None]
+                    phases[phase][name] = {'n': len(values), 'sum': sum(values),
+                                           'mean': sum(values) / len(values) if values else None}
+            deltas = [(values['outlier']['mean'] - values['normal']['mean'], phase)
+                      for phase, values in phases.items() if phase != 'gateway'
+                      and values['outlier']['n'] and values['normal']['n']]
+            delta, driver = max(deltas, default=(0, None))
+            record['cohort'] = {'outliers': len(outlier), 'normal': len(normal), 'phases': phases,
+                                'driver': driver if delta > 0 else None,
+                                'driver_delta_ms': delta if delta > 0 else None}
+        else:
+            record['reason'] = 'insufficient_baseline'
+        result[day] = record
+    return result
+
+
 def collect():
     if not TOKEN:
         raise SystemExit('ADX_TOKEN required')
@@ -601,6 +715,10 @@ def collect():
                         for key in NETWORK_BUCKETS:
                             pooled['network'][key].extend(values.get('network', {}).get(key, []))
                         pooled['network_partial'] |= values.get('network_partial', False)
+                        for key in ('timeout_events', 'timeout_unlinked'):
+                            pooled[key] = pooled.get(key, 0) + values.get(key, 0)
+                        pooled['timeout_count'] = pooled.get('timeout_count', 0) + len(values.get('timeout_requests', {}))
+                        pooled.setdefault('timeout_rows', []).extend(values.get('timeout_requests', {}).values())
                 else: problems[status] = problems.get(status, 0) + 1
             except Exception as error:
                 category = 'http_' + str(error.code) if isinstance(error, urllib.error.HTTPError) else type(error).__name__
@@ -622,9 +740,11 @@ def collect():
     days, chosen, daily_metrics = [], [], []
     generated_at = dt.datetime.now(UTC).isoformat()
     trace_cutoff = (dt.datetime.now(CST).date() - dt.timedelta(days=TRACE_DAYS - 1)).isoformat()
+    anomalies = request_anomalies(grouped, usage_by_day, generated_at, bool(problems))
     for date in sorted(set(grouped) | set(usage_by_day)):
         records = grouped.get(date, [])
-        daily_metrics.append(request_daily_metrics(records, date, generated_at, bool(problems), usage_by_day.get(date)))
+        daily_metrics.append({**request_daily_metrics(records, date, generated_at, bool(problems), usage_by_day.get(date)),
+                              'anomaly': anomalies[date]})
         if not records or date < trace_cutoff:
             continue
         records.sort(key=lambda item:item[2]['gateway'],reverse=True)
@@ -632,7 +752,7 @@ def collect():
         slow = records[:min(slow_count, 50)]
         chosen.extend(slow)
         days.append({'date': date, 'anomaly': {'latency': {'n':len(records),'slow_count':slow_count,
-            'slow_requests':[row for _,_,row in slow]}, 'timeouts':{'requests':[]}}})
+            'slow_requests':[row for _,_,row in slow]}, 'timeouts': anomalies[date]['timeouts']}})
     chosen.sort(key=lambda item:(item[2]['date'], item[2]['gateway']), reverse=True)
     by_binding = {}
     for idx, query, row in chosen[:MAX_TRACE_REQUESTS]:
