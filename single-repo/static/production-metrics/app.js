@@ -856,7 +856,7 @@ function envAnswerFirstTrend(doc) {
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.answer_first?.n, note: '个请求' }),
-    note: '网关受理到首个答案 chat.delta；仅统计网关记录的样本。旧版日志可能漏掉后续 chunk，样本覆盖有限；历史估算单独列示，不纳入本图。',
+    note: '网关受理到首个答案 chat.delta；仅统计网关记录的样本。旧版日志可能漏掉后续 chunk，样本覆盖有限；缺失值不补 0。',
   });
 }
 
@@ -869,7 +869,7 @@ function envReactTrend(doc) {
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.react?.n, note: '个请求' }),
-    note: '首个网关文本至首个网关答案 chat.delta 的时间差；仅在同一请求两个时间点均有记录且顺序有效时统计，不纳入历史估算；缺失值不补 0。',
+    note: '首个网关文本至首个网关答案 chat.delta 的时间差；仅在同一请求两个时间点均有记录且顺序有效时统计；缺失值不补 0。',
   });
 }
 
@@ -1016,7 +1016,7 @@ function envSummary(doc) {
   const tokenBare = (value) => (Number.isFinite(value) && value >= 0
     ? trimNumberZeros((value / tokenDiv).toFixed(value / tokenDiv >= 100 ? 1 : 2))
     : '—');
-  // The four request-scope tiles always stay on the board, in the same order
+  // The measured request-scope tiles stay on the board, in the same order
   // and with the same wording, whatever the anchor day happens to hold. A day
   // without samples shows "—" and a zero count instead of dropping the card,
   // so a collection gap is visible as a gap rather than as a missing metric.
@@ -1031,7 +1031,6 @@ function envSummary(doc) {
   };
   const firstTile = requestTile('first_token', '首吐字', '网关受理 → 首个文本 chunk');
   const answerTile = requestTile('answer_first', '答案首吐字', '网关受理 → 首个答案 chat.delta · 网关实测');
-  const answerEstimateTile = requestTile('answer_first_history', '答案首吐字（历史估算）', '会话回答段起点估算 · 非网关转发时间，不纳入实测');
   const reactTile = requestTile('react', 'ReAct 阶段', '网关首文本 → 网关首答案 · 同一请求配对');
   const networkTiles = [
     ['uplink_send', '端到云', '上行时延', '端侧发出请求 → 云侧 Bridge 收到请求'],
@@ -1060,7 +1059,6 @@ function envSummary(doc) {
     </div>
     ${firstTile}
     ${answerTile}
-    ${answerEstimateTile}
     ${reactTile}
     ${networkTiles}
     <div class="stat-card">
@@ -3924,13 +3922,11 @@ function renderEnv() {
   const timeText = latestObserved ? `采集于 ${esc(fmtDateTime(latestObserved))}`
     : snapshotTime ? `快照生成于 ${esc(fmtDateTime(snapshotTime))}，行级采集时间未知` : '采集时间未知';
   const requestOnly = scoped.days.some((row) => row.source === 'workspace_request_logs');
-  const answerPartial = daily.cloud_trace_collection?.answer_workspaces_partial;
   const warnings = [
     stale && '超过 6 小时未更新，请检查采集任务',
     state.envRefreshFailed && '刷新失败，保留上次快照',
     state.rangeDays === 1 && !scoped.days.length && '尚无当天采集数据',
     requestOnly && '模型用量及 Token 基于日志记录，可能重复；网关流异常率不代表业务请求失败率；工具耗时尚未完整采集',
-    answerPartial > 0 && `答案历史仅扫描近期会话，${fmtCount(answerPartial)} 个工作区可能不完整`,
   ].filter(Boolean);
   const freshness = `<div class="env-data-notes" aria-label="数据说明"><div><strong>数据更新</strong><span>${timeText} · 定时采集，并非实时流</span></div>${warnings.length ? `<div><strong>数据限制</strong><span>${warnings.join('；')}。</span></div>` : ''}<div><strong>覆盖标记</strong><span>* 表示部分日或日志覆盖不全。</span></div></div>`;
   target.innerHTML = `${freshness}${envSummary(scoped)}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
