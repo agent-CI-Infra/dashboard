@@ -849,7 +849,8 @@ def with_workspace_traces(previous, traces):
             if isinstance(day.get('model_usage_events'), int) and isinstance(day.get('gateway_stream'), dict):
                 old['model_usage_events'] = day['model_usage_events']
                 old['gateway_stream'] = dict(day['gateway_stream'])
-                for key in ('tokens', 'tpot'):
+                for key in ('tokens', 'tpot', 'uplink_send', 'downlink_first_text', 'downlink_terminal',
+                            'network_partial', 'anomaly'):
                     if key in day:
                         old[key] = day[key]
                 old['telemetry_observed_at'] = day.get('telemetry_observed_at') or day.get('observed_at')
@@ -865,6 +866,11 @@ def with_workspace_traces(previous, traces):
         existing[day['date']] = dict(day)
     result['days'] = [existing[key] for key in sorted(existing)]
     result['cloud_trace_collection'] = traces
+    if any(isinstance(day.get('anomaly'), dict) for day in traces.get('request_daily_metrics', [])):
+        result['anomaly_version'] = 3
+        result['definitions'] = {**result.get('definitions', {}),
+            'anomaly': '各自然日之前 7 个已结束自然日的可读日志样本 P95，至少 20 个样本；仅代表已读取工作区',
+            'timeout': '显式 llm_call_error 或网关流异常日志中的超时错误；工作区内按请求 ID 去重'}
     return result
 
 

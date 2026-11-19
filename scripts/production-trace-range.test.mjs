@@ -38,12 +38,14 @@ test('request list displays every matching row and drops an out-of-range selecti
     + extract('function availableTraceCandidates(', "$('request-traces').addEventListener('change'")
     + ';globalThis.render=renderRequestTraces;globalThis.nodes=nodes;globalThis.state=state;', context);
   const yesterday = Array.from({length: 225}, (_, i) => ({request_id:`yesterday-${i}`,gateway:1000+i}));
-  const doc = {cloud_trace_collection:{schema:'digitalmate/cloud-traces@1',days:[
+  const doc = {cloud_trace_collection:{schema:'digitalmate/cloud-traces@1',
+    slow_trace_sampling:{ratio:.1,minimum:10,population:'finished_gateway_requests'},days:[
     {date:'2026-11-13',anomaly:{latency:{slow_requests:yesterday}}},
     {date:'2026-11-14',anomaly:{latency:{slow_requests:[{request_id:'today',gateway:2000}]}}},
   ]}};
   context.render(doc);
   assert.equal(context.state.traceCandidates.length, 225);
+  assert.match(context.nodes['trace-picker'].innerHTML, /10%（向上取整），至少 10 条/);
   assert.equal((context.nodes['trace-picker'].innerHTML.match(/data-cloud-select=/g) || []).length, 225);
   assert.doesNotMatch(context.nodes['trace-picker'].innerHTML, /cloud:today/);
   assert.equal(context.state.traceId, 'cloud:yesterday-224');

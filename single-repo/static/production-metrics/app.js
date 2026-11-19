@@ -766,14 +766,13 @@ function envTrendChart(doc, opts) {
     return path;
   };
 
-  const dense = rows.length > 16;
   const layer = (item) => {
     const path = linePath(item.values);
     const dots = item.values
       .map((value, index) => {
         if (value === null) return '';
         const labelX = Math.min(Math.max(x(index), pad.left + 18), width - pad.right - 18);
-        const label = opts.pointLabels === false || dense
+        const label = opts.pointLabels === false
           ? ''
           : pointLabel(labelX, y(value), value, item.values[index - 1], { format: opts.labelFormat || formatValue, lowerIsBetter: true, below: !!item.below });
         return `<circle class="trend-dot" cx="${x(index).toFixed(1)}" cy="${y(value).toFixed(1)}" r="2.6" />${label}`;
@@ -856,7 +855,7 @@ function envAnswerFirstTrend(doc) {
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.answer_first?.n, note: '个请求' }),
-    note: '网关受理到首个答案 chat.delta；仅统计网关记录的样本。旧版日志可能漏掉后续 chunk，样本覆盖有限；历史估算单独列示，不纳入本图。',
+    note: '网关受理到首个答案 chat.delta；仅统计网关记录的样本。旧版日志可能漏掉后续 chunk，样本覆盖有限；缺失值不补 0。',
   });
 }
 
@@ -869,7 +868,7 @@ function envReactTrend(doc) {
     formatAxis: fmtAxisSeconds,
     labelFormat: fmtAxisSeconds,
     sample: (row) => ({ n: row?.react?.n, note: '个请求' }),
-    note: '首个网关文本至首个网关答案 chat.delta 的时间差；仅在同一请求两个时间点均有记录且顺序有效时统计，不纳入历史估算；缺失值不补 0。',
+    note: '首个网关文本至首个网关答案 chat.delta 的时间差；仅在同一请求两个时间点均有记录且顺序有效时统计；缺失值不补 0。',
   });
 }
 
@@ -954,6 +953,7 @@ function summarizeCloudWindow(rows) {
     telemetry_partial: rows.some((row) => row.telemetry_partial), window_days: rows.length,
     window_start: rows[0].date, window_end: rows[rows.length - 1].date };
   result.current_sample_days = rows.filter((row) => row.current_sample_used).length;
+  result.network_partial = rows.some((row) => row.network_partial);
   for (const key of ['gateway', 'first_token', 'answer_first', 'answer_first_history', 'react', 'tool', 'tpot', 'uplink_send', 'downlink_first_text', 'downlink_terminal']) {
     result[key] = aggregateCloudMetric(rows, key);
   }
@@ -997,6 +997,7 @@ function envSummary(doc) {
   if (!rows.length) return '';
   const anchor = summarizeCloudWindow(rows);
   const seconds = (value) => fmtSecondsBare(value);
+  const milliseconds = (value) => Number.isFinite(value) && value >= 0 ? value.toFixed(1).replace(/\.0$/, '') : '—';
   const formatted = (metric, field, formatter) => `${metric?.approx && field !== 'mean' && Number.isFinite(metric?.[field]) ? '≈' : ''}${formatter(metric?.[field])}`;
   const workspaceMetrics = anchor.source === 'workspace_request_logs' || Number.isFinite(anchor.model_usage_events);
   const rateValue = workspaceMetrics ? anchor.gateway_stream?.exception_rate : anchor.failure_rate;
@@ -1014,7 +1015,7 @@ function envSummary(doc) {
   const tokenBare = (value) => (Number.isFinite(value) && value >= 0
     ? trimNumberZeros((value / tokenDiv).toFixed(value / tokenDiv >= 100 ? 1 : 2))
     : '—');
-  // The four request-scope tiles always stay on the board, in the same order
+  // The measured request-scope tiles stay on the board, in the same order
   // and with the same wording, whatever the anchor day happens to hold. A day
   // without samples shows "—" and a zero count instead of dropping the card,
   // so a collection gap is visible as a gap rather than as a missing metric.
@@ -1029,8 +1030,20 @@ function envSummary(doc) {
   };
   const firstTile = requestTile('first_token', '首吐字', '网关受理 → 首个文本 chunk');
   const answerTile = requestTile('answer_first', '答案首吐字', '网关受理 → 首个答案 chat.delta · 网关实测');
-  const answerEstimateTile = requestTile('answer_first_history', '答案首吐字（历史估算）', '会话回答段起点估算 · 非网关转发时间，不纳入实测');
   const reactTile = requestTile('react', 'ReAct 阶段', '网关首文本 → 网关首答案 · 同一请求配对');
+  const networkTiles = [
+    ['uplink_send', '端到云', '上行时延', '端侧发出请求 → 云侧 Bridge 收到请求'],
+    ['downlink_first_text', '云到端', '首段文字下行', '云侧 Bridge 发出首段文字 → 端侧收到'],
+    ['downlink_terminal', '云到端', '结束帧下行', '云侧 Bridge 发出结束帧 → 端侧收到'],
+  ].map(([key, direction, label, hint]) => {
+    const metric = anchor[key];
+    const count = metric?.n > 0 ? `${fmtCount(metric.n)} 个有效样本` : '所选范围无有效样本 · 等待已校时样本';
+    return `<div class="stat-card network-card" data-metric="${key}">
+      <div class="stat-label">${direction}<strong>${label}</strong> 平均 / P50 / P95（ms）</div>
+      <div class="stat-value combo">${formatted(metric, 'mean', milliseconds)} / ${formatted(metric, 'p50', milliseconds)} / ${formatted(metric, 'p95', milliseconds)}</div>
+      <div class="stat-hint">${count} · 覆盖 ${fmtCount(metric?.days)} / ${fmtCount(anchor.window_days)} 天${anchor.network_partial ? ' · 采集部分覆盖' : ''} · ${hint} · 校时误差 ≤ 50 ms；下行仅计已配对帧</div>
+    </div>`;
+  }).join('');
   const rangeNote = `${esc(anchor.window_start)} 至 ${esc(anchor.window_end)} · ${fmtCount(anchor.window_days)} 个有数据的日期${anchor.partial ? ' · 含部分覆盖' : ''}${anchor.current_sample_days ? ` · ${fmtCount(anchor.current_sample_days)} 天使用当前可读日志样本` : ''}`;
   return `<div class="env-data-notes env-range-notes"><div><strong>统计范围</strong><span>${rangeNote}</span></div><div><strong>汇总口径</strong><span>均值按样本数或输出 Token 加权；多日分位数仅在可合并分布完整时显示，≈ 表示近似。</span></div></div><section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
     <div class="stat-card">
@@ -1045,8 +1058,8 @@ function envSummary(doc) {
     </div>
     ${firstTile}
     ${answerTile}
-    ${answerEstimateTile}
     ${reactTile}
+    ${networkTiles}
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>TPOT</strong> 平均 / P50 / P95（ms/token）</div>
       <div class="stat-value combo">${formatted(anchor.tpot, 'mean', fmtTpotBare)} / ${formatted(anchor.tpot, 'p50', fmtTpotBare)} / ${formatted(anchor.tpot, 'p95', fmtTpotBare)}</div>
@@ -1185,6 +1198,68 @@ const ANOMALY_PHASES = [
   ['overhead', '网关开销'],
 ];
 
+function summarizeCloudAnomalies(rows) {
+  const entries = rows.filter(row => row.anomaly);
+  if (!entries.length) return null;
+  const metrics = {};
+  for (const [key] of ANOMALY_METRICS) {
+    const all = entries.map(row => row.anomaly.metrics?.[key]).filter(Boolean);
+    const baselined = all.filter(metric => Number.isFinite(metric.baseline_p95));
+    const valid = baselined.filter(metric => Number.isFinite(metric.outliers) && metric.n > 0);
+    const n = valid.reduce((sum, metric) => sum + metric.n, 0);
+    const outliers = valid.reduce((sum, metric) => sum + metric.outliers, 0);
+    const thresholds = baselined.map(metric => metric.baseline_p95);
+    const baselineCounts = all.map(metric => metric.baseline_n).filter(Number.isFinite);
+    metrics[key] = { n: n || all.reduce((sum, metric) => sum + (metric.n || 0), 0),
+      outliers: n ? outliers : null, rate: n ? outliers / n : null,
+      baseline_n: baselineCounts.length ? Math.max(...baselineCounts) : 0,
+      baseline_p95: thresholds.length ? Math.min(...thresholds) : null,
+      baseline_p95_max: thresholds.length ? Math.max(...thresholds) : null,
+      coverage_days: valid.length, baseline_days: baselined.length };
+  }
+  const max = entries.filter(row => Number.isFinite(row.anomaly.latency?.max_ms))
+    .reduce((best, row) => !best || row.anomaly.latency.max_ms > best.anomaly.latency.max_ms ? row : best, null);
+  const timeoutDays = entries.map(row => row.anomaly.timeouts || {});
+  const baselines = entries.map(row => row.anomaly.baseline).filter(value => value?.from && value?.to);
+  const phases = {};
+  for (const [key] of ANOMALY_PHASES) {
+    phases[key] = {};
+    for (const group of ['normal', 'outlier']) {
+      const values = entries.map(row => row.anomaly.cohort?.phases?.[key]?.[group])
+        .filter(value => value?.n > 0 && Number.isFinite(value.mean));
+      const n = values.reduce((sum, value) => sum + value.n, 0);
+      const total = values.reduce((sum, value) => sum + (Number.isFinite(value.sum) ? value.sum : value.mean * value.n), 0);
+      phases[key][group] = { n, mean: n ? total / n : null };
+    }
+  }
+  const deltas = ['first_token', 'react', 'answer_tail'].map(key => {
+    const phase = phases[key];
+    return phase.normal.n && phase.outlier.n ? [key, phase.outlier.mean - phase.normal.mean] : null;
+  }).filter(value => value && value[1] > 0).sort((a, b) => b[1] - a[1]);
+  return { available: metrics.gateway.coverage_days > 0,
+    source: entries.every(row => row.anomaly.source === 'kubernetes_slow_sample') ? 'kubernetes_slow_sample' : 'workspace_request_logs',
+    partial: entries.some(row => row.partial || row.anomaly.partial),
+    window_start: rows[0].date, window_end: rows.at(-1).date, window_days: rows.length,
+    analysis_days: entries.length, metrics,
+    baseline: { from: baselines.map(value => value.from).sort()[0], to: baselines.map(value => value.to).sort().at(-1),
+      days: Math.max(0, ...baselines.map(value => value.days || 0)) },
+    latency: { n: entries.reduce((sum, row) => sum + (row.anomaly.latency?.n || 0), 0),
+      max_ms: max?.anomaly.latency.max_ms, max_request: max?.anomaly.latency.max_request, max_date: max?.date,
+      slow_count: entries.reduce((sum, row) => sum + (row.anomaly.latency?.slow_count || 0), 0),
+      slow_requests: entries.flatMap(row => row.anomaly.latency?.slow_requests || []) },
+    timeouts: { count: timeoutDays.every(value => Number.isFinite(value.count)) ? timeoutDays.reduce((sum, value) => sum + value.count, 0) : null,
+      identified: timeoutDays.reduce((sum, value) => sum + (value.identified || value.count || 0), 0),
+      records: timeoutDays.some(value => Number.isFinite(value.records)) ? timeoutDays.reduce((sum, value) => sum + (value.records || 0), 0) : null,
+      requests: timeoutDays.flatMap(value => value.requests || []) },
+    cohort: { outliers: entries.reduce((sum, row) => sum + (row.anomaly.cohort?.outliers || 0), 0),
+      normal: entries.reduce((sum, row) => sum + (row.anomaly.cohort?.normal || 0), 0), phases,
+      driver: deltas[0]?.[0], driver_delta_ms: deltas[0]?.[1] },
+    error_categories: entries.reduce((counts, row) => {
+      for (const [key, value] of Object.entries(row.anomaly.error_categories || {})) counts[key] = (counts[key] || 0) + value;
+      return counts;
+    }, {}) };
+}
+
 function envAnomaly(doc) {
   const traceDays = new Map((doc?.cloud_trace_collection?.days || []).filter((row) => row?.date)
     .map((row) => [row.date, row]));
@@ -1192,22 +1267,18 @@ function envAnomaly(doc) {
     if (row.anomaly) return row;
     const trace = traceDays.get(row.date)?.anomaly?.latency;
     if (!(trace?.n > 0)) return row;
-    const slow = Array.isArray(trace.slow_requests) ? trace.slow_requests : [];
+    // The diagnostic picker can retain more rows than the anomaly tail.
+    const slowCount = Math.ceil(trace.n * .05);
+    const slow = (Array.isArray(trace.slow_requests) ? trace.slow_requests : [])
+      .filter(item => Number.isFinite(item?.gateway)).sort((a, b) => b.gateway - a.gateway).slice(0, slowCount);
     const maximum = slow.filter((item) => Number.isFinite(item?.gateway))
       .reduce((best, item) => !best || item.gateway > best.gateway ? item : best, null);
     return { ...row, anomaly: { available: false, source: 'kubernetes_slow_sample',
-      latency: { ...trace, max_ms: maximum?.gateway, max_request: maximum }, timeouts: {} } };
+      latency: { ...trace, slow_count: slowCount, slow_requests: slow, max_ms: maximum?.gateway, max_request: maximum }, timeouts: {} } };
   });
-  const hasBaseline = (row) => row.anomaly?.available
-    && Object.values(row.anomaly.metrics || {}).some((metric) => Number.isFinite(metric?.baseline_p95));
-  const analysed = rows.filter(hasBaseline);
-  // The latency maximum and the slow/timeout tables do not need a baseline, so
-  // a first collected day still renders the module.
-  const withDetail = rows.filter((row) => row.anomaly?.latency?.n || row.anomaly?.timeouts?.count);
-  const anchor = [...analysed].reverse().find((row) => !row.partial)
-    || analysed[analysed.length - 1]
-    || withDetail[withDetail.length - 1];
-  const head = (windowDays, sampled = false) => `<div class="trend-head"><h3>异常请求分析</h3><span class="muted">${sampled ? '采样慢请求 · 基线尚未采集' : `超基线 P95 · 近 ${fmtCount(windowDays)} 个完整日`}</span></div>`;
+  const summary = summarizeCloudAnomalies(rows);
+  const anchor = summary ? { date: `${summary.window_start} 至 ${summary.window_end}`, partial: summary.partial, anomaly: summary } : null;
+  const head = (windowDays, sampled = false) => `<div class="trend-head"><h3>异常请求分析</h3><span class="muted">${sampled ? '采样慢请求 · 基线尚未采集' : `所选范围 ${fmtCount(windowDays)} 天 · 各日历史基线 P95`}</span></div>`;
   if (!anchor) {
     return `<div class="trend-card wide env-anomaly">${head(7)}<p class="empty">等待下一次采集生成异常分析（需要按请求合并各阶段耗时）。</p><p class="chart-note">异常判定以当日之前的完整日为基线，不使用当日 P95，避免固定比例的样本被机械标为异常。</p></div>`;
   }
@@ -1222,15 +1293,15 @@ function envAnomaly(doc) {
   const phaseLabels = Object.fromEntries(ANOMALY_PHASES);
   const driver = cohort?.driver && Number.isFinite(cohort.driver_delta_ms)
     ? `${phaseLabels[cohort.driver] || cohort.driver} +${fmtDuration(cohort.driver_delta_ms)}`
-    : '—';
+    : a.available ? '暂无可比阶段样本' : '—';
   const maxHint = Number.isFinite(latency.max_ms)
-    ? `${esc(anchor.date)} · ${esc(latency.max_request?.request_id || 'request_id 未记录')}`
-    : '当日无请求样本';
+    ? `${esc(latency.max_date)} · ${esc(latency.max_request?.request_id || '请求明细超过保留窗口')}`
+    : '所选范围无请求样本';
   const lead = `<div class="anomaly-lead">
     <div class="stat-card">
       <div class="stat-label">超基线请求</div>
       <div class="stat-value">${a.available ? `${fmtCount(gateway.outliers)} / ${fmtCount(gateway.n)}` : '—'}</div>
-      <div class="stat-hint">${a.available ? `${rate} · 请求耗时 &gt; 基线 P95${Number.isFinite(gateway.baseline_p95) ? ` ${fmtDuration(gateway.baseline_p95)}` : ''}` : sampled ? '基线尚未采集，仅展示可读日志中的慢请求' : '基线样本不足，仅展示最大时延与慢请求'}</div>
+      <div class="stat-hint">${a.available ? `${rate} · 各日请求耗时 &gt; 各自历史基线 P95 · 基线覆盖 ${fmtCount(gateway.coverage_days)} / ${fmtCount(a.window_days)} 天` : sampled ? '基线尚未采集，仅展示可读日志中的慢请求' : '基线样本不足，仅展示最大时延与慢请求'}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">最大时延</div>
@@ -1238,14 +1309,14 @@ function envAnomaly(doc) {
       <div class="stat-hint">${maxHint}</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">超时请求</div>
+      <div class="stat-label">日志内超时请求</div>
       <div class="stat-value">${fmtCount(timeouts.count)}</div>
-      <div class="stat-hint">${sampled ? '超时统计未采集' : `llm_call_error 超时 · ${fmtCount(timeouts.records)} 条已记录 request_id`}</div>
+      <div class="stat-hint">${sampled ? '超时统计未采集' : `显式错误日志 · ${fmtCount(timeouts.records)} 条超时事件 · 已识别 ${fmtCount(timeouts.identified)} 个请求`}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">主要拉高阶段</div>
-      <div class="stat-value">${esc(driver)}</div>
-      <div class="stat-hint">${a.baseline ? `${esc(a.baseline.from)} 至 ${esc(a.baseline.to)} · ${fmtCount(a.baseline.days)} 个完整日` : '异常组均值 − 正常组均值'}</div>
+      <div class="stat-value">${esc(a.available && gateway.outliers === 0 ? '无超基线请求' : driver)}</div>
+      <div class="stat-hint">${a.available ? '所选范围阶段均值 · 异常组 − 正常组' : '基线不足，阶段对比暂不可用'}</div>
     </div>
   </div>`;
 
@@ -1291,10 +1362,10 @@ function envAnomaly(doc) {
       ? '当日没有可关联的 request_id（旧版采集器未写入），请等待下一次采集。'
       : '当日没有超时或慢请求记录。');
 
-  const metricRows = ANOMALY_METRICS.map(([key, label, kind]) => {
+  const metricRows = ANOMALY_METRICS.filter(([key]) => a.metrics?.[key]?.n > 0 || a.metrics?.[key]?.baseline_n > 0).map(([key, label, kind]) => {
     const metric = a.metrics?.[key] || {};
     const baseline = Number.isFinite(metric.baseline_p95)
-      ? `${metricValue(metric.baseline_p95, kind)} <span class="muted">(n=${fmtCount(metric.baseline_n)})</span>`
+      ? `${metricValue(metric.baseline_p95, kind)}${metric.baseline_p95_max > metric.baseline_p95 ? ` – ${metricValue(metric.baseline_p95_max, kind)}` : ''} <span class="muted">(${fmtCount(metric.baseline_days)} 天)</span>`
       : `基线不足 <span class="muted">(n=${fmtCount(metric.baseline_n)})</span>`;
     const share = Number.isFinite(metric.rate)
       ? `<div class="anomaly-rate"><span class="anomaly-track"><span class="anomaly-fill" style="width:${Math.min(100, metric.rate * 100).toFixed(1)}%"></span></span><span>${fmtPercent(metric.rate * 100)}</span></div>`
@@ -1303,7 +1374,7 @@ function envAnomaly(doc) {
   }).join('');
 
   const cohortRows = cohort
-    ? ANOMALY_PHASES.map(([key, label]) => {
+    ? ANOMALY_PHASES.filter(([key]) => cohort.phases?.[key]?.normal?.n || cohort.phases?.[key]?.outlier?.n).map(([key, label]) => {
       const phase = cohort.phases?.[key] || {};
       const normal = phase.normal || {};
       const outlier = phase.outlier || {};
@@ -1314,18 +1385,18 @@ function envAnomaly(doc) {
     : '';
 
   return `<div class="trend-card wide env-anomaly" aria-label="异常请求分析">
-    ${head(a.available ? a.baseline.days : 7, sampled)}
+    ${head(a.window_days, sampled)}
     <p class="chart-note">${esc(anchor.date)}${anchor.partial ? ' · 部分日' : ''} · ${a.available
-      ? `基线为 ${esc(a.baseline.from)} 至 ${esc(a.baseline.to)} 的 ${fmtCount(a.baseline.days)} 个完整日合并样本。异常请求 = 云侧请求耗时超过基线 P95 的请求；低于基线的请求归入正常组。`
-      : '当日之前还没有足够的完整日样本，基线判定暂不可用；最大时延、超时与慢请求明细仍按当日样本展示。'}</p>
+      ? `各日分别使用其之前 7 个已结束自然日的可读日志样本建立基线，再汇总所选范围。分析覆盖 ${fmtCount(a.analysis_days)} / ${fmtCount(a.window_days)} 天；部分工作区未读到日志时按已读样本统计。`
+      : '历史基线样本不足；最大时延、超时与慢请求明细按所选范围内已采集的样本展示。'}</p>
     ${lead}
     <details class="slow-request-details"><summary class="anomaly-subhead">超时与最慢 5% 请求</summary>
     <div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>类型</th><th class="num">请求耗时</th><th class="num">首吐字</th><th class="num">ReAct 阶段</th><th>request_id</th></tr></thead><tbody>${detailRows || `<tr><td colspan="5" class="muted">${detailNote}</td></tr>`}</tbody></table></div></details>
-    ${categoryText ? `<p class="chart-note">当日网关失败原因：${esc(categoryText)}。</p>` : ''}
-    ${a.available ? `<div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>指标</th><th>基线 P95</th><th class="num">当日样本</th><th class="num">超基线</th><th>占比</th></tr></thead><tbody>${metricRows}</tbody></table></div>` : ''}
+    ${categoryText ? `<p class="chart-note">所选范围日志失败原因：${esc(categoryText)}。</p>` : ''}
+    ${a.available ? `<div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>指标</th><th>各日基线 P95 范围</th><th class="num">有基线样本</th><th class="num">超基线</th><th>占比</th></tr></thead><tbody>${metricRows}</tbody></table></div>` : ''}
     ${cohort ? `<h4 class="anomaly-subhead">慢请求阶段对比（均值）</h4><div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>阶段</th><th class="num">正常请求</th><th class="num">异常请求</th><th class="num">增量</th></tr></thead><tbody>${cohortRows}</tbody></table></div>` : ''}
-    <p class="chart-note">${detailNote} 慢请求 = 当日可读取请求耗时排序的最慢 5%。${sampled ? '当前 Kubernetes 采集未计算超时数、历史基线和超基线异常数；不能据此认定没有超时或异常。' : '超时 = <code>llm_call_error</code> 文本含 timeout / timed out / deadline exceeded。'} 公开看板只发布这些请求的不透明 request_id 与各阶段耗时，不包含消息内容、用户标识或 IP；需要继续排查时，可用下方「按请求 ID 查询」检索网关记录。</p>
-    <p class="chart-note">基线取该日之前最近 7 个完整日（不含当日与部分日）的合并样本，P95 为最近排名分位，每项至少 20 个基线样本；异常 = 当日样本严格大于基线 P95；各指标单独判定，同一请求可能同时计入请求耗时与某个阶段指标。分布稳定时约 5% 的样本会自然超过基线 P95，应关注占比持续升高或集中在同一阶段的日期。阶段均值只统计该阶段有样本的请求，增量 = 异常组 − 正常组；首吐字 + ReAct 阶段 + 答案尾段构成请求耗时，因此增量最大的阶段即主要拉高项。请求耗时 / 首吐字 / 答案首吐字 / ReAct 按请求统计，TTFT / TPOT 按模型调用统计，工具调用按每次工具调用统计。基线不是当日 P95，避免固定约 5% 的样本被机械标为异常。</p>
+    <p class="chart-note">${detailNote} 慢请求按每个自然日已读取请求的最慢 5% 选取；请求明细只保留最近 7 天。${sampled ? '旧快照只有慢请求样本，超时统计未采集。' : '超时仅识别 llm_call_error 或网关流异常日志中的 TimeoutError / timeout / timed out / deadline exceeded；同一工作区按 request_id 去重，无 ID 的事件只计记录数。'} 公开看板仅展示请求标识和耗时。</p>
+    <p class="chart-note">每个自然日使用其之前 7 个已结束自然日的可读日志样本计算最近排名 P95，每项至少需要 20 个基线样本。当天样本严格超过其历史基线即计为超基线，范围汇总仅使用有基线的样本；表格显示各日阈值范围。工作区缺失时，历史基线及当日结果均只代表已读日志。阶段对比按各组有效样本数加权汇总，主要拉高阶段为首吐字、ReAct 和答案尾段中均值增量最大的正值。</p>
   </div>`;
 }
 
@@ -1387,7 +1458,6 @@ function envCallTrend(doc) {
         lowerIsBetter: !!opts.lowerIsBetter,
         colorDirection: !opts.lowerIsBetter,
         below: !!opts.below,
-        dense: rows.length > 16,
       });
       return `<circle class="trend-dot" cx="${x(index).toFixed(1)}" cy="${scale(value).toFixed(1)}" r="2.8" />${label}`;
     })
@@ -1534,10 +1604,10 @@ function fmtInUnit(value, div = 1) {
 
 // Per-point value with a day-over-day direction glyph, drawn beside each dot.
 // Latency-family charts color the glyph by "lower is better"; volume charts
-// keep it neutral so growth never reads as an alarm. Skipped entirely when the
-// selected range packs too many points for legible labels.
-function pointLabel(cx, cy, value, previous, { format, below = false, lowerIsBetter = false, colorDirection = false, dense = false } = {}) {
-  if (dense || !Number.isFinite(value)) return '';
+// keep it neutral so growth never reads as an alarm. Overlapping labels are
+// handled after rendering, without hiding an entire selected date range.
+function pointLabel(cx, cy, value, previous, { format, below = false, lowerIsBetter = false, colorDirection = false } = {}) {
+  if (!Number.isFinite(value)) return '';
   let glyph = '';
   let pctText = '';
   let tone = 'flat';
@@ -2243,7 +2313,6 @@ function volumeTrendChart(days, failures, visibility = {}) {
         path += `${open ? 'L' : 'M'}${x(index).toFixed(1)},${scale(value).toFixed(1)}`;
         open = true;
       });
-      const dense = rows.length > 16;
       const dots = item.values
         .map((value, index) => {
           if (value === null) return '';
@@ -2254,7 +2323,6 @@ function volumeTrendChart(days, failures, visibility = {}) {
             below: item.axis === 'right',
             lowerIsBetter: item.key === 'failure',
             colorDirection: item.key !== 'failure',
-            dense,
           });
           return `<circle class="trend-dot" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="2.5">
             <title>${esc(`${rows[index]?.date || ''} · ${item.label} ${item.format(value)}`)}</title>
@@ -2468,10 +2536,10 @@ function latencyTrendChart(points, visibility = {}) {
   return `<div class="trend-card wide">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="模型请求平均耗时及 P50 / P95 趋势">
     ${grid}
     <line class="axis-line" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}" />
-    ${layer('duration', mean, 'ttft', true, y, { format: fmtDuration, lowerIsBetter: true, dense: rows.length > 16 })}
-    ${layer('p50', p50, 'p50-upper', true, y, { format: fmtDuration, lowerIsBetter: true, below: true, dense: rows.length > 16 })}
+    ${layer('duration', mean, 'ttft', true, y, { format: fmtDuration, lowerIsBetter: true })}
+    ${layer('p50', p50, 'p50-upper', true, y, { format: fmtDuration, lowerIsBetter: true, below: true })}
     ${intervalLayer('p50', p50Lower, p50Upper, 'p50-upper')}
-    ${layer('p95', p95, 'p95-upper', true, y, { format: fmtDuration, lowerIsBetter: true, dense: rows.length > 16 })}
+    ${layer('p95', p95, 'p95-upper', true, y, { format: fmtDuration, lowerIsBetter: true })}
     ${intervalLayer('p95', lower, upper, 'p95-upper')}
     ${xLabels}
     <line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + innerHeight}" hidden />
@@ -2509,7 +2577,7 @@ function ttftTrendChart(points, visibility = {}, { columns = 1 } = {}) {
       // mean and its labels would collide with it.
       const label = columns > 1 && key.endsWith('_p50')
         ? ''
-        : pointLabel(x(i), y(value), value, rows[i - 1]?.[field], { format: fmtDuration, lowerIsBetter: true, dense: rows.length > 16, ...pointOpts });
+        : pointLabel(x(i), y(value), value, rows[i - 1]?.[field], { format: fmtDuration, lowerIsBetter: true, ...pointOpts });
       return `<circle class="trend-dot" cx="${x(i).toFixed(1)}" cy="${y(value).toFixed(1)}" r="3" />${label}`;
     }).join('');
     return `<g class="latency-layer ${style}${visible(key) ? '' : ' is-hidden'}">${path ? `<path class="trend-series" d="${path}" />` : ''}${dots}</g>`;
@@ -2556,7 +2624,7 @@ function tpotTrendChart(points, visibility = {}, { columns = 1 } = {}) {
       // mean and its labels would collide with it.
       const label = columns > 1 && key.endsWith('_p50')
         ? ''
-        : pointLabel(x(i), y(value), value, rows[i - 1]?.[field], { format: fmtTpotBare, lowerIsBetter: true, dense: rows.length > 16, ...pointOpts });
+        : pointLabel(x(i), y(value), value, rows[i - 1]?.[field], { format: fmtTpotBare, lowerIsBetter: true, ...pointOpts });
       return `<circle class="trend-dot" cx="${x(i).toFixed(1)}" cy="${y(value).toFixed(1)}" r="3" />${label}`;
     }).join('');
     return `<g class="latency-layer ${style}${visible(key) ? '' : ' is-hidden'}">${path ? `<path class="trend-series" d="${path}" />` : ''}${dots}</g>`;
@@ -2636,7 +2704,7 @@ function tokenTrendChart(points, visibility = {}, unit = 'query') {
       const dots = item.values
         .map((value, index) => {
           if (value === null) return '';
-          const label = pointLabel(x(index), y(value), value, item.values[index - 1], { format: fmtTokenCompact, below: item.below, colorDirection: true, dense: rows.length > 16 });
+          const label = pointLabel(x(index), y(value), value, item.values[index - 1], { format: fmtTokenCompact, below: item.below, colorDirection: true });
           return `<circle class="trend-dot" cx="${x(index).toFixed(1)}" cy="${y(value).toFixed(1)}" r="2.5">
             <title>${esc(`${rows[index]?.date || ''} · ${item.label} ${fmtTokenCompact(value)}`)}</title>
           </circle>${label}`;
@@ -3218,6 +3286,11 @@ function syncRangeButtons(disabled = false) {
   if (window.parent !== window) {
     window.parent.postMessage({ type: 'production-metrics-range-state', range: state.rangeDays, disabled }, location.origin);
   }
+  if (typeof CustomEvent === 'function') {
+    document.dispatchEvent(new CustomEvent('production-metrics-range-change', {
+      detail: cloudTraceWindow(state.rangeDays, todayShanghai(), historyCompleteThrough(state.history)),
+    }));
+  }
 }
 
 function currentModelDays() {
@@ -3772,8 +3845,11 @@ function renderRequestTraces(doc) {
   const coverage = traceCollection
     ? `${cloudCollectionLabel(traceCollection)}只读采集于 ${fmtDateTime(traceCollection.generated_at)}：${fmtCount(traceCollection.read_log_count)} / ${fmtCount(traceCollection.binding_count)} 个绑定读取到日志；排名仅覆盖已读取日志中的已结束请求，工具明细可能不完整。`
     : '生产快照采集数据';
-  const note = cloudCount ? `${coverage} 当前范围共 ${cloudCount} 条云侧慢请求${traceCollection ? '' : '或超时请求'}。`
-    : `${coverage} 当前范围没有可用的云侧慢请求明细。${state.localTrace ? '下方历史样例不属于当前榜单。' : ''}`;
+  const sampling = traceCollection?.slow_trace_sampling;
+  const samplingNote = sampling?.ratio === .1 && sampling?.minimum === 10
+    ? ' 每日按已读取日志中的已结束云侧请求数取 10%（向上取整），至少 10 条；不足 10 条时全部展示，按耗时降序选取。' : '';
+  const note = (cloudCount ? `${coverage} 当前范围共 ${cloudCount} 条云侧慢请求${traceCollection ? '' : '或超时请求'}。`
+    : `${coverage} 当前范围没有可用的云侧慢请求明细。${state.localTrace ? '下方历史样例不属于当前榜单。' : ''}`) + samplingNote;
   const cloudRows = candidates.map((item, index) => ({item, index})).filter(({item}) => item.scope === 'cloud');
   const groups = new Map();
   for (const row of cloudRows) {
@@ -3994,6 +4070,12 @@ function cloudTraceScopedDays(days, rangeDays, today, completeThrough = null) {
   return cloudScopedDays(days, rangeDays, today, Number(rangeDays) === 0 ? today : completeThrough);
 }
 
+function cloudTraceWindow(rangeDays, today, completeThrough = null) {
+  const range = [0, 1, 7, 30].includes(Number(rangeDays)) ? Number(rangeDays) : 0;
+  const end = range === 0 || range === 1 ? today : (completeThrough || today);
+  return { range, start: range ? addDays(end, -(range - 1)) : '', end };
+}
+
 function cloudTraceRangeLabel(rangeDays, today, completeThrough = null) {
   if (Number(rangeDays) === 0) return `全部可用日期（含 ${today} 截至采集的数据）`;
   if (Number(rangeDays) === 1) return `${today}（当天截至采集）`;
@@ -4022,13 +4104,11 @@ function renderEnv() {
   const timeText = latestObserved ? `采集于 ${esc(fmtDateTime(latestObserved))}`
     : snapshotTime ? `快照生成于 ${esc(fmtDateTime(snapshotTime))}，行级采集时间未知` : '采集时间未知';
   const requestOnly = scoped.days.some((row) => row.source === 'workspace_request_logs');
-  const answerPartial = daily.cloud_trace_collection?.answer_workspaces_partial;
   const warnings = [
     stale && '超过 6 小时未更新，请检查采集任务',
     state.envRefreshFailed && '刷新失败，保留上次快照',
     state.rangeDays === 1 && !scoped.days.length && '尚无当天采集数据',
     requestOnly && '模型用量及 Token 基于日志记录，可能重复；网关流异常率不代表业务请求失败率；工具耗时尚未完整采集',
-    answerPartial > 0 && `答案历史仅扫描近期会话，${fmtCount(answerPartial)} 个工作区可能不完整`,
   ].filter(Boolean);
   const freshness = `<div class="env-data-notes" aria-label="数据说明"><div><strong>数据更新</strong><span>${timeText} · 定时采集，并非实时流</span></div>${warnings.length ? `<div><strong>数据限制</strong><span>${warnings.join('；')}。</span></div>` : ''}<div><strong>覆盖标记</strong><span>* 表示部分日或日志覆盖不全。</span></div></div>`;
   const prefixCache = prefixCachePanel(daily.prefix_cache, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history));
@@ -4144,6 +4224,7 @@ window.addEventListener('message', (event) => {
     if (button && !button.disabled) button.click();
   }
 });
+document.addEventListener('production-metrics-range-request', () => syncRangeButtons(!state.history));
 
 $('model-trends').addEventListener('click', (event) => {
   const latency = event.target.closest('[data-latency-layer]');
@@ -4226,14 +4307,20 @@ function refineCharts(root) {
       else kept.push(box);
     });
   });
+  const groups = new Map();
   root.querySelectorAll('p.chart-note').forEach((note) => {
     if (note.closest('details')) return;
+    const parent = note.parentElement;
+    if (!groups.has(parent)) groups.set(parent, []);
+    groups.get(parent).push(note);
+  });
+  groups.forEach((notes) => {
     const details = document.createElement('details');
     details.className = 'chart-note-details';
     const summary = document.createElement('summary');
     summary.textContent = '统计口径';
-    note.replaceWith(details);
-    details.append(summary, note);
+    notes[0].replaceWith(details);
+    details.append(summary, ...notes);
   });
 }
 

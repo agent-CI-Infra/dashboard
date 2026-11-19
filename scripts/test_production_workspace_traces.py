@@ -11,6 +11,51 @@ collector = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(collector)
 
 class ProductionTraceTests(unittest.TestCase):
+    def test_inventory_includes_unfinished_requests_without_changing_finished_metrics(self):
+        now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+        old = now - dt.timedelta(days=8)
+        stamp = lambda value: value.strftime('%Y-%m-%d %H:%M:%S.000')
+        lines = [f'{stamp(old)} [MessageHandler] dispatch: request_id=digitalmate-old',
+                 f'{stamp(now)} [MessageHandler] dispatch: request_id=digitalmate-finished PRIVATE',
+                 f'{stamp(now)} [MessageHandler] Stream 被取消: request_id=digitalmate-finished total_chunks=1',
+                 f'{stamp(now)} [MessageHandler] dispatch: request_id=digitalmate-unfinished']
+        inventory = []
+        with patch.object(collector, 'query_for', return_value={}), \
+             patch.object(collector, 'listing', return_value=[{'name': 'process.log', 'type': 'file', 'size': 100}]), \
+             patch.object(collector, 'download_log', return_value=iter(lines)):
+            query, rows, status, _ = collector.read_log({}, request_inventory=inventory)
+        self.assertEqual(status, 'ok')
+        self.assertEqual(len(rows), 1)
+        self.assertEqual([row['log_state'] for row in inventory], ['finished', 'unfinished'])
+        self.assertEqual(inventory[0]['stream_status'], 'cancelled')
+        self.assertNotIn('end_time', inventory[1])
+        self.assertEqual(query, {})
+        self.assertNotIn('PRIVATE', json.dumps(inventory))
+        self.assertNotIn('digitalmate-old', json.dumps(inventory))
+
+    def test_collected_inventory_has_every_request_before_slow_sample_limits(self):
+        today = dt.datetime.now(collector.CST).date()
+        start = dt.datetime.combine(today, dt.time.min, collector.CST).astimezone(collector.UTC)
+        stamp = lambda value: value.strftime('%Y-%m-%d %H:%M:%S.000')
+        lines = []
+        for number in range(101):
+            lines.extend([f'{stamp(start)} [MessageHandler] dispatch: request_id=digitalmate-{number}',
+                          f'{stamp(start + dt.timedelta(seconds=1))} [MessageHandler] Stream done request_id=digitalmate-{number} total_chunks=1'])
+        with patch.object(collector, 'TOKEN', 'test'), \
+             patch.object(collector, 'binding_list', return_value=[{}]), \
+             patch.object(collector, 'query_for', return_value={}), \
+             patch.object(collector, 'listing', return_value=[{'name': 'process.log', 'type': 'file', 'size': 100}]), \
+             patch.object(collector, 'download_log', return_value=iter(lines)), \
+             patch.object(collector, 'attach_answer_estimates', return_value=True), \
+             patch.object(collector, 'attach_native_trajectories', return_value=0), \
+             patch.object(collector, 'attach_tool_events', return_value=True):
+            result = collector.collect()
+        inventory = result['request_inventory']
+        self.assertEqual(len(inventory['requests']), 101)
+        self.assertEqual(inventory['window']['end'], today.isoformat())
+        self.assertEqual(inventory['source'], 'workspace_request_logs')
+        self.assertEqual(len(result['days'][0]['anomaly']['latency']['slow_requests']), 11)
+
     def test_daily_metrics_use_every_finished_request_without_leaking_ids(self):
         rows = [(0, {}, {'gateway': 100.0, 'first_token': 20.0, 'request_id': 'secret-id'}),
                 (1, {}, {'gateway': 300.0, 'first_token': 40.0, 'request_id': 'other-id'})]

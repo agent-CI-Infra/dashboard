@@ -288,5 +288,98 @@ class ArchiveTests(unittest.TestCase):
         self.assertEqual(self.index['coverage']['pending_databases'],1)
 
 
+class RequestReconciliationTests(unittest.TestCase):
+    def setUp(self):
+        self.request = {'request_id': 'digitalmate-a', 'start_time': '2026-11-18T16:00:00+00:00',
+                        'end_time': '2026-11-18T16:00:02+00:00', 'log_state': 'finished',
+                        'stream_status': 'normal', 'private': 'PRIVATE'}
+        self.metrics = {'cloud_trace_collection': {'generated_at': '2026-11-19T02:01:44+00:00', 'request_inventory': {
+            'schema': 'digitalmate/request-inventory@1', 'source': 'workspace_request_logs',
+            'generated_at': '2026-11-19T02:01:44+00:00',
+            'window': {'start': '2026-11-13', 'end': '2026-11-19'},
+            'binding_count': 194, 'read_log_count': 193, 'errors': {'missing': 1},
+            'requests': [self.request]}}}
+        self.trace = {'key': 'a' * 64, 'request_id': 'digitalmate-a', 'request_ids': ['digitalmate-a'],
+                      'start_time': '2026-11-18T16:00:00.001+00:00', 'duration_ms': 1998,
+                      'lifecycle': 'final', 'observed_at': '2026-11-19T02:02:04+00:00'}
+        self.index = {'generated_at': '2026-11-19T02:02:04+00:00', 'coverage': {
+            'pending_databases': 0, 'scope_errors': {}, 'inventory_errors': 0, 'invalid_records': 0},
+            'traces': [self.trace]}
+
+    def test_exact_match_uses_shanghai_day_and_allowlisted_fields(self):
+        data = archive.reconcile_requests(self.metrics, self.index)
+        self.assertEqual(data['requests'][0]['match_state'], 'matched')
+        self.assertEqual(data['requests'][0]['date'], '2026-11-19')
+        self.assertEqual(data['days'][0]['matched'], 1)
+        self.assertEqual(data['days'][0]['archived_traces'], 1)
+        self.assertEqual(data['read_log_count'], 193)
+        self.assertNotIn('PRIVATE', json.dumps(data))
+
+    def test_missing_running_and_native_only_requests_are_counted_independently(self):
+        inventory = self.metrics['cloud_trace_collection']['request_inventory']['requests']
+        inventory.append(dict(self.request, request_id='digitalmate-missing'))
+        inventory.append({'request_id': 'digitalmate-running', 'start_time': self.request['start_time'],
+                          'log_state': 'unfinished'})
+        self.index['traces'].append(dict(self.trace, key='b' * 64, request_id='digitalmate-running',
+                                         request_ids=['digitalmate-running'], duration_ms=0, lifecycle='running'))
+        self.index['traces'].append(dict(self.trace, key='c' * 64, request_id='digitalmate-only',
+                                         request_ids=['digitalmate-only']))
+        data = archive.reconcile_requests(self.metrics, self.index)
+        day = data['days'][0]
+        self.assertEqual({key: day[key] for key in ('logged_requests', 'logged_finished', 'logged_unfinished',
+                                                   'matched', 'missing', 'archived_traces', 'native_only')},
+                         {'logged_requests': 3, 'logged_finished': 2, 'logged_unfinished': 1,
+                          'matched': 2, 'missing': 1, 'archived_traces': 3, 'native_only': 1})
+
+    def test_archive_budget_or_read_error_keeps_absence_pending(self):
+        self.index['traces'] = []
+        self.index['coverage']['pending_databases'] = 1
+        data = archive.reconcile_requests(self.metrics, self.index)
+        self.assertEqual(data['requests'][0]['match_state'], 'pending_archive')
+
+    def test_cancelled_stream_can_end_before_native_cleanup_without_losing_its_link(self):
+        self.trace['duration_ms'] = 2500
+        for status in ('normal', 'unknown', 'cancelled'):
+            self.request['stream_status'] = status
+            data = archive.reconcile_requests(self.metrics, self.index)
+            row = data['requests'][0]
+            expected = 'matched' if status == 'cancelled' else 'timing_conflict'
+            self.assertEqual(row['match_state'], expected)
+            if status == 'cancelled':
+                self.assertEqual(row['cancel_tail_ms'], 501)
+                self.assertEqual(data['days'][0]['matched_cancel_tail'], 1)
+        self.trace['start_time'] = '2026-11-18T16:00:03+00:00'
+        row = archive.reconcile_requests(self.metrics, self.index)['requests'][0]
+        self.assertEqual(row['match_state'], 'timing_conflict')
+        self.assertNotIn('missing', data['days'][0])
+
+    def test_reused_id_conflicting_root_and_wrong_time_never_become_matched(self):
+        for case in ('duplicate_log', 'duplicate_native', 'wrong_root', 'earlier_start', 'later_end', 'naive_time'):
+            with self.subTest(case=case):
+                metrics, index = copy.deepcopy(self.metrics), copy.deepcopy(self.index)
+                if case == 'duplicate_log':
+                    metrics['cloud_trace_collection']['request_inventory']['requests'].append(dict(self.request))
+                if case == 'duplicate_native': index['traces'].append(dict(self.trace, key='b' * 64))
+                if case == 'wrong_root': index['traces'][0]['request_id'] = 'digitalmate-other'
+                if case == 'earlier_start': index['traces'][0]['start_time'] = '2026-11-18T15:59:59+00:00'
+                if case == 'later_end': index['traces'][0]['duration_ms'] = 3000
+                if case == 'naive_time': index['traces'][0]['start_time'] = '2026-11-18T16:00:00'
+                data = archive.reconcile_requests(metrics, index)
+                self.assertNotEqual(data['requests'][0]['match_state'], 'matched')
+
+    def test_legacy_or_invalid_inventory_is_unavailable_and_invalid_rows_are_counted(self):
+        self.assertEqual(archive.reconcile_requests({}, self.index)['state'], 'unavailable')
+        inventory = self.metrics['cloud_trace_collection']['request_inventory']
+        inventory['requests'].append({'request_id': 'PRIVATE', 'start_time': 'invalid'})
+        data = archive.reconcile_requests(self.metrics, self.index)
+        self.assertEqual(data['invalid_requests'], 1)
+        self.assertNotIn('PRIVATE', json.dumps(data))
+        stale = copy.deepcopy(self.metrics)
+        stale['cloud_trace_collection']['request_inventory']['generated_at'] = '2026-11-19T01:00:00Z'
+        self.assertEqual(archive.reconcile_requests(stale, self.index)['state'], 'unavailable')
+        inventory['window']['start'] = '2026-10-01'
+        self.assertEqual(archive.reconcile_requests(self.metrics, self.index)['state'], 'unavailable')
+
+
 if __name__ == '__main__':
     unittest.main()

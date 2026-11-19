@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>DigitalMate Bench</title>
-    <link rel="stylesheet" href="style.css?v=20261112.2" />
+    <link rel="stylesheet" href="style.css?v=20261118.2" />
   </head>
   <body>
     <main class="page">
@@ -23,6 +23,13 @@
         <div class="block-head">
           <h2 id="gaia-title">GAIA 全量（165）</h2>
           <p id="gaia-meta" class="muted small"></p>
+          <div class="gaia-runs" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:8px 0 2px">
+            <label class="muted small">选择运行
+              <select id="gaia-run" aria-label="选择要查看的 GAIA 运行"
+                style="font:inherit;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink)"></select>
+            </label>
+            <a id="gaia-detail" class="small" href="../data/bench/gaia-165/index.html">逐题明细（含每例 token）→</a>
+          </div>
         </div>
         <div id="gaia-kpis" class="cards"></div>
         <div id="gaia-chart" class="gaia-chart"></div>
@@ -58,6 +65,6 @@
         <div class="scroll"><table id="history" class="grid"></table></div>
       </section>
     </main>
-    <script src="app.js?v=20261112.2"></script>
+    <script src="app.js?v=20261118.3"></script>
   </body>
 </html>

@@ -693,6 +693,8 @@ td.nowrap { white-space: nowrap; }
 .perf-history summary { cursor: pointer; font-size: 13.5px; font-weight: 600; }
 .perf-history summary .sub { color: var(--muted); font-weight: 400; }
 .perf-history[open] summary { margin-bottom: 8px; }
+/* The nightly view highlights the inspected run's row without hiding the rest. */
+.perf-table tr.perf-view-run td { background: var(--surface-2); }
 @media (max-width: 860px) {
   .perf-layout { grid-template-columns: 1fr; }
   .perf-list { max-height: none; }

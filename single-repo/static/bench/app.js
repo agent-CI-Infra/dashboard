@@ -263,6 +263,7 @@
   // <board>/data/bench/gaia-165/gaia-165.json. Optional: a board without that
   // file simply does not show the section.
   const GAIA_URLS = ['../data/bench/gaia-165/gaia-165.json', 'data/bench/gaia-165/gaia-165.json']
+  const GAIA_RUNS_URLS = ['../data/bench/gaia-165/runs.json', 'data/bench/gaia-165/runs.json']
   const GAIA_BUCKETS = [
     ['PASS', '通过', 'pass', '进分子'],
     ['FAIL', '未通过', 'fail', '进分母，算不通过'],
@@ -282,6 +283,57 @@
       }
     }
     return null
+  }
+
+  // A board may publish several GAIA runs side by side (baseline, Hive, a
+  // Nullius run, one per nightly). runs.json names them; the newest first.
+  async function loadGaiaRuns() {
+    for (const url of GAIA_RUNS_URLS) {
+      try {
+        const res = await fetch(url, { cache: 'no-store' })
+        if (!res.ok) continue
+        const got = await res.json()
+        const runs = Array.isArray(got) ? got : got.runs
+        if (Array.isArray(runs) && runs.length) {
+          return { base: url.slice(0, url.lastIndexOf('/') + 1), runs }
+        }
+      } catch {
+        // fall through to the single gaia-165.json path
+      }
+    }
+    return null
+  }
+
+  async function initGaia() {
+    const pick = await loadGaiaRuns()
+    if (!pick) {
+      renderGaia(await loadGaia())
+      return
+    }
+    const sel = $('#gaia-run')
+    const detail = $('#gaia-detail')
+    sel.innerHTML = pick.runs.map((r, i) => `<option value="${i}">${esc(r.label || r.id)}</option>`).join('')
+    const apply = async (i) => {
+      const run = pick.runs[i]
+      if (!run) return
+      try {
+        const res = await fetch(pick.base + run.file, { cache: 'no-store' })
+        if (!res.ok) throw new Error(run.file + ' ' + res.status)
+        const det = $('#gaia-details')
+        if (det && det.open) det.open = false      // a stale table must not survive a switch
+        const table = $('#gaia-tasks')
+        if (table) table.innerHTML = ''
+        renderGaia(await res.json())
+        const meta = $('#gaia-meta')
+        if (meta) meta.textContent = [run.window, run.note].filter(Boolean).join(' · ')
+        if (detail) detail.href = '../data/bench/gaia-165/index.html#run-' + encodeURIComponent(run.id)
+      } catch (e) {
+        const kpis = $('#gaia-kpis')
+        if (kpis) kpis.innerHTML = card('加载失败', esc(String(e && e.message ? e.message : e)), [])
+      }
+    }
+    sel.addEventListener('change', () => apply(Number(sel.value)))
+    await apply(0)
   }
 
   function renderGaia(g) {
@@ -351,15 +403,19 @@
     const fillTasks = () => {
       if (filled) return
       filled = true
+      const withTok = g.tasks.some((t) => t.tokensIn !== undefined || t.tokensOut !== undefined)
+      const tok = (v) => (v === null || v === undefined ? '—' : Number(v).toLocaleString())
       const rows = g.tasks.map((t) => {
         const bucket = String(t.bucket || '').split('(')[0].toUpperCase()
         const [label, cls] = GAIA_BUCKET_LABEL[bucket] || ['—', 'unknown']
         const ms = Number(t.durationMs) > 0 ? fmtMs(t.durationMs) : '—'
         const steps = t.steps === null || t.steps === undefined ? '—' : esc(t.steps)
         const kind = t.type ? esc(t.type) : '—'
-        return `<tr><td class="mono">${esc(t.id)}</td><td class="num">${t.level ? `L${esc(t.level)}` : '—'}</td><td>${kind}</td><td class="num">${steps}</td><td>${t.hasFile ? '是' : '否'}</td><td><span class="status ${cls}">${label}</span></td><td class="mono">${esc(t.reason || '—')}</td><td class="num">${ms}</td></tr>`
+        const tokCells = withTok ? `<td class="num">${tok(t.tokensIn)}</td><td class="num">${tok(t.tokensOut)}</td>` : ''
+        return `<tr><td class="mono">${esc(t.id)}</td><td class="num">${t.level ? `L${esc(t.level)}` : '—'}</td><td>${kind}</td><td class="num">${steps}</td><td>${t.hasFile ? '是' : '否'}</td>${tokCells}<td><span class="status ${cls}">${label}</span></td><td class="mono">${esc(t.reason || '—')}</td><td class="num">${ms}</td></tr>`
       }).join('')
-      $('#gaia-tasks').innerHTML = `<thead><tr><th>task</th><th class="num">难度</th><th>类型</th><th class="num">步数</th><th>附件</th><th>结果</th><th>原因</th><th class="num">时长</th></tr></thead><tbody>${rows}</tbody>`
+      const tokHead = withTok ? '<th class="num">输入 tkn</th><th class="num">输出 tkn</th>' : ''
+      $('#gaia-tasks').innerHTML = `<thead><tr><th>task</th><th class="num">难度</th><th>类型</th><th class="num">步数</th><th>附件</th>${tokHead}<th>结果</th><th>原因</th><th class="num">时长</th></tr></thead><tbody>${rows}</tbody>`
     }
     details.addEventListener('toggle', () => {
       if (details.open) fillTasks()
@@ -506,7 +562,7 @@
         : `最近 ${runs.length} 次运行`
       renderLatest(runs)
       renderTables(runs)
-      renderGaia(await loadGaia())
+      await initGaia()
       lastRuns = runs
       renderChart(runs)
     } catch (err) {

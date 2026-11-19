@@ -82,7 +82,17 @@
     if(!snapshot)throw Error('快照尚未加载');
     const parts=url.split('/').filter(Boolean);
     if(opts.method!=='POST'){
-      if(parts[2]==='item')return clone(snapshot.details[parts[3]+':'+parts[4]]||{body:'此项正文不在快照中，请在 GitHub 打开。',cross_references:[]});
+      if(parts[2]==='item'){
+        const key=parts[3]+':'+parts[4];
+        if(!snapshot.details)snapshot.details={};
+        // Bodies no longer ride inside snapshot.json; fetch the shared details
+        // file once on the first drawer open and keep it for later cards.
+        if(!Object.hasOwn(snapshot.details,key)){
+          try{snapshot.details=await(await fetch(new URL('data/details.json',document.baseURI))).json()||{};}
+          catch(e){/* keep the empty cache; the fallback text still explains */}
+        }
+        return clone(snapshot.details[key]||{body:'此项正文不在快照中，请在 GitHub 打开。',cross_references:[]});
+      }
       return payload();
     }
     const previous=clone(state),body=JSON.parse(opts.body||'{}');

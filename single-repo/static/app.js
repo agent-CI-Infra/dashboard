@@ -48,11 +48,13 @@
   const CONCLUSION_TONE = { success: 'good', failure: 'bad', timed_out: 'bad', cancelled: '', skipped: '', in_progress: 'warn', queued: 'warn', pending: 'warn', neutral: '', action_required: 'warn', startup_failure: 'bad', error: 'bad', expected: 'warn' };
   const CONCLUSION_NAME = { success: '成功', failure: '失败', timed_out: '超时', cancelled: '取消', skipped: '跳过', in_progress: '运行中', queued: '排队', pending: '等待', neutral: '中性', action_required: '需处理', startup_failure: '启动失败', error: '错误', expected: '等待' };
 
-  const VIEW_KEY = 'gsb.list.view', LINE_KEY = 'gsb.line', COV_SORT_KEY = 'gsb.coverage.sort';
+  const VIEW_KEY = 'gsb.list.view', LINE_KEY = 'gsb.line', COV_SORT_KEY = 'gsb.coverage.sort', PERF_RUN_KEY = 'gsb.perfRun';
   const loadViews = () => { try { return { issues: 'table', prs: 'table', ...JSON.parse(localStorage.getItem(VIEW_KEY) || '{}') }; } catch (e) { return { issues: 'table', prs: 'table' }; } };
   const loadLine = () => { try { return localStorage.getItem(LINE_KEY); } catch (e) { return null; } };
   const loadCovSort = () => { try { return localStorage.getItem(COV_SORT_KEY) === 'lines' ? 'lines' : 'name'; } catch (e) { return 'name'; } };
-  const STATE = { snap: null, status: null, tab: 'overview', views: loadViews(), line: loadLine(), covOpen: new Set(), covSort: loadCovSort(), sort: {}, filters: { issueQ: '', issueLabel: '', issueAssignee: '', runBranch: '' }, ageFilter: { issues: null, prs: null }, coverageWeekOffset: 0, e2e: null, nightlyRuns: [], e2eSteps: {}, e2eFilter: { status: '', q: '' }, e2eLoading: new Set(), e2eErrors: new Set(), e2eCollapsed: new Set(), performance: null, perfCase: null, st: null, pollTimer: null };
+  // A nightly run pinned in the E2E view switcher; '' means the latest data.
+  const loadPerfRun = () => { try { const value = localStorage.getItem(PERF_RUN_KEY) || ''; return /^\d+$/.test(value) ? value : ''; } catch (e) { return ''; } };
+  const STATE = { snap: null, status: null, tab: 'overview', views: loadViews(), line: loadLine(), covOpen: new Set(), covSort: loadCovSort(), sort: {}, filters: { issueQ: '', issueLabel: '', issueAssignee: '', runBranch: '' }, ageFilter: { issues: null, prs: null }, coverageWeekOffset: 0, e2e: null, nightlyRuns: [], e2eSteps: {}, e2eFilter: { status: '', q: '' }, e2eLoading: new Set(), e2eErrors: new Set(), e2eCollapsed: new Set(), performance: null, perfCase: null, perfRunId: loadPerfRun(), st: null, pollTimer: null };
   const returnParams = new URLSearchParams(location.search);
   const returnFocus = { line: returnParams.get('returnLine'), caseName: returnParams.get('returnCase'), pending: !!returnParams.get('returnCase'),
     e2eKey: returnParams.get('returnE2E'), e2ePending: !!returnParams.get('returnE2E') };
@@ -485,7 +487,7 @@
       ${card('最近动态', merged.length || opened.length ? `<ul class="checks">${[...merged, ...opened].join('')}</ul>` : empty('最近没有合并或新建'), { sub: '最近合并的 PR 与新建的 Issue' })}
     </div>`;
     const status = Object.entries(S).filter(([, s]) => s.status !== 'ok').map(([k, s]) => badge(`${k} ${s.status}`, s.status === 'partial' ? 'warn' : 'bad'));
-    html += `<p class="muted small" style="margin-top:12px">数据来源 ${link(snap.repo_url, esc(snap.repo))} · 视图每 60 秒读取已发布快照${status.length ? ` · 部分区块不完整：${status.join(' ')}` : ''}</p>`;
+    html += `<p class="muted small" style="margin-top:12px">数据来源 ${link(snap.repo_url, esc(snap.repo))} · 视图每 60 秒检查已发布快照（浏览器按 10 分钟窗口缓存）${status.length ? ` · 部分区块不完整：${status.join(' ')}` : ''}</p>`;
     return html;
   }
 
@@ -967,7 +969,7 @@
       .map(([family, items]) => ({ family, items: items.sort((a, b) => a.name.localeCompare(b.name, 'en', { numeric: true })) }));
   }
   function realCaseItem(item) {
-    const latest = item.points.at(-1);
+    const latest = item.basis || item.points.at(-1);
     const marks = item.points.map((point) => {
       const state = realStatus(point.delivery);
       const scores = (point.metrics || []).map((metric) => `${metric.label} ${scoreText(metric)}${scoreSource(metric)}`).join(' · ');
@@ -984,27 +986,51 @@
       const current = duration ? null : (latest.metrics || []).find((item) => metricKey(item) === metricKey(metric));
       const now = duration ? msText(latest.duration_ms) : current ? `${scoreText(current)}${scoreSource(current)}` : '本次无此指标';
       const chart = realTrendChart(item.points, metric);
-      return `<figure class="real-trend${duration ? ' duration' : ''}"><figcaption><span>${esc(metric.label)}</span> <span class="num">${esc(now)}</span> <span class="muted">最新</span></figcaption>${chart || '<div class="muted real-trend-empty">还没有可画的数值</div>'}</figure>`;
+      return `<figure class="real-trend${duration ? ' duration' : ''}"><figcaption><span>${esc(metric.label)}</span> <span class="num">${esc(now)}</span> <span class="muted">${item.basis ? '该轮' : '最新'}</span></figcaption>${chart || '<div class="muted real-trend-empty">还没有可画的数值</div>'}</figure>`;
     }).join('');
     const anomaly = ['error', 'failed'].includes(latest.quality_status) ? ` ${badge('评分异常', 'warn')}` : '';
-    return `<article class="e2e-case real-case" data-real-item="${esc(item.name)}"><header class="e2e-case-head"><h4 class="e2e-case-title"><a class="real-case-link" data-real-case="${esc(item.name)}" href="${esc(realCaseHref(item.name))}" aria-label="查看 ${esc(item.name)} 的 Real E2E 详情"><code>${esc(item.name)}</code></a></h4><span class="sub">${n(item.points.length)} 次执行 · 最新 ${deliveryBadge(latest.delivery)}${anomaly}</span></header>
+    return `<article class="e2e-case real-case" data-real-item="${esc(item.name)}"><header class="e2e-case-head"><h4 class="e2e-case-title"><a class="real-case-link" data-real-case="${esc(item.name)}" href="${esc(realCaseHref(item.name))}" aria-label="查看 ${esc(item.name)} 的 Real E2E 详情"><code>${esc(item.name)}</code></a></h4><span class="sub">${n(item.points.length)} 次执行 · ${item.basis ? '该轮' : '最新'} ${deliveryBadge(latest.delivery)}${anomaly}</span></header>
       ${item.spec ? `<div class="sub e2e-case-file"><code>${esc(item.spec)}</code></div>` : ''}
       <ol class="e2e-timeline" aria-label="${esc(item.name)}的执行历史">${marks}</ol>
       <div class="real-trends">${trends}</div></article>`;
   }
   function realScoresSection(executed, history = {}, scoreRuns = [], mockPreview = false, localArtifactPreview = false, scoreReport = null) {
     const report = scoreReport || executed.find((entry) => entry.artifact.startsWith('real-e2e-results') && entry.scores?.length);
-    const groups = realCaseGroups(report, history);
+    // The nightly view switcher pins every per-case "最新" read to that run's
+    // own point; cases without a point for the run are hidden for clarity.
+    const viewRunId = String(STATE.perfRunId || '');
+    const groups = viewRunId
+      ? realCaseGroups(report, history).map((group) => ({ ...group, items: group.items.flatMap((item) => {
+          const basis = item.points.find((p) => dmSameRun(p.run_id, viewRunId));
+          return basis ? [{ ...item, basis }] : [];
+        }) })).filter((group) => group.items.length)
+      : realCaseGroups(report, history);
     let html = sectionHead('Real E2E 质量评分', localArtifactPreview ? '本地导入的真实历史产物；逐用例结果请以来源运行和日期为准' : mockPreview ? '本地模拟评分与耗时，仅用于预览；不代表 CI 实测结果' : '质量分数仅作观察，不设置通过门槛；交付结果单独显示');
-    if (scoreRuns.length) html += `<div class="card score-run-summary"><b>${localArtifactPreview ? '最近两次主仓 Nightly（下方展示本地导入的历史报告）' : '最近两天的 Nightly'}</b><div class="muted">按北京时间，同一天优先使用手动或触发式运行。</div>${scoreRuns.slice(0, 2).map((run) => `<div class="score-run-row"><span class="${run.conclusion === 'success' ? 'good' : run.conclusion === 'cancelled' ? 'muted' : 'bad'}">${run.conclusion === 'success' ? '✓' : run.conclusion === 'cancelled' ? '−' : '×'}</span> ${esc(scoreDay(run.created_at))} · ${run.event === 'workflow_dispatch' ? (run.branch === 'main' ? '手动' : '触发式') : '定时'} · ${link(run.url, `run ${esc(run.run_id)}`)} · 整次运行${run.conclusion === 'success' ? '成功' : run.conclusion === 'cancelled' ? '取消' : '失败'} · 耗时 ${dur(run.duration_s)} · 产物${run.artifact_status === 'available' ? '已读取' : run.artifact_status === 'unreadable' ? '解析失败' : '缺失'}</div>`).join('')}<div class="muted">产物未读到时，逐用例分数和耗时未知；整次失败不代表每个用例失败。</div></div>`;
-    if (!report) {
+    if (scoreRuns.length) html += `<div class="card score-run-summary"><b>${localArtifactPreview ? '最近两次主仓 Nightly（下方展示本地导入的历史报告）' : '最近两天的 Nightly'}</b><div class="muted">按北京时间，同一天优先使用手动或触发式运行。</div>${scoreRuns.slice(0, 2).map((run) => `<div class="score-run-row"><span class="${run.conclusion === 'success' ? 'good' : run.conclusion === 'cancelled' ? 'muted' : 'bad'}">${run.conclusion === 'success' ? '✓' : run.conclusion === 'cancelled' ? '−' : '×'}</span> ${esc(scoreDay(run.created_at))} · ${run.event === 'workflow_dispatch' ? (run.branch === 'main' ? '手动' : '触发式') : '定时'} · ${dmVersionBadge(run.created_at)}${link(run.url, `run ${esc(run.run_id)}`)} · 整次运行${run.conclusion === 'success' ? '成功' : run.conclusion === 'cancelled' ? '取消' : '失败'} · 耗时 ${dur(run.duration_s)} · 产物${run.artifact_status === 'available' ? '已读取' : run.artifact_status === 'unreadable' ? '解析失败' : '缺失'}</div>`).join('')}<div class="muted">产物未读到时，逐用例分数和耗时未知；整次失败不代表每个用例失败。</div></div>`;
+    if (viewRunId) {
+      const rows = groups.flatMap((group) => group.items.map((item) => item.basis));
+      html += `<div class="muted" style="margin:-4px 0 8px">正在查看 run ${esc(viewRunId)} 的逐用例数据（${n(rows.length)} 个用例）${report && String(report.run_id) === viewRunId ? '，与最新可读报告一致' : '；该 run 无完整报告，分数和耗时来自逐用例历史'}。</div>`;
+      if (rows.length) {
+        const passed = rows.filter((row) => row.delivery === 'passed').length;
+        const scored = rows.filter((row) => (row.metrics || []).some((metric) => metric.value != null)).length;
+        html += tiles([
+          { label: 'Real E2E 用例', value: n(rows.length), sub: `${new Set(rows.map((row) => row.family)).size} 类评分` },
+          { label: '交付通过', value: `${n(passed)}<small>/ ${n(rows.length)}</small>`, sub: '仅表示测试流程与最终交付成功', tone: passed === rows.length ? 'good' : 'warn' },
+          { label: '有质量分数', value: `${n(scored)}<small>/ ${n(rows.length)}</small>`, sub: '未评分或 Judge 错误会明确显示', tone: scored === rows.length ? 'good' : 'warn' },
+          { label: '质量门槛', value: '无', sub: '不根据分数改变 CI 结论' },
+        ]);
+      } else {
+        html += `<div class="banner warn"><span class="icon">▲</span><div><div class="title">run ${esc(viewRunId)} 没有已采集的评分数据</div><div>该 Nightly 未被统一采集过，或评分产物缺失。回到最新，或先在统一采集里补采该 run。</div></div></div>`;
+        return html;
+      }
+    } else if (!report) {
       html += `<div class="banner warn"><span class="icon">▲</span><div><div class="title">尚未读取到最新 Real E2E 评分</div><div>${groups.length ? '以下仍显示已保存的逐用例历史；最新运行的分数和耗时暂不可用。' : '需要可解析的 <code>real-e2e-results</code> 产物，才能显示逐用例分数、失败标记和耗时。'}</div></div></div>`;
       if (!groups.length) return html;
     } else {
       const scores = report.scores;
       const passed = scores.filter((row) => row.delivery === 'passed').length;
       const scored = scores.filter((row) => row.metrics.some((metric) => metric.value != null)).length;
-      html += `<div class="muted" style="margin:-4px 0 8px">${mockPreview ? `本地模拟运行 · ${date(report.created_at)}` : `最近一次可读取的逐用例报告：${link(report.url, `run ${esc(report.run_id)}`)} · <code>${esc(report.branch)}</code> · ${date(report.created_at)}`} · 此处保留各评分器的原始量纲。</div>`;
+      html += `<div class="muted" style="margin:-4px 0 8px">${mockPreview ? `本地模拟运行 · ${date(report.created_at)}` : `最近一次可读取的逐用例报告：${dmVersionBadge(report.created_at)}${link(report.url, `run ${esc(report.run_id)}`)} · <code>${esc(report.branch)}</code> · ${date(report.created_at)}`} · 此处保留各评分器的原始量纲。</div>`;
       html += tiles([
         { label: 'Real E2E 用例', value: n(scores.length), sub: `${new Set(scores.map((row) => row.family)).size} 类评分` },
         { label: '交付通过', value: `${n(passed)}<small>/ ${n(scores.length)}</small>`, sub: '仅表示测试流程与最终交付成功', tone: passed === scores.length ? 'good' : 'warn' },
@@ -1081,7 +1107,7 @@
     const points = item.history.map(({record, c}) => {
       const href = caseHTMLPath(c, record, item.slice);
       const viewer = href ? `./e2e-report.html?${new URLSearchParams({ src: href.slice(2), line: currentLine(STATE.snap).key, case: item.key })}` : '';
-      const description = `${date(record.created_at)} · ${E2E_NAME[c.status]} · 耗时 ${msText(c.duration_ms)} · ${record.title || 'run'} ${record.run_id}${c.project ? ` · ${c.project}` : ''}${href ? ' · 打开执行记录 HTML' : ''}`;
+      const description = `${date(record.created_at)} · ${esc(dmVersionText(record.created_at))} · ${E2E_NAME[c.status]} · 耗时 ${msText(c.duration_ms)} · ${record.title || 'run'} ${record.run_id}${c.project ? ` · ${c.project}` : ''}${href ? ' · 打开执行记录 HTML' : ''}`;
       const content = `<span class="e2e-status-mark ${esc(c.status)}" aria-hidden="true">${E2E_MARK[c.status]}</span>`;
       return `<li class="e2e-history-point ${esc(c.status)}" data-e2e-artifact="${esc(record.artifact_id)}">${href
         ? `<a class="e2e-point e2e-case-html" href="${esc(viewer)}" target="_blank" rel="noopener"${tip(description)} aria-label="${esc(description)}">${content}</a>`
@@ -1116,10 +1142,46 @@
     return html;
   }
   const e2eRecordsSection = () => `<div id="e2e-records">${e2eHistoryContent()}</div>`;
+  // The nightly view switcher: picking a run rescopes the case performance and
+  // Real E2E score sections to that run's already-collected data. Runs that the
+  // unified collector never read stay empty, so the copy/collect helper below
+  // remains the way to backfill them first.
+  // Performance history names runs `nightly-<id>-<attempt>` while the picker,
+  // score history and run lists use the bare Actions id; both must match.
+  const dmSameRun = (value, runId) => {
+    if (!runId) return false;
+    const v = String(value || '');
+    return v === runId || v.startsWith(`nightly-${runId}-`);
+  };
+  function nightlyViewStatus() {
+    const selected = String(STATE.perfRunId || '');
+    if (!selected) return '当前查看最新采集的数据。';
+    const testsData = STATE.snap?.sections?.tests?.data || {};
+    const perfPoint = Object.values(STATE.performance?.cases || {}).flatMap((c) => c.points || []).find((p) => dmSameRun(p.run_id, selected));
+    const scorePoint = Object.values(testsData.score_history || {}).flatMap((points) => points || []).find((p) => dmSameRun(p.run_id, selected));
+    const run = STATE.nightlyRuns.find((r) => String(r.id) === selected);
+    const when = run?.created_at || perfPoint?.finished_at || scorePoint?.created_at;
+    const version = dmVersionOf(when);
+    const hasPerf = Boolean(perfPoint), hasScore = Boolean(scorePoint);
+    return `正在查看 run ${selected}${version ? `（${version}）` : ''} · ${hasPerf ? '用例性能已切换' : '无已采集的用例性能数据'} · ${hasScore ? '评分已切换' : '无已采集的评分数据'}。`;
+  }
+  function applyNightlyView(runId) {
+    const value = String(runId || '').trim().replace(/[^0-9]/g, '');
+    if (value === String(STATE.perfRunId || '')) return;
+    STATE.perfRunId = value;
+    STATE.perfCase = null;
+    try { value ? localStorage.setItem(PERF_RUN_KEY, value) : localStorage.removeItem(PERF_RUN_KEY); } catch (e) { /* private mode */ }
+    renderAll();
+  }
   function nightlyCollectionEntry() {
     if (String(STATE.snap?.repo || '').toLowerCase() !== 'openjiuwen-ai/digitalmate') return '';
-    const options = STATE.nightlyRuns.map((run) => `<option value="${esc(run.id)}">${esc(`#${run.run_number} · ${run.event} · ${shortDateTime(run.created_at)} · ${run.conclusion} · run ${run.id}`)}</option>`).join('');
-    return `<section class="card" aria-label="手动采集 Nightly 数据"><h3>手动采集 Nightly 数据</h3><p class="muted">选择已完成的 Nightly，使用同一个 run ID 更新 E2E 性能、Bench 和 ST / 测试矩阵。</p><div class="filters"><label for="nightly-run-id">Nightly</label><select id="nightly-run-id" aria-label="选择已完成的 Nightly run">${options || '<option value="">暂无已发布的 Nightly 列表</option>'}</select><label for="nightly-run-id-manual">或输入 run ID</label><input id="nightly-run-id-manual" inputmode="numeric" placeholder="如 42919555343"><button class="btn" type="button" data-nightly-collect>复制 run ID</button><a class="btn primary" href="https://github.com/agent-dashboard-ai/Agent-Dashboard/actions/workflows/collect-digitalmate-nightly.yml" target="_blank" rel="noopener">打开统一采集</a></div><p class="small-note">GitHub Actions 不支持从链接预填 workflow 输入。复制后在统一采集页粘贴 run ID 并运行；需要 Agent-Dashboard 的 Actions 写权限。</p><p class="muted" data-nightly-collect-status role="status"></p></section>`;
+    const selected = String(STATE.perfRunId || '');
+    const latest = `<option value="">最新（自动口径）</option>`;
+    const options = STATE.nightlyRuns.map((run) => {
+      const version = dmVersionOf(run.created_at);
+      return `<option value="${esc(run.id)}"${String(run.id) === selected ? ' selected' : ''}>${esc(`#${run.run_number} · ${shortDateTime(run.created_at)} · ${run.conclusion} · run ${run.id}`)}${version ? ` · ${esc(version)}` : ''}</option>`;
+    }).join('');
+    return `<section class="card" aria-label="Nightly 数据视图"><h3>Nightly 数据视图</h3><p class="muted">选择一个 Nightly，用例性能与 Real E2E 评分切换到该 run 已采集的数据；未被统一采集过的 run 会明确提示没有数据。</p><div class="filters"><label for="nightly-run-id">Nightly</label><select id="nightly-run-id" aria-label="选择 Nightly run">${latest}${options || ''}</select><label for="nightly-run-id-manual">或输入 run ID</label><input id="nightly-run-id-manual" inputmode="numeric" placeholder="如 42919555343"><button class="btn primary" type="button" data-nightly-view>查看该 run</button><button class="btn" type="button" data-nightly-latest${selected ? '' : ' hidden'}>回到最新</button></div><p class="muted" data-nightly-view-status role="status">${esc(nightlyViewStatus())}</p><div class="filters"><button class="btn small" type="button" data-nightly-collect>复制当前 run ID</button><a class="btn small" href="https://github.com/agent-dashboard-ai/Agent-Dashboard/actions/workflows/collect-digitalmate-nightly.yml" target="_blank" rel="noopener">打开统一采集（补采未采集的 run）</a></div><p class="small-note">选择器只切换已采集数据的视图；补采后 Pages 重新部署，数据才会出现。GitHub Actions 不支持从链接预填输入，需复制 run ID 粘贴运行；需要 Agent-Dashboard 的 Actions 写权限。</p><p class="muted" data-nightly-collect-status role="status"></p></section>`;
   }
   function renderE2EHistory() {
     const box = $('#e2e-records');
@@ -1344,11 +1406,11 @@
       <p class="perf-note">上下文 = model call 的 input tokens；缓存读取 ${perfInt(cloud.usage?.cache_read_tokens)} tokens，reasoning ${perfInt(cloud.usage?.reasoning_tokens)} tokens。trace 由 Orbit 异步写入，未匹配时不代表当前 query。</p>`;
   }
 
-  function perfHistoryTable(points) {
+  function perfHistoryTable(points, viewRunId = '') {
     if (!points.length) return empty('还没有历史点');
     return `<div class="table-wrap perf-table-wrap"><table class="perf-table"><thead><tr><th>日期</th><th>状态</th><th class="num">平均查询</th><th class="num">查询数</th><th>运行</th><th>commit</th></tr></thead><tbody>${points.slice().reverse().map((p) => {
       const [label, tone] = perfStatus(p.status);
-      return `<tr><td class="nowrap">${esc(p.date)}</td><td>${badge(label, tone)}</td><td class="num nowrap">${perfMs(p.query_ms)}</td><td class="num">${n(p.query_count ?? 0)}</td><td><code>${esc(p.run_id || '—')}</code></td><td class="mono">${esc((p.commit || '').slice(0, 7) || '—')}</td></tr>`;
+      return `<tr${viewRunId && dmSameRun(p.run_id, viewRunId) ? ' class="perf-view-run"' : ''}><td class="nowrap">${esc(p.date)}</td><td>${badge(label, tone)}</td><td class="num nowrap">${perfMs(p.query_ms)}</td><td class="num">${n(p.query_count ?? 0)}</td><td>${dmVersionBadge(p.finished_at || p.date)}<code>${esc(p.run_id || '—')}</code></td><td class="mono">${esc((p.commit || '').slice(0, 7) || '—')}</td></tr>`;
     }).join('')}</tbody></table></div>`;
   }
 
@@ -1357,6 +1419,11 @@
     const cases = history?.cases && typeof history.cases === 'object' ? Object.values(history.cases) : [];
     if (!cases.length) return '';
     cases.sort((a, b) => String(b.latest?.finished_at || '').localeCompare(String(a.latest?.finished_at || '')) || String(a.id).localeCompare(String(b.id)));
+    // A run picked in the nightly view wins over the auto-detected 口径; every
+    // per-case read below then uses that run's point instead of `latest`.
+    const viewRunId = String(STATE.perfRunId || '');
+    const runPoint = (item, runId) => (Array.isArray(item.points) ? item.points : []).find((p) => dmSameRun(p.run_id, runId));
+    const basis = (item) => (viewRunId ? runPoint(item, viewRunId) : item.latest);
     // `history.cases` accumulates every case id ever seen: withdrawn cases keep
     // a frozen status and inflate the denominator forever. Report the run that
     // produced most of the current points instead of the whole history.
@@ -1371,19 +1438,23 @@
       runCounts.set(runId, entry);
     }
     const currentRun = [...runCounts.values()].sort((a, b) => b.count - a.count || b.at.localeCompare(a.at))[0] || null;
-    const scoped = currentRun ? cases.filter((item) => item.latest?.run_id === currentRun.runId) : cases;
+    const scoped = viewRunId ? cases.filter((item) => runPoint(item, viewRunId)) : (currentRun ? cases.filter((item) => item.latest?.run_id === currentRun.runId) : cases);
     const scopedIds = new Set(scoped.map((item) => item.id));
     if (!STATE.perfCase || !scopedIds.has(STATE.perfCase)) {
-      STATE.perfCase = scopedIds.has('DM-WF-BACK-01') ? 'DM-WF-BACK-01' : scoped[0].id;
+      STATE.perfCase = scopedIds.has('DM-WF-BACK-01') ? 'DM-WF-BACK-01' : scoped[0]?.id;
+    }
+    if (!scoped.length) {
+      return sectionHead('Nightly 用例性能', `真机 / 模拟器 nightly · 每用例每轮一个查询耗时点 · 从发出 query 到收到最后一条消息 · 同日重跑保留 · 数据 ${esc(history.updated_at ? shortDateTime(history.updated_at) : '—')}`)
+        + `<div class="banner warn"><span class="icon">▲</span><div><div class="title">run ${esc(viewRunId)} 没有已采集的用例性能数据</div><div>该 Nightly 未被统一采集过。回到最新，或复制 run ID 到统一采集页补采后再查看。</div></div></div>`;
     }
     const selected = history.cases[STATE.perfCase] || scoped[0];
-    const latest = selected.latest || {};
+    const latest = basis(selected) || {};
     const points = (Array.isArray(selected.points) ? selected.points : []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)) || ((Date.parse(a.finished_at) || 0) - (Date.parse(b.finished_at) || 0)));
-    const statuses = scoped.map((c) => c.latest?.status);
+    const statuses = scoped.map((c) => basis(c)?.status);
     const completed = statuses.filter((s) => String(s).toUpperCase() === 'COMPLETED').length;
     const blocked = statuses.filter((s) => String(s).toUpperCase() === 'BLOCKED').length;
     const failed = statuses.filter((s) => ['FAILED', 'ERROR'].includes(String(s).toUpperCase())).length;
-    const latestQueries = scoped.map((c) => c.latest?.query_ms).filter((v) => v != null);
+    const latestQueries = scoped.map((c) => basis(c)?.query_ms).filter((v) => v != null);
     const avgQuery = latestQueries.length ? Math.round(latestQueries.reduce((sum, value) => sum + value, 0) / latestQueries.length) : null;
     const values = points.map((p) => p.query_ms).filter((v) => v != null).sort((a, b) => a - b);
     const median = values.length ? (values.length % 2 ? values[(values.length - 1) / 2] : Math.round((values[values.length / 2 - 1] + values[values.length / 2]) / 2)) : null;
@@ -1393,35 +1464,69 @@
     const title = selected.title || latest.title || selected.id;
     const caseButtons = scoped.map((c) => {
       const active = c.id === selected.id;
-      return `<button type="button" class="perf-case${active ? ' active' : ''}" data-perf-case="${esc(c.id)}" aria-pressed="${active}"><span class="perf-case-top">${perfDot(c.latest?.status)}<code>${esc(c.id)}</code><span class="perf-case-dur" title="本轮 query 平均耗时">${perfMs(c.latest?.query_ms)}</span></span><span class="perf-case-title">${esc(c.title || '')}</span>${perfSparkline(c.points)}</button>`;
+      const at = basis(c);
+      return `<button type="button" class="perf-case${active ? ' active' : ''}" data-perf-case="${esc(c.id)}" aria-pressed="${active}"><span class="perf-case-top">${perfDot(at?.status)}<code>${esc(c.id)}</code><span class="perf-case-dur" title="本轮 query 平均耗时">${perfMs(at?.query_ms)}</span></span><span class="perf-case-title">${esc(at?.title || c.title || '')}</span>${perfSparkline(c.points)}</button>`;
     }).join('');
     const updated = history.updated_at ? shortDateTime(history.updated_at) : '—';
+    const basisText = viewRunId ? `查看 run ${viewRunId}（${n(scoped.length)} 个用例）` : (currentRun ? `口径 ${dmVersionBadge(currentRun.at)}${esc(currentRun.runId)}（${n(scoped.length)} 个用例）` : '');
     return `<div class="perf-section" data-perf-section>
-      ${sectionHead('Nightly 用例性能', `真机 / 模拟器 nightly · 每用例每轮一个查询耗时点 · 从发出 query 到收到最后一条消息 · 同日重跑保留 · 数据 ${esc(updated)}${currentRun ? ` · 口径 ${esc(currentRun.runId)}（${n(scoped.length)} 个用例）` : ''}`)}
+      ${sectionHead('Nightly 用例性能', `真机 / 模拟器 nightly · 每用例每轮一个查询耗时点 · 从发出 query 到收到最后一条消息 · 同日重跑保留 · 数据 ${esc(updated)} · ${basisText}`)}
       ${tiles([
-        { label: '用例', value: n(scoped.length), sub: `最新一轮 ${n(completed)} 通过` },
+        { label: '用例', value: n(scoped.length), sub: `${viewRunId ? '该轮' : '最新一轮'} ${n(completed)} 通过` },
         { label: '最新通过', value: `${n(completed)}<small>/ ${n(scoped.length)}</small>`, sub: `${Math.round((completed / scoped.length) * 100)}%`, tone: completed === scoped.length ? 'good' : '' },
         { label: '阻塞 / 失败', value: `${n(blocked)} / ${n(failed)}`, sub: '阻塞不等于失败', tone: blocked || failed ? 'warn' : 'good' },
-        { label: '最新平均查询耗时', value: perfMs(avgQuery), sub: '各用例最近一次 · 不含 E2E 等待' },
+        { label: '最新平均查询耗时', value: perfMs(avgQuery), sub: `各用例${viewRunId ? '该轮' : '最近一次'} · 不含 E2E 等待` },
       ])}
       <div class="perf-layout">
         <div class="card perf-list-card"><h3>用例 <span class="sub">${n(scoped.length)} 个 · 点击切换</span></h3><div class="perf-list">${caseButtons}</div></div>
         <div class="perf-detail">
-          <div class="card perf-detail-head"><div class="perf-detail-title"><div class="perf-title-row"><h3><code>${esc(selected.id)}</code></h3>${badge(selectedLabel, selectedTone)}</div><p class="perf-case-name">${esc(title)}</p><p class="muted">完成于 ${esc(shortDateTime(latest.finished_at))} · run <code>${esc(latest.run_id || '—')}</code> · commit <span class="mono">${esc((latest.commit || '').slice(0, 7) || '—')}</span> · ${esc(perfDevice(latest.device))} · E2E 总耗时 ${perfMs(latest.duration_ms)}</p></div></div>
+          <div class="card perf-detail-head"><div class="perf-detail-title"><div class="perf-title-row"><h3><code>${esc(selected.id)}</code></h3>${badge(selectedLabel, selectedTone)}</div><p class="perf-case-name">${esc(title)}</p><p class="muted">完成于 ${esc(shortDateTime(latest.finished_at))} · ${dmVersionBadge(latest.finished_at)}run <code>${esc(latest.run_id || '—')}</code> · commit <span class="mono">${esc((latest.commit || '').slice(0, 7) || '—')}</span> · ${esc(perfDevice(latest.device))} · E2E 总耗时 ${perfMs(latest.duration_ms)}</p></div></div>
           <div class="perf-kpis">
             <div><span>本轮平均查询</span><strong>${perfMs(latest.query_ms)}</strong></div>
             <div><span>历史中位数</span><strong>${perfMs(median)}</strong></div>
             <div><span>查询次数</span><strong>${n(queryCount)}</strong></div>
             <div><span>记录轮次</span><strong>${n(activeRuns)}</strong></div>
           </div>
-          <div class="card perf-card"><h3>最近一次 Profiling · 查询耗时 <span class="sub">${n(queryCount)} 次查询 · 以最后一条消息到达计 · E2E ${perfMs(latest.duration_ms)}</span></h3>${perfQueries(latest)}</div>
+          <div class="card perf-card"><h3>${viewRunId ? '该轮' : '最近一次'} Profiling · 查询耗时 <span class="sub">${n(queryCount)} 次查询 · 以最后一条消息到达计 · E2E ${perfMs(latest.duration_ms)}</span></h3>${perfQueries(latest)}</div>
           <div class="card perf-card"><h3>Orbit 云端 trace <span class="sub">model 耗时 · TTFT · TPOT · 上下文 tokens · 阶段</span></h3>${perfCloud(latest)}</div>
           <div class="card perf-card"><h3>每轮平均查询耗时 <span class="sub">每轮一个点 · 从 query 到消息接收 · Asia/Shanghai</span></h3>${perfChart(points)}<p class="perf-note">当前 ${n(activeRuns)} 轮运行；每点为当轮 query 平均耗时，仅 profiling，不含 E2E 步骤等待；缺失值不补 0。</p></div>
-          <details class="card perf-card perf-history"><summary>执行历史 <span class="sub">${n(points.length)} 次</span></summary>${perfHistoryTable(points)}</details>
+          <details class="card perf-card perf-history"><summary>执行历史 <span class="sub">${n(points.length)} 次</span></summary>${perfHistoryTable(points, viewRunId)}</details>
         </div>
       </div>
     </div>`;
   }
+
+  // DigitalMate 版本计划，与团队《Digital Mate version plan》表保持一致（北京时间日历）。
+  // 每条是 [发布日, 版本号]；表中空白的日期按「上一个发布版本 + -betaN」命名，N 为发布后第 N 天。
+  // 计划开始前的日期不显示版本；计划结束后的日期先沿用最后版本 + betaN，等计划更新。
+  const DIGITALMATE_VERSION_PLAN = [
+    ['2026-11-03', 'v0.1.7'], ['2026-11-05', 'v0.1.8'], ['2026-11-07', 'v0.1.9'],
+    ['2026-11-10', 'v0.1.10'], ['2026-11-12', 'v0.1.11'], ['2026-11-14', 'v0.1.12'],
+    ['2026-11-17', 'v0.1.13'], ['2026-11-19', 'v0.1.14'], ['2026-11-21', 'v0.1.15'],
+    ['2026-11-24', 'v0.1.16'], ['2026-11-26', 'v0.1.17'], ['2026-11-28', 'v0.1.18'],
+    ['2026-12-01', 'v0.1.19'], ['2026-12-03', 'v0.1.20'], ['2026-12-05', 'v0.1.21'],
+    ['2026-12-08', 'v0.1.22'], ['2026-12-10', 'v0.1.23'], ['2026-12-12', 'v0.1.24'],
+    ['2026-12-15', 'v0.1.25'], ['2026-12-17', 'v0.1.26'], ['2026-12-19', 'v0.1.27'],
+    ['2026-12-22', 'v0.1.28'], ['2026-12-24', 'v0.1.29'], ['2026-12-26', 'v0.1.30'],
+    ['2026-12-29', 'v0.1.31'], ['2026-12-31', 'v0.1.32'],
+  ];
+  // 版本按运行的北京时间日期查表（发布流程与评分行同口径）；只在 DigitalMate 看板生效。
+  function dmVersionOf(iso) {
+    if (!iso || String(STATE.snap?.repo || '').toLowerCase() !== 'openjiuwen-ai/digitalmate') return null;
+    const day = scoreDay(iso);
+    if (!day) return null;
+    let released = null;
+    for (const [date, version] of DIGITALMATE_VERSION_PLAN) {
+      if (date > day) break;
+      released = { date, version };
+    }
+    if (!released) return null;
+    if (released.date === day) return released.version;
+    const gap = Math.round((Date.parse(day) - Date.parse(released.date)) / 86400000);
+    return `${released.version}-beta${gap}`;
+  }
+  const dmVersionBadge = (iso) => { const v = dmVersionOf(iso); return v ? `${badge(v, 'none')} ` : ''; };
+  const dmVersionText = (iso) => dmVersionOf(iso) || '—';
 
   // ST execution board: per-case verdict matrix, latest-run detail and run history,
   // published as digitalmate/st-history@1 by the collect-digitalmate-st workflow.
@@ -1431,6 +1536,7 @@
     const runs = (d.runs || []).filter((r) => r && r.st);
     if (!runs.length) return empty('暂无 ST 运行数据');
     const latest = runs[0];
+    const latestVersion = dmVersionOf(latest.createdAt);
     const cases = latest.st.cases || [];
     // One resolver for both the KPI and the matrices: direct cases, relay suites
     // and component suites (with the suite verdict for fixture-only suites).
@@ -1463,7 +1569,7 @@
       return `${rows.filter((x) => x.status === 'passed').length}/${rows.length}`;
     };
     let html = tiles([
-      { label: '最新运行', value: `<a href="${esc(latest.url)}" target="_blank" rel="noopener">#${esc(latest.runId)}</a>`, sub: esc(String(latest.createdAt).slice(0, 16).replace('T', ' ')) + ' UTC', tone: latest.conclusion === 'success' ? 'good' : 'bad' },
+      { label: '最新运行', value: `${dmVersionBadge(latest.createdAt)}<a href="${esc(latest.url)}" target="_blank" rel="noopener">#${esc(latest.runId)}</a>`, sub: esc(String(latest.createdAt).slice(0, 16).replace('T', ' ')) + ' UTC', tone: latest.conclusion === 'success' ? 'good' : 'bad' },
       { label: '最新通过', value: `${passed}<small>/ ${scopes.length}</small>`, sub: `直连 ${laneCount('direct')} · relay ${laneCount('relay')} · 组件 ${laneCount('component')}`, tone: passed === scopes.length ? 'good' : 'bad' },
       { label: '用例耗时中位', value: fmtMs(medianOf(cases)), sub: `runner ${esc(latest.st.runner || '—')}` },
       { label: '近 90 轮失败', value: `${failedRuns}<small>/ ${runs.length}</small>`, sub: `失败率 ${runs.length ? Math.round((failedRuns / runs.length) * 100) : 0}%`, tone: failedRuns ? 'warn' : 'good' },
@@ -1500,7 +1606,7 @@
       html += `<div class="card">${table('t-st-component-matrix', matrixCols, matrixRowsFor(componentOrder))}</div>`;
     }
 
-    html += sectionHead('最新运行用例明细', `${esc(latest.st.runner || '—')} · ${esc(latest.st.machine || '—')}${latest.st.runId ? ` · ST runId <code>${esc(latest.st.runId)}</code>` : ''}`);
+    html += sectionHead('最新运行用例明细', `${latestVersion ? `版本 ${esc(latestVersion)} · ` : ''}${esc(latest.st.runner || '—')} · ${esc(latest.st.machine || '—')}${latest.st.runId ? ` · ST runId <code>${esc(latest.st.runId)}</code>` : ''}`);
     html += `<div class="card">${table('t-st-cases', [
       { key: 'title', label: '用例', render: (c) => `${esc(c.title || c.name)}${c.coverageId ? ` <span class="muted">${esc(c.coverageId)}</span>` : ''}` },
       { key: 'status', label: '结果', render: (c) => stBadge(c.status) },
@@ -1543,6 +1649,7 @@
     html += sectionHead('运行历史', `数据由 collect-digitalmate-st 从 nightly 的 digitalmate-st-* artifact 同步 · 保留 90 轮`);
     html += `<div class="card">${table('t-st-runs', [
       { key: 'runId', label: '运行', render: (r) => `<a href="${esc(r.url)}" target="_blank" rel="noopener">#${esc(r.runId)}</a>` },
+      { key: 'dmVersion', label: '版本', sortable: false, render: (r) => (dmVersionOf(r.createdAt) ? badge(dmVersionOf(r.createdAt), 'none') : '<span class="muted">—</span>') },
       { key: 'createdAt', label: '时间', render: (r) => esc(String(r.createdAt).slice(0, 16).replace('T', ' ')) + ' UTC' },
       { key: 'conclusion', label: '结果', render: (r) => (r.conclusion === 'success' ? badge('success', 'good') : badge('failure', 'bad')) },
       { key: 'total', label: '用例', num: true, render: (r) => n((r.st.cases || []).length) },
@@ -1749,7 +1856,7 @@
   }
 
   // ------------------------------------------------------------ shell
-  const DIGITALMATE_TABS = { 'production-metrics': './production-metrics/index.html?v=20261114.2#models', 'test-matrix': './test-matrix/index.html', bench: './bench/index.html', runners: './runners/index.html' };
+  const DIGITALMATE_TABS = { 'production-metrics': './production-metrics/index.html?v=20261119.5#models', 'test-matrix': './test-matrix/index.html', bench: './bench/index.html', runners: './runners/index.html' };
   const activeTab = () => {
     const requested = location.hash.slice(1);
     const known = [...document.querySelectorAll('#tabs [data-tab]')].some(tab => (!tab.hidden || (!STATE.snap && DIGITALMATE_TABS[requested])) && tab.dataset.tab === requested);
@@ -1849,7 +1956,7 @@
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
     try {
-      const res = await fetch(url, { cache: 'no-store', ...opts, signal: ctrl.signal });
+      const res = await fetch(url, { ...opts, signal: ctrl.signal });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } finally {
@@ -1872,7 +1979,7 @@
       try {
         const headers = {};
         if (offset > 0) headers.Range = `bytes=${offset}-`;
-        const res = await fetch(url, { cache: 'no-store', headers, signal: ctrl.signal });
+        const res = await fetch(url, { headers, signal: ctrl.signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         if (offset > 0 && res.status !== 206) {
           // Server ignored the range: restart the download from scratch.
@@ -1906,22 +2013,25 @@
   }
   async function load() {
     try {
-      // 10-minute cache bust: coarse enough for the CDN edge to serve repeated
-      // loads, fresh enough for hourly snapshot updates.
-      const doc = await fetchSnapshotJson('./data/snapshot.json?m='+Math.floor(Date.now()/6e5));
+      // 10-minute cache bust: coarse enough for the CDN edge and the browser
+      // cache to serve repeated loads and quiet 60s polls, fresh enough for
+      // hourly snapshot updates.
+      const bucket = Math.floor(Date.now()/6e5);
+      const doc = await fetchSnapshotJson('./data/snapshot.json?m='+bucket);
       if(!doc.sections || !doc.board)throw new Error('快照格式尚未更新，请稍后刷新');
       STATE.snap=doc;STATE.status={refreshing:false};
       if ((returnFocus.pending || returnFocus.e2ePending) && (doc.lines || []).some((line) => line.key === returnFocus.line)) STATE.line = returnFocus.line;
       window.GSBLocalBoard?.setSnapshot(doc);
       STATE.clientError = null;
       // Run records are optional: a missing index only hides that section.
-      STATE.e2e = await fetchJson('./data/e2e/index.json?ts='+Date.now()).catch(() => null);
-      const nightlyRuns = await fetchJson('./data/nightly-runs.json?ts='+Date.now()).catch(() => null);
+      // All data files share the snapshot's cache bucket so polls stay cheap.
+      STATE.e2e = await fetchJson('./data/e2e/index.json?m='+bucket).catch(() => null);
+      const nightlyRuns = await fetchJson('./data/nightly-runs.json?m='+bucket).catch(() => null);
       STATE.nightlyRuns = Array.isArray(nightlyRuns) ? nightlyRuns : Array.isArray(nightlyRuns?.runs) ? nightlyRuns.runs : [];
       // Optional nightly performance history; a missing file hides the section on other boards.
-      STATE.performance = await fetchJson('./data/e2e-performance/history.json?ts='+Date.now()).catch(() => null);
+      STATE.performance = await fetchJson('./data/e2e-performance/history.json?m='+bucket).catch(() => null);
       // Optional ST history published by collect-digitalmate-st; absent on other boards.
-      STATE.st = await fetchJson('./data/st.json?ts='+Date.now()).catch(() => null);
+      STATE.st = await fetchJson('./data/st.json?m='+bucket).catch(() => null);
       STATE.e2eErrors.clear();
     } catch (err) {
       STATE.clientError = err.name === 'AbortError'
@@ -1963,7 +2073,22 @@
     STATE.e2eFilter[el.dataset.e2eFilter] = el.value;
     renderE2EHistory();
   });
+  $('#tab-tests').addEventListener('change', (ev) => {
+    if (ev.target.id !== 'nightly-run-id') return;
+    applyNightlyView(ev.target.value);
+  });
   document.addEventListener('click', (ev) => {
+    const nightlyView = ev.target.closest('[data-nightly-view]');
+    if (nightlyView) {
+      const manualRunId = $('#nightly-run-id-manual')?.value.trim();
+      applyNightlyView(manualRunId || $('#nightly-run-id')?.value);
+      return;
+    }
+    const nightlyLatest = ev.target.closest('[data-nightly-latest]');
+    if (nightlyLatest) {
+      applyNightlyView('');
+      return;
+    }
     const collectNightly = ev.target.closest('[data-nightly-collect]');
     if (collectNightly) {
       const input = $('#nightly-run-id');
@@ -1971,7 +2096,7 @@
       const runId = manualRunId || input?.value;
       const status = $('[data-nightly-collect-status]');
       if (!runId) {
-        if (status) status.textContent = '先选择一个已完成的 Nightly。';
+        if (status) status.textContent = '先选择一个 Nightly 或输入 run ID。';
         return;
       }
       if (!navigator.clipboard?.writeText) {
@@ -1979,7 +2104,7 @@
         return;
       }
       navigator.clipboard.writeText(String(runId)).then(() => {
-        if (status) status.textContent = `已复制 run ID ${runId}。在统一采集页粘贴到 run_id 输入框。`;
+        if (status) status.textContent = `已复制 run ID ${runId}。在统一采集页粘贴到 run_id 输入框并运行。`;
       }).catch(() => {
         if (status) status.textContent = `请手动复制 run ID：${runId}`;
       });
