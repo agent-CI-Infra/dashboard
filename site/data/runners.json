@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-20T02:41:04Z",
+  "updatedAt": "2026-11-20T10:37:16Z",
   "source": "openJiuwen-ai/DigitalMate",
   "runners": [
     {
@@ -35,7 +35,7 @@
       "name": "digitalmate-win-st-01",
       "os": "Windows",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "Windows",
@@ -68,10 +68,10 @@
       "job": {
         "name": "Fast Checks / 2 · HarmonyOS UT",
         "workflow": "CI Advisory",
-        "run_number": 26,
-        "run_id": 44662407751,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44662407751",
-        "started_at": "2026-11-20T02:40:45Z"
+        "run_number": 114,
+        "run_id": 44720208392,
+        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44720208392",
+        "started_at": "2026-11-20T10:33:58Z"
       }
     },
     {
@@ -93,10 +93,10 @@
       "job": {
         "name": "hypium-ut",
         "workflow": "CI",
-        "run_number": 3348,
-        "run_id": 44662175319,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44662175319",
-        "started_at": "2026-11-20T02:37:58Z"
+        "run_number": 3368,
+        "run_id": 44720012599,
+        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44720012599",
+        "started_at": "2026-11-20T10:32:32Z"
       }
     },
     {
@@ -185,12 +185,12 @@
         "dm-architecture"
       ],
       "job": {
-        "name": "Fast Checks / 2 · Architecture",
+        "name": "2 · ArkTS Lint / ArkTS Code Check",
         "workflow": "CI Advisory",
-        "run_number": 26,
-        "run_id": 44662407751,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44662407751",
-        "started_at": "2026-11-20T02:40:45Z"
+        "run_number": 114,
+        "run_id": 44720208392,
+        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44720208392",
+        "started_at": "2026-11-20T10:33:58Z"
       }
     },
     {
@@ -208,12 +208,12 @@
         "dm-architecture"
       ],
       "job": {
-        "name": "Fast Checks / 2 · Linux UT",
-        "workflow": "CI Advisory",
-        "run_number": 26,
-        "run_id": 44662407751,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44662407751",
-        "started_at": "2026-11-20T02:40:45Z"
+        "name": "node-ut",
+        "workflow": "CI",
+        "run_number": 3368,
+        "run_id": 44720012599,
+        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44720012599",
+        "started_at": "2026-11-20T10:32:32Z"
       }
     },
     {
@@ -221,7 +221,7 @@
       "name": "dm-hk-ci-03",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -236,7 +236,7 @@
       "name": "dm-hk-ci-04",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -251,66 +251,42 @@
       "name": "dm-hk-ci-05",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
         "Linux",
         "dm-codecheck",
         "dm-nodeut"
-      ],
-      "job": {
-        "name": "2 · ArkTS Lint / ArkTS Code Check",
-        "workflow": "CI Advisory",
-        "run_number": 26,
-        "run_id": 44662407751,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44662407751",
-        "started_at": "2026-11-20T02:40:45Z"
-      }
+      ]
     },
     {
       "id": 38,
       "name": "dm-hk-ci-06",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
         "Linux",
         "dm-codecheck",
         "dm-nodeut"
-      ],
-      "job": {
-        "name": "node-ut",
-        "workflow": "CI",
-        "run_number": 3348,
-        "run_id": 44662175319,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44662175319",
-        "started_at": "2026-11-20T02:37:58Z"
-      }
+      ]
     },
     {
       "id": 39,
       "name": "dm-hk-ci-07",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
         "Linux",
         "dm-codecheck",
         "dm-nodeut"
-      ],
-      "job": {
-        "name": "ArkTS Code Check",
-        "workflow": "Code Check",
-        "run_number": 3824,
-        "run_id": 44662175219,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44662175219",
-        "started_at": "2026-11-20T02:37:58Z"
-      }
+      ]
     },
     {
       "id": 40,
@@ -324,25 +300,18 @@
         "Linux",
         "dm-codecheck",
         "dm-nodeut"
-      ]
+      ],
+      "job": {
+        "name": "Fast Checks / 2 · Linux UT",
+        "workflow": "CI Advisory",
+        "run_number": 114,
+        "run_id": 44720208392,
+        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44720208392",
+        "started_at": "2026-11-20T10:33:58Z"
+      }
     }
   ],
-  "queued": [
-    {
-      "name": "Fast Checks / 2 · Linux UT",
-      "workflow": "CI Advisory",
-      "run_number": 27,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44662448144",
-      "created_at": "2026-11-20T02:40:59Z"
-    },
-    {
-      "name": "Fast Checks / 2 · HarmonyOS UT",
-      "workflow": "CI Advisory",
-      "run_number": 27,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44662448144",
-      "created_at": "2026-11-20T02:40:59Z"
-    }
-  ],
+  "queued": [],
   "history": [
     {
       "at": "2026-11-13T09:13:19Z",
@@ -1098,6 +1067,43 @@
         "dm-hk-ci-05": "2 · ArkTS Lint / ArkTS Code Check",
         "dm-hk-ci-06": "node-ut",
         "dm-hk-ci-07": "ArkTS Code Check"
+      }
+    },
+    {
+      "at": "2026-11-20T10:37:16Z",
+      "s": {
+        "HwdeMacBook-Air-2": "online",
+        "digitalmate-main-windows-01": "offline",
+        "digitalmate-win-st-01": "online",
+        "digitalmate-win-st-02": "online",
+        "digitalmate-win-st-03": "online",
+        "digitalmate-win-st-04": "online",
+        "dm-cloud-codecheck-02": "online",
+        "dm-cloud-flex-01": "online",
+        "dm-cloud-nodeut-01": "online",
+        "dm-cloud-nodeut-02": "online",
+        "dm-hk-ci-01": "online",
+        "dm-hk-ci-02": "online",
+        "dm-hk-ci-03": "online",
+        "dm-hk-ci-04": "online",
+        "dm-hk-ci-05": "online",
+        "dm-hk-ci-06": "online",
+        "dm-hk-ci-07": "online",
+        "dm-hk-ci-08": "online"
+      },
+      "b": {
+        "digitalmate-win-st-02": true,
+        "digitalmate-win-st-03": true,
+        "dm-hk-ci-01": true,
+        "dm-hk-ci-02": true,
+        "dm-hk-ci-08": true
+      },
+      "j": {
+        "digitalmate-win-st-02": "Fast Checks / 2 · HarmonyOS UT",
+        "digitalmate-win-st-03": "hypium-ut",
+        "dm-hk-ci-01": "2 · ArkTS Lint / ArkTS Code Check",
+        "dm-hk-ci-02": "node-ut",
+        "dm-hk-ci-08": "Fast Checks / 2 · Linux UT"
       }
     }
   ]
