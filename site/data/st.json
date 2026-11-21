@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-21T11:07:08Z",
+  "updatedAt": "2026-11-21T11:15:56Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -309,12 +309,196 @@
         "runner": "digitalmate-win-st-01",
         "machine": "PC-20261103OHIZ",
         "issues": [
-          "13/13 business cases ran in per-case isolation and every native run printed \"ST passed\" (job log, attempt 2).",
-          "The job still exited 1: tests/st/run-isolated.mjs:18 requires exactly one native case equal to the requested name, but a branch key expands to two (tests/st/scenes.mjs:70), so real_model_structured_choice and real_model_structured_choice_home were recorded as blocked by the harness, not by a case failure.",
-          "The case-level artifact was rejected by the Actions artifact storage quota (#1710); this entry was reconstructed from the job log, so elapsedMs is null and the CI conclusion stays failure."
+          "business: 13/13 cases ran in per-case isolation and every native run printed \"ST passed\"; the job still exited 1 because tests/st/run-isolated.mjs:18 requires one native case per isolated run while a branch key expands to two (tests/st/scenes.mjs:70), so real_model_structured_choice and real_model_structured_choice_home were recorded blocked by the harness, not by a case failure.",
+          "component: job conclusion success; attachment-policy, session-proximity, artifact-versions, markdown and suggestions all reported \"ST passed\".",
+          "live-wire: connection/business/forward/chunks passed; identity failed; artifact blocked; optional did not run because the workflow still names a suite that no longer exists at this revision.",
+          "All three lanes uploaded no artifact because the Actions artifact storage quota (#1710) rejected every upload; component/live-wire rows here are reconstructed from job logs, so elapsedMs is null and the CI conclusion stays failure."
         ],
-        "liveWire": [],
-        "component": [],
+        "liveWire": [
+          {
+            "suite": "connection",
+            "caseName": "gateway_connection",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "business",
+            "caseName": "duplicate_downlink_idempotent",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "forward",
+            "caseName": "protocol_unknown_event_forward_compat",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "chunks",
+            "caseName": "protocol_chunk_boundary_reassembly",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "identity",
+            "caseName": "protocol_invalid_task_identity",
+            "status": "failed",
+            "nativeStatus": "failed",
+            "issues": [
+              "suite runner exitCode 1 / evidenceStatus failed at 2026-11-21T10:28:05Z; native case failed, evidence files were not uploaded (artifact quota #1710)"
+            ]
+          },
+          {
+            "suite": "artifact",
+            "caseName": "artifact_receipt_required",
+            "status": "blocked",
+            "nativeStatus": "blocked",
+            "issues": [
+              "suite runner exitCode 1 / evidenceStatus blocked at 2026-11-21T10:30:23Z; no usable three-way evidence, artifact quota #1710"
+            ]
+          },
+          {
+            "suite": "optional",
+            "caseName": "protocol_malformed_optional_fields",
+            "status": "blocked",
+            "nativeStatus": "unavailable",
+            "issues": [
+              "not run: nightly still passes --suite optional, but tests/st/live-wire/run.mjs at e319c05 registers only connection|business|identity|forward|chunks|artifact, so the runner rejected the name before any case started (PRO-01 was retired)"
+            ]
+          }
+        ],
+        "component": [
+          {
+            "suite": "artifact-versions",
+            "title": "产物版本契约",
+            "status": "passed",
+            "runId": "",
+            "issues": [],
+            "cases": [],
+            "fixtures": []
+          },
+          {
+            "suite": "attachment-policy",
+            "title": "本地附件策略",
+            "status": "passed",
+            "runId": "",
+            "issues": [],
+            "cases": [
+              {
+                "name": "local_attachment_blocked_types",
+                "title": "拒绝的类型",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
+              },
+              {
+                "name": "local_attachment_image_containers",
+                "title": "图片容器",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
+              },
+              {
+                "name": "local_attachment_magic_mismatch",
+                "title": "魔数不符",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
+              },
+              {
+                "name": "local_attachment_size_limits",
+                "title": "大小限制",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
+              },
+              {
+                "name": "local_attachment_supported_controls",
+                "title": "支持的控件",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
+              },
+              {
+                "name": "local_attachment_preview_decode",
+                "title": "预览解码",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
+              }
+            ],
+            "fixtures": []
+          },
+          {
+            "suite": "markdown",
+            "title": "Markdown 渲染",
+            "status": "passed",
+            "runId": "",
+            "issues": [],
+            "cases": [
+              {
+                "name": "fixed_review_inputs_render_on_device",
+                "title": "固定输入渲染",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
+              }
+            ],
+            "fixtures": []
+          },
+          {
+            "suite": "session-proximity",
+            "title": "会话邻近契约",
+            "status": "passed",
+            "runId": "",
+            "issues": [],
+            "cases": [
+              {
+                "name": "native_topic_projection",
+                "title": "主题投影",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
+              },
+              {
+                "name": "native_capacity_draft",
+                "title": "容量与草稿",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
+              },
+              {
+                "name": "native_capacity_controls",
+                "title": "容量与控件",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
+              }
+            ],
+            "fixtures": []
+          },
+          {
+            "suite": "suggestions",
+            "title": "建议协议与按钮",
+            "status": "passed",
+            "runId": "",
+            "issues": [],
+            "cases": [
+              {
+                "name": "metadata_replay_and_native_buttons",
+                "title": "元数据回放与原生按钮",
+                "status": "passed",
+                "elapsedMs": null,
+                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
+              }
+            ],
+            "fixtures": []
+          }
+        ],
         "cases": [
           {
             "name": "real_model_text_reply",
