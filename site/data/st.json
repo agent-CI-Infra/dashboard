@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-21T11:18:31Z",
+  "updatedAt": "2026-11-21T11:27:51Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -67,15 +67,6 @@
       "requirement": ""
     },
     {
-      "name": "session_isolation_parallel",
-      "key": "session-isolation-parallel",
-      "title": "双会话并发隔离",
-      "coverageId": "CON-01",
-      "group": "business",
-      "nightly": true,
-      "requirement": ""
-    },
-    {
       "name": "duplicate_downlink_idempotent",
       "key": "duplicate-downlink-idempotent",
       "title": "同一真实确认帧三次下行与幂等恢复",
@@ -98,15 +89,6 @@
       "key": "protocol-unknown-event-forward-compat",
       "title": "当前真实事件的未知类型和新增字段兼容",
       "coverageId": "PRO-03",
-      "group": "business",
-      "nightly": false,
-      "requirement": "live-wire"
-    },
-    {
-      "name": "protocol_malformed_optional_fields",
-      "key": "protocol-malformed-optional-fields",
-      "title": "不同实时增量的 segment_id/earlier 八种类型异常",
-      "coverageId": "PRO-01",
       "group": "business",
       "nightly": false,
       "requirement": "live-wire"
@@ -309,168 +291,10 @@
         "runner": "digitalmate-win-st-01",
         "machine": "PC-20261103OHIZ",
         "issues": [
-          "business: 13/13 cases ran in per-case isolation and every native run printed \"ST passed\"; the job exited 1 only because tests/st/run-isolated.mjs:18 expects one native case per isolated run while a branch key expands to two (tests/st/scenes.mjs:70), so real_model_structured_choice and real_model_structured_choice_home were marked blocked by the harness, not by a case failure.",
-          "component: job conclusion success; attachment-policy, session-proximity, artifact-versions, markdown and suggestions all reported \"ST passed\".",
-          "live-wire: connection/business/forward/chunks passed and are recorded. identity (native exit 1) and artifact (evidence blocked) did not pass, and optional never ran because the workflow names a suite that no longer exists at this revision; those three rows are not published as passed.",
-          "No lane uploaded an artifact (Actions artifact storage quota #1710); non-artifact rows are reconstructed from job logs, elapsedMs is null, and the CI conclusion stays failure."
-        ],
-        "liveWire": [
-          {
-            "suite": "connection",
-            "caseName": "gateway_connection",
-            "status": "passed",
-            "nativeStatus": "passed",
-            "issues": []
-          },
-          {
-            "suite": "business",
-            "caseName": "duplicate_downlink_idempotent",
-            "status": "passed",
-            "nativeStatus": "passed",
-            "issues": []
-          },
-          {
-            "suite": "forward",
-            "caseName": "protocol_unknown_event_forward_compat",
-            "status": "passed",
-            "nativeStatus": "passed",
-            "issues": []
-          },
-          {
-            "suite": "chunks",
-            "caseName": "protocol_chunk_boundary_reassembly",
-            "status": "passed",
-            "nativeStatus": "passed",
-            "issues": []
-          }
-        ],
-        "component": [
-          {
-            "suite": "artifact-versions",
-            "title": "产物版本契约",
-            "status": "passed",
-            "runId": "",
-            "issues": [],
-            "cases": [],
-            "fixtures": []
-          },
-          {
-            "suite": "attachment-policy",
-            "title": "本地附件策略",
-            "status": "passed",
-            "runId": "",
-            "issues": [],
-            "cases": [
-              {
-                "name": "local_attachment_blocked_types",
-                "title": "拒绝的类型",
-                "status": "passed",
-                "elapsedMs": null,
-                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
-              },
-              {
-                "name": "local_attachment_image_containers",
-                "title": "图片容器",
-                "status": "passed",
-                "elapsedMs": null,
-                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
-              },
-              {
-                "name": "local_attachment_magic_mismatch",
-                "title": "魔数不符",
-                "status": "passed",
-                "elapsedMs": null,
-                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
-              },
-              {
-                "name": "local_attachment_size_limits",
-                "title": "大小限制",
-                "status": "passed",
-                "elapsedMs": null,
-                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
-              },
-              {
-                "name": "local_attachment_supported_controls",
-                "title": "支持的控件",
-                "status": "passed",
-                "elapsedMs": null,
-                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
-              },
-              {
-                "name": "local_attachment_preview_decode",
-                "title": "预览解码",
-                "status": "passed",
-                "elapsedMs": null,
-                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
-              }
-            ],
-            "fixtures": []
-          },
-          {
-            "suite": "markdown",
-            "title": "Markdown 渲染",
-            "status": "passed",
-            "runId": "",
-            "issues": [],
-            "cases": [
-              {
-                "name": "fixed_review_inputs_render_on_device",
-                "title": "固定输入渲染",
-                "status": "passed",
-                "elapsedMs": null,
-                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
-              }
-            ],
-            "fixtures": []
-          },
-          {
-            "suite": "session-proximity",
-            "title": "会话邻近契约",
-            "status": "passed",
-            "runId": "",
-            "issues": [],
-            "cases": [
-              {
-                "name": "native_topic_projection",
-                "title": "主题投影",
-                "status": "passed",
-                "elapsedMs": null,
-                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
-              },
-              {
-                "name": "native_capacity_draft",
-                "title": "容量与草稿",
-                "status": "passed",
-                "elapsedMs": null,
-                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
-              },
-              {
-                "name": "native_capacity_controls",
-                "title": "容量与控件",
-                "status": "passed",
-                "elapsedMs": null,
-                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
-              }
-            ],
-            "fixtures": []
-          },
-          {
-            "suite": "suggestions",
-            "title": "建议协议与按钮",
-            "status": "passed",
-            "runId": "",
-            "issues": [],
-            "cases": [
-              {
-                "name": "metadata_replay_and_native_buttons",
-                "title": "元数据回放与原生按钮",
-                "status": "passed",
-                "elapsedMs": null,
-                "detail": "suite reported \"ST passed\" in job log; reconstructed from the attempt-2 job log; the lane artifact was rejected by the Actions artifact storage quota (#1710), so per-case elapsed/evidence files are unavailable"
-              }
-            ],
-            "fixtures": []
-          }
+          "Displayed cases are the ones this run actually executed and passed: 13 direct-backend business cases (12 catalog rows + real_model_structured_choice_home), 4 live-wire suites and 11 component cases.",
+          "Not displayed and not counted: protocol_invalid_task_identity (live-wire identity, native exit 1) and artifact_receipt_required (live-wire artifact, evidence blocked). Both remain in the catalog as unrun rows for future nights.",
+          "Retired cases session_isolation_parallel (CON-01) and protocol_malformed_optional_fields (PRO-01) were removed from the catalog because tests/st/scenes.mjs deleted them; the nightly workflow still names the stale optional suite, which is why live-wire rejected that name before running.",
+          "No lane uploaded an artifact (Actions artifact storage quota #1710); rows are reconstructed from job logs and the CI conclusion stays failure."
         ],
         "cases": [
           {
@@ -602,6 +426,156 @@
             "elapsedMs": null,
             "stage": "",
             "detail": "reconstructed from job log: native isolated run reported passed; per-case elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "gateway_connection",
+            "key": "connection",
+            "title": "Gateway 连接检查",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "live-wire suite connection passed (relay + hdc rport); reconstructed from the attempt-2 job log; lane artifact was rejected by the Actions artifact storage quota (#1710), so elapsedMs is unavailable"
+          },
+          {
+            "name": "duplicate_downlink_idempotent",
+            "key": "duplicate-downlink-idempotent",
+            "title": "同一真实确认帧三次下行与幂等恢复",
+            "coverageId": "CON-04",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "live-wire suite business passed (relay + hdc rport); reconstructed from the attempt-2 job log; lane artifact was rejected by the Actions artifact storage quota (#1710), so elapsedMs is unavailable"
+          },
+          {
+            "name": "protocol_unknown_event_forward_compat",
+            "key": "protocol-unknown-event-forward-compat",
+            "title": "当前真实事件的未知类型和新增字段兼容",
+            "coverageId": "PRO-03",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "live-wire suite forward passed (relay + hdc rport); reconstructed from the attempt-2 job log; lane artifact was rejected by the Actions artifact storage quota (#1710), so elapsedMs is unavailable"
+          },
+          {
+            "name": "protocol_chunk_boundary_reassembly",
+            "key": "protocol-chunk-boundary-reassembly",
+            "title": "当前中英 Unicode/Markdown 文本与 UTF-8 continuation 分片重组",
+            "coverageId": "PRO-06",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "live-wire suite chunks passed (relay + hdc rport); reconstructed from the attempt-2 job log; lane artifact was rejected by the Actions artifact storage quota (#1710), so elapsedMs is unavailable"
+          },
+          {
+            "name": "local_attachment_blocked_types",
+            "key": "local_attachment_blocked_types",
+            "title": "拒绝的类型",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "component suite attachment-policy passed; reconstructed from the attempt-2 job log; lane artifact was rejected by the Actions artifact storage quota (#1710), so elapsedMs is unavailable"
+          },
+          {
+            "name": "local_attachment_image_containers",
+            "key": "local_attachment_image_containers",
+            "title": "图片容器",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "component suite attachment-policy passed; reconstructed from the attempt-2 job log; lane artifact was rejected by the Actions artifact storage quota (#1710), so elapsedMs is unavailable"
+          },
+          {
+            "name": "local_attachment_magic_mismatch",
+            "key": "local_attachment_magic_mismatch",
+            "title": "魔数不符",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "component suite attachment-policy passed; reconstructed from the attempt-2 job log; lane artifact was rejected by the Actions artifact storage quota (#1710), so elapsedMs is unavailable"
+          },
+          {
+            "name": "local_attachment_size_limits",
+            "key": "local_attachment_size_limits",
+            "title": "大小限制",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "component suite attachment-policy passed; reconstructed from the attempt-2 job log; lane artifact was rejected by the Actions artifact storage quota (#1710), so elapsedMs is unavailable"
+          },
+          {
+            "name": "local_attachment_supported_controls",
+            "key": "local_attachment_supported_controls",
+            "title": "支持的控件",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "component suite attachment-policy passed; reconstructed from the attempt-2 job log; lane artifact was rejected by the Actions artifact storage quota (#1710), so elapsedMs is unavailable"
+          },
+          {
+            "name": "local_attachment_preview_decode",
+            "key": "local_attachment_preview_decode",
+            "title": "预览解码",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "component suite attachment-policy passed; reconstructed from the attempt-2 job log; lane artifact was rejected by the Actions artifact storage quota (#1710), so elapsedMs is unavailable"
+          },
+          {
+            "name": "fixed_review_inputs_render_on_device",
+            "key": "fixed_review_inputs_render_on_device",
+            "title": "固定输入渲染",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "component suite markdown passed; reconstructed from the attempt-2 job log; lane artifact was rejected by the Actions artifact storage quota (#1710), so elapsedMs is unavailable"
+          },
+          {
+            "name": "native_topic_projection",
+            "key": "native_topic_projection",
+            "title": "主题投影",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "component suite session-proximity passed; reconstructed from the attempt-2 job log; lane artifact was rejected by the Actions artifact storage quota (#1710), so elapsedMs is unavailable"
+          },
+          {
+            "name": "native_capacity_draft",
+            "key": "native_capacity_draft",
+            "title": "容量与草稿",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "component suite session-proximity passed; reconstructed from the attempt-2 job log; lane artifact was rejected by the Actions artifact storage quota (#1710), so elapsedMs is unavailable"
+          },
+          {
+            "name": "native_capacity_controls",
+            "key": "native_capacity_controls",
+            "title": "容量与控件",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "component suite session-proximity passed; reconstructed from the attempt-2 job log; lane artifact was rejected by the Actions artifact storage quota (#1710), so elapsedMs is unavailable"
+          },
+          {
+            "name": "metadata_replay_and_native_buttons",
+            "key": "metadata_replay_and_native_buttons",
+            "title": "元数据回放与原生按钮",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "component suite suggestions passed; reconstructed from the attempt-2 job log; lane artifact was rejected by the Actions artifact storage quota (#1710), so elapsedMs is unavailable"
           }
         ]
       }
