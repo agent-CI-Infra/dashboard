@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-19T23:58:31.540Z",
+  "updatedAt": "2026-11-21T10:57:58.161Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -295,6 +295,25 @@
     }
   ],
   "runs": [
+    {
+      "runId": 44882941508,
+      "attempt": 2,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44882941508",
+      "createdAt": "2026-11-21T08:01:52Z",
+      "headSha": "e319c05a09ba",
+      "conclusion": "failure",
+      "st": {
+        "runId": "",
+        "status": "failed",
+        "mode": "business",
+        "runner": "",
+        "machine": "",
+        "issues": [
+          "digitalmate-st artifact has no summary.json: the ST run failed and its artifact upload was blocked by the Actions artifact storage quota (#1710), so no case-level summary was published for this run"
+        ],
+        "cases": []
+      }
+    },
     {
       "runId": "local-release113-20261120-001752",
       "attempt": 1,
