@@ -569,7 +569,7 @@
       { key: 'tools', label: '工具/检索', color: '#bf8700', pick: (r) => (r.byType || {})['工具/检索'] },
       { key: 'reason', label: '纯推理', color: '#8250df', pick: (r) => (r.byType || {})['纯推理'] },
     ]
-    const W = 780, H = 300, padL = 46, padR = 18, padT = 16, padB = 54
+    const W = 780, H = 312, padL = 46, padR = 18, padT = 16, padB = 66
     const plotW = W - padL - padR, plotH = H - padT - padB
     const xAt = (i) => padL + (runs.length === 1 ? plotW / 2 : (plotW * i) / (runs.length - 1))
     const yAt = (v) => padT + plotH * (1 - v)
@@ -588,8 +588,10 @@
       return `<path d="${d}" fill="none" stroke="${spec.color}" stroke-width="2"></path>${marks}`
     }).join('')
     const xLabels = runs.map((r, i) => {
-      const short = String(r.label || '').replace(/^\d{4}-\d{2}-\d{2} · /, '').slice(0, 11)
-      return `<text x="${xAt(i)}" y="${H - padB + 18}" text-anchor="middle" font-size="10">${esc(short)}</text>`
+      const when = String(r.date || r.label || '').slice(5, 10)
+      const commit = String(r.commit || '').slice(0, 12)
+      return `<text x="${xAt(i)}" y="${H - padB + 17}" text-anchor="middle" font-size="10">${esc(when)}</text>` +
+             (commit ? `<text x="${xAt(i)}" y="${H - padB + 30}" text-anchor="middle" font-size="9" opacity="0.65">${esc(commit)}</text>` : '')
     }).join('')
     const legend = SERIES.map((spec) =>
       `<span style="display:inline-flex;align-items:center;gap:5px;margin-right:14px;font-size:12px">` +
