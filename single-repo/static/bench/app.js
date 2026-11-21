@@ -553,22 +553,48 @@
     })
   })
 
+  // A trend over the runs runs.json lists: raw pass rate, oldest first.
+  async function renderGaiaTrend() {
+    const target = $('#gaia-trend')
+    if (!target) return
+    const pick = await loadGaiaRuns()
+    if (!pick || !pick.runs.length) {
+      target.innerHTML = '<div class="muted small">还没有可画的 GAIA 运行。</div>'
+      return
+    }
+    const runs = pick.runs.slice().reverse()
+    const W = 760, H = 250, pad = 36
+    const bw = (W - pad * 2) / runs.length
+    const bars = runs.map((r, i) => {
+      const v = Math.round((Number(r.rate) || 0) * 1000) / 10
+      const h = Math.max(1, (v / 100) * (H - pad * 2))
+      const x = pad + i * bw + bw * 0.2
+      const y = H - pad - h
+      const w = bw * 0.6
+      const color = i === runs.length - 1 ? '#1f6feb' : '#8b949e'
+      const short = String(r.label || '').replace(/^\d{4}-\d{2}-\d{2} · /, '').slice(0, 16)
+      return `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${color}"></rect>` +
+             `<text x="${x + w / 2}" y="${y - 6}" text-anchor="middle" font-size="11">${v}%</text>` +
+             `<text x="${x + w / 2}" y="${H - pad + 15}" text-anchor="middle" font-size="10">${esc(short)}</text></g>`
+    }).join('')
+    const base = `<line x1="${pad}" y1="${H - pad}" x2="${W - pad}" y2="${H - pad}" stroke="currentColor" stroke-opacity="0.25"></line>`
+    target.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="GAIA 全量通过率趋势">${base}${bars}</svg>`
+    const note = $('#gaia-trend-note')
+    if (note) note.textContent = `共 ${runs.length} 次运行，旧 → 新；蓝色为最新一轮，数值为 raw 通过率。`
+  }
+
   async function main() {
     try {
-      const data = normalize(await load())
-      const runs = data.runs.slice().sort((a, b) => new Date(runTime(b)) - new Date(runTime(a)))
-      $('#source-line').textContent = data.updatedAt
-        ? `数据更新于 ${fmt(data.updatedAt)} · 最近 ${runs.length} 次运行`
-        : `最近 ${runs.length} 次运行`
-      renderLatest(runs)
-      renderTables(runs)
+      const pick = await loadGaiaRuns()
+      if (pick) {
+        const line = $('#source-line')
+        if (line) line.textContent = `${pick.runs.length} 次 GAIA 全量运行 · 数据来自 runs.json`
+      }
       await initGaia()
-      lastRuns = runs
-      renderChart(runs)
+      await renderGaiaTrend()
     } catch (err) {
       const box = $('#error')
-      box.hidden = false
-      box.textContent = err.message || String(err)
+      if (box) { box.hidden = false; box.textContent = err.message || String(err) }
     }
   }
 
