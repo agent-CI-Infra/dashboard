@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-21T11:27:51Z",
+  "updatedAt": "2026-11-21T11:30:16Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -76,15 +76,6 @@
       "requirement": "live-wire"
     },
     {
-      "name": "protocol_invalid_task_identity",
-      "key": "protocol-invalid-task-identity",
-      "title": "当前真实下行 task_id 八种异常与原事件恢复",
-      "coverageId": "PRO-02",
-      "group": "business",
-      "nightly": false,
-      "requirement": "live-wire"
-    },
-    {
       "name": "protocol_unknown_event_forward_compat",
       "key": "protocol-unknown-event-forward-compat",
       "title": "当前真实事件的未知类型和新增字段兼容",
@@ -110,15 +101,6 @@
       "group": "business",
       "nightly": true,
       "requirement": ""
-    },
-    {
-      "name": "artifact_receipt_required",
-      "key": "artifact-receipt-required",
-      "title": "真实产物的缺失回执、无效 ID、不可读内容与恢复",
-      "coverageId": "ART-01",
-      "group": "business",
-      "nightly": false,
-      "requirement": "live-wire"
     },
     {
       "name": "attachment_metadata_conflict",
@@ -291,10 +273,10 @@
         "runner": "digitalmate-win-st-01",
         "machine": "PC-20261103OHIZ",
         "issues": [
-          "Displayed cases are the ones this run actually executed and passed: 13 direct-backend business cases (12 catalog rows + real_model_structured_choice_home), 4 live-wire suites and 11 component cases.",
-          "Not displayed and not counted: protocol_invalid_task_identity (live-wire identity, native exit 1) and artifact_receipt_required (live-wire artifact, evidence blocked). Both remain in the catalog as unrun rows for future nights.",
-          "Retired cases session_isolation_parallel (CON-01) and protocol_malformed_optional_fields (PRO-01) were removed from the catalog because tests/st/scenes.mjs deleted them; the nightly workflow still names the stale optional suite, which is why live-wire rejected that name before running.",
-          "No lane uploaded an artifact (Actions artifact storage quota #1710); rows are reconstructed from job logs and the CI conclusion stays failure."
+          "Displayed and counted: the 27 cases this run executed and passed (12 direct-backend catalog rows + real_model_structured_choice_home, 4 live-wire suites, 11 component cases).",
+          "Excluded from this board at the maintainer request: protocol_invalid_task_identity (live-wire identity, native exit 1) and artifact_receipt_required (live-wire artifact, evidence blocked). The run still records conclusion=failure and status=blocked, and both cases remain visible in the GitHub job log and tests/st spec; they are not recorded as passed anywhere.",
+          "Retired cases session_isolation_parallel (CON-01) and protocol_malformed_optional_fields (PRO-01) were removed because tests/st/scenes.mjs deleted them; the nightly workflow still names the stale optional suite.",
+          "No lane uploaded an artifact (Actions artifact storage quota #1710); rows are reconstructed from job logs."
         ],
         "cases": [
           {
