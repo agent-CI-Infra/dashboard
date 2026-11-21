@@ -553,7 +553,7 @@
     })
   })
 
-  // A trend over the runs runs.json lists: raw pass rate, oldest first.
+  // A line chart over the runs runs.json lists: raw, product, and the two capability types.
   async function renderGaiaTrend() {
     const target = $('#gaia-trend')
     if (!target) return
@@ -563,24 +563,41 @@
       return
     }
     const runs = pick.runs.slice().sort((a, b) => String(a.label || '').localeCompare(String(b.label || '')))
-    const W = 760, H = 250, pad = 36
-    const bw = (W - pad * 2) / runs.length
-    const bars = runs.map((r, i) => {
-      const v = Math.round((Number(r.rate) || 0) * 1000) / 10
-      const h = Math.max(1, (v / 100) * (H - pad * 2))
-      const x = pad + i * bw + bw * 0.2
-      const y = H - pad - h
-      const w = bw * 0.6
-      const color = i === runs.length - 1 ? '#1f6feb' : '#8b949e'
-      const short = String(r.label || '').replace(/^\d{4}-\d{2}-\d{2} · /, '').slice(0, 16)
-      return `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${color}"></rect>` +
-             `<text x="${x + w / 2}" y="${y - 6}" text-anchor="middle" font-size="11">${v}%</text>` +
-             `<text x="${x + w / 2}" y="${H - pad + 15}" text-anchor="middle" font-size="10">${esc(short)}</text></g>`
+    const SERIES = [
+      { key: 'raw', label: 'raw 通过率', color: '#1f6feb', pick: (r) => r.rate },
+      { key: 'product', label: 'product 通过率', color: '#2da44e', pick: (r) => r.product },
+      { key: 'tools', label: '工具/检索', color: '#bf8700', pick: (r) => (r.byType || {})['工具/检索'] },
+      { key: 'reason', label: '纯推理', color: '#8250df', pick: (r) => (r.byType || {})['纯推理'] },
+    ]
+    const W = 780, H = 300, padL = 46, padR = 18, padT = 16, padB = 54
+    const plotW = W - padL - padR, plotH = H - padT - padB
+    const xAt = (i) => padL + (runs.length === 1 ? plotW / 2 : (plotW * i) / (runs.length - 1))
+    const yAt = (v) => padT + plotH * (1 - v)
+    const pct = (v) => (v === null || v === undefined ? '—' : `${Math.round(v * 1000) / 10}%`)
+    const ticks = [0, 0.25, 0.5, 0.75, 1].map((t) =>
+      `<line x1="${padL}" y1="${yAt(t)}" x2="${W - padR}" y2="${yAt(t)}" stroke="currentColor" stroke-opacity="0.12"></line>` +
+      `<text x="${padL - 8}" y="${yAt(t) + 3.5}" text-anchor="end" font-size="10">${Math.round(t * 100)}%</text>`).join('')
+    const lines = SERIES.map((spec) => {
+      const pts = runs.map((r, i) => ({ x: xAt(i), y: yAt(spec.pick(r)), v: spec.pick(r) }))
+        .filter((pt) => pt.v !== null && pt.v !== undefined)
+      if (!pts.length) return ''
+      const d = pts.map((pt, i) => `${i ? 'L' : 'M'}${pt.x.toFixed(1)},${pt.y.toFixed(1)}`).join(' ')
+      const marks = pts.map((pt) =>
+        `<circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="3.5" fill="${spec.color}"></circle>` +
+        `<title>${esc(spec.label)} · ${pct(pt.v)}</title>`).join('')
+      return `<path d="${d}" fill="none" stroke="${spec.color}" stroke-width="2"></path>${marks}`
     }).join('')
-    const base = `<line x1="${pad}" y1="${H - pad}" x2="${W - pad}" y2="${H - pad}" stroke="currentColor" stroke-opacity="0.25"></line>`
-    target.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="GAIA 全量通过率趋势">${base}${bars}</svg>`
+    const xLabels = runs.map((r, i) => {
+      const short = String(r.label || '').replace(/^\d{4}-\d{2}-\d{2} · /, '').slice(0, 11)
+      return `<text x="${xAt(i)}" y="${H - padB + 18}" text-anchor="middle" font-size="10">${esc(short)}</text>`
+    }).join('')
+    const legend = SERIES.map((spec) =>
+      `<span style="display:inline-flex;align-items:center;gap:5px;margin-right:14px;font-size:12px">` +
+      `<i style="width:14px;height:3px;background:${spec.color};display:inline-block;border-radius:2px"></i>${esc(spec.label)}</span>`).join('')
+    target.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="GAIA 全量趋势">` +
+      `${ticks}${lines}${xLabels}</svg><div class="chart-legend" style="margin-top:6px">${legend}</div>`
     const note = $('#gaia-trend-note')
-    if (note) note.textContent = `共 ${runs.length} 次运行，旧 → 新；蓝色为最新一轮，数值为 raw 通过率。`
+    if (note) note.textContent = `共 ${runs.length} 次运行（旧 → 新）。raw = PASS/全部；product = PASS/可判分（剔除未跑完）；工具/检索与纯推理取各轮的分组通过率。`
   }
 
   async function main() {
