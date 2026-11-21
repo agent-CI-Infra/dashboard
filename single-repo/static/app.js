@@ -1665,15 +1665,7 @@
     let html = sectionState(sec, 'E2E');
     if (!d) return html;
     const tree = d.tree;
-    const ut = d.executed.find((e) => e.artifact.startsWith('ut'));
-    const e2e = d.executed.find((e) => e.layer === 'e2e' && !e.artifact.startsWith('real-e2e-results'));
     html += nightlyCollectionEntry();
-    html += tiles([
-      { label: '测试文件（仓库树）', value: n(tree?.total), sub: tree ? `来源 ${esc(d.tree_source)}` : '文件树不可用' },
-      { label: '有测试的包', value: tree ? `${d.inventory.filter((p) => p.tested).length}<small>/ ${d.inventory.length}</small>` : '—', tone: d.inventory.some((p) => !p.tested) ? 'warn' : 'good' },
-      { label: 'CI 最近 UT 用例', value: n(ut?.totals?.tests), sub: ut?.totals ? `${ut.totals.passed} 通过 · ${ut.totals.failed} 失败 · ${ut.totals.skipped} 跳过` : ut ? '产物存在但没有解析出用例数' : '无产物', tone: ut?.totals?.failed ? 'bad' : ut?.totals ? 'good' : '' },
-      { label: 'CI 最近 E2E 用例', value: n(e2e?.totals?.tests), sub: e2e?.totals ? `${e2e.totals.passed} 通过 · ${e2e.totals.failed} 失败/超时 · ${e2e.totals.skipped} 跳过 · ${e2e.totals.flaky} 重试通过` : e2e ? '产物存在但没有解析出用例数' : '无产物', tone: e2e?.totals?.failed ? 'bad' : e2e?.totals ? 'good' : '' },
-    ]);
     html += performanceSection();
     html += e2eRecordsSection();
     html += realScoresSection(d.executed, d.score_history, d.score_runs, d.mock_real_e2e, d.local_artifact_preview, d.score_report);
