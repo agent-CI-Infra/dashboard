@@ -562,7 +562,7 @@
       target.innerHTML = '<div class="muted small">还没有可画的 GAIA 运行。</div>'
       return
     }
-    const runs = pick.runs.slice().reverse()
+    const runs = pick.runs.slice().sort((a, b) => String(a.label || '').localeCompare(String(b.label || '')))
     const W = 760, H = 250, pad = 36
     const bw = (W - pad * 2) / runs.length
     const bars = runs.map((r, i) => {
