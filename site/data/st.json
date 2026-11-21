@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-21T10:57:58.161Z",
+  "updatedAt": "2026-11-21T11:07:08Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -303,15 +303,150 @@
       "headSha": "e319c05a09ba",
       "conclusion": "failure",
       "st": {
-        "runId": "",
-        "status": "failed",
+        "runId": "nightly-44882941508-2",
+        "status": "blocked",
         "mode": "business",
-        "runner": "",
-        "machine": "",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
         "issues": [
-          "digitalmate-st artifact has no summary.json: the ST run failed and its artifact upload was blocked by the Actions artifact storage quota (#1710), so no case-level summary was published for this run"
+          "13/13 business cases ran in per-case isolation and every native run printed \"ST passed\" (job log, attempt 2).",
+          "The job still exited 1: tests/st/run-isolated.mjs:18 requires exactly one native case equal to the requested name, but a branch key expands to two (tests/st/scenes.mjs:70), so real_model_structured_choice and real_model_structured_choice_home were recorded as blocked by the harness, not by a case failure.",
+          "The case-level artifact was rejected by the Actions artifact storage quota (#1710); this entry was reconstructed from the job log, so elapsedMs is null and the CI conclusion stays failure."
         ],
-        "cases": []
+        "liveWire": [],
+        "component": [],
+        "cases": [
+          {
+            "name": "real_model_text_reply",
+            "key": "text",
+            "title": "文本回复",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: native isolated run reported passed; per-case elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "real_model_txt_download_and_content",
+            "key": "text-file",
+            "title": "文本生成 TXT 并下载",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: native isolated run reported passed; per-case elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "real_model_multi_turn",
+            "key": "multi",
+            "title": "三轮对话与上下文更新",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: native isolated run reported passed; per-case elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "real_model_file_to_text",
+            "key": "file-text",
+            "title": "上传文件并提取文本",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: native isolated run reported passed; per-case elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "real_model_file_to_file",
+            "key": "file-file",
+            "title": "上传 CSV 并生成转换文件",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: native isolated run reported passed; per-case elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "real_model_structured_choice",
+            "key": "choice",
+            "title": "结构化选项回答并继续任务",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: native isolated run reported passed; per-case elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "real_model_structured_choice_home",
+            "key": "real_model_structured_choice_home",
+            "title": "结构化选项回答并继续任务（Home 澄清卡分支）",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: native isolated run reported passed; per-case elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "reset_detached_recovery",
+            "key": "reset-detached-recovery",
+            "title": "独立房间 reset/detached 与真实断链恢复",
+            "coverageId": "REC-03",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: native isolated run reported passed; per-case elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "attachment_metadata_conflict",
+            "key": "attachment-metadata-conflict",
+            "title": "附件元数据冲突与真实云端对照",
+            "coverageId": "ATT-01",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: native isolated run reported passed; per-case elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "attachment_corrupt_recovery",
+            "key": "attachment-corrupt-recovery",
+            "title": "损坏图片与文本恢复",
+            "coverageId": "ATT-02",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: native isolated run reported passed; per-case elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "attachment_image_understanding",
+            "key": "attachment-image-understanding",
+            "title": "真实华为 HDR/MPF 相机 JPG 原图识别",
+            "coverageId": "ATT-03",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: native isolated run reported passed; per-case elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "skill_default_generation",
+            "key": "skill-default-generation",
+            "title": "默认生成技能：Word / Excel / PPT / PDF 各交付一个文件",
+            "coverageId": "SKL-01",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: native isolated run reported passed; per-case elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "skill_default_parsing",
+            "key": "skill-default-parsing",
+            "title": "默认解析技能：文本 PDF 提取与 CSV 对账单合计",
+            "coverageId": "SKL-02",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: native isolated run reported passed; per-case elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          }
+        ]
       }
     },
     {
