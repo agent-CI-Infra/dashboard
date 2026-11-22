@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/test-matrix@1",
- "generatedAt": "2026-11-22T12:01:36.200Z",
+ "generatedAt": "2026-11-22T19:59:40.973Z",
  "source": {
   "repository": "openJiuwen-ai/DigitalMate",
-  "main": "3469f034",
+  "main": "8c4feb38",
   "refs": [
    {
     "label": "test/st-complete-coverage",
@@ -25,16 +25,16 @@
   "e2e": 27
  },
  "nightly": {
-  "createdAt": "2026-11-22T06:00:32Z",
-  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/44991796626",
+  "createdAt": "2026-11-22T18:00:36Z",
+  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45052600978",
   "jobs": {
    "Update HK DigitalMate (latest main)": "failure",
    "Finalize archived REMINDER evidence": "skipped",
-   "DigitalMate ST live-wire (Windows)": "failure",
    "Nightly report": "success",
-   "DigitalMate ST (Windows)": "skipped",
-   "E2E (${{ (inputs.e2e_case || 'all') }})": "skipped",
+   "DigitalMate ST live-wire (Windows)": "failure",
    "Bench (full)": "skipped",
+   "E2E (${{ (inputs.e2e_case || 'all') }})": "skipped",
+   "DigitalMate ST (Windows)": "skipped",
    "DigitalMate ST component (Windows)": "failure"
   }
  },
@@ -90,7 +90,7 @@
    },
    "UT-Server": {
     "cases": 445,
-    "tests": 6034,
+    "tests": 6055,
     "byStatus": {
      "ci_lane": 445
     },
@@ -7969,7 +7969,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 50,
+   "tests": 66,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_engine_free_search.py",
    "title": "test_engine_free_search",
@@ -9376,7 +9376,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 48,
+   "tests": 49,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_engine_watch.py",
    "title": "test_engine_watch",
@@ -9460,7 +9460,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 36,
+   "tests": 38,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_engine_web_search.py",
    "title": "test_engine_web_search",
@@ -13198,7 +13198,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 14,
+   "tests": 15,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_search_policy.py",
    "title": "test_search_policy",
@@ -14710,7 +14710,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 66,
+   "tests": 67,
    "layer": "UT-Server",
    "id": "services/agent_bridge/tests/test_workswarm_adapter.py",
    "title": "test_workswarm_adapter",
