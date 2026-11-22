@@ -2,13 +2,13 @@
  "schema": "digitalmate/e2e-performance-history@1",
  "metrics_version": 7,
  "duration_hist_backfill_done": true,
- "generated_at": "2026-11-22T11:28:35Z",
- "updated_at": "2026-11-22T11:28:35Z",
- "window_start": "2026-10-18T16:00:00+00:00",
- "window_end": "2026-11-22T11:28:09+00:00",
+ "generated_at": "2026-11-22T19:42:40Z",
+ "updated_at": "2026-11-22T19:42:40Z",
+ "window_start": "2026-10-19T16:00:00+00:00",
+ "window_end": "2026-11-22T19:42:30+00:00",
  "current_day_partial": true,
- "complete_through": "2026-11-21",
- "partial_day": "2026-11-22",
+ "complete_through": "2026-11-22",
+ "partial_day": "2026-11-23",
  "source_scope": "gateway-all-requests",
  "excluded_missing_model": 0,
  "device": {
@@ -6298,210 +6298,7 @@
        "failed_total_tokens": null,
        "failed_token_sample_count": 0
       }
-     ],
-     "slow_requests": [
-      {
-       "request_id": "fa211769-4fd8-4b8a-b0be-5b0acd3c35a8",
-       "call_id": "fa211769-4fd8-4b8a-b0be-5b0acd3c35a8",
-       "start_time": "2026-11-16T12:20:14.791+00:00",
-       "duration_ms": 819,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "11468043-a2be-4364-910a-98741c48b757",
-       "call_id": "11468043-a2be-4364-910a-98741c48b757",
-       "start_time": "2026-11-16T14:44:47.069+00:00",
-       "duration_ms": 773,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "a066d652-5da4-46cf-a220-8825e68b2f58",
-       "call_id": "a066d652-5da4-46cf-a220-8825e68b2f58",
-       "start_time": "2026-11-16T13:18:31.493+00:00",
-       "duration_ms": 735,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "b7957eb6-ad8e-4002-ab0e-5155e32a11eb",
-       "call_id": "b7957eb6-ad8e-4002-ab0e-5155e32a11eb",
-       "start_time": "2026-11-16T15:40:24.699+00:00",
-       "duration_ms": 612,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "2278807b-ed98-45dc-8329-0f60806cd1df",
-       "call_id": "2278807b-ed98-45dc-8329-0f60806cd1df",
-       "start_time": "2026-11-15T22:52:14.859+00:00",
-       "duration_ms": 601,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "491fa84a-0a1f-4a9c-b962-692fdc49d8a3",
-       "call_id": "491fa84a-0a1f-4a9c-b962-692fdc49d8a3",
-       "start_time": "2026-11-16T12:30:39.212+00:00",
-       "duration_ms": 582,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "874339e0-c5d3-4a98-a1fe-79896e147c86",
-       "call_id": "874339e0-c5d3-4a98-a1fe-79896e147c86",
-       "start_time": "2026-11-16T06:45:30.098+00:00",
-       "duration_ms": 526,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "7ee529bf-28c4-43f3-8ce5-e2406d1b06af",
-       "call_id": "7ee529bf-28c4-43f3-8ce5-e2406d1b06af",
-       "start_time": "2026-11-16T13:35:14.628+00:00",
-       "duration_ms": 474,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "79efa07b-c848-4a0c-9325-983e7495ba65",
-       "call_id": "79efa07b-c848-4a0c-9325-983e7495ba65",
-       "start_time": "2026-11-16T15:03:05.313+00:00",
-       "duration_ms": 472,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "1b81a268-1a09-492d-9e92-545c1bdbfd90",
-       "call_id": "1b81a268-1a09-492d-9e92-545c1bdbfd90",
-       "start_time": "2026-11-16T00:52:00.512+00:00",
-       "duration_ms": 448,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "5224130c-76e9-45bd-bb4f-5f39450fd6b4",
-       "call_id": "5224130c-76e9-45bd-bb4f-5f39450fd6b4",
-       "start_time": "2026-11-16T00:53:52.026+00:00",
-       "duration_ms": 441,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "e3efbea1-10b3-484b-bd00-f06f887c7e1b",
-       "call_id": "e3efbea1-10b3-484b-bd00-f06f887c7e1b",
-       "start_time": "2026-11-16T06:39:02.692+00:00",
-       "duration_ms": 438,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "a8745b41-fff1-423f-80b9-359e8fc16543",
-       "call_id": "a8745b41-fff1-423f-80b9-359e8fc16543",
-       "start_time": "2026-11-16T06:58:57.186+00:00",
-       "duration_ms": 436,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "b3708e61-df26-4229-8017-ce82e459bf50",
-       "call_id": "b3708e61-df26-4229-8017-ce82e459bf50",
-       "start_time": "2026-11-16T14:49:40.969+00:00",
-       "duration_ms": 422,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "c7ccac07-ec91-4d8a-a417-abd272091295",
-       "call_id": "c7ccac07-ec91-4d8a-a417-abd272091295",
-       "start_time": "2026-11-16T03:05:20.104+00:00",
-       "duration_ms": 414,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "45057d75-b63c-4852-8251-07cdf940fbe5",
-       "call_id": "45057d75-b63c-4852-8251-07cdf940fbe5",
-       "start_time": "2026-11-16T06:45:29.612+00:00",
-       "duration_ms": 410,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "527d2923-015b-4d2c-aeda-637ed47845df",
-       "call_id": "527d2923-015b-4d2c-aeda-637ed47845df",
-       "start_time": "2026-11-15T16:01:45.764+00:00",
-       "duration_ms": 400,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "dfc93565-cd73-42cc-934e-6ec1ea559283",
-       "call_id": "dfc93565-cd73-42cc-934e-6ec1ea559283",
-       "start_time": "2026-11-16T14:18:52.817+00:00",
-       "duration_ms": 390,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "82149703-e9ea-40cc-8da4-5ecbefedcf1a",
-       "call_id": "82149703-e9ea-40cc-8da4-5ecbefedcf1a",
-       "start_time": "2026-11-16T06:58:12.061+00:00",
-       "duration_ms": 389,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "1e9c4c89-9c8f-464c-b5fe-cd1d28acd52c",
-       "call_id": "1e9c4c89-9c8f-464c-b5fe-cd1d28acd52c",
-       "start_time": "2026-11-16T13:20:18.794+00:00",
-       "duration_ms": 381,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "6a39ea3f-c4af-4eb3-aa28-c1ff0552d680",
-       "call_id": "6a39ea3f-c4af-4eb3-aa28-c1ff0552d680",
-       "start_time": "2026-11-16T12:31:43.775+00:00",
-       "duration_ms": 379,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "3dc409b6-256e-4d4d-98e6-5bc1468e5fb0",
-       "call_id": "3dc409b6-256e-4d4d-98e6-5bc1468e5fb0",
-       "start_time": "2026-11-16T03:11:55.251+00:00",
-       "duration_ms": 374,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "ab620f04-e8a5-41d6-81e1-c9241425c0f3",
-       "call_id": "ab620f04-e8a5-41d6-81e1-c9241425c0f3",
-       "start_time": "2026-11-16T11:52:49.433+00:00",
-       "duration_ms": 367,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "7c98ae33-5377-4b52-aa07-abe3d42be02a",
-       "call_id": "7c98ae33-5377-4b52-aa07-abe3d42be02a",
-       "start_time": "2026-11-16T14:47:38.389+00:00",
-       "duration_ms": 364,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "b15a6949-dd1e-4f23-9047-ccc42791de73",
-       "call_id": "b15a6949-dd1e-4f23-9047-ccc42791de73",
-       "start_time": "2026-11-16T06:38:24.471+00:00",
-       "duration_ms": 362,
-       "status": "success",
-       "reason": null
-      }
-     ],
-     "timeout_requests": []
+     ]
     },
     {
      "date": "2026-11-17",
@@ -10841,15 +10638,19 @@
     {
      "date": "2026-11-22",
      "status": "COMPLETED",
-     "partial": true,
-     "query_ms": 256,
-     "duration_sum_ms": 11260,
-     "duration_sample_count": 44,
-     "duration_p50_ms": 250,
-     "duration_p95_ms": 375,
+     "partial": false,
+     "query_ms": 264,
+     "duration_sum_ms": 16391,
+     "duration_sample_count": 62,
+     "duration_p50_ms": 256,
+     "duration_p95_ms": 388,
      "duration_histogram": [
       [
        253,
+       1
+      ],
+      [
+       254,
        1
       ],
       [
@@ -10858,11 +10659,11 @@
       ],
       [
        256,
-       2
+       3
       ],
       [
        257,
-       2
+       3
       ],
       [
        266,
@@ -10874,7 +10675,7 @@
       ],
       [
        269,
-       2
+       4
       ],
       [
        270,
@@ -10906,7 +10707,7 @@
       ],
       [
        278,
-       1
+       2
       ],
       [
        279,
@@ -10918,7 +10719,7 @@
       ],
       [
        281,
-       1
+       2
       ],
       [
        282,
@@ -10930,6 +10731,10 @@
       ],
       [
        284,
+       2
+      ],
+      [
+       285,
        1
       ],
       [
@@ -10937,8 +10742,12 @@
        3
       ],
       [
+       287,
+       2
+      ],
+      [
        288,
-       1
+       2
       ],
       [
        289,
@@ -10946,7 +10755,11 @@
       ],
       [
        290,
-       2
+       3
+      ],
+      [
+       291,
+       1
       ],
       [
        292,
@@ -10958,7 +10771,7 @@
       ],
       [
        297,
-       1
+       2
       ],
       [
        298,
@@ -10973,31 +10786,43 @@
        1
       ],
       [
+       301,
+       1
+      ],
+      [
+       304,
+       1
+      ],
+      [
        308,
+       1
+      ],
+      [
+       309,
        1
       ]
      ],
-     "success_count": 44,
-     "query_count": 44,
+     "success_count": 62,
+     "query_count": 62,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-22T06:41:17Z",
+     "finished_at": "2026-11-22T12:57:31Z",
      "failed_queries": 0,
      "unknown_status_count": 0,
      "blocked_queries": 0,
      "failure_reasons": {},
      "timeout_count": 0,
-     "latency_max_ms": 451,
+     "latency_max_ms": 462,
      "latency_max_request": {
-      "request_id": "a582ff0f-f851-48f7-9e40-28805f147481",
-      "call_id": "a582ff0f-f851-48f7-9e40-28805f147481",
-      "start_time": "2026-11-22T00:19:43.289+00:00",
-      "duration_ms": 451,
+      "request_id": "7f038e58-47c3-4c84-b85f-f299ed90749e",
+      "call_id": "7f038e58-47c3-4c84-b85f-f299ed90749e",
+      "start_time": "2026-11-22T12:29:37.113+00:00",
+      "duration_ms": 462,
       "status": "success",
       "reason": null
      },
-     "slow_count": 3,
-     "slow_threshold_ms": 375,
+     "slow_count": 4,
+     "slow_threshold_ms": 388,
      "hours": [
       {
        "hour": 4,
@@ -11038,13 +10863,21 @@
        "duration_sum_ms": 1129,
        "duration_sample_count": 4,
        "failed": 0
+      },
+      {
+       "hour": 20,
+       "calls": 18,
+       "success_count": 18,
+       "duration_sum_ms": 5131,
+       "duration_sample_count": 18,
+       "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/bge-m3",
-       "call_count": 44,
-       "success_count": 44,
+       "call_count": 62,
+       "success_count": 62,
        "failed_count": 0,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
@@ -11054,7 +10887,7 @@
        "ttft_estimated_sample_count": 0,
        "ttft_estimated_sum_ms": null,
        "ttft_estimated_histogram": [],
-       "ttft_filtered_count": 22,
+       "ttft_filtered_count": 29,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
@@ -11066,13 +10899,17 @@
        "tpot_histogram": [],
        "tpot_estimated_histogram": [],
        "tpot_filtered_count": 0,
-       "duration_sum_ms": 11260,
-       "duration_p50_ms": 250,
-       "duration_p95_ms": 375,
-       "duration_sample_count": 44,
+       "duration_sum_ms": 16391,
+       "duration_p50_ms": 256,
+       "duration_p95_ms": 388,
+       "duration_sample_count": 62,
        "duration_histogram": [
         [
          253,
+         1
+        ],
+        [
+         254,
          1
         ],
         [
@@ -11081,11 +10918,11 @@
         ],
         [
          256,
-         2
+         3
         ],
         [
          257,
-         2
+         3
         ],
         [
          266,
@@ -11097,7 +10934,7 @@
         ],
         [
          269,
-         2
+         4
         ],
         [
          270,
@@ -11129,7 +10966,7 @@
         ],
         [
          278,
-         1
+         2
         ],
         [
          279,
@@ -11141,7 +10978,7 @@
         ],
         [
          281,
-         1
+         2
         ],
         [
          282,
@@ -11153,6 +10990,10 @@
         ],
         [
          284,
+         2
+        ],
+        [
+         285,
          1
         ],
         [
@@ -11160,8 +11001,12 @@
          3
         ],
         [
+         287,
+         2
+        ],
+        [
          288,
-         1
+         2
         ],
         [
          289,
@@ -11169,7 +11014,11 @@
         ],
         [
          290,
-         2
+         3
+        ],
+        [
+         291,
+         1
         ],
         [
          292,
@@ -11181,7 +11030,7 @@
         ],
         [
          297,
-         1
+         2
         ],
         [
          298,
@@ -11196,14 +11045,26 @@
          1
         ],
         [
+         301,
+         1
+        ],
+        [
+         304,
+         1
+        ],
+        [
          308,
+         1
+        ],
+        [
+         309,
          1
         ]
        ],
-       "input_tokens": 577,
+       "input_tokens": 791,
        "output_tokens": 0,
-       "total_tokens": 577,
-       "token_sample_count": 44,
+       "total_tokens": 791,
+       "token_sample_count": 62,
        "token_coverage": 1.0,
        "failed_input_tokens": null,
        "failed_output_tokens": null,
@@ -11213,6 +11074,14 @@
      ],
      "slow_requests": [
       {
+       "request_id": "7f038e58-47c3-4c84-b85f-f299ed90749e",
+       "call_id": "7f038e58-47c3-4c84-b85f-f299ed90749e",
+       "start_time": "2026-11-22T12:29:37.113+00:00",
+       "duration_ms": 462,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "a582ff0f-f851-48f7-9e40-28805f147481",
        "call_id": "a582ff0f-f851-48f7-9e40-28805f147481",
        "start_time": "2026-11-22T00:19:43.289+00:00",
@@ -11221,18 +11090,18 @@
        "reason": null
       },
       {
-       "request_id": "b0f66f36-6383-4da8-bfac-66ac82bb57a3",
-       "call_id": "b0f66f36-6383-4da8-bfac-66ac82bb57a3",
-       "start_time": "2026-11-22T06:41:16.944+00:00",
-       "duration_ms": 382,
+       "request_id": "4e67a748-42b8-467c-96ed-a99f948088a9",
+       "call_id": "4e67a748-42b8-467c-96ed-a99f948088a9",
+       "start_time": "2026-11-22T12:56:50.595+00:00",
+       "duration_ms": 413,
        "status": "success",
        "reason": null
       },
       {
-       "request_id": "3ddd1a66-3215-44ed-bde6-f39da0fbc09a",
-       "call_id": "3ddd1a66-3215-44ed-bde6-f39da0fbc09a",
-       "start_time": "2026-11-21T20:25:21.477+00:00",
-       "duration_ms": 375,
+       "request_id": "48ae109d-974d-42f9-a99b-e03cb7cf0e11",
+       "call_id": "48ae109d-974d-42f9-a99b-e03cb7cf0e11",
+       "start_time": "2026-11-22T12:24:53.618+00:00",
+       "duration_ms": 388,
        "status": "success",
        "reason": null
       }
@@ -11243,15 +11112,19 @@
    "latest": {
     "date": "2026-11-22",
     "status": "COMPLETED",
-    "partial": true,
-    "query_ms": 256,
-    "duration_sum_ms": 11260,
-    "duration_sample_count": 44,
-    "duration_p50_ms": 250,
-    "duration_p95_ms": 375,
+    "partial": false,
+    "query_ms": 264,
+    "duration_sum_ms": 16391,
+    "duration_sample_count": 62,
+    "duration_p50_ms": 256,
+    "duration_p95_ms": 388,
     "duration_histogram": [
      [
       253,
+      1
+     ],
+     [
+      254,
       1
      ],
      [
@@ -11260,11 +11133,11 @@
      ],
      [
       256,
-      2
+      3
      ],
      [
       257,
-      2
+      3
      ],
      [
       266,
@@ -11276,7 +11149,7 @@
      ],
      [
       269,
-      2
+      4
      ],
      [
       270,
@@ -11308,7 +11181,7 @@
      ],
      [
       278,
-      1
+      2
      ],
      [
       279,
@@ -11320,7 +11193,7 @@
      ],
      [
       281,
-      1
+      2
      ],
      [
       282,
@@ -11332,6 +11205,10 @@
      ],
      [
       284,
+      2
+     ],
+     [
+      285,
       1
      ],
      [
@@ -11339,8 +11216,12 @@
       3
      ],
      [
+      287,
+      2
+     ],
+     [
       288,
-      1
+      2
      ],
      [
       289,
@@ -11348,7 +11229,11 @@
      ],
      [
       290,
-      2
+      3
+     ],
+     [
+      291,
+      1
      ],
      [
       292,
@@ -11360,7 +11245,7 @@
      ],
      [
       297,
-      1
+      2
      ],
      [
       298,
@@ -11375,31 +11260,43 @@
       1
      ],
      [
+      301,
+      1
+     ],
+     [
+      304,
+      1
+     ],
+     [
       308,
+      1
+     ],
+     [
+      309,
       1
      ]
     ],
-    "success_count": 44,
-    "query_count": 44,
+    "success_count": 62,
+    "query_count": 62,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-22T06:41:17Z",
+    "finished_at": "2026-11-22T12:57:31Z",
     "failed_queries": 0,
     "unknown_status_count": 0,
     "blocked_queries": 0,
     "failure_reasons": {},
     "timeout_count": 0,
-    "latency_max_ms": 451,
+    "latency_max_ms": 462,
     "latency_max_request": {
-     "request_id": "a582ff0f-f851-48f7-9e40-28805f147481",
-     "call_id": "a582ff0f-f851-48f7-9e40-28805f147481",
-     "start_time": "2026-11-22T00:19:43.289+00:00",
-     "duration_ms": 451,
+     "request_id": "7f038e58-47c3-4c84-b85f-f299ed90749e",
+     "call_id": "7f038e58-47c3-4c84-b85f-f299ed90749e",
+     "start_time": "2026-11-22T12:29:37.113+00:00",
+     "duration_ms": 462,
      "status": "success",
      "reason": null
     },
-    "slow_count": 3,
-    "slow_threshold_ms": 375,
+    "slow_count": 4,
+    "slow_threshold_ms": 388,
     "hours": [
      {
       "hour": 4,
@@ -11440,13 +11337,21 @@
       "duration_sum_ms": 1129,
       "duration_sample_count": 4,
       "failed": 0
+     },
+     {
+      "hour": 20,
+      "calls": 18,
+      "success_count": 18,
+      "duration_sum_ms": 5131,
+      "duration_sample_count": 18,
+      "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/bge-m3",
-      "call_count": 44,
-      "success_count": 44,
+      "call_count": 62,
+      "success_count": 62,
       "failed_count": 0,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
@@ -11456,7 +11361,7 @@
       "ttft_estimated_sample_count": 0,
       "ttft_estimated_sum_ms": null,
       "ttft_estimated_histogram": [],
-      "ttft_filtered_count": 22,
+      "ttft_filtered_count": 29,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
@@ -11468,13 +11373,17 @@
       "tpot_histogram": [],
       "tpot_estimated_histogram": [],
       "tpot_filtered_count": 0,
-      "duration_sum_ms": 11260,
-      "duration_p50_ms": 250,
-      "duration_p95_ms": 375,
-      "duration_sample_count": 44,
+      "duration_sum_ms": 16391,
+      "duration_p50_ms": 256,
+      "duration_p95_ms": 388,
+      "duration_sample_count": 62,
       "duration_histogram": [
        [
         253,
+        1
+       ],
+       [
+        254,
         1
        ],
        [
@@ -11483,11 +11392,11 @@
        ],
        [
         256,
-        2
+        3
        ],
        [
         257,
-        2
+        3
        ],
        [
         266,
@@ -11499,7 +11408,7 @@
        ],
        [
         269,
-        2
+        4
        ],
        [
         270,
@@ -11531,7 +11440,7 @@
        ],
        [
         278,
-        1
+        2
        ],
        [
         279,
@@ -11543,7 +11452,7 @@
        ],
        [
         281,
-        1
+        2
        ],
        [
         282,
@@ -11555,6 +11464,10 @@
        ],
        [
         284,
+        2
+       ],
+       [
+        285,
         1
        ],
        [
@@ -11562,8 +11475,12 @@
         3
        ],
        [
+        287,
+        2
+       ],
+       [
         288,
-        1
+        2
        ],
        [
         289,
@@ -11571,7 +11488,11 @@
        ],
        [
         290,
-        2
+        3
+       ],
+       [
+        291,
+        1
        ],
        [
         292,
@@ -11583,7 +11504,7 @@
        ],
        [
         297,
-        1
+        2
        ],
        [
         298,
@@ -11598,14 +11519,26 @@
         1
        ],
        [
+        301,
+        1
+       ],
+       [
+        304,
+        1
+       ],
+       [
         308,
+        1
+       ],
+       [
+        309,
         1
        ]
       ],
-      "input_tokens": 577,
+      "input_tokens": 791,
       "output_tokens": 0,
-      "total_tokens": 577,
-      "token_sample_count": 44,
+      "total_tokens": 791,
+      "token_sample_count": 62,
       "token_coverage": 1.0,
       "failed_input_tokens": null,
       "failed_output_tokens": null,
@@ -11615,6 +11548,14 @@
     ],
     "slow_requests": [
      {
+      "request_id": "7f038e58-47c3-4c84-b85f-f299ed90749e",
+      "call_id": "7f038e58-47c3-4c84-b85f-f299ed90749e",
+      "start_time": "2026-11-22T12:29:37.113+00:00",
+      "duration_ms": 462,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "a582ff0f-f851-48f7-9e40-28805f147481",
       "call_id": "a582ff0f-f851-48f7-9e40-28805f147481",
       "start_time": "2026-11-22T00:19:43.289+00:00",
@@ -11623,18 +11564,18 @@
       "reason": null
      },
      {
-      "request_id": "b0f66f36-6383-4da8-bfac-66ac82bb57a3",
-      "call_id": "b0f66f36-6383-4da8-bfac-66ac82bb57a3",
-      "start_time": "2026-11-22T06:41:16.944+00:00",
-      "duration_ms": 382,
+      "request_id": "4e67a748-42b8-467c-96ed-a99f948088a9",
+      "call_id": "4e67a748-42b8-467c-96ed-a99f948088a9",
+      "start_time": "2026-11-22T12:56:50.595+00:00",
+      "duration_ms": 413,
       "status": "success",
       "reason": null
      },
      {
-      "request_id": "3ddd1a66-3215-44ed-bde6-f39da0fbc09a",
-      "call_id": "3ddd1a66-3215-44ed-bde6-f39da0fbc09a",
-      "start_time": "2026-11-21T20:25:21.477+00:00",
-      "duration_ms": 375,
+      "request_id": "48ae109d-974d-42f9-a99b-e03cb7cf0e11",
+      "call_id": "48ae109d-974d-42f9-a99b-e03cb7cf0e11",
+      "start_time": "2026-11-22T12:24:53.618+00:00",
+      "duration_ms": 388,
       "status": "success",
       "reason": null
      }
@@ -56008,410 +55949,7 @@
        "failed_total_tokens": 350001,
        "failed_token_sample_count": 34
       }
-     ],
-     "slow_requests": [
-      {
-       "request_id": "531464ceb0284fd8a03c38cb0beb721d",
-       "call_id": "4f08fafa-5911-4c82-8712-e3c7a04d39c2",
-       "start_time": "2026-11-16T14:36:16.650+00:00",
-       "duration_ms": 75739,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "98143adbe9414e808a02ed25a9f6c98f",
-       "call_id": "6910d969-b63f-4711-b4ab-cc9b5196bac9",
-       "start_time": "2026-11-16T04:28:53.889+00:00",
-       "duration_ms": 75578,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "4f0c5cffa3624d38ac594483e5f9bb20",
-       "call_id": "4861b5ae-0875-4a3f-bc00-4d03f2f08d0b",
-       "start_time": "2026-11-16T13:18:32.740+00:00",
-       "duration_ms": 65989,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "f2c34711199640c78c876988812e33a3",
-       "call_id": "d5d600e6-75d7-4c1d-99f6-78b05294b811",
-       "start_time": "2026-11-16T13:34:10.002+00:00",
-       "duration_ms": 63101,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "63162694161c45919030ab5f0113fd70",
-       "call_id": "78a4a353-dbec-4f66-b4cc-d137d4b0f1ac",
-       "start_time": "2026-11-16T13:39:45.691+00:00",
-       "duration_ms": 62773,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "2c5ad0dee4344badb5ba61192a0bdba6",
-       "call_id": "933a3adb-9c1f-48dd-b736-2db1c706ed3d",
-       "start_time": "2026-11-16T15:07:45.899+00:00",
-       "duration_ms": 60656,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "ed48aa8677014b88a2f4978f7a5bb6d8",
-       "call_id": "d250e25d-552b-41b6-ae17-fa0151a039ca",
-       "start_time": "2026-11-16T13:25:32.701+00:00",
-       "duration_ms": 59994,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "27a9f621af754843859ab092d5743f03",
-       "call_id": "96f66c75-339b-4b59-b283-67e80ef3e2d5",
-       "start_time": "2026-11-16T13:59:45.459+00:00",
-       "duration_ms": 58393,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "eea13650bd5f40f5a957320a1ace08d7",
-       "call_id": "3b0210d9-c71a-4e71-83cb-4a1cadf9235c",
-       "start_time": "2026-11-16T14:30:16.077+00:00",
-       "duration_ms": 57251,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "1eb5b4bfa9fb449899cbb31fbca7968e",
-       "call_id": "bb12472a-91b6-45c9-a785-189879204402",
-       "start_time": "2026-11-16T12:04:31.849+00:00",
-       "duration_ms": 55965,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "5480a3c2012e4da3aa1305158457f8ad",
-       "call_id": "87c42d61-a5ab-421d-a3cf-dac48f4d349a",
-       "start_time": "2026-11-16T14:31:14.180+00:00",
-       "duration_ms": 54111,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "4430460e744645018def5761eb8d283e",
-       "call_id": "7d901f20-d14c-4138-9979-4338b3713563",
-       "start_time": "2026-11-16T11:24:57.596+00:00",
-       "duration_ms": 53227,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "2e55e13b82404fc5b16dcb10c3646b61",
-       "call_id": "47cce1ca-0dec-492d-a895-a7ee5ebf9113",
-       "start_time": "2026-11-16T03:12:34.635+00:00",
-       "duration_ms": 52396,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "3eb740602cba41f8b40f24d91d27f360",
-       "call_id": "db86a502-a60a-424f-8e80-0117c4e46d16",
-       "start_time": "2026-11-16T11:27:15.952+00:00",
-       "duration_ms": 51454,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "2c8804a185504d77894f8f5339aaf0d3",
-       "call_id": "6721ce49-0f03-40a6-90f8-f62346b18bd1",
-       "start_time": "2026-11-16T12:18:47.256+00:00",
-       "duration_ms": 51297,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "88f517198add4bd2bf4eabd4a1d74c39",
-       "call_id": "99624705-323c-49ff-9933-ca9afb0eab34",
-       "start_time": "2026-11-16T02:57:23.063+00:00",
-       "duration_ms": 49825,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "fdaa62b00174489f8f76bb134c0a4a90",
-       "call_id": "03a4c2cb-3f85-45fb-9811-0780db943384",
-       "start_time": "2026-11-16T13:06:54.173+00:00",
-       "duration_ms": 49085,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "4bec8d8afdc1483aa837d02f43a38379",
-       "call_id": "a662ab63-2114-47cf-81d6-601e7f2dc415",
-       "start_time": "2026-11-16T13:06:54.308+00:00",
-       "duration_ms": 48945,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "9cbac061a01f4d79bf76f7a114e58f66",
-       "call_id": "3e1f9398-0d24-4802-939f-9dca798f7e77",
-       "start_time": "2026-11-16T13:06:54.310+00:00",
-       "duration_ms": 48861,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "39c826e0749c439ca8418f17acdb957b",
-       "call_id": "6cfde167-14df-4af1-9936-6140098203d1",
-       "start_time": "2026-11-16T13:06:54.358+00:00",
-       "duration_ms": 48789,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "f3ca06e6db164ece93eac39f6f1588af",
-       "call_id": "c70ccb18-21c0-4d89-a08a-7dd632e4be5d",
-       "start_time": "2026-11-16T13:04:19.057+00:00",
-       "duration_ms": 48377,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "b2d3e899729240a8b8c83883798b4bd6",
-       "call_id": "0f526614-bf0d-4cac-937b-dcba4952eb32",
-       "start_time": "2026-11-16T14:52:55.623+00:00",
-       "duration_ms": 48201,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "f43c2afb5f784816b43dd6e7823148e4",
-       "call_id": "51548783-dfa4-4b29-b20f-f2e12ee991d1",
-       "start_time": "2026-11-16T13:06:55.130+00:00",
-       "duration_ms": 48026,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "111e2f2459084b58b555eef31f957f4b",
-       "call_id": "db0ba67f-81fc-48a3-8949-3e42dc4a3c67",
-       "start_time": "2026-11-16T07:00:13.321+00:00",
-       "duration_ms": 47968,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "f0c9d63cb2a4467c910defb47a08dd06",
-       "call_id": "07555dde-a4aa-4b3b-ab73-dc6f130b1357",
-       "start_time": "2026-11-16T13:06:55.323+00:00",
-       "duration_ms": 47934,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "4c388f75429b4cad87c7c60b56ca472a",
-       "call_id": "3d4be465-6cde-4ce3-a8ad-c8e25be1bfa0",
-       "start_time": "2026-11-16T13:06:55.309+00:00",
-       "duration_ms": 47833,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "fd8e32c02837499baf03d553c160c6e9",
-       "call_id": "ac2262e9-4dae-4c4e-84ef-5785f00ddbd4",
-       "start_time": "2026-11-16T13:31:15.202+00:00",
-       "duration_ms": 47650,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "997573202e4e4e0f97c68258d3fb739b",
-       "call_id": "8e0c58de-d59e-4fa8-9ffe-580e59aeceec",
-       "start_time": "2026-11-16T14:54:20.200+00:00",
-       "duration_ms": 47050,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "17bc0a9223624364b17fa3472cacebc5",
-       "call_id": "2041dcc2-c2da-4976-9df1-21b9b53aba28",
-       "start_time": "2026-11-16T14:45:24.796+00:00",
-       "duration_ms": 45026,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "16c57e6ef2bd460f86ed4360b007aa65",
-       "call_id": "92b086f8-87a6-48f7-bf88-5e9ec0dcfa21",
-       "start_time": "2026-11-16T13:32:53.164+00:00",
-       "duration_ms": 45002,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "4fd28117fc1c4b3ea67c50da59583c05",
-       "call_id": "ec411fba-6233-4943-b23f-ab7d4d54f8ed",
-       "start_time": "2026-11-16T13:31:18.296+00:00",
-       "duration_ms": 44836,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "277cc65dcd7f497187beef009415da9c",
-       "call_id": "316f0c3d-d00c-4712-b267-ef9d63271e7b",
-       "start_time": "2026-11-16T14:53:26.910+00:00",
-       "duration_ms": 43109,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "228ab9128bda4b049ccc33e6c79b24bf",
-       "call_id": "990e3864-eb12-4b7b-b159-081920f95812",
-       "start_time": "2026-11-16T14:49:44.744+00:00",
-       "duration_ms": 43071,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "f88377ef01d944f0859566497d742fc3",
-       "call_id": "c19eb9a8-2890-4cde-a5df-ed243ec6febd",
-       "start_time": "2026-11-16T15:02:38.119+00:00",
-       "duration_ms": 41934,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "f87273deadfe426588eb79fbb211a1a2",
-       "call_id": "25bfe17e-354b-4947-82a3-cd91d9d830c9",
-       "start_time": "2026-11-16T13:30:31.220+00:00",
-       "duration_ms": 41572,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "78154f71765f4068a6a11aaa68db6cd8",
-       "call_id": "6f0e1288-c427-44a1-b51d-1164dc38f4b2",
-       "start_time": "2026-11-16T03:13:27.458+00:00",
-       "duration_ms": 41570,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "1441a6b1bdc84e7daf95ae25e9fa4803",
-       "call_id": "c24e1d7c-035b-4523-958c-98522df43d47",
-       "start_time": "2026-11-16T01:53:28.025+00:00",
-       "duration_ms": 41430,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "6051d8ec543941ed922e685b1ce2b9e4",
-       "call_id": "aa4317fb-9835-4c71-9316-36838f517da5",
-       "start_time": "2026-11-16T13:04:50.980+00:00",
-       "duration_ms": 40667,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "90f9624d711d4c58a0ad1acc39f973c6",
-       "call_id": "e0cd908d-c012-4f54-afdb-4915fff48ed7",
-       "start_time": "2026-11-16T06:57:30.882+00:00",
-       "duration_ms": 40174,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "910c88f998cd4194aa5a18faa99ab22e",
-       "call_id": "383a7f3d-d8ca-4673-8f56-17eba371ef86",
-       "start_time": "2026-11-16T07:06:22.742+00:00",
-       "duration_ms": 40004,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "63c306a7264341ae9b3886fc2793540c",
-       "call_id": "490d3dab-ea73-4a9c-b9a1-19a9a4dcf57e",
-       "start_time": "2026-11-16T11:23:39.312+00:00",
-       "duration_ms": 39971,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "27188c5d61584cd0af752ecae610e7cf",
-       "call_id": "b00512d6-2bb5-4d47-9c27-04a12a18ce64",
-       "start_time": "2026-11-16T12:22:01.311+00:00",
-       "duration_ms": 39870,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "79e97bac4d354fb0af5136235048c20e",
-       "call_id": "91c5087e-2c95-48df-b3dd-78c65a1d38b8",
-       "start_time": "2026-11-16T13:04:51.898+00:00",
-       "duration_ms": 39747,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "2ae715f094df46fc9da4480df46eafc8",
-       "call_id": "68cc1be3-d001-4c9e-a22b-9b9c8dbad230",
-       "start_time": "2026-11-16T13:31:23.249+00:00",
-       "duration_ms": 39577,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "688e81336c474c9390b0589b9f380554",
-       "call_id": "729564ee-79cb-4ea2-ac42-5ebeb0ed36a7",
-       "start_time": "2026-11-16T02:44:17.271+00:00",
-       "duration_ms": 39325,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "04df0f53e91a484693b6194ddcb3a6f8",
-       "call_id": "1993832d-331b-40df-9a75-22eb90755832",
-       "start_time": "2026-11-16T13:07:05.612+00:00",
-       "duration_ms": 39294,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "b883929630924fb283515e2dea917faf",
-       "call_id": "ad687c9b-f942-4d0f-9695-32f432144168",
-       "start_time": "2026-11-16T06:58:14.377+00:00",
-       "duration_ms": 38923,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "04baf202ba50435380d05b8f476a5bc0",
-       "call_id": "82dd21f9-4c88-4c61-bba6-141ab5908463",
-       "start_time": "2026-11-16T14:44:58.616+00:00",
-       "duration_ms": 38681,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "b250fbc54d9945edab7d35b80c0c357e",
-       "call_id": "0a21210b-a12c-442c-94a9-ae0a1710cb4d",
-       "start_time": "2026-11-16T06:50:05.011+00:00",
-       "duration_ms": 37570,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "c1a4f97166db4f578cb42b5b1ebf2f44",
-       "call_id": "cbd484ca-cf86-4119-9f82-504e627fb310",
-       "start_time": "2026-11-16T03:11:56.809+00:00",
-       "duration_ms": 37181,
-       "status": "success",
-       "reason": null
-      }
-     ],
-     "timeout_requests": []
+     ]
     },
     {
      "date": "2026-11-17",
@@ -71064,12 +70602,12 @@
     {
      "date": "2026-11-22",
      "status": "COMPLETED",
-     "partial": true,
-     "query_ms": 2338,
-     "duration_sum_ms": 654567,
-     "duration_sample_count": 280,
-     "duration_p50_ms": 994,
-     "duration_p95_ms": 7940,
+     "partial": false,
+     "query_ms": 2957,
+     "duration_sum_ms": 949145,
+     "duration_sample_count": 321,
+     "duration_p50_ms": 1067,
+     "duration_p95_ms": 12679,
      "duration_histogram": [
       [
        311,
@@ -71121,7 +70659,7 @@
       ],
       [
        330,
-       5
+       7
       ],
       [
        331,
@@ -71165,7 +70703,7 @@
       ],
       [
        341,
-       7
+       8
       ],
       [
        342,
@@ -71213,7 +70751,7 @@
       ],
       [
        354,
-       5
+       6
       ],
       [
        355,
@@ -71249,7 +70787,7 @@
       ],
       [
        363,
-       2
+       3
       ],
       [
        364,
@@ -71269,7 +70807,7 @@
       ],
       [
        371,
-       4
+       5
       ],
       [
        372,
@@ -71277,7 +70815,7 @@
       ],
       [
        373,
-       1
+       2
       ],
       [
        374,
@@ -71289,7 +70827,7 @@
       ],
       [
        376,
-       2
+       3
       ],
       [
        377,
@@ -71301,11 +70839,11 @@
       ],
       [
        379,
-       1
+       2
       ],
       [
        380,
-       1
+       2
       ],
       [
        381,
@@ -71313,6 +70851,10 @@
       ],
       [
        382,
+       1
+      ],
+      [
+       383,
        1
       ],
       [
@@ -71324,6 +70866,14 @@
        2
       ],
       [
+       388,
+       1
+      ],
+      [
+       390,
+       1
+      ],
+      [
        391,
        1
       ],
@@ -71333,6 +70883,10 @@
       ],
       [
        393,
+       1
+      ],
+      [
+       398,
        1
       ],
       [
@@ -71348,6 +70902,14 @@
        1
       ],
       [
+       403,
+       1
+      ],
+      [
+       404,
+       1
+      ],
+      [
        406,
        1
       ],
@@ -71357,7 +70919,7 @@
       ],
       [
        408,
-       1
+       2
       ],
       [
        409,
@@ -71366,6 +70928,10 @@
       [
        410,
        2
+      ],
+      [
+       411,
+       1
       ],
       [
        412,
@@ -71380,12 +70946,20 @@
        1
       ],
       [
+       416,
+       1
+      ],
+      [
+       417,
+       1
+      ],
+      [
        419,
        1
       ],
       [
        426,
-       1
+       2
       ],
       [
        427,
@@ -71396,12 +70970,20 @@
        1
       ],
       [
+       434,
+       1
+      ],
+      [
        435,
        2
       ],
       [
        437,
-       2
+       3
+      ],
+      [
+       438,
+       1
       ],
       [
        440,
@@ -71416,8 +70998,12 @@
        1
       ],
       [
-       445,
+       444,
        1
+      ],
+      [
+       445,
+       3
       ],
       [
        446,
@@ -71425,7 +71011,7 @@
       ],
       [
        447,
-       1
+       2
       ],
       [
        451,
@@ -71433,11 +71019,19 @@
       ],
       [
        453,
-       1
+       2
       ],
       [
        454,
        1
+      ],
+      [
+       455,
+       1
+      ],
+      [
+       460,
+       2
       ],
       [
        462,
@@ -71452,8 +71046,16 @@
        1
       ],
       [
-       477,
+       475,
        1
+      ],
+      [
+       476,
+       1
+      ],
+      [
+       477,
+       2
       ],
       [
        486,
@@ -71468,7 +71070,19 @@
        2
       ],
       [
+       494,
+       1
+      ],
+      [
        495,
+       1
+      ],
+      [
+       496,
+       1
+      ],
+      [
+       500,
        1
       ],
       [
@@ -71476,8 +71090,16 @@
        1
       ],
       [
-       517,
+       505,
        1
+      ],
+      [
+       507,
+       1
+      ],
+      [
+       517,
+       2
       ],
       [
        520,
@@ -71488,11 +71110,11 @@
        1
       ]
      ],
-     "success_count": 280,
-     "query_count": 281,
+     "success_count": 321,
+     "query_count": 322,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-22T08:12:58Z",
+     "finished_at": "2026-11-22T12:57:53Z",
      "failed_queries": 1,
      "unknown_status_count": 0,
      "blocked_queries": 0,
@@ -71509,8 +71131,8 @@
       "status": "success",
       "reason": null
      },
-     "slow_count": 15,
-     "slow_threshold_ms": 7940,
+     "slow_count": 17,
+     "slow_threshold_ms": 12679,
      "hours": [
       {
        "hour": 4,
@@ -71567,21 +71189,29 @@
        "duration_sum_ms": 2946,
        "duration_sample_count": 3,
        "failed": 0
+      },
+      {
+       "hour": 20,
+       "calls": 41,
+       "success_count": 41,
+       "duration_sum_ms": 294578,
+       "duration_sample_count": 41,
+       "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 281,
-       "success_count": 280,
+       "call_count": 322,
+       "success_count": 321,
        "failed_count": 1,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
        "ttft_sample_count": 0,
        "ttft_sum_ms": null,
-       "ttft_estimated_avg_ms": 1395,
-       "ttft_estimated_sample_count": 38,
-       "ttft_estimated_sum_ms": 52995,
+       "ttft_estimated_avg_ms": 1456,
+       "ttft_estimated_sample_count": 66,
+       "ttft_estimated_sum_ms": 96072,
        "ttft_estimated_histogram": [
         [
          301,
@@ -71593,6 +71223,10 @@
         ],
         [
          321,
+         1
+        ],
+        [
+         326,
          1
         ],
         [
@@ -71608,8 +71242,12 @@
          2
         ],
         [
+         354,
+         1
+        ],
+        [
          356,
-         2
+         3
         ],
         [
          358,
@@ -71617,35 +71255,47 @@
         ],
         [
          359,
-         2
+         4
         ],
         [
          360,
+         2
+        ],
+        [
+         361,
          1
         ],
         [
          362,
-         2
+         5
         ],
         [
          363,
-         1
+         2
         ],
         [
          364,
-         3
+         5
         ],
         [
          365,
          1
         ],
         [
-         368,
+         366,
          1
         ],
         [
+         367,
+         1
+        ],
+        [
+         368,
+         2
+        ],
+        [
          369,
-         3
+         4
         ],
         [
          370,
@@ -71657,23 +71307,23 @@
         ],
         [
          372,
-         1
+         2
         ],
         [
          373,
-         1
+         2
         ],
         [
          374,
-         1
+         3
         ],
         [
          375,
-         1
+         4
         ],
         [
          377,
-         1
+         2
         ],
         [
          378,
@@ -71681,7 +71331,7 @@
         ],
         [
          379,
-         1
+         2
         ],
         [
          381,
@@ -71689,7 +71339,7 @@
         ],
         [
          382,
-         1
+         2
         ],
         [
          385,
@@ -71698,17 +71348,21 @@
         [
          387,
          1
+        ],
+        [
+         419,
+         1
         ]
        ],
-       "ttft_filtered_count": 118,
+       "ttft_filtered_count": 127,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
        "tpot_weight_tokens": 0,
-       "tpot_estimated_avg_ms": 5.334034754276405,
-       "tpot_estimated_sample_count": 38,
-       "tpot_estimated_decode_sum_ms": 157162.0,
-       "tpot_estimated_weight_tokens": 29464,
+       "tpot_estimated_avg_ms": 5.108377319938702,
+       "tpot_estimated_sample_count": 66,
+       "tpot_estimated_decode_sum_ms": 300015.0,
+       "tpot_estimated_weight_tokens": 58730,
        "tpot_histogram": [],
        "tpot_estimated_histogram": [
         [
@@ -71716,20 +71370,40 @@
          1
         ],
         [
+         37,
+         1
+        ],
+        [
+         49,
+         1
+        ],
+        [
+         52,
+         1
+        ],
+        [
+         57,
+         2
+        ],
+        [
          58,
          1
         ],
         [
          62,
-         1
+         2
         ],
         [
          63,
          2
         ],
         [
+         64,
+         2
+        ],
+        [
          67,
-         1
+         2
         ],
         [
          68,
@@ -71737,11 +71411,11 @@
         ],
         [
          69,
-         2
+         3
         ],
         [
          70,
-         1
+         2
         ],
         [
          71,
@@ -71753,27 +71427,39 @@
         ],
         [
          74,
-         1
+         2
         ],
         [
          75,
-         1
+         5
+        ],
+        [
+         76,
+         2
+        ],
+        [
+         77,
+         2
         ],
         [
          78,
-         1
+         2
         ],
         [
          79,
          2
         ],
         [
+         80,
+         1
+        ],
+        [
          81,
-         2
+         3
         ],
         [
          83,
-         1
+         2
         ],
         [
          85,
@@ -71781,11 +71467,15 @@
         ],
         [
          88,
-         1
+         2
         ],
         [
          89,
          4
+        ],
+        [
+         90,
+         1
         ],
         [
          91,
@@ -71805,10 +71495,14 @@
         ],
         [
          100,
-         1
+         2
         ],
         [
          103,
+         1
+        ],
+        [
+         105,
          1
         ],
         [
@@ -71820,11 +71514,11 @@
          1
         ]
        ],
-       "tpot_filtered_count": 118,
-       "duration_sum_ms": 654567,
-       "duration_p50_ms": 994,
-       "duration_p95_ms": 7940,
-       "duration_sample_count": 280,
+       "tpot_filtered_count": 127,
+       "duration_sum_ms": 949145,
+       "duration_p50_ms": 1067,
+       "duration_p95_ms": 12679,
+       "duration_sample_count": 321,
        "duration_histogram": [
         [
          311,
@@ -71876,7 +71570,7 @@
         ],
         [
          330,
-         5
+         7
         ],
         [
          331,
@@ -71920,7 +71614,7 @@
         ],
         [
          341,
-         7
+         8
         ],
         [
          342,
@@ -71968,7 +71662,7 @@
         ],
         [
          354,
-         5
+         6
         ],
         [
          355,
@@ -72004,7 +71698,7 @@
         ],
         [
          363,
-         2
+         3
         ],
         [
          364,
@@ -72024,7 +71718,7 @@
         ],
         [
          371,
-         4
+         5
         ],
         [
          372,
@@ -72032,7 +71726,7 @@
         ],
         [
          373,
-         1
+         2
         ],
         [
          374,
@@ -72044,7 +71738,7 @@
         ],
         [
          376,
-         2
+         3
         ],
         [
          377,
@@ -72056,11 +71750,11 @@
         ],
         [
          379,
-         1
+         2
         ],
         [
          380,
-         1
+         2
         ],
         [
          381,
@@ -72068,6 +71762,10 @@
         ],
         [
          382,
+         1
+        ],
+        [
+         383,
          1
         ],
         [
@@ -72079,6 +71777,14 @@
          2
         ],
         [
+         388,
+         1
+        ],
+        [
+         390,
+         1
+        ],
+        [
          391,
          1
         ],
@@ -72088,6 +71794,10 @@
         ],
         [
          393,
+         1
+        ],
+        [
+         398,
          1
         ],
         [
@@ -72103,6 +71813,14 @@
          1
         ],
         [
+         403,
+         1
+        ],
+        [
+         404,
+         1
+        ],
+        [
          406,
          1
         ],
@@ -72112,7 +71830,7 @@
         ],
         [
          408,
-         1
+         2
         ],
         [
          409,
@@ -72121,6 +71839,10 @@
         [
          410,
          2
+        ],
+        [
+         411,
+         1
         ],
         [
          412,
@@ -72135,12 +71857,20 @@
          1
         ],
         [
+         416,
+         1
+        ],
+        [
+         417,
+         1
+        ],
+        [
          419,
          1
         ],
         [
          426,
-         1
+         2
         ],
         [
          427,
@@ -72151,12 +71881,20 @@
          1
         ],
         [
+         434,
+         1
+        ],
+        [
          435,
          2
         ],
         [
          437,
-         2
+         3
+        ],
+        [
+         438,
+         1
         ],
         [
          440,
@@ -72171,8 +71909,12 @@
          1
         ],
         [
-         445,
+         444,
          1
+        ],
+        [
+         445,
+         3
         ],
         [
          446,
@@ -72180,7 +71922,7 @@
         ],
         [
          447,
-         1
+         2
         ],
         [
          451,
@@ -72188,11 +71930,19 @@
         ],
         [
          453,
-         1
+         2
         ],
         [
          454,
          1
+        ],
+        [
+         455,
+         1
+        ],
+        [
+         460,
+         2
         ],
         [
          462,
@@ -72207,8 +71957,16 @@
          1
         ],
         [
-         477,
+         475,
          1
+        ],
+        [
+         476,
+         1
+        ],
+        [
+         477,
+         2
         ],
         [
          486,
@@ -72223,7 +71981,19 @@
          2
         ],
         [
+         494,
+         1
+        ],
+        [
          495,
+         1
+        ],
+        [
+         496,
+         1
+        ],
+        [
+         500,
          1
         ],
         [
@@ -72231,8 +72001,16 @@
          1
         ],
         [
-         517,
+         505,
          1
+        ],
+        [
+         507,
+         1
+        ],
+        [
+         517,
+         2
         ],
         [
          520,
@@ -72243,10 +72021,10 @@
          1
         ]
        ],
-       "input_tokens": 2013863,
-       "output_tokens": 76310,
-       "total_tokens": 2090173,
-       "token_sample_count": 280,
+       "input_tokens": 3349013,
+       "output_tokens": 120028,
+       "total_tokens": 3469041,
+       "token_sample_count": 321,
        "token_coverage": 1.0,
        "failed_input_tokens": 14,
        "failed_output_tokens": 0,
@@ -72272,10 +72050,34 @@
        "reason": null
       },
       {
+       "request_id": "bb9d2b62e10c400f87b0b9155b573ddc",
+       "call_id": "73511d10-197f-4114-a977-94bc4acdded4",
+       "start_time": "2026-11-22T12:04:18.542+00:00",
+       "duration_ms": 28399,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "fba51d80cbb74501ac0de4bce844cca4",
        "call_id": "54b9fa7b-2f84-4c34-b57d-c992a0721d78",
        "start_time": "2026-11-22T05:53:55.172+00:00",
        "duration_ms": 28205,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "f743867a0b0345c9b69cdf47d4c4d80e",
+       "call_id": "24d5658f-3e0c-41be-9eaf-d672c4ace446",
+       "start_time": "2026-11-22T12:29:09.246+00:00",
+       "duration_ms": 23276,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "5e3024085894494ab9004092342c2453",
+       "call_id": "92a1b95f-ce47-4dad-b933-56d77d3b4b9c",
+       "start_time": "2026-11-22T12:04:21.385+00:00",
+       "duration_ms": 22094,
        "status": "success",
        "reason": null
       },
@@ -72288,10 +72090,34 @@
        "reason": null
       },
       {
+       "request_id": "5c4bd2161dd243708eaad515074f5ee1",
+       "call_id": "f349ea18-68ef-4efd-b3bd-a3663c70ae03",
+       "start_time": "2026-11-22T12:57:30.322+00:00",
+       "duration_ms": 20075,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "09f61413f0aa4475a454e29b66385362",
+       "call_id": "cbb4bdab-e268-4868-b200-81f119236008",
+       "start_time": "2026-11-22T12:03:59.468+00:00",
+       "duration_ms": 18595,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "be4926ad76c742f783d9dafdd39761fd",
        "call_id": "3e5584a9-cd93-4094-b03d-e38826b04ff7",
        "start_time": "2026-11-21T20:25:49.313+00:00",
        "duration_ms": 18260,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "0499e1341e7b426c8f720026b020f9af",
+       "call_id": "1c109cbd-2c69-4880-b3b3-849f6cb92059",
+       "start_time": "2026-11-22T12:57:11.279+00:00",
+       "duration_ms": 18019,
        "status": "success",
        "reason": null
       },
@@ -72336,42 +72162,10 @@
        "reason": null
       },
       {
-       "request_id": "39433f54062c415abff80449f23dd452",
-       "call_id": "b3aa7f54-4066-458f-bbd8-a46fa540e9fd",
-       "start_time": "2026-11-22T00:05:56.223+00:00",
-       "duration_ms": 11656,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "8db1dd640fcc4d39be7589d853cebb9c",
-       "call_id": "73b7b8b1-aa90-41e7-8f0b-a86b46082572",
-       "start_time": "2026-11-21T20:25:37.784+00:00",
-       "duration_ms": 11095,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "ba65113126e442be922423d85fcfcd09",
-       "call_id": "1ed6f669-2c69-4991-a587-65305225f654",
-       "start_time": "2026-11-21T23:52:55.266+00:00",
-       "duration_ms": 9457,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "01de38c8e1ac4531ad70921070d11f5e",
-       "call_id": "4235e5be-5c21-4be2-a289-552551b9c584",
-       "start_time": "2026-11-21T23:52:09.103+00:00",
-       "duration_ms": 8099,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "4e5eef75d5094deb9587c0bbe6b84640",
-       "call_id": "494e3edf-4fb8-4965-8db4-1c104e7e3c1d",
-       "start_time": "2026-11-21T23:53:14.253+00:00",
-       "duration_ms": 7940,
+       "request_id": "303c5820e6b94163b77422501c11136b",
+       "call_id": "2bddc8a9-30d4-436c-a894-ac956eb4c685",
+       "start_time": "2026-11-22T12:25:11.011+00:00",
+       "duration_ms": 12679,
        "status": "success",
        "reason": null
       }
@@ -72382,12 +72176,12 @@
    "latest": {
     "date": "2026-11-22",
     "status": "COMPLETED",
-    "partial": true,
-    "query_ms": 2338,
-    "duration_sum_ms": 654567,
-    "duration_sample_count": 280,
-    "duration_p50_ms": 994,
-    "duration_p95_ms": 7940,
+    "partial": false,
+    "query_ms": 2957,
+    "duration_sum_ms": 949145,
+    "duration_sample_count": 321,
+    "duration_p50_ms": 1067,
+    "duration_p95_ms": 12679,
     "duration_histogram": [
      [
       311,
@@ -72439,7 +72233,7 @@
      ],
      [
       330,
-      5
+      7
      ],
      [
       331,
@@ -72483,7 +72277,7 @@
      ],
      [
       341,
-      7
+      8
      ],
      [
       342,
@@ -72531,7 +72325,7 @@
      ],
      [
       354,
-      5
+      6
      ],
      [
       355,
@@ -72567,7 +72361,7 @@
      ],
      [
       363,
-      2
+      3
      ],
      [
       364,
@@ -72587,7 +72381,7 @@
      ],
      [
       371,
-      4
+      5
      ],
      [
       372,
@@ -72595,7 +72389,7 @@
      ],
      [
       373,
-      1
+      2
      ],
      [
       374,
@@ -72607,7 +72401,7 @@
      ],
      [
       376,
-      2
+      3
      ],
      [
       377,
@@ -72619,11 +72413,11 @@
      ],
      [
       379,
-      1
+      2
      ],
      [
       380,
-      1
+      2
      ],
      [
       381,
@@ -72631,6 +72425,10 @@
      ],
      [
       382,
+      1
+     ],
+     [
+      383,
       1
      ],
      [
@@ -72642,6 +72440,14 @@
       2
      ],
      [
+      388,
+      1
+     ],
+     [
+      390,
+      1
+     ],
+     [
       391,
       1
      ],
@@ -72651,6 +72457,10 @@
      ],
      [
       393,
+      1
+     ],
+     [
+      398,
       1
      ],
      [
@@ -72666,6 +72476,14 @@
       1
      ],
      [
+      403,
+      1
+     ],
+     [
+      404,
+      1
+     ],
+     [
       406,
       1
      ],
@@ -72675,7 +72493,7 @@
      ],
      [
       408,
-      1
+      2
      ],
      [
       409,
@@ -72684,6 +72502,10 @@
      [
       410,
       2
+     ],
+     [
+      411,
+      1
      ],
      [
       412,
@@ -72698,12 +72520,20 @@
       1
      ],
      [
+      416,
+      1
+     ],
+     [
+      417,
+      1
+     ],
+     [
       419,
       1
      ],
      [
       426,
-      1
+      2
      ],
      [
       427,
@@ -72714,12 +72544,20 @@
       1
      ],
      [
+      434,
+      1
+     ],
+     [
       435,
       2
      ],
      [
       437,
-      2
+      3
+     ],
+     [
+      438,
+      1
      ],
      [
       440,
@@ -72734,8 +72572,12 @@
       1
      ],
      [
-      445,
+      444,
       1
+     ],
+     [
+      445,
+      3
      ],
      [
       446,
@@ -72743,7 +72585,7 @@
      ],
      [
       447,
-      1
+      2
      ],
      [
       451,
@@ -72751,11 +72593,19 @@
      ],
      [
       453,
-      1
+      2
      ],
      [
       454,
       1
+     ],
+     [
+      455,
+      1
+     ],
+     [
+      460,
+      2
      ],
      [
       462,
@@ -72770,8 +72620,16 @@
       1
      ],
      [
-      477,
+      475,
       1
+     ],
+     [
+      476,
+      1
+     ],
+     [
+      477,
+      2
      ],
      [
       486,
@@ -72786,7 +72644,19 @@
       2
      ],
      [
+      494,
+      1
+     ],
+     [
       495,
+      1
+     ],
+     [
+      496,
+      1
+     ],
+     [
+      500,
       1
      ],
      [
@@ -72794,8 +72664,16 @@
       1
      ],
      [
-      517,
+      505,
       1
+     ],
+     [
+      507,
+      1
+     ],
+     [
+      517,
+      2
      ],
      [
       520,
@@ -72806,11 +72684,11 @@
       1
      ]
     ],
-    "success_count": 280,
-    "query_count": 281,
+    "success_count": 321,
+    "query_count": 322,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-22T08:12:58Z",
+    "finished_at": "2026-11-22T12:57:53Z",
     "failed_queries": 1,
     "unknown_status_count": 0,
     "blocked_queries": 0,
@@ -72827,8 +72705,8 @@
      "status": "success",
      "reason": null
     },
-    "slow_count": 15,
-    "slow_threshold_ms": 7940,
+    "slow_count": 17,
+    "slow_threshold_ms": 12679,
     "hours": [
      {
       "hour": 4,
@@ -72885,21 +72763,29 @@
       "duration_sum_ms": 2946,
       "duration_sample_count": 3,
       "failed": 0
+     },
+     {
+      "hour": 20,
+      "calls": 41,
+      "success_count": 41,
+      "duration_sum_ms": 294578,
+      "duration_sample_count": 41,
+      "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 281,
-      "success_count": 280,
+      "call_count": 322,
+      "success_count": 321,
       "failed_count": 1,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
       "ttft_sample_count": 0,
       "ttft_sum_ms": null,
-      "ttft_estimated_avg_ms": 1395,
-      "ttft_estimated_sample_count": 38,
-      "ttft_estimated_sum_ms": 52995,
+      "ttft_estimated_avg_ms": 1456,
+      "ttft_estimated_sample_count": 66,
+      "ttft_estimated_sum_ms": 96072,
       "ttft_estimated_histogram": [
        [
         301,
@@ -72911,6 +72797,10 @@
        ],
        [
         321,
+        1
+       ],
+       [
+        326,
         1
        ],
        [
@@ -72926,8 +72816,12 @@
         2
        ],
        [
+        354,
+        1
+       ],
+       [
         356,
-        2
+        3
        ],
        [
         358,
@@ -72935,35 +72829,47 @@
        ],
        [
         359,
-        2
+        4
        ],
        [
         360,
+        2
+       ],
+       [
+        361,
         1
        ],
        [
         362,
-        2
+        5
        ],
        [
         363,
-        1
+        2
        ],
        [
         364,
-        3
+        5
        ],
        [
         365,
         1
        ],
        [
-        368,
+        366,
         1
        ],
        [
+        367,
+        1
+       ],
+       [
+        368,
+        2
+       ],
+       [
         369,
-        3
+        4
        ],
        [
         370,
@@ -72975,23 +72881,23 @@
        ],
        [
         372,
-        1
+        2
        ],
        [
         373,
-        1
+        2
        ],
        [
         374,
-        1
+        3
        ],
        [
         375,
-        1
+        4
        ],
        [
         377,
-        1
+        2
        ],
        [
         378,
@@ -72999,7 +72905,7 @@
        ],
        [
         379,
-        1
+        2
        ],
        [
         381,
@@ -73007,7 +72913,7 @@
        ],
        [
         382,
-        1
+        2
        ],
        [
         385,
@@ -73016,17 +72922,21 @@
        [
         387,
         1
+       ],
+       [
+        419,
+        1
        ]
       ],
-      "ttft_filtered_count": 118,
+      "ttft_filtered_count": 127,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
       "tpot_weight_tokens": 0,
-      "tpot_estimated_avg_ms": 5.334034754276405,
-      "tpot_estimated_sample_count": 38,
-      "tpot_estimated_decode_sum_ms": 157162.0,
-      "tpot_estimated_weight_tokens": 29464,
+      "tpot_estimated_avg_ms": 5.108377319938702,
+      "tpot_estimated_sample_count": 66,
+      "tpot_estimated_decode_sum_ms": 300015.0,
+      "tpot_estimated_weight_tokens": 58730,
       "tpot_histogram": [],
       "tpot_estimated_histogram": [
        [
@@ -73034,20 +72944,40 @@
         1
        ],
        [
+        37,
+        1
+       ],
+       [
+        49,
+        1
+       ],
+       [
+        52,
+        1
+       ],
+       [
+        57,
+        2
+       ],
+       [
         58,
         1
        ],
        [
         62,
-        1
+        2
        ],
        [
         63,
         2
        ],
        [
+        64,
+        2
+       ],
+       [
         67,
-        1
+        2
        ],
        [
         68,
@@ -73055,11 +72985,11 @@
        ],
        [
         69,
-        2
+        3
        ],
        [
         70,
-        1
+        2
        ],
        [
         71,
@@ -73071,27 +73001,39 @@
        ],
        [
         74,
-        1
+        2
        ],
        [
         75,
-        1
+        5
+       ],
+       [
+        76,
+        2
+       ],
+       [
+        77,
+        2
        ],
        [
         78,
-        1
+        2
        ],
        [
         79,
         2
        ],
        [
+        80,
+        1
+       ],
+       [
         81,
-        2
+        3
        ],
        [
         83,
-        1
+        2
        ],
        [
         85,
@@ -73099,11 +73041,15 @@
        ],
        [
         88,
-        1
+        2
        ],
        [
         89,
         4
+       ],
+       [
+        90,
+        1
        ],
        [
         91,
@@ -73123,10 +73069,14 @@
        ],
        [
         100,
-        1
+        2
        ],
        [
         103,
+        1
+       ],
+       [
+        105,
         1
        ],
        [
@@ -73138,11 +73088,11 @@
         1
        ]
       ],
-      "tpot_filtered_count": 118,
-      "duration_sum_ms": 654567,
-      "duration_p50_ms": 994,
-      "duration_p95_ms": 7940,
-      "duration_sample_count": 280,
+      "tpot_filtered_count": 127,
+      "duration_sum_ms": 949145,
+      "duration_p50_ms": 1067,
+      "duration_p95_ms": 12679,
+      "duration_sample_count": 321,
       "duration_histogram": [
        [
         311,
@@ -73194,7 +73144,7 @@
        ],
        [
         330,
-        5
+        7
        ],
        [
         331,
@@ -73238,7 +73188,7 @@
        ],
        [
         341,
-        7
+        8
        ],
        [
         342,
@@ -73286,7 +73236,7 @@
        ],
        [
         354,
-        5
+        6
        ],
        [
         355,
@@ -73322,7 +73272,7 @@
        ],
        [
         363,
-        2
+        3
        ],
        [
         364,
@@ -73342,7 +73292,7 @@
        ],
        [
         371,
-        4
+        5
        ],
        [
         372,
@@ -73350,7 +73300,7 @@
        ],
        [
         373,
-        1
+        2
        ],
        [
         374,
@@ -73362,7 +73312,7 @@
        ],
        [
         376,
-        2
+        3
        ],
        [
         377,
@@ -73374,11 +73324,11 @@
        ],
        [
         379,
-        1
+        2
        ],
        [
         380,
-        1
+        2
        ],
        [
         381,
@@ -73386,6 +73336,10 @@
        ],
        [
         382,
+        1
+       ],
+       [
+        383,
         1
        ],
        [
@@ -73397,6 +73351,14 @@
         2
        ],
        [
+        388,
+        1
+       ],
+       [
+        390,
+        1
+       ],
+       [
         391,
         1
        ],
@@ -73406,6 +73368,10 @@
        ],
        [
         393,
+        1
+       ],
+       [
+        398,
         1
        ],
        [
@@ -73421,6 +73387,14 @@
         1
        ],
        [
+        403,
+        1
+       ],
+       [
+        404,
+        1
+       ],
+       [
         406,
         1
        ],
@@ -73430,7 +73404,7 @@
        ],
        [
         408,
-        1
+        2
        ],
        [
         409,
@@ -73439,6 +73413,10 @@
        [
         410,
         2
+       ],
+       [
+        411,
+        1
        ],
        [
         412,
@@ -73453,12 +73431,20 @@
         1
        ],
        [
+        416,
+        1
+       ],
+       [
+        417,
+        1
+       ],
+       [
         419,
         1
        ],
        [
         426,
-        1
+        2
        ],
        [
         427,
@@ -73469,12 +73455,20 @@
         1
        ],
        [
+        434,
+        1
+       ],
+       [
         435,
         2
        ],
        [
         437,
-        2
+        3
+       ],
+       [
+        438,
+        1
        ],
        [
         440,
@@ -73489,8 +73483,12 @@
         1
        ],
        [
-        445,
+        444,
         1
+       ],
+       [
+        445,
+        3
        ],
        [
         446,
@@ -73498,7 +73496,7 @@
        ],
        [
         447,
-        1
+        2
        ],
        [
         451,
@@ -73506,11 +73504,19 @@
        ],
        [
         453,
-        1
+        2
        ],
        [
         454,
         1
+       ],
+       [
+        455,
+        1
+       ],
+       [
+        460,
+        2
        ],
        [
         462,
@@ -73525,8 +73531,16 @@
         1
        ],
        [
-        477,
+        475,
         1
+       ],
+       [
+        476,
+        1
+       ],
+       [
+        477,
+        2
        ],
        [
         486,
@@ -73541,7 +73555,19 @@
         2
        ],
        [
+        494,
+        1
+       ],
+       [
         495,
+        1
+       ],
+       [
+        496,
+        1
+       ],
+       [
+        500,
         1
        ],
        [
@@ -73549,8 +73575,16 @@
         1
        ],
        [
-        517,
+        505,
         1
+       ],
+       [
+        507,
+        1
+       ],
+       [
+        517,
+        2
        ],
        [
         520,
@@ -73561,10 +73595,10 @@
         1
        ]
       ],
-      "input_tokens": 2013863,
-      "output_tokens": 76310,
-      "total_tokens": 2090173,
-      "token_sample_count": 280,
+      "input_tokens": 3349013,
+      "output_tokens": 120028,
+      "total_tokens": 3469041,
+      "token_sample_count": 321,
       "token_coverage": 1.0,
       "failed_input_tokens": 14,
       "failed_output_tokens": 0,
@@ -73590,10 +73624,34 @@
       "reason": null
      },
      {
+      "request_id": "bb9d2b62e10c400f87b0b9155b573ddc",
+      "call_id": "73511d10-197f-4114-a977-94bc4acdded4",
+      "start_time": "2026-11-22T12:04:18.542+00:00",
+      "duration_ms": 28399,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "fba51d80cbb74501ac0de4bce844cca4",
       "call_id": "54b9fa7b-2f84-4c34-b57d-c992a0721d78",
       "start_time": "2026-11-22T05:53:55.172+00:00",
       "duration_ms": 28205,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "f743867a0b0345c9b69cdf47d4c4d80e",
+      "call_id": "24d5658f-3e0c-41be-9eaf-d672c4ace446",
+      "start_time": "2026-11-22T12:29:09.246+00:00",
+      "duration_ms": 23276,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "5e3024085894494ab9004092342c2453",
+      "call_id": "92a1b95f-ce47-4dad-b933-56d77d3b4b9c",
+      "start_time": "2026-11-22T12:04:21.385+00:00",
+      "duration_ms": 22094,
       "status": "success",
       "reason": null
      },
@@ -73606,10 +73664,34 @@
       "reason": null
      },
      {
+      "request_id": "5c4bd2161dd243708eaad515074f5ee1",
+      "call_id": "f349ea18-68ef-4efd-b3bd-a3663c70ae03",
+      "start_time": "2026-11-22T12:57:30.322+00:00",
+      "duration_ms": 20075,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "09f61413f0aa4475a454e29b66385362",
+      "call_id": "cbb4bdab-e268-4868-b200-81f119236008",
+      "start_time": "2026-11-22T12:03:59.468+00:00",
+      "duration_ms": 18595,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "be4926ad76c742f783d9dafdd39761fd",
       "call_id": "3e5584a9-cd93-4094-b03d-e38826b04ff7",
       "start_time": "2026-11-21T20:25:49.313+00:00",
       "duration_ms": 18260,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "0499e1341e7b426c8f720026b020f9af",
+      "call_id": "1c109cbd-2c69-4880-b3b3-849f6cb92059",
+      "start_time": "2026-11-22T12:57:11.279+00:00",
+      "duration_ms": 18019,
       "status": "success",
       "reason": null
      },
@@ -73654,42 +73736,10 @@
       "reason": null
      },
      {
-      "request_id": "39433f54062c415abff80449f23dd452",
-      "call_id": "b3aa7f54-4066-458f-bbd8-a46fa540e9fd",
-      "start_time": "2026-11-22T00:05:56.223+00:00",
-      "duration_ms": 11656,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "8db1dd640fcc4d39be7589d853cebb9c",
-      "call_id": "73b7b8b1-aa90-41e7-8f0b-a86b46082572",
-      "start_time": "2026-11-21T20:25:37.784+00:00",
-      "duration_ms": 11095,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "ba65113126e442be922423d85fcfcd09",
-      "call_id": "1ed6f669-2c69-4991-a587-65305225f654",
-      "start_time": "2026-11-21T23:52:55.266+00:00",
-      "duration_ms": 9457,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "01de38c8e1ac4531ad70921070d11f5e",
-      "call_id": "4235e5be-5c21-4be2-a289-552551b9c584",
-      "start_time": "2026-11-21T23:52:09.103+00:00",
-      "duration_ms": 8099,
-      "status": "success",
-      "reason": null
-     },
-     {
-      "request_id": "4e5eef75d5094deb9587c0bbe6b84640",
-      "call_id": "494e3edf-4fb8-4965-8db4-1c104e7e3c1d",
-      "start_time": "2026-11-21T23:53:14.253+00:00",
-      "duration_ms": 7940,
+      "request_id": "303c5820e6b94163b77422501c11136b",
+      "call_id": "2bddc8a9-30d4-436c-a894-ac956eb4c685",
+      "start_time": "2026-11-22T12:25:11.011+00:00",
+      "duration_ms": 12679,
       "status": "success",
       "reason": null
      }
@@ -90035,410 +90085,7 @@
        "failed_total_tokens": 1083388,
        "failed_token_sample_count": 86
       }
-     ],
-     "slow_requests": [
-      {
-       "request_id": "e5f57afb0eaa45feb67dff574930bbf5",
-       "call_id": "ea749574-41bb-4373-8dfe-2e07d250f0aa",
-       "start_time": "2026-11-16T13:31:20.309+00:00",
-       "duration_ms": 66030,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "c31c96e2f88848aba8996c000a87b590",
-       "call_id": "68526d08-9fe2-4180-8d06-c87f74564ff2",
-       "start_time": "2026-11-16T13:19:32.569+00:00",
-       "duration_ms": 63616,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "9b30e51a8318453d9580411176ebdb87",
-       "call_id": "53f778e0-6077-43be-8596-fa4c27375f8e",
-       "start_time": "2026-11-16T14:15:24.257+00:00",
-       "duration_ms": 62343,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "d05fe7c495cc48fdb30b801b0d367a9e",
-       "call_id": "5f481d65-e1b7-496c-9243-89012b413709",
-       "start_time": "2026-11-15T16:11:26.710+00:00",
-       "duration_ms": 60870,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "fefd24ad798645ecb1e3b3ad8f2a9145",
-       "call_id": "bea7c30d-4712-4fa0-a5e2-fb788c2fcfcc",
-       "start_time": "2026-11-16T00:24:39.864+00:00",
-       "duration_ms": 60249,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "90ff2372b1164ca58d5eaa95dd1fa800",
-       "call_id": "7f20e044-2618-4681-a287-fb2acac979fb",
-       "start_time": "2026-11-16T13:34:31.774+00:00",
-       "duration_ms": 60102,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "e9d6a098622e47fd8f6679801a7bb431",
-       "call_id": "183054ee-8ead-4cfe-bf0f-e3c6754ba545",
-       "start_time": "2026-11-16T13:00:57.972+00:00",
-       "duration_ms": 59740,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "d2446a03b15342f79a9cca2b782e8606",
-       "call_id": "32689268-4d0e-4f88-9412-25c70de85e06",
-       "start_time": "2026-11-16T03:27:32.378+00:00",
-       "duration_ms": 59169,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "32e91e1666b941da84fd69135a54c6b6",
-       "call_id": "19fef320-51b4-4f6c-93fb-3b11f61ac425",
-       "start_time": "2026-11-16T03:28:16.964+00:00",
-       "duration_ms": 59151,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "46eb3d2f2f7540a9a280e7150bcf4cb2",
-       "call_id": "a9376030-651a-4a6e-8a04-9a16df2a4abd",
-       "start_time": "2026-11-16T09:25:38.193+00:00",
-       "duration_ms": 59019,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "1856b080cc7d438c856fc8b2e6bc58f0",
-       "call_id": "88f18821-5991-4a93-b02a-e25324cf9f23",
-       "start_time": "2026-11-16T13:31:00.086+00:00",
-       "duration_ms": 58669,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "e79feef9146940178bc628d385bc2d62",
-       "call_id": "010f7cf0-68bb-4438-8444-b1d2e0f3b429",
-       "start_time": "2026-11-16T05:51:37.264+00:00",
-       "duration_ms": 58262,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "8acc632c22de4385ba82a4c14c7e80fc",
-       "call_id": "ce779ce9-8db6-411c-9ae7-4c305ec06283",
-       "start_time": "2026-11-16T13:31:21.748+00:00",
-       "duration_ms": 57822,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "16d2f264b8bd4df3a81f60edf6917ad6",
-       "call_id": "ad33e7d9-5bf8-42fc-8bea-78852c8db5ce",
-       "start_time": "2026-11-15T17:33:31.219+00:00",
-       "duration_ms": 57280,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "9160587018ed4dbb9989f08875b32e28",
-       "call_id": "35aca617-673c-42ba-88e2-eb28f66ccbff",
-       "start_time": "2026-11-16T13:18:09.991+00:00",
-       "duration_ms": 56151,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "29b4ef9bf327435e86ed4ee31e199790",
-       "call_id": "d86fa967-bebd-4dfb-8fe3-16f50f6fd787",
-       "start_time": "2026-11-16T03:28:08.963+00:00",
-       "duration_ms": 55956,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "b399f271e2864d388e59de274480de48",
-       "call_id": "39209a70-c4e3-419c-94f5-6958a5dd5d22",
-       "start_time": "2026-11-16T14:15:09.427+00:00",
-       "duration_ms": 55824,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "8539a19423c84168a0949fc57bb3f2e0",
-       "call_id": "c7d93a40-5c46-4294-b8b8-cee1c461aa24",
-       "start_time": "2026-11-16T13:25:32.712+00:00",
-       "duration_ms": 54320,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "2d29abb6e08d4134ab45c3617369e4de",
-       "call_id": "2bf62c36-8036-4636-a729-ca15c7a56996",
-       "start_time": "2026-11-16T08:51:52.620+00:00",
-       "duration_ms": 54089,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "5132474b17e54da3a7a364c15de59ed8",
-       "call_id": "95750e3c-a7b5-4791-9af3-249e233e0f24",
-       "start_time": "2026-11-16T09:57:50.505+00:00",
-       "duration_ms": 53392,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "ae08f61e12c64748ae13a81a7a5ee346",
-       "call_id": "deefc163-beaf-45c8-9129-f3b0db0628de",
-       "start_time": "2026-11-16T11:14:17.477+00:00",
-       "duration_ms": 52737,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "4442c0368fb64093901c0bfc649fe643",
-       "call_id": "5474c3ed-6f5b-4267-aad4-684c46ba493f",
-       "start_time": "2026-11-16T13:33:53.765+00:00",
-       "duration_ms": 52443,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "76ea3aea7824480e9110df9edacac0e1",
-       "call_id": "7f027be1-9809-4279-a178-8717242aab4b",
-       "start_time": "2026-11-16T08:04:52.390+00:00",
-       "duration_ms": 51927,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "f75bbb1b232845c88f2772bc25089976",
-       "call_id": "5b65abe0-d79a-4f55-8ba5-68604991c397",
-       "start_time": "2026-11-15T17:33:39.211+00:00",
-       "duration_ms": 51904,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "d60ef6b43fa14aac88affba3988cadd0",
-       "call_id": "bfd86b6c-93e5-41c5-8905-eca72651105a",
-       "start_time": "2026-11-16T02:56:01.421+00:00",
-       "duration_ms": 50934,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "980adcb4cdef4df9969a8f24fcaa9b4a",
-       "call_id": "7e41dc17-9b88-4f06-86d1-607c1c63c81b",
-       "start_time": "2026-11-16T09:35:02.702+00:00",
-       "duration_ms": 50108,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "26c56cc592f94b788ca85b7c10b1ae73",
-       "call_id": "52f5563d-987b-4434-8ae4-853fa46d97c1",
-       "start_time": "2026-11-16T09:25:24.138+00:00",
-       "duration_ms": 49152,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "656ab36f17114f70825dd7830fd65971",
-       "call_id": "f45f308a-244c-4785-9702-abfffd141315",
-       "start_time": "2026-11-16T14:15:55.300+00:00",
-       "duration_ms": 48664,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "8556e17cc7fa405492c59f02a3d4acd8",
-       "call_id": "106fa4ea-8ad5-4c44-98aa-0929f36df2ef",
-       "start_time": "2026-11-16T13:01:14.520+00:00",
-       "duration_ms": 48095,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "a9085fbf161649a4aaaae29e589f6f72",
-       "call_id": "8f8927e8-e392-406e-9af2-ce1706bffd1e",
-       "start_time": "2026-11-16T04:54:48.785+00:00",
-       "duration_ms": 48062,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "f6abf834cb5d4cdaac22c31259a2c4bd",
-       "call_id": "dfb729f1-33c2-4e73-b6a3-18bac87a61ec",
-       "start_time": "2026-11-16T13:44:08.168+00:00",
-       "duration_ms": 48000,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "592f038e4ca449d8bcb804f15bebcd9d",
-       "call_id": "e1a0f06c-39d7-4a5b-b18d-0ef5ca688ecf",
-       "start_time": "2026-11-16T14:20:29.674+00:00",
-       "duration_ms": 46774,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "30f67d2188e949f0891783d748244a9c",
-       "call_id": "1631f2a7-1844-4014-93d0-be1939b29c47",
-       "start_time": "2026-11-16T07:38:27.695+00:00",
-       "duration_ms": 46256,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "1fd11249633e40c0b7c8f4e2689f5bfb",
-       "call_id": "ed4a2744-dbc4-45e7-820f-eec1d865fef5",
-       "start_time": "2026-11-16T11:29:06.596+00:00",
-       "duration_ms": 46205,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "b4cee9db0e6a46babdd57af5e00bcf58",
-       "call_id": "a9623a36-2c22-484d-aaaa-8165db0f9351",
-       "start_time": "2026-11-16T06:59:45.911+00:00",
-       "duration_ms": 46167,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "cb0da785e02c4240bd079f39a0f2e356",
-       "call_id": "a91aa92a-af9f-440c-a155-44cfac2b2da0",
-       "start_time": "2026-11-16T07:42:33.023+00:00",
-       "duration_ms": 46037,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "7718d5830d9a488f94f696305b60e591",
-       "call_id": "25b972fe-4fe0-468f-8269-a61466a80e39",
-       "start_time": "2026-11-16T11:23:57.719+00:00",
-       "duration_ms": 45644,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "0e7308632de541729036b22d84b782cf",
-       "call_id": "fa62de41-7afb-4228-9e91-618c5d0ef6e3",
-       "start_time": "2026-11-16T08:37:30.871+00:00",
-       "duration_ms": 45332,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "e6a72aa27dd840759087dc8b128b9a10",
-       "call_id": "34731811-d841-425e-ba92-a8fca3883f1f",
-       "start_time": "2026-11-16T14:16:41.564+00:00",
-       "duration_ms": 44791,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "593723495b314e9494260f0caec527ae",
-       "call_id": "7ef0d166-c7db-4b17-814a-b645a07a3f26",
-       "start_time": "2026-11-16T05:40:19.070+00:00",
-       "duration_ms": 44491,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "193e6c71-651f-43b1-bd5d-9b6b16b87c40",
-       "call_id": "193e6c71-651f-43b1-bd5d-9b6b16b87c40",
-       "start_time": "2026-11-16T13:33:48.735+00:00",
-       "duration_ms": 43874,
-       "status": "failure",
-       "reason": "content_blocked"
-      },
-      {
-       "request_id": "7b72b7c7ba8c42bf92bf7c618ae0108e",
-       "call_id": "3e8bc584-8efe-478e-9396-4b531cc2e675",
-       "start_time": "2026-11-16T14:20:27.749+00:00",
-       "duration_ms": 43164,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "4e9c4a1996df4246b8afae700cb2ab85",
-       "call_id": "5db14337-1a25-4f00-ba61-4a68a859708a",
-       "start_time": "2026-11-16T08:25:38.325+00:00",
-       "duration_ms": 42798,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "c62da0f6701e44499a32e2bce69bc45b",
-       "call_id": "da4b2981-1a9f-475e-8c91-76edceeabab6",
-       "start_time": "2026-11-15T18:25:49.870+00:00",
-       "duration_ms": 42288,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "ba21c56ed33c4616a5ab48d1051b6c19",
-       "call_id": "d363e6d2-0024-40cb-b865-75bf908d0134",
-       "start_time": "2026-11-16T13:30:08.731+00:00",
-       "duration_ms": 42194,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "315d5f8c50f745ca8fd4d6e659f54321",
-       "call_id": "c14432cb-34c1-410a-8726-3d78bfecf4e0",
-       "start_time": "2026-11-16T14:16:47.862+00:00",
-       "duration_ms": 42129,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "1911356f3abf456d842ede59db04ce73",
-       "call_id": "b3276e4c-94a2-409f-9c5e-f9bfc8356437",
-       "start_time": "2026-11-16T13:39:35.105+00:00",
-       "duration_ms": 41678,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "577d9822cced45a1afaa3a470ba36998",
-       "call_id": "0ee1d4a8-6740-40bb-b0f7-819f2d771e45",
-       "start_time": "2026-11-16T13:31:45.840+00:00",
-       "duration_ms": 41207,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "30225cb452ba4ad88eaeda62db567ce1",
-       "call_id": "c01eff0f-7191-4365-8aa6-82569f1e2beb",
-       "start_time": "2026-11-16T13:31:58.331+00:00",
-       "duration_ms": 41140,
-       "status": "success",
-       "reason": null
-      },
-      {
-       "request_id": "7dbfc480cfb84058b97792375c9e9edb",
-       "call_id": "7d59be4b-f9f2-45b7-a609-1893c4b8f0d6",
-       "start_time": "2026-11-16T09:00:39.266+00:00",
-       "duration_ms": 40447,
-       "status": "success",
-       "reason": null
-      }
-     ],
-     "timeout_requests": []
+     ]
     },
     {
      "date": "2026-11-17",
@@ -101069,12 +100716,12 @@
     {
      "date": "2026-11-22",
      "status": "COMPLETED",
-     "partial": true,
-     "query_ms": 4941,
-     "duration_sum_ms": 3320227,
-     "duration_sample_count": 672,
-     "duration_p50_ms": 3748,
-     "duration_p95_ms": 11638,
+     "partial": false,
+     "query_ms": 5441,
+     "duration_sum_ms": 5348390,
+     "duration_sample_count": 983,
+     "duration_p50_ms": 5187,
+     "duration_p95_ms": 11495,
      "duration_histogram": [
       [
        315,
@@ -101089,11 +100736,19 @@
        1
       ],
       [
+       331,
+       1
+      ],
+      [
        332,
        1
       ],
       [
        333,
+       1
+      ],
+      [
+       336,
        1
       ],
       [
@@ -101106,6 +100761,10 @@
       ],
       [
        344,
+       1
+      ],
+      [
+       345,
        1
       ],
       [
@@ -101134,7 +100793,7 @@
       ],
       [
        356,
-       1
+       3
       ],
       [
        357,
@@ -101162,7 +100821,7 @@
       ],
       [
        364,
-       1
+       2
       ],
       [
        365,
@@ -101198,11 +100857,11 @@
       ],
       [
        373,
-       7
+       8
       ],
       [
        374,
-       14
+       15
       ],
       [
        375,
@@ -101210,7 +100869,7 @@
       ],
       [
        376,
-       4
+       6
       ],
       [
        377,
@@ -101218,11 +100877,11 @@
       ],
       [
        378,
-       14
+       17
       ],
       [
        379,
-       5
+       7
       ],
       [
        380,
@@ -101230,35 +100889,35 @@
       ],
       [
        381,
-       4
-      ],
-      [
-       382,
-       4
-      ],
-      [
-       383,
        7
       ],
       [
-       384,
+       382,
        6
       ],
       [
-       385,
-       5
-      ],
-      [
-       386,
+       383,
        10
       ],
       [
-       387,
+       384,
+       9
+      ],
+      [
+       385,
        6
       ],
       [
+       386,
+       11
+      ],
+      [
+       387,
+       7
+      ],
+      [
        388,
-       8
+       10
       ],
       [
        389,
@@ -101266,27 +100925,27 @@
       ],
       [
        390,
-       10
+       12
       ],
       [
        391,
-       10
-      ],
-      [
-       392,
-       5
-      ],
-      [
-       393,
        11
       ],
       [
+       392,
+       8
+      ],
+      [
+       393,
+       14
+      ],
+      [
        394,
-       10
+       12
       ],
       [
        395,
-       12
+       13
       ],
       [
        396,
@@ -101294,35 +100953,35 @@
       ],
       [
        397,
-       6
-      ],
-      [
-       398,
-       14
-      ],
-      [
-       399,
-       6
-      ],
-      [
-       400,
-       9
-      ],
-      [
-       401,
-       7
-      ],
-      [
-       402,
-       7
-      ],
-      [
-       403,
        8
       ],
       [
+       398,
+       16
+      ],
+      [
+       399,
+       9
+      ],
+      [
+       400,
+       10
+      ],
+      [
+       401,
+       11
+      ],
+      [
+       402,
+       11
+      ],
+      [
+       403,
+       10
+      ],
+      [
        404,
-       2
+       3
       ],
       [
        405,
@@ -101333,12 +100992,16 @@
        3
       ],
       [
+       407,
+       4
+      ],
+      [
        408,
-       3
+       5
       ],
       [
        409,
-       4
+       5
       ],
       [
        410,
@@ -101349,92 +101012,100 @@
        1
       ],
       [
-       413,
+       412,
        2
       ],
       [
+       413,
+       4
+      ],
+      [
        414,
-       1
+       6
       ],
       [
        415,
-       3
+       4
       ],
       [
        416,
-       1
+       4
       ],
       [
        417,
-       5
+       8
       ],
       [
        418,
-       5
+       6
       ],
       [
        419,
-       1
+       5
       ],
       [
        420,
-       1
+       2
       ],
       [
        421,
-       1
+       2
       ],
       [
        422,
        2
       ],
       [
-       424,
-       1
-      ],
-      [
-       425,
-       4
-      ],
-      [
-       426,
+       423,
        2
       ],
       [
-       427,
+       424,
+       2
+      ],
+      [
+       425,
        5
       ],
       [
-       428,
-       6
-      ],
-      [
-       429,
-       6
-      ],
-      [
-       430,
+       426,
        3
       ],
       [
-       431,
-       4
+       427,
+       8
       ],
       [
-       432,
-       14
+       428,
+       9
       ],
       [
-       433,
-       11
-      ],
-      [
-       434,
+       429,
        7
       ],
       [
-       435,
+       430,
+       6
+      ],
+      [
+       431,
+       5
+      ],
+      [
+       432,
+       18
+      ],
+      [
+       433,
+       14
+      ],
+      [
+       434,
        10
+      ],
+      [
+       435,
+       12
       ],
       [
        436,
@@ -101446,95 +101117,95 @@
       ],
       [
        438,
-       2
+       4
       ],
       [
        439,
-       6
+       8
       ],
       [
        441,
-       2
-      ],
-      [
-       442,
-       5
-      ],
-      [
-       443,
-       1
-      ],
-      [
-       444,
-       1
-      ],
-      [
-       445,
        3
       ],
       [
+       442,
+       6
+      ],
+      [
+       443,
+       3
+      ],
+      [
+       444,
+       7
+      ],
+      [
+       445,
+       6
+      ],
+      [
        446,
-       5
-      ],
-      [
-       447,
-       5
-      ],
-      [
-       448,
-       6
-      ],
-      [
-       449,
-       6
-      ],
-      [
-       450,
-       11
-      ],
-      [
-       451,
-       15
-      ],
-      [
-       452,
-       15
-      ],
-      [
-       453,
-       20
-      ],
-      [
-       454,
-       14
-      ],
-      [
-       455,
-       18
-      ],
-      [
-       456,
-       13
-      ],
-      [
-       457,
        9
       ],
       [
+       447,
+       14
+      ],
+      [
+       448,
+       15
+      ],
+      [
+       449,
+       12
+      ],
+      [
+       450,
+       21
+      ],
+      [
+       451,
+       24
+      ],
+      [
+       452,
+       26
+      ],
+      [
+       453,
+       30
+      ],
+      [
+       454,
+       25
+      ],
+      [
+       455,
+       33
+      ],
+      [
+       456,
+       21
+      ],
+      [
+       457,
+       14
+      ],
+      [
        458,
-       10
+       18
       ],
       [
        459,
-       1
+       9
       ],
       [
        460,
-       6
+       8
       ],
       [
        461,
-       1
+       2
       ],
       [
        462,
@@ -101542,39 +101213,47 @@
       ],
       [
        463,
+       4
+      ],
+      [
+       464,
        1
+      ],
+      [
+       465,
+       3
       ],
       [
        466,
-       3
-      ],
-      [
-       467,
-       3
-      ],
-      [
-       468,
-       3
-      ],
-      [
-       469,
-       5
-      ],
-      [
-       470,
-       2
-      ],
-      [
-       471,
-       1
-      ],
-      [
-       472,
        7
       ],
       [
+       467,
+       5
+      ],
+      [
+       468,
+       8
+      ],
+      [
+       469,
+       12
+      ],
+      [
+       470,
+       9
+      ],
+      [
+       471,
+       5
+      ],
+      [
+       472,
+       12
+      ],
+      [
        473,
-       3
+       6
       ],
       [
        474,
@@ -101582,7 +101261,7 @@
       ],
       [
        475,
-       5
+       8
       ],
       [
        476,
@@ -101614,14 +101293,14 @@
       ],
       [
        485,
-       1
+       2
       ]
      ],
-     "success_count": 672,
-     "query_count": 675,
+     "success_count": 983,
+     "query_count": 986,
      "run_id": "prod-adx-jiuwen",
      "commit": "",
-     "finished_at": "2026-11-22T09:10:20Z",
+     "finished_at": "2026-11-22T15:18:59Z",
      "failed_queries": 3,
      "unknown_status_count": 0,
      "blocked_queries": 0,
@@ -101638,8 +101317,8 @@
       "status": "success",
       "reason": null
      },
-     "slow_count": 34,
-     "slow_threshold_ms": 11638,
+     "slow_count": 50,
+     "slow_threshold_ms": 11495,
      "hours": [
       {
        "hour": 4,
@@ -101736,13 +101415,45 @@
        "duration_sum_ms": 44235,
        "duration_sample_count": 20,
        "failed": 0
+      },
+      {
+       "hour": 20,
+       "calls": 113,
+       "success_count": 113,
+       "duration_sum_ms": 682743,
+       "duration_sample_count": 113,
+       "failed": 0
+      },
+      {
+       "hour": 21,
+       "calls": 90,
+       "success_count": 90,
+       "duration_sum_ms": 560084,
+       "duration_sample_count": 90,
+       "failed": 0
+      },
+      {
+       "hour": 22,
+       "calls": 61,
+       "success_count": 61,
+       "duration_sum_ms": 447338,
+       "duration_sample_count": 61,
+       "failed": 0
+      },
+      {
+       "hour": 23,
+       "calls": 47,
+       "success_count": 47,
+       "duration_sum_ms": 337998,
+       "duration_sample_count": 47,
+       "failed": 0
       }
      ],
      "benchmark_models": [
       {
        "model": "openai/deepseek-v4.1-flash-1017",
-       "call_count": 675,
-       "success_count": 672,
+       "call_count": 986,
+       "success_count": 983,
        "failed_count": 3,
        "unknown_status_count": 0,
        "ttft_avg_ms": null,
@@ -101752,7 +101463,7 @@
        "ttft_estimated_sample_count": 0,
        "ttft_estimated_sum_ms": null,
        "ttft_estimated_histogram": [],
-       "ttft_filtered_count": 330,
+       "ttft_filtered_count": 493,
        "tpot_avg_ms": null,
        "tpot_sample_count": 0,
        "tpot_decode_sum_ms": null,
@@ -101763,11 +101474,11 @@
        "tpot_estimated_weight_tokens": 0,
        "tpot_histogram": [],
        "tpot_estimated_histogram": [],
-       "tpot_filtered_count": 330,
-       "duration_sum_ms": 3320227,
-       "duration_p50_ms": 3748,
-       "duration_p95_ms": 11638,
-       "duration_sample_count": 672,
+       "tpot_filtered_count": 493,
+       "duration_sum_ms": 5348390,
+       "duration_p50_ms": 5187,
+       "duration_p95_ms": 11495,
+       "duration_sample_count": 983,
        "duration_histogram": [
         [
          315,
@@ -101782,11 +101493,19 @@
          1
         ],
         [
+         331,
+         1
+        ],
+        [
          332,
          1
         ],
         [
          333,
+         1
+        ],
+        [
+         336,
          1
         ],
         [
@@ -101799,6 +101518,10 @@
         ],
         [
          344,
+         1
+        ],
+        [
+         345,
          1
         ],
         [
@@ -101827,7 +101550,7 @@
         ],
         [
          356,
-         1
+         3
         ],
         [
          357,
@@ -101855,7 +101578,7 @@
         ],
         [
          364,
-         1
+         2
         ],
         [
          365,
@@ -101891,11 +101614,11 @@
         ],
         [
          373,
-         7
+         8
         ],
         [
          374,
-         14
+         15
         ],
         [
          375,
@@ -101903,7 +101626,7 @@
         ],
         [
          376,
-         4
+         6
         ],
         [
          377,
@@ -101911,11 +101634,11 @@
         ],
         [
          378,
-         14
+         17
         ],
         [
          379,
-         5
+         7
         ],
         [
          380,
@@ -101923,35 +101646,35 @@
         ],
         [
          381,
-         4
-        ],
-        [
-         382,
-         4
-        ],
-        [
-         383,
          7
         ],
         [
-         384,
+         382,
          6
         ],
         [
-         385,
-         5
-        ],
-        [
-         386,
+         383,
          10
         ],
         [
-         387,
+         384,
+         9
+        ],
+        [
+         385,
          6
         ],
         [
+         386,
+         11
+        ],
+        [
+         387,
+         7
+        ],
+        [
          388,
-         8
+         10
         ],
         [
          389,
@@ -101959,27 +101682,27 @@
         ],
         [
          390,
-         10
+         12
         ],
         [
          391,
-         10
-        ],
-        [
-         392,
-         5
-        ],
-        [
-         393,
          11
         ],
         [
+         392,
+         8
+        ],
+        [
+         393,
+         14
+        ],
+        [
          394,
-         10
+         12
         ],
         [
          395,
-         12
+         13
         ],
         [
          396,
@@ -101987,35 +101710,35 @@
         ],
         [
          397,
-         6
-        ],
-        [
-         398,
-         14
-        ],
-        [
-         399,
-         6
-        ],
-        [
-         400,
-         9
-        ],
-        [
-         401,
-         7
-        ],
-        [
-         402,
-         7
-        ],
-        [
-         403,
          8
         ],
         [
+         398,
+         16
+        ],
+        [
+         399,
+         9
+        ],
+        [
+         400,
+         10
+        ],
+        [
+         401,
+         11
+        ],
+        [
+         402,
+         11
+        ],
+        [
+         403,
+         10
+        ],
+        [
          404,
-         2
+         3
         ],
         [
          405,
@@ -102026,12 +101749,16 @@
          3
         ],
         [
+         407,
+         4
+        ],
+        [
          408,
-         3
+         5
         ],
         [
          409,
-         4
+         5
         ],
         [
          410,
@@ -102042,92 +101769,100 @@
          1
         ],
         [
-         413,
+         412,
          2
         ],
         [
+         413,
+         4
+        ],
+        [
          414,
-         1
+         6
         ],
         [
          415,
-         3
+         4
         ],
         [
          416,
-         1
+         4
         ],
         [
          417,
-         5
+         8
         ],
         [
          418,
-         5
+         6
         ],
         [
          419,
-         1
+         5
         ],
         [
          420,
-         1
+         2
         ],
         [
          421,
-         1
+         2
         ],
         [
          422,
          2
         ],
         [
-         424,
-         1
-        ],
-        [
-         425,
-         4
-        ],
-        [
-         426,
+         423,
          2
         ],
         [
-         427,
+         424,
+         2
+        ],
+        [
+         425,
          5
         ],
         [
-         428,
-         6
-        ],
-        [
-         429,
-         6
-        ],
-        [
-         430,
+         426,
          3
         ],
         [
-         431,
-         4
+         427,
+         8
         ],
         [
-         432,
-         14
+         428,
+         9
         ],
         [
-         433,
-         11
-        ],
-        [
-         434,
+         429,
          7
         ],
         [
-         435,
+         430,
+         6
+        ],
+        [
+         431,
+         5
+        ],
+        [
+         432,
+         18
+        ],
+        [
+         433,
+         14
+        ],
+        [
+         434,
          10
+        ],
+        [
+         435,
+         12
         ],
         [
          436,
@@ -102139,95 +101874,95 @@
         ],
         [
          438,
-         2
+         4
         ],
         [
          439,
-         6
+         8
         ],
         [
          441,
-         2
-        ],
-        [
-         442,
-         5
-        ],
-        [
-         443,
-         1
-        ],
-        [
-         444,
-         1
-        ],
-        [
-         445,
          3
         ],
         [
+         442,
+         6
+        ],
+        [
+         443,
+         3
+        ],
+        [
+         444,
+         7
+        ],
+        [
+         445,
+         6
+        ],
+        [
          446,
-         5
-        ],
-        [
-         447,
-         5
-        ],
-        [
-         448,
-         6
-        ],
-        [
-         449,
-         6
-        ],
-        [
-         450,
-         11
-        ],
-        [
-         451,
-         15
-        ],
-        [
-         452,
-         15
-        ],
-        [
-         453,
-         20
-        ],
-        [
-         454,
-         14
-        ],
-        [
-         455,
-         18
-        ],
-        [
-         456,
-         13
-        ],
-        [
-         457,
          9
         ],
         [
+         447,
+         14
+        ],
+        [
+         448,
+         15
+        ],
+        [
+         449,
+         12
+        ],
+        [
+         450,
+         21
+        ],
+        [
+         451,
+         24
+        ],
+        [
+         452,
+         26
+        ],
+        [
+         453,
+         30
+        ],
+        [
+         454,
+         25
+        ],
+        [
+         455,
+         33
+        ],
+        [
+         456,
+         21
+        ],
+        [
+         457,
+         14
+        ],
+        [
          458,
-         10
+         18
         ],
         [
          459,
-         1
+         9
         ],
         [
          460,
-         6
+         8
         ],
         [
          461,
-         1
+         2
         ],
         [
          462,
@@ -102235,39 +101970,47 @@
         ],
         [
          463,
+         4
+        ],
+        [
+         464,
          1
+        ],
+        [
+         465,
+         3
         ],
         [
          466,
-         3
-        ],
-        [
-         467,
-         3
-        ],
-        [
-         468,
-         3
-        ],
-        [
-         469,
-         5
-        ],
-        [
-         470,
-         2
-        ],
-        [
-         471,
-         1
-        ],
-        [
-         472,
          7
         ],
         [
+         467,
+         5
+        ],
+        [
+         468,
+         8
+        ],
+        [
+         469,
+         12
+        ],
+        [
+         470,
+         9
+        ],
+        [
+         471,
+         5
+        ],
+        [
+         472,
+         12
+        ],
+        [
          473,
-         3
+         6
         ],
         [
          474,
@@ -102275,7 +102018,7 @@
         ],
         [
          475,
-         5
+         8
         ],
         [
          476,
@@ -102307,13 +102050,13 @@
         ],
         [
          485,
-         1
+         2
         ]
        ],
-       "input_tokens": 15495880,
-       "output_tokens": 567429,
-       "total_tokens": 16063309,
-       "token_sample_count": 672,
+       "input_tokens": 25148711,
+       "output_tokens": 914634,
+       "total_tokens": 26063345,
+       "token_sample_count": 983,
        "token_coverage": 1.0,
        "failed_input_tokens": 126922,
        "failed_output_tokens": 0,
@@ -102327,6 +102070,14 @@
        "call_id": "20199eee-64d3-47ec-b810-fa93fa709635",
        "start_time": "2026-11-22T05:32:08.384+00:00",
        "duration_ms": 14991,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "090f2c55564949da99a1c98774899d74",
+       "call_id": "0c50edc7-7f9a-4ce7-a137-e50140f07448",
+       "start_time": "2026-11-22T12:50:17.441+00:00",
+       "duration_ms": 14950,
        "status": "success",
        "reason": null
       },
@@ -102507,10 +102258,34 @@
        "reason": null
       },
       {
+       "request_id": "df8dc53ea71b4602886caa6a621d9732",
+       "call_id": "03df6124-fb27-4658-a1ce-62110d4b6f8e",
+       "start_time": "2026-11-22T12:29:18.391+00:00",
+       "duration_ms": 12378,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "3131189cba5f4f0faf484b3a100520d5",
        "call_id": "0ef87ec1-7cab-464b-b868-993d11a12fb5",
        "start_time": "2026-11-22T08:12:09.876+00:00",
        "duration_ms": 12365,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "070055a5a1284f9fb4c6e88917dd5700",
+       "call_id": "27d0282b-de07-423c-83dc-f6a75376e418",
+       "start_time": "2026-11-22T13:02:25.237+00:00",
+       "duration_ms": 12340,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "6bf426bd1d984adda59ceba163c2ec01",
+       "call_id": "a0abb121-747c-4ff3-ab57-1a3cc14ee0a2",
+       "start_time": "2026-11-22T13:07:15.041+00:00",
+       "duration_ms": 12330,
        "status": "success",
        "reason": null
       },
@@ -102571,6 +102346,30 @@
        "reason": null
       },
       {
+       "request_id": "ae057037d38e47b1b5ad3b9eea9261b9",
+       "call_id": "75e9eb10-d053-41a6-9549-54b42a25ed16",
+       "start_time": "2026-11-22T12:42:44.761+00:00",
+       "duration_ms": 11830,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "e81f372c10c1447284c046773fd1a6b1",
+       "call_id": "34683a47-6637-4835-9e50-2fce6a6601b7",
+       "start_time": "2026-11-22T13:01:03.780+00:00",
+       "duration_ms": 11823,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "9ffd2a14dad14d89af66f26679af406f",
+       "call_id": "1211c254-d3d4-482d-abb6-78716c4dfdd6",
+       "start_time": "2026-11-22T12:22:49.561+00:00",
+       "duration_ms": 11806,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "aac72bc81dc241098e3b50d126ef8de6",
        "call_id": "cc0a18ef-50b6-4590-a6cc-f23c294dace5",
        "start_time": "2026-11-22T07:53:23.825+00:00",
@@ -102587,10 +102386,82 @@
        "reason": null
       },
       {
+       "request_id": "22c4366e7b2649798f6e8c21eba6aa36",
+       "call_id": "c6713079-75d0-4df7-84e0-0b7e9b1de81d",
+       "start_time": "2026-11-22T12:59:41.670+00:00",
+       "duration_ms": 11661,
+       "status": "success",
+       "reason": null
+      },
+      {
        "request_id": "62a083775c134d478c01022a481b29f9",
        "call_id": "86b86cfb-e2f5-4fc5-ae8f-0c0ff3782a6d",
        "start_time": "2026-11-22T08:48:51.700+00:00",
        "duration_ms": 11638,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "d1d55f62b50b4f8f99538645811aab73",
+       "call_id": "8baa2e93-232a-40ce-aebe-f35bdf61d5fb",
+       "start_time": "2026-11-22T12:24:12.415+00:00",
+       "duration_ms": 11637,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "1edf153255c9401b8cfa9ec1d760553b",
+       "call_id": "3471a20c-abab-4b5d-a375-ba5315a8b8f6",
+       "start_time": "2026-11-22T06:43:00.011+00:00",
+       "duration_ms": 11632,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "75e0a63ea52f447ea04ba505a01ffa12",
+       "call_id": "a37cea19-8687-41c3-b949-52f7e0240b10",
+       "start_time": "2026-11-22T05:24:23.128+00:00",
+       "duration_ms": 11624,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "78bb5e6f2a6e4c59bbd6d4ab7fa16f31",
+       "call_id": "d37024b7-a80e-48fb-b4d7-9fbd433aee61",
+       "start_time": "2026-11-22T05:25:49.413+00:00",
+       "duration_ms": 11596,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "b096b37f809b4948b58c9a6d622f2b75",
+       "call_id": "0bb42770-fc03-408f-8aa4-e9aefc275e57",
+       "start_time": "2026-11-22T08:28:13.109+00:00",
+       "duration_ms": 11550,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "1578d1665ab4461898b4c9c29f378d96",
+       "call_id": "987f41d0-8493-4c37-9744-147319375c93",
+       "start_time": "2026-11-22T13:14:05.539+00:00",
+       "duration_ms": 11549,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "c7e4fe8570fe497785b5f328b1cec0f4",
+       "call_id": "7a20c298-f57a-438c-ad45-063003b11194",
+       "start_time": "2026-11-22T08:44:25.934+00:00",
+       "duration_ms": 11518,
+       "status": "success",
+       "reason": null
+      },
+      {
+       "request_id": "a8e29ba4e7eb48e58429a01941e2e702",
+       "call_id": "cd203679-352b-4e73-bc5e-5efdc4da209e",
+       "start_time": "2026-11-22T12:48:52.403+00:00",
+       "duration_ms": 11495,
        "status": "success",
        "reason": null
       }
@@ -102601,12 +102472,12 @@
    "latest": {
     "date": "2026-11-22",
     "status": "COMPLETED",
-    "partial": true,
-    "query_ms": 4941,
-    "duration_sum_ms": 3320227,
-    "duration_sample_count": 672,
-    "duration_p50_ms": 3748,
-    "duration_p95_ms": 11638,
+    "partial": false,
+    "query_ms": 5441,
+    "duration_sum_ms": 5348390,
+    "duration_sample_count": 983,
+    "duration_p50_ms": 5187,
+    "duration_p95_ms": 11495,
     "duration_histogram": [
      [
       315,
@@ -102621,11 +102492,19 @@
       1
      ],
      [
+      331,
+      1
+     ],
+     [
       332,
       1
      ],
      [
       333,
+      1
+     ],
+     [
+      336,
       1
      ],
      [
@@ -102638,6 +102517,10 @@
      ],
      [
       344,
+      1
+     ],
+     [
+      345,
       1
      ],
      [
@@ -102666,7 +102549,7 @@
      ],
      [
       356,
-      1
+      3
      ],
      [
       357,
@@ -102694,7 +102577,7 @@
      ],
      [
       364,
-      1
+      2
      ],
      [
       365,
@@ -102730,11 +102613,11 @@
      ],
      [
       373,
-      7
+      8
      ],
      [
       374,
-      14
+      15
      ],
      [
       375,
@@ -102742,7 +102625,7 @@
      ],
      [
       376,
-      4
+      6
      ],
      [
       377,
@@ -102750,11 +102633,11 @@
      ],
      [
       378,
-      14
+      17
      ],
      [
       379,
-      5
+      7
      ],
      [
       380,
@@ -102762,35 +102645,35 @@
      ],
      [
       381,
-      4
-     ],
-     [
-      382,
-      4
-     ],
-     [
-      383,
       7
      ],
      [
-      384,
+      382,
       6
      ],
      [
-      385,
-      5
-     ],
-     [
-      386,
+      383,
       10
      ],
      [
-      387,
+      384,
+      9
+     ],
+     [
+      385,
       6
      ],
      [
+      386,
+      11
+     ],
+     [
+      387,
+      7
+     ],
+     [
       388,
-      8
+      10
      ],
      [
       389,
@@ -102798,27 +102681,27 @@
      ],
      [
       390,
-      10
+      12
      ],
      [
       391,
-      10
-     ],
-     [
-      392,
-      5
-     ],
-     [
-      393,
       11
      ],
      [
+      392,
+      8
+     ],
+     [
+      393,
+      14
+     ],
+     [
       394,
-      10
+      12
      ],
      [
       395,
-      12
+      13
      ],
      [
       396,
@@ -102826,35 +102709,35 @@
      ],
      [
       397,
-      6
-     ],
-     [
-      398,
-      14
-     ],
-     [
-      399,
-      6
-     ],
-     [
-      400,
-      9
-     ],
-     [
-      401,
-      7
-     ],
-     [
-      402,
-      7
-     ],
-     [
-      403,
       8
      ],
      [
+      398,
+      16
+     ],
+     [
+      399,
+      9
+     ],
+     [
+      400,
+      10
+     ],
+     [
+      401,
+      11
+     ],
+     [
+      402,
+      11
+     ],
+     [
+      403,
+      10
+     ],
+     [
       404,
-      2
+      3
      ],
      [
       405,
@@ -102865,12 +102748,16 @@
       3
      ],
      [
+      407,
+      4
+     ],
+     [
       408,
-      3
+      5
      ],
      [
       409,
-      4
+      5
      ],
      [
       410,
@@ -102881,92 +102768,100 @@
       1
      ],
      [
-      413,
+      412,
       2
      ],
      [
+      413,
+      4
+     ],
+     [
       414,
-      1
+      6
      ],
      [
       415,
-      3
+      4
      ],
      [
       416,
-      1
+      4
      ],
      [
       417,
-      5
+      8
      ],
      [
       418,
-      5
+      6
      ],
      [
       419,
-      1
+      5
      ],
      [
       420,
-      1
+      2
      ],
      [
       421,
-      1
+      2
      ],
      [
       422,
       2
      ],
      [
-      424,
-      1
-     ],
-     [
-      425,
-      4
-     ],
-     [
-      426,
+      423,
       2
      ],
      [
-      427,
+      424,
+      2
+     ],
+     [
+      425,
       5
      ],
      [
-      428,
-      6
-     ],
-     [
-      429,
-      6
-     ],
-     [
-      430,
+      426,
       3
      ],
      [
-      431,
-      4
+      427,
+      8
      ],
      [
-      432,
-      14
+      428,
+      9
      ],
      [
-      433,
-      11
-     ],
-     [
-      434,
+      429,
       7
      ],
      [
-      435,
+      430,
+      6
+     ],
+     [
+      431,
+      5
+     ],
+     [
+      432,
+      18
+     ],
+     [
+      433,
+      14
+     ],
+     [
+      434,
       10
+     ],
+     [
+      435,
+      12
      ],
      [
       436,
@@ -102978,95 +102873,95 @@
      ],
      [
       438,
-      2
+      4
      ],
      [
       439,
-      6
+      8
      ],
      [
       441,
-      2
-     ],
-     [
-      442,
-      5
-     ],
-     [
-      443,
-      1
-     ],
-     [
-      444,
-      1
-     ],
-     [
-      445,
       3
      ],
      [
+      442,
+      6
+     ],
+     [
+      443,
+      3
+     ],
+     [
+      444,
+      7
+     ],
+     [
+      445,
+      6
+     ],
+     [
       446,
-      5
-     ],
-     [
-      447,
-      5
-     ],
-     [
-      448,
-      6
-     ],
-     [
-      449,
-      6
-     ],
-     [
-      450,
-      11
-     ],
-     [
-      451,
-      15
-     ],
-     [
-      452,
-      15
-     ],
-     [
-      453,
-      20
-     ],
-     [
-      454,
-      14
-     ],
-     [
-      455,
-      18
-     ],
-     [
-      456,
-      13
-     ],
-     [
-      457,
       9
      ],
      [
+      447,
+      14
+     ],
+     [
+      448,
+      15
+     ],
+     [
+      449,
+      12
+     ],
+     [
+      450,
+      21
+     ],
+     [
+      451,
+      24
+     ],
+     [
+      452,
+      26
+     ],
+     [
+      453,
+      30
+     ],
+     [
+      454,
+      25
+     ],
+     [
+      455,
+      33
+     ],
+     [
+      456,
+      21
+     ],
+     [
+      457,
+      14
+     ],
+     [
       458,
-      10
+      18
      ],
      [
       459,
-      1
+      9
      ],
      [
       460,
-      6
+      8
      ],
      [
       461,
-      1
+      2
      ],
      [
       462,
@@ -103074,39 +102969,47 @@
      ],
      [
       463,
+      4
+     ],
+     [
+      464,
       1
+     ],
+     [
+      465,
+      3
      ],
      [
       466,
-      3
-     ],
-     [
-      467,
-      3
-     ],
-     [
-      468,
-      3
-     ],
-     [
-      469,
-      5
-     ],
-     [
-      470,
-      2
-     ],
-     [
-      471,
-      1
-     ],
-     [
-      472,
       7
      ],
      [
+      467,
+      5
+     ],
+     [
+      468,
+      8
+     ],
+     [
+      469,
+      12
+     ],
+     [
+      470,
+      9
+     ],
+     [
+      471,
+      5
+     ],
+     [
+      472,
+      12
+     ],
+     [
       473,
-      3
+      6
      ],
      [
       474,
@@ -103114,7 +103017,7 @@
      ],
      [
       475,
-      5
+      8
      ],
      [
       476,
@@ -103146,14 +103049,14 @@
      ],
      [
       485,
-      1
+      2
      ]
     ],
-    "success_count": 672,
-    "query_count": 675,
+    "success_count": 983,
+    "query_count": 986,
     "run_id": "prod-adx-jiuwen",
     "commit": "",
-    "finished_at": "2026-11-22T09:10:20Z",
+    "finished_at": "2026-11-22T15:18:59Z",
     "failed_queries": 3,
     "unknown_status_count": 0,
     "blocked_queries": 0,
@@ -103170,8 +103073,8 @@
      "status": "success",
      "reason": null
     },
-    "slow_count": 34,
-    "slow_threshold_ms": 11638,
+    "slow_count": 50,
+    "slow_threshold_ms": 11495,
     "hours": [
      {
       "hour": 4,
@@ -103268,13 +103171,45 @@
       "duration_sum_ms": 44235,
       "duration_sample_count": 20,
       "failed": 0
+     },
+     {
+      "hour": 20,
+      "calls": 113,
+      "success_count": 113,
+      "duration_sum_ms": 682743,
+      "duration_sample_count": 113,
+      "failed": 0
+     },
+     {
+      "hour": 21,
+      "calls": 90,
+      "success_count": 90,
+      "duration_sum_ms": 560084,
+      "duration_sample_count": 90,
+      "failed": 0
+     },
+     {
+      "hour": 22,
+      "calls": 61,
+      "success_count": 61,
+      "duration_sum_ms": 447338,
+      "duration_sample_count": 61,
+      "failed": 0
+     },
+     {
+      "hour": 23,
+      "calls": 47,
+      "success_count": 47,
+      "duration_sum_ms": 337998,
+      "duration_sample_count": 47,
+      "failed": 0
      }
     ],
     "benchmark_models": [
      {
       "model": "openai/deepseek-v4.1-flash-1017",
-      "call_count": 675,
-      "success_count": 672,
+      "call_count": 986,
+      "success_count": 983,
       "failed_count": 3,
       "unknown_status_count": 0,
       "ttft_avg_ms": null,
@@ -103284,7 +103219,7 @@
       "ttft_estimated_sample_count": 0,
       "ttft_estimated_sum_ms": null,
       "ttft_estimated_histogram": [],
-      "ttft_filtered_count": 330,
+      "ttft_filtered_count": 493,
       "tpot_avg_ms": null,
       "tpot_sample_count": 0,
       "tpot_decode_sum_ms": null,
@@ -103295,11 +103230,11 @@
       "tpot_estimated_weight_tokens": 0,
       "tpot_histogram": [],
       "tpot_estimated_histogram": [],
-      "tpot_filtered_count": 330,
-      "duration_sum_ms": 3320227,
-      "duration_p50_ms": 3748,
-      "duration_p95_ms": 11638,
-      "duration_sample_count": 672,
+      "tpot_filtered_count": 493,
+      "duration_sum_ms": 5348390,
+      "duration_p50_ms": 5187,
+      "duration_p95_ms": 11495,
+      "duration_sample_count": 983,
       "duration_histogram": [
        [
         315,
@@ -103314,11 +103249,19 @@
         1
        ],
        [
+        331,
+        1
+       ],
+       [
         332,
         1
        ],
        [
         333,
+        1
+       ],
+       [
+        336,
         1
        ],
        [
@@ -103331,6 +103274,10 @@
        ],
        [
         344,
+        1
+       ],
+       [
+        345,
         1
        ],
        [
@@ -103359,7 +103306,7 @@
        ],
        [
         356,
-        1
+        3
        ],
        [
         357,
@@ -103387,7 +103334,7 @@
        ],
        [
         364,
-        1
+        2
        ],
        [
         365,
@@ -103423,11 +103370,11 @@
        ],
        [
         373,
-        7
+        8
        ],
        [
         374,
-        14
+        15
        ],
        [
         375,
@@ -103435,7 +103382,7 @@
        ],
        [
         376,
-        4
+        6
        ],
        [
         377,
@@ -103443,11 +103390,11 @@
        ],
        [
         378,
-        14
+        17
        ],
        [
         379,
-        5
+        7
        ],
        [
         380,
@@ -103455,35 +103402,35 @@
        ],
        [
         381,
-        4
-       ],
-       [
-        382,
-        4
-       ],
-       [
-        383,
         7
        ],
        [
-        384,
+        382,
         6
        ],
        [
-        385,
-        5
-       ],
-       [
-        386,
+        383,
         10
        ],
        [
-        387,
+        384,
+        9
+       ],
+       [
+        385,
         6
        ],
        [
+        386,
+        11
+       ],
+       [
+        387,
+        7
+       ],
+       [
         388,
-        8
+        10
        ],
        [
         389,
@@ -103491,27 +103438,27 @@
        ],
        [
         390,
-        10
+        12
        ],
        [
         391,
-        10
-       ],
-       [
-        392,
-        5
-       ],
-       [
-        393,
         11
        ],
        [
+        392,
+        8
+       ],
+       [
+        393,
+        14
+       ],
+       [
         394,
-        10
+        12
        ],
        [
         395,
-        12
+        13
        ],
        [
         396,
@@ -103519,35 +103466,35 @@
        ],
        [
         397,
-        6
-       ],
-       [
-        398,
-        14
-       ],
-       [
-        399,
-        6
-       ],
-       [
-        400,
-        9
-       ],
-       [
-        401,
-        7
-       ],
-       [
-        402,
-        7
-       ],
-       [
-        403,
         8
        ],
        [
+        398,
+        16
+       ],
+       [
+        399,
+        9
+       ],
+       [
+        400,
+        10
+       ],
+       [
+        401,
+        11
+       ],
+       [
+        402,
+        11
+       ],
+       [
+        403,
+        10
+       ],
+       [
         404,
-        2
+        3
        ],
        [
         405,
@@ -103558,12 +103505,16 @@
         3
        ],
        [
+        407,
+        4
+       ],
+       [
         408,
-        3
+        5
        ],
        [
         409,
-        4
+        5
        ],
        [
         410,
@@ -103574,92 +103525,100 @@
         1
        ],
        [
-        413,
+        412,
         2
        ],
        [
+        413,
+        4
+       ],
+       [
         414,
-        1
+        6
        ],
        [
         415,
-        3
+        4
        ],
        [
         416,
-        1
+        4
        ],
        [
         417,
-        5
+        8
        ],
        [
         418,
-        5
+        6
        ],
        [
         419,
-        1
+        5
        ],
        [
         420,
-        1
+        2
        ],
        [
         421,
-        1
+        2
        ],
        [
         422,
         2
        ],
        [
-        424,
-        1
-       ],
-       [
-        425,
-        4
-       ],
-       [
-        426,
+        423,
         2
        ],
        [
-        427,
+        424,
+        2
+       ],
+       [
+        425,
         5
        ],
        [
-        428,
-        6
-       ],
-       [
-        429,
-        6
-       ],
-       [
-        430,
+        426,
         3
        ],
        [
-        431,
-        4
+        427,
+        8
        ],
        [
-        432,
-        14
+        428,
+        9
        ],
        [
-        433,
-        11
-       ],
-       [
-        434,
+        429,
         7
        ],
        [
-        435,
+        430,
+        6
+       ],
+       [
+        431,
+        5
+       ],
+       [
+        432,
+        18
+       ],
+       [
+        433,
+        14
+       ],
+       [
+        434,
         10
+       ],
+       [
+        435,
+        12
        ],
        [
         436,
@@ -103671,95 +103630,95 @@
        ],
        [
         438,
-        2
+        4
        ],
        [
         439,
-        6
+        8
        ],
        [
         441,
-        2
-       ],
-       [
-        442,
-        5
-       ],
-       [
-        443,
-        1
-       ],
-       [
-        444,
-        1
-       ],
-       [
-        445,
         3
        ],
        [
+        442,
+        6
+       ],
+       [
+        443,
+        3
+       ],
+       [
+        444,
+        7
+       ],
+       [
+        445,
+        6
+       ],
+       [
         446,
-        5
-       ],
-       [
-        447,
-        5
-       ],
-       [
-        448,
-        6
-       ],
-       [
-        449,
-        6
-       ],
-       [
-        450,
-        11
-       ],
-       [
-        451,
-        15
-       ],
-       [
-        452,
-        15
-       ],
-       [
-        453,
-        20
-       ],
-       [
-        454,
-        14
-       ],
-       [
-        455,
-        18
-       ],
-       [
-        456,
-        13
-       ],
-       [
-        457,
         9
        ],
        [
+        447,
+        14
+       ],
+       [
+        448,
+        15
+       ],
+       [
+        449,
+        12
+       ],
+       [
+        450,
+        21
+       ],
+       [
+        451,
+        24
+       ],
+       [
+        452,
+        26
+       ],
+       [
+        453,
+        30
+       ],
+       [
+        454,
+        25
+       ],
+       [
+        455,
+        33
+       ],
+       [
+        456,
+        21
+       ],
+       [
+        457,
+        14
+       ],
+       [
         458,
-        10
+        18
        ],
        [
         459,
-        1
+        9
        ],
        [
         460,
-        6
+        8
        ],
        [
         461,
-        1
+        2
        ],
        [
         462,
@@ -103767,39 +103726,47 @@
        ],
        [
         463,
+        4
+       ],
+       [
+        464,
         1
+       ],
+       [
+        465,
+        3
        ],
        [
         466,
-        3
-       ],
-       [
-        467,
-        3
-       ],
-       [
-        468,
-        3
-       ],
-       [
-        469,
-        5
-       ],
-       [
-        470,
-        2
-       ],
-       [
-        471,
-        1
-       ],
-       [
-        472,
         7
        ],
        [
+        467,
+        5
+       ],
+       [
+        468,
+        8
+       ],
+       [
+        469,
+        12
+       ],
+       [
+        470,
+        9
+       ],
+       [
+        471,
+        5
+       ],
+       [
+        472,
+        12
+       ],
+       [
         473,
-        3
+        6
        ],
        [
         474,
@@ -103807,7 +103774,7 @@
        ],
        [
         475,
-        5
+        8
        ],
        [
         476,
@@ -103839,13 +103806,13 @@
        ],
        [
         485,
-        1
+        2
        ]
       ],
-      "input_tokens": 15495880,
-      "output_tokens": 567429,
-      "total_tokens": 16063309,
-      "token_sample_count": 672,
+      "input_tokens": 25148711,
+      "output_tokens": 914634,
+      "total_tokens": 26063345,
+      "token_sample_count": 983,
       "token_coverage": 1.0,
       "failed_input_tokens": 126922,
       "failed_output_tokens": 0,
@@ -103859,6 +103826,14 @@
       "call_id": "20199eee-64d3-47ec-b810-fa93fa709635",
       "start_time": "2026-11-22T05:32:08.384+00:00",
       "duration_ms": 14991,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "090f2c55564949da99a1c98774899d74",
+      "call_id": "0c50edc7-7f9a-4ce7-a137-e50140f07448",
+      "start_time": "2026-11-22T12:50:17.441+00:00",
+      "duration_ms": 14950,
       "status": "success",
       "reason": null
      },
@@ -104039,10 +104014,34 @@
       "reason": null
      },
      {
+      "request_id": "df8dc53ea71b4602886caa6a621d9732",
+      "call_id": "03df6124-fb27-4658-a1ce-62110d4b6f8e",
+      "start_time": "2026-11-22T12:29:18.391+00:00",
+      "duration_ms": 12378,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "3131189cba5f4f0faf484b3a100520d5",
       "call_id": "0ef87ec1-7cab-464b-b868-993d11a12fb5",
       "start_time": "2026-11-22T08:12:09.876+00:00",
       "duration_ms": 12365,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "070055a5a1284f9fb4c6e88917dd5700",
+      "call_id": "27d0282b-de07-423c-83dc-f6a75376e418",
+      "start_time": "2026-11-22T13:02:25.237+00:00",
+      "duration_ms": 12340,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "6bf426bd1d984adda59ceba163c2ec01",
+      "call_id": "a0abb121-747c-4ff3-ab57-1a3cc14ee0a2",
+      "start_time": "2026-11-22T13:07:15.041+00:00",
+      "duration_ms": 12330,
       "status": "success",
       "reason": null
      },
@@ -104103,6 +104102,30 @@
       "reason": null
      },
      {
+      "request_id": "ae057037d38e47b1b5ad3b9eea9261b9",
+      "call_id": "75e9eb10-d053-41a6-9549-54b42a25ed16",
+      "start_time": "2026-11-22T12:42:44.761+00:00",
+      "duration_ms": 11830,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "e81f372c10c1447284c046773fd1a6b1",
+      "call_id": "34683a47-6637-4835-9e50-2fce6a6601b7",
+      "start_time": "2026-11-22T13:01:03.780+00:00",
+      "duration_ms": 11823,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "9ffd2a14dad14d89af66f26679af406f",
+      "call_id": "1211c254-d3d4-482d-abb6-78716c4dfdd6",
+      "start_time": "2026-11-22T12:22:49.561+00:00",
+      "duration_ms": 11806,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "aac72bc81dc241098e3b50d126ef8de6",
       "call_id": "cc0a18ef-50b6-4590-a6cc-f23c294dace5",
       "start_time": "2026-11-22T07:53:23.825+00:00",
@@ -104119,10 +104142,82 @@
       "reason": null
      },
      {
+      "request_id": "22c4366e7b2649798f6e8c21eba6aa36",
+      "call_id": "c6713079-75d0-4df7-84e0-0b7e9b1de81d",
+      "start_time": "2026-11-22T12:59:41.670+00:00",
+      "duration_ms": 11661,
+      "status": "success",
+      "reason": null
+     },
+     {
       "request_id": "62a083775c134d478c01022a481b29f9",
       "call_id": "86b86cfb-e2f5-4fc5-ae8f-0c0ff3782a6d",
       "start_time": "2026-11-22T08:48:51.700+00:00",
       "duration_ms": 11638,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "d1d55f62b50b4f8f99538645811aab73",
+      "call_id": "8baa2e93-232a-40ce-aebe-f35bdf61d5fb",
+      "start_time": "2026-11-22T12:24:12.415+00:00",
+      "duration_ms": 11637,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "1edf153255c9401b8cfa9ec1d760553b",
+      "call_id": "3471a20c-abab-4b5d-a375-ba5315a8b8f6",
+      "start_time": "2026-11-22T06:43:00.011+00:00",
+      "duration_ms": 11632,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "75e0a63ea52f447ea04ba505a01ffa12",
+      "call_id": "a37cea19-8687-41c3-b949-52f7e0240b10",
+      "start_time": "2026-11-22T05:24:23.128+00:00",
+      "duration_ms": 11624,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "78bb5e6f2a6e4c59bbd6d4ab7fa16f31",
+      "call_id": "d37024b7-a80e-48fb-b4d7-9fbd433aee61",
+      "start_time": "2026-11-22T05:25:49.413+00:00",
+      "duration_ms": 11596,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "b096b37f809b4948b58c9a6d622f2b75",
+      "call_id": "0bb42770-fc03-408f-8aa4-e9aefc275e57",
+      "start_time": "2026-11-22T08:28:13.109+00:00",
+      "duration_ms": 11550,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "1578d1665ab4461898b4c9c29f378d96",
+      "call_id": "987f41d0-8493-4c37-9744-147319375c93",
+      "start_time": "2026-11-22T13:14:05.539+00:00",
+      "duration_ms": 11549,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "c7e4fe8570fe497785b5f328b1cec0f4",
+      "call_id": "7a20c298-f57a-438c-ad45-063003b11194",
+      "start_time": "2026-11-22T08:44:25.934+00:00",
+      "duration_ms": 11518,
+      "status": "success",
+      "reason": null
+     },
+     {
+      "request_id": "a8e29ba4e7eb48e58429a01941e2e702",
+      "call_id": "cd203679-352b-4e73-bc5e-5efdc4da209e",
+      "start_time": "2026-11-22T12:48:52.403+00:00",
+      "duration_ms": 11495,
       "status": "success",
       "reason": null
      }
@@ -104306,480 +104401,6 @@
   "PROD-glm-5.2-openai-glm-5.2-8eb06d8c8024": {
    "title": "现网模型 glm-5.2",
    "points": [
-    {
-     "date": "2026-10-19",
-     "status": "COMPLETED",
-     "partial": false,
-     "query_ms": 15514,
-     "duration_sum_ms": 2637419,
-     "duration_sample_count": 170,
-     "duration_p50_ms": 9958,
-     "duration_p95_ms": 43915,
-     "success_count": 170,
-     "query_count": 256,
-     "run_id": "prod-adx-jiuwen",
-     "commit": "",
-     "finished_at": "2026-10-19T15:26:06Z",
-     "failed_queries": 86,
-     "unknown_status_count": 0,
-     "blocked_queries": 0,
-     "failure_reasons": {
-      "invalid_request": 86
-     },
-     "timeout_count": 0,
-     "latency_max_ms": 102646,
-     "latency_max_request": {
-      "request_id": "a6c627b386544aab95aacac93dd58896",
-      "call_id": "da8962f0-2e95-4b5c-8674-76be48aee4cf",
-      "start_time": "2026-10-19T06:26:43.115+00:00",
-      "duration_ms": 102646,
-      "status": "success",
-      "reason": null
-     },
-     "slow_count": 13,
-     "slow_threshold_ms": 40018,
-     "hours": [
-      {
-       "hour": 9,
-       "calls": 3,
-       "success_count": 1,
-       "duration_sum_ms": 5636,
-       "duration_sample_count": 1,
-       "failed": 2
-      },
-      {
-       "hour": 10,
-       "calls": 2,
-       "success_count": 0,
-       "duration_sum_ms": 0,
-       "duration_sample_count": 0,
-       "failed": 2
-      },
-      {
-       "hour": 11,
-       "calls": 10,
-       "success_count": 8,
-       "duration_sum_ms": 239233,
-       "duration_sample_count": 8,
-       "failed": 2
-      },
-      {
-       "hour": 14,
-       "calls": 47,
-       "success_count": 43,
-       "duration_sum_ms": 827714,
-       "duration_sample_count": 43,
-       "failed": 4
-      },
-      {
-       "hour": 15,
-       "calls": 11,
-       "success_count": 3,
-       "duration_sum_ms": 27884,
-       "duration_sample_count": 3,
-       "failed": 8
-      },
-      {
-       "hour": 16,
-       "calls": 19,
-       "success_count": 11,
-       "duration_sum_ms": 99301,
-       "duration_sample_count": 11,
-       "failed": 8
-      },
-      {
-       "hour": 17,
-       "calls": 18,
-       "success_count": 4,
-       "duration_sum_ms": 31289,
-       "duration_sample_count": 4,
-       "failed": 14
-      },
-      {
-       "hour": 18,
-       "calls": 47,
-       "success_count": 29,
-       "duration_sum_ms": 407793,
-       "duration_sample_count": 29,
-       "failed": 18
-      },
-      {
-       "hour": 19,
-       "calls": 55,
-       "success_count": 43,
-       "duration_sum_ms": 592423,
-       "duration_sample_count": 43,
-       "failed": 12
-      },
-      {
-       "hour": 20,
-       "calls": 16,
-       "success_count": 8,
-       "duration_sum_ms": 182225,
-       "duration_sample_count": 8,
-       "failed": 8
-      },
-      {
-       "hour": 22,
-       "calls": 24,
-       "success_count": 20,
-       "duration_sum_ms": 223921,
-       "duration_sample_count": 20,
-       "failed": 4
-      },
-      {
-       "hour": 23,
-       "calls": 4,
-       "success_count": 0,
-       "duration_sum_ms": 0,
-       "duration_sample_count": 0,
-       "failed": 4
-      }
-     ],
-     "benchmark_models": [
-      {
-       "model": "openai/glm-5.2",
-       "call_count": 256,
-       "success_count": 170,
-       "failed_count": 86,
-       "unknown_status_count": 0,
-       "ttft_avg_ms": null,
-       "ttft_sample_count": 0,
-       "ttft_sum_ms": null,
-       "ttft_estimated_avg_ms": 5459,
-       "ttft_estimated_sample_count": 168,
-       "ttft_estimated_sum_ms": 917150,
-       "ttft_estimated_histogram": [
-        [
-         386,
-         1
-        ],
-        [
-         397,
-         1
-        ],
-        [
-         398,
-         1
-        ],
-        [
-         404,
-         1
-        ],
-        [
-         405,
-         1
-        ],
-        [
-         406,
-         1
-        ],
-        [
-         409,
-         1
-        ],
-        [
-         410,
-         1
-        ],
-        [
-         411,
-         1
-        ],
-        [
-         414,
-         1
-        ],
-        [
-         415,
-         1
-        ],
-        [
-         416,
-         2
-        ],
-        [
-         417,
-         2
-        ],
-        [
-         418,
-         3
-        ],
-        [
-         419,
-         1
-        ],
-        [
-         420,
-         2
-        ],
-        [
-         421,
-         7
-        ],
-        [
-         422,
-         3
-        ],
-        [
-         423,
-         1
-        ],
-        [
-         424,
-         3
-        ],
-        [
-         425,
-         3
-        ],
-        [
-         426,
-         3
-        ],
-        [
-         427,
-         5
-        ],
-        [
-         428,
-         5
-        ],
-        [
-         429,
-         8
-        ],
-        [
-         430,
-         3
-        ],
-        [
-         431,
-         4
-        ],
-        [
-         432,
-         8
-        ],
-        [
-         433,
-         10
-        ],
-        [
-         434,
-         9
-        ],
-        [
-         435,
-         9
-        ],
-        [
-         436,
-         6
-        ],
-        [
-         437,
-         9
-        ],
-        [
-         438,
-         6
-        ],
-        [
-         439,
-         9
-        ],
-        [
-         440,
-         3
-        ],
-        [
-         441,
-         6
-        ],
-        [
-         442,
-         2
-        ],
-        [
-         443,
-         3
-        ],
-        [
-         444,
-         4
-        ],
-        [
-         446,
-         3
-        ],
-        [
-         447,
-         2
-        ],
-        [
-         448,
-         3
-        ],
-        [
-         449,
-         1
-        ],
-        [
-         450,
-         1
-        ],
-        [
-         452,
-         1
-        ],
-        [
-         453,
-         1
-        ],
-        [
-         457,
-         1
-        ],
-        [
-         459,
-         1
-        ],
-        [
-         461,
-         1
-        ],
-        [
-         464,
-         1
-        ],
-        [
-         471,
-         1
-        ],
-        [
-         473,
-         1
-        ]
-       ],
-       "ttft_filtered_count": 2,
-       "tpot_avg_ms": null,
-       "tpot_sample_count": 0,
-       "tpot_decode_sum_ms": null,
-       "tpot_weight_tokens": 0,
-       "tpot_estimated_avg_ms": 22.5792362011055,
-       "tpot_estimated_sample_count": 168,
-       "tpot_estimated_decode_sum_ms": 1707487.0,
-       "tpot_estimated_weight_tokens": 75622,
-       "tpot_histogram": [],
-       "tpot_estimated_histogram": [
-        [
-         147,
-         1
-        ],
-        [
-         149,
-         2
-        ],
-        [
-         150,
-         5
-        ],
-        [
-         151,
-         3
-        ],
-        [
-         152,
-         6
-        ],
-        [
-         153,
-         6
-        ],
-        [
-         154,
-         17
-        ],
-        [
-         155,
-         12
-        ],
-        [
-         156,
-         23
-        ],
-        [
-         157,
-         15
-        ],
-        [
-         158,
-         12
-        ],
-        [
-         159,
-         14
-        ],
-        [
-         160,
-         16
-        ],
-        [
-         161,
-         8
-        ],
-        [
-         162,
-         9
-        ],
-        [
-         163,
-         7
-        ],
-        [
-         164,
-         1
-        ],
-        [
-         165,
-         6
-        ],
-        [
-         167,
-         1
-        ],
-        [
-         168,
-         1
-        ],
-        [
-         169,
-         2
-        ],
-        [
-         177,
-         1
-        ]
-       ],
-       "tpot_filtered_count": 1,
-       "duration_sum_ms": 2637419,
-       "duration_p50_ms": 9958,
-       "duration_p95_ms": 43915,
-       "duration_sample_count": 170,
-       "input_tokens": 5474018,
-       "output_tokens": 75829,
-       "total_tokens": 5549847,
-       "token_sample_count": 170,
-       "token_coverage": 1.0,
-       "failed_input_tokens": 1204,
-       "failed_output_tokens": 0,
-       "failed_total_tokens": 1204,
-       "failed_token_sample_count": 86
-      }
-     ]
-    },
     {
      "date": "2026-10-20",
      "status": "COMPLETED",
@@ -109829,146 +109450,6 @@
   "PROD-openpangu-2.0-pro-openai-openpangu-2.0-pro-951356c27a65": {
    "title": "现网模型 openpangu-2.0-pro",
    "points": [
-    {
-     "date": "2026-10-19",
-     "status": "FAILED",
-     "partial": false,
-     "query_ms": null,
-     "duration_sum_ms": null,
-     "duration_sample_count": 0,
-     "duration_p50_ms": null,
-     "duration_p95_ms": null,
-     "success_count": 0,
-     "query_count": 34,
-     "run_id": "prod-adx-jiuwen",
-     "commit": "",
-     "finished_at": "2026-10-19T15:26:07Z",
-     "failed_queries": 34,
-     "unknown_status_count": 0,
-     "blocked_queries": 0,
-     "failure_reasons": {
-      "invalid_request": 34
-     },
-     "timeout_count": 0,
-     "latency_max_ms": 780,
-     "latency_max_request": {
-      "request_id": "b07556bd-9998-486a-85b6-42b5ba291ef3",
-      "call_id": "b07556bd-9998-486a-85b6-42b5ba291ef3",
-      "start_time": "2026-10-19T02:46:41.102+00:00",
-      "duration_ms": 780,
-      "status": "failure",
-      "reason": "invalid_request"
-     },
-     "slow_count": 2,
-     "slow_threshold_ms": 701,
-     "hours": [
-      {
-       "hour": 10,
-       "calls": 2,
-       "success_count": 0,
-       "duration_sum_ms": 0,
-       "duration_sample_count": 0,
-       "failed": 2
-      },
-      {
-       "hour": 15,
-       "calls": 2,
-       "success_count": 0,
-       "duration_sum_ms": 0,
-       "duration_sample_count": 0,
-       "failed": 2
-      },
-      {
-       "hour": 17,
-       "calls": 6,
-       "success_count": 0,
-       "duration_sum_ms": 0,
-       "duration_sample_count": 0,
-       "failed": 6
-      },
-      {
-       "hour": 18,
-       "calls": 10,
-       "success_count": 0,
-       "duration_sum_ms": 0,
-       "duration_sample_count": 0,
-       "failed": 10
-      },
-      {
-       "hour": 19,
-       "calls": 4,
-       "success_count": 0,
-       "duration_sum_ms": 0,
-       "duration_sample_count": 0,
-       "failed": 4
-      },
-      {
-       "hour": 20,
-       "calls": 4,
-       "success_count": 0,
-       "duration_sum_ms": 0,
-       "duration_sample_count": 0,
-       "failed": 4
-      },
-      {
-       "hour": 22,
-       "calls": 2,
-       "success_count": 0,
-       "duration_sum_ms": 0,
-       "duration_sample_count": 0,
-       "failed": 2
-      },
-      {
-       "hour": 23,
-       "calls": 4,
-       "success_count": 0,
-       "duration_sum_ms": 0,
-       "duration_sample_count": 0,
-       "failed": 4
-      }
-     ],
-     "benchmark_models": [
-      {
-       "model": "openai/openpangu-2.0-pro",
-       "call_count": 34,
-       "success_count": 0,
-       "failed_count": 34,
-       "unknown_status_count": 0,
-       "ttft_avg_ms": null,
-       "ttft_sample_count": 0,
-       "ttft_sum_ms": null,
-       "ttft_estimated_avg_ms": null,
-       "ttft_estimated_sample_count": 0,
-       "ttft_estimated_sum_ms": null,
-       "ttft_estimated_histogram": [],
-       "ttft_filtered_count": 0,
-       "tpot_avg_ms": null,
-       "tpot_sample_count": 0,
-       "tpot_decode_sum_ms": null,
-       "tpot_weight_tokens": 0,
-       "tpot_estimated_avg_ms": null,
-       "tpot_estimated_sample_count": 0,
-       "tpot_estimated_decode_sum_ms": null,
-       "tpot_estimated_weight_tokens": 0,
-       "tpot_histogram": [],
-       "tpot_estimated_histogram": [],
-       "tpot_filtered_count": 0,
-       "duration_sum_ms": null,
-       "duration_p50_ms": null,
-       "duration_p95_ms": null,
-       "duration_sample_count": 0,
-       "input_tokens": null,
-       "output_tokens": null,
-       "total_tokens": null,
-       "token_sample_count": 0,
-       "token_coverage": null,
-       "failed_input_tokens": 476,
-       "failed_output_tokens": 0,
-       "failed_total_tokens": 476,
-       "failed_token_sample_count": 34
-      }
-     ]
-    },
     {
      "date": "2026-10-20",
      "status": "FAILED",
