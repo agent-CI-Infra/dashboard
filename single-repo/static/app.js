@@ -1415,9 +1415,12 @@
   }
 
   function performanceSection() {
-    const pausedE2E = (STATE.performance?.runs || []).filter((r) => r.status === 'skipped').sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))[0];
-    const pausedBanner = pausedE2E ? `<div class="banner warn"><span class="icon">▲</span><div><div class="title">E2E 未运行：${esc(pausedE2E.reason || 'nightly 未运行')}</div><div>${esc(pausedE2E.branch || '')} · ${esc(pausedE2E.createdAt || '')}</div></div></div>` : '';
-    return pausedBanner + performanceSectionInner();
+    const runs = Array.isArray(STATE.performance?.runs) ? STATE.performance.runs : [];
+    const latest = (statuses) => runs.filter((r) => statuses.includes(r.status)).sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))[0];
+    const failedE2E = latest(['failed', 'blocked']);
+    const pausedE2E = latest(['skipped']);
+    const banner = (run, title) => run ? `<div class="banner warn"><span class="icon">▲</span><div><div class="title">${title}：${esc(run.reason || 'nightly 未完成')}</div><div>${esc(run.branch || '')} · ${esc(run.createdAt || '')}</div></div></div>` : '';
+    return banner(failedE2E, 'E2E 最近一次运行失败') + banner(pausedE2E, 'E2E 未运行') + performanceSectionInner();
   }
 
   function performanceSectionInner() {
