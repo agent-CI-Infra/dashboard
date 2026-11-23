@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-23T09:35:00Z",
+  "updatedAt": "2026-11-23T17:45:00Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -297,6 +297,31 @@
         "machine": "",
         "issues": [
           "main nightly paused by operator until 2026-11-25; release_v0.1.13 slots continue"
+        ],
+        "cases": [],
+        "liveWire": null,
+        "component": null
+      }
+    },
+    {
+      "runId": 45212006953,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45212006953",
+      "createdAt": "2026-11-23T16:00:13Z",
+      "headSha": "cce587e4ba42",
+      "conclusion": "failure",
+      "branch": "release_v0.1.13",
+      "st": {
+        "runId": "nightly-45212006953-1",
+        "status": "failed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "ST job failed at Run real DigitalMate ST; job log unavailable (BlobNotFound); artifacts=0 (#1710).",
+          "Component session-proximity failed; attachment-policy/markdown/suggestions passed (#2531).",
+          "Live-wire all suites blocked (connection/business/identity/forward/chunks/artifact).",
+          "E2E final-image gate failed; 27 cases: 13 completed, 6 blocked; e2e-performance.json missing (#1710)."
         ],
         "cases": [],
         "liveWire": null,
