@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-23T09:12:05Z",
+  "updatedAt": "2026-11-23T09:13:43Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -275,7 +275,8 @@
         "machine": "PC-20261103OHIZ",
         "issues": [
           "ST job failed on real_model_txt_download_and_content (text-file); no ST artifact uploaded (#1710); rows reconstructed from the job log.",
-          "Manual text-file rerun on winbox passed (summary.json: pdf-content and docx-content both match); the nightly failure is not reproducible in the current ST environment."
+          "Manual text-file rerun on winbox passed (summary.json: pdf-content and docx-content both match); the nightly failure is not reproducible in the current ST environment.",
+          "live-wire: connection/business/identity/chunks passed; forward failed; artifact blocked. identity/artifact cases are excluded from this board as in #482."
         ],
         "cases": [
           {
@@ -433,10 +434,10 @@
             "key": "protocol-unknown-event-forward-compat",
             "title": "当前真实事件的未知类型和新增字段兼容",
             "coverageId": "PRO-03",
-            "status": "passed",
+            "status": "failed",
             "elapsedMs": null,
             "stage": "",
-            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+            "detail": "live-wire forward suite failed (exitCode 1, evidenceStatus=failed); elapsed not recoverable (artifact quota #1710)"
           },
           {
             "name": "protocol_chunk_boundary_reassembly",
@@ -578,7 +579,8 @@
         "runner": "digitalmate-win-st-01",
         "machine": "PC-20261103OHIZ",
         "issues": [
-          "ST job success; no ST artifact uploaded (Actions artifact quota #1710); rows reconstructed from the job log."
+          "ST job success; no ST artifact uploaded (Actions artifact quota #1710); rows reconstructed from the job log.",
+          "live-wire: connection/business/forward/chunks passed; identity and artifact blocked (excluded from this board as in #482)."
         ],
         "cases": [
           {
