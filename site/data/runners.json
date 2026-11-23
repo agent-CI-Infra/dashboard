@@ -1,28 +1,20 @@
 {
-  "updatedAt": "2026-11-23T02:54:31Z",
+  "updatedAt": "2026-11-23T12:16:54Z",
   "source": "openJiuwen-ai/DigitalMate",
   "runners": [
     {
       "id": 21,
       "name": "HwdeMacBook-Air-2",
       "os": "macOS",
-      "status": "offline",
-      "busy": true,
+      "status": "online",
+      "busy": false,
       "labels": [
         "self-hosted",
         "macOS",
         "ARM64",
         "harmonyos",
         "digitalmate-ci"
-      ],
-      "job": {
-        "name": "Update HK DigitalMate (latest main)",
-        "workflow": "Nightly",
-        "run_number": 495,
-        "run_id": 45099934169,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45099934169",
-        "started_at": "2026-11-23T02:23:39Z"
-      }
+      ]
     },
     {
       "id": 31,
@@ -168,7 +160,7 @@
       "name": "dm-hk-ci-02",
       "os": "Linux",
       "status": "online",
-      "busy": false,
+      "busy": true,
       "labels": [
         "self-hosted",
         "X64",
@@ -176,7 +168,15 @@
         "dm-codecheck",
         "dm-nodeut",
         "dm-architecture"
-      ]
+      ],
+      "job": {
+        "name": "size",
+        "workflow": "repo-size-guard",
+        "run_number": 1964,
+        "run_id": 45172770282,
+        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45172770282",
+        "started_at": "2026-11-23T12:16:46Z"
+      }
     },
     {
       "id": 35,
@@ -255,32 +255,32 @@
       "name": "dm-hk-ci-08",
       "os": "Linux",
       "status": "online",
-      "busy": false,
+      "busy": true,
       "labels": [
         "self-hosted",
         "X64",
         "Linux",
         "dm-codecheck",
         "dm-nodeut"
-      ]
+      ],
+      "job": {
+        "name": "2 · ArkTS Lint / ArkTS Code Check",
+        "workflow": "CI Advisory",
+        "run_number": 351,
+        "run_id": 45172655239,
+        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45172655239",
+        "started_at": "2026-11-23T12:16:48Z"
+      }
     },
     {
       "id": 43,
       "name": "harmonyos-ut-01",
       "os": "unknown",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "harmonyos-ut"
-      ],
-      "job": {
-        "name": "Fast Checks / 2 · HarmonyOS UT",
-        "workflow": "CI Advisory",
-        "run_number": 233,
-        "run_id": 45100138154,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45100138154",
-        "started_at": "2026-11-23T02:37:22Z"
-      }
+      ]
     },
     {
       "id": 46,
@@ -1296,6 +1296,40 @@
       "j": {
         "HwdeMacBook-Air-2": "Update HK DigitalMate (latest main)",
         "harmonyos-ut-01": "Fast Checks / 2 · HarmonyOS UT"
+      }
+    },
+    {
+      "at": "2026-11-23T12:16:54Z",
+      "s": {
+        "HwdeMacBook-Air-2": "online",
+        "digitalmate-win-st-01": "online",
+        "digitalmate-win-st-02": "online",
+        "digitalmate-win-st-03": "online",
+        "digitalmate-win-st-04": "online",
+        "dm-cloud-codecheck-02": "online",
+        "dm-cloud-flex-01": "online",
+        "dm-cloud-nodeut-01": "online",
+        "dm-cloud-nodeut-02": "online",
+        "dm-hk-ci-01": "online",
+        "dm-hk-ci-02": "online",
+        "dm-hk-ci-03": "online",
+        "dm-hk-ci-04": "online",
+        "dm-hk-ci-05": "online",
+        "dm-hk-ci-06": "online",
+        "dm-hk-ci-07": "online",
+        "dm-hk-ci-08": "online",
+        "harmonyos-ut-01": "online",
+        "merge-01": "online",
+        "merge-gate-01": "online",
+        "runtime-ut-01": "online"
+      },
+      "b": {
+        "dm-hk-ci-02": true,
+        "dm-hk-ci-08": true
+      },
+      "j": {
+        "dm-hk-ci-02": "size",
+        "dm-hk-ci-08": "2 · ArkTS Lint / ArkTS Code Check"
       }
     }
   ]
