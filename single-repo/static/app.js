@@ -1415,6 +1415,12 @@
   }
 
   function performanceSection() {
+    const pausedE2E = (STATE.performance?.runs || []).filter((r) => r.status === 'skipped').sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))[0];
+    const pausedBanner = pausedE2E ? `<div class="banner warn"><span class="icon">▲</span><div><div class="title">E2E 未运行：${esc(pausedE2E.reason || 'nightly 未运行')}</div><div>${esc(pausedE2E.branch || '')} · ${esc(pausedE2E.createdAt || '')}</div></div></div>` : '';
+    return pausedBanner + performanceSectionInner();
+  }
+
+  function performanceSectionInner() {
     const history = STATE.performance;
     const cases = history?.cases && typeof history.cases === 'object' ? Object.values(history.cases) : [];
     if (!cases.length) return '';
