@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-21T11:30:16Z",
+  "updatedAt": "2026-11-23T09:12:05Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -259,6 +259,657 @@
     }
   ],
   "runs": [
+    {
+      "runId": 45128684093,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45128684093",
+      "createdAt": "2026-11-23T07:06:15Z",
+      "headSha": "2f07373e24d6",
+      "conclusion": "failure",
+      "branch": "release_v0.1.13",
+      "st": {
+        "runId": "nightly-45128684093-1",
+        "status": "failed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "ST job failed on real_model_txt_download_and_content (text-file); no ST artifact uploaded (#1710); rows reconstructed from the job log.",
+          "Manual text-file rerun on winbox passed (summary.json: pdf-content and docx-content both match); the nightly failure is not reproducible in the current ST environment."
+        ],
+        "cases": [
+          {
+            "name": "real_model_text_reply",
+            "key": "text",
+            "title": "文本回复",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "real_model_txt_download_and_content",
+            "key": "text-file",
+            "title": "文本生成 TXT 并下载",
+            "coverageId": "",
+            "status": "failed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "real_model_multi_turn",
+            "key": "multi",
+            "title": "三轮对话与上下文更新",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "real_model_file_to_text",
+            "key": "file-text",
+            "title": "上传文件并提取文本",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "real_model_file_to_file",
+            "key": "file-file",
+            "title": "上传 CSV 并生成转换文件",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "real_model_structured_choice",
+            "key": "choice",
+            "title": "结构化选项回答并继续任务",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "real_model_structured_choice_home",
+            "key": "real_model_structured_choice_home",
+            "title": "结构化选项回答并继续任务（Home 澄清卡分支）",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "reset_detached_recovery",
+            "key": "reset-detached-recovery",
+            "title": "独立房间 reset/detached 与真实断链恢复",
+            "coverageId": "REC-03",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "attachment_metadata_conflict",
+            "key": "attachment-metadata-conflict",
+            "title": "附件元数据冲突与真实云端对照",
+            "coverageId": "ATT-01",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "attachment_corrupt_recovery",
+            "key": "attachment-corrupt-recovery",
+            "title": "损坏图片与文本恢复",
+            "coverageId": "ATT-02",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "attachment_image_understanding",
+            "key": "attachment-image-understanding",
+            "title": "真实华为 HDR/MPF 相机 JPG 原图识别",
+            "coverageId": "ATT-03",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "skill_default_generation",
+            "key": "skill-default-generation",
+            "title": "默认生成技能：Word / Excel / PPT / PDF 各交付一个文件",
+            "coverageId": "SKL-01",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "skill_default_parsing",
+            "key": "skill-default-parsing",
+            "title": "默认解析技能：文本 PDF 提取与 CSV 对账单合计",
+            "coverageId": "SKL-02",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "gateway_connection",
+            "key": "connection",
+            "title": "Gateway 连接检查",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "duplicate_downlink_idempotent",
+            "key": "duplicate-downlink-idempotent",
+            "title": "同一真实确认帧三次下行与幂等恢复",
+            "coverageId": "CON-04",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "protocol_unknown_event_forward_compat",
+            "key": "protocol-unknown-event-forward-compat",
+            "title": "当前真实事件的未知类型和新增字段兼容",
+            "coverageId": "PRO-03",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "protocol_chunk_boundary_reassembly",
+            "key": "protocol-chunk-boundary-reassembly",
+            "title": "当前中英 Unicode/Markdown 文本与 UTF-8 continuation 分片重组",
+            "coverageId": "PRO-06",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "local_attachment_blocked_types",
+            "key": "local_attachment_blocked_types",
+            "title": "拒绝的类型",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "local_attachment_image_containers",
+            "key": "local_attachment_image_containers",
+            "title": "图片容器",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "local_attachment_magic_mismatch",
+            "key": "local_attachment_magic_mismatch",
+            "title": "魔数不符",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "local_attachment_size_limits",
+            "key": "local_attachment_size_limits",
+            "title": "大小限制",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "local_attachment_supported_controls",
+            "key": "local_attachment_supported_controls",
+            "title": "支持的控件",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "local_attachment_preview_decode",
+            "key": "local_attachment_preview_decode",
+            "title": "预览解码",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "fixed_review_inputs_render_on_device",
+            "key": "fixed_review_inputs_render_on_device",
+            "title": "固定输入渲染",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "native_topic_projection",
+            "key": "native_topic_projection",
+            "title": "主题投影",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "native_capacity_draft",
+            "key": "native_capacity_draft",
+            "title": "容量与草稿",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "native_capacity_controls",
+            "key": "native_capacity_controls",
+            "title": "容量与控件",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          },
+          {
+            "name": "metadata_replay_and_native_buttons",
+            "key": "metadata_replay_and_native_buttons",
+            "title": "元数据回放与原生按钮",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: 12/13 passed; text-file failed; elapsed not recoverable (artifact quota #1710). Manual text-file rerun passed on winbox at C:\\st-manual-text-file-20261123-161352."
+          }
+        ],
+        "liveWire": null,
+        "component": null
+      }
+    },
+    {
+      "runId": 45109302725,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45109302725",
+      "createdAt": "2026-11-23T04:01:06Z",
+      "headSha": "ff1f57e7bdc0",
+      "conclusion": "failure",
+      "branch": "release_v0.1.13",
+      "st": {
+        "runId": "nightly-45109302725-1",
+        "status": "passed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "ST job success; no ST artifact uploaded (Actions artifact quota #1710); rows reconstructed from the job log."
+        ],
+        "cases": [
+          {
+            "name": "real_model_text_reply",
+            "key": "text",
+            "title": "文本回复",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "real_model_txt_download_and_content",
+            "key": "text-file",
+            "title": "文本生成 TXT 并下载",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "real_model_multi_turn",
+            "key": "multi",
+            "title": "三轮对话与上下文更新",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "real_model_file_to_text",
+            "key": "file-text",
+            "title": "上传文件并提取文本",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "real_model_file_to_file",
+            "key": "file-file",
+            "title": "上传 CSV 并生成转换文件",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "real_model_structured_choice",
+            "key": "choice",
+            "title": "结构化选项回答并继续任务",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "real_model_structured_choice_home",
+            "key": "real_model_structured_choice_home",
+            "title": "结构化选项回答并继续任务（Home 澄清卡分支）",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "reset_detached_recovery",
+            "key": "reset-detached-recovery",
+            "title": "独立房间 reset/detached 与真实断链恢复",
+            "coverageId": "REC-03",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "attachment_metadata_conflict",
+            "key": "attachment-metadata-conflict",
+            "title": "附件元数据冲突与真实云端对照",
+            "coverageId": "ATT-01",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "attachment_corrupt_recovery",
+            "key": "attachment-corrupt-recovery",
+            "title": "损坏图片与文本恢复",
+            "coverageId": "ATT-02",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "attachment_image_understanding",
+            "key": "attachment-image-understanding",
+            "title": "真实华为 HDR/MPF 相机 JPG 原图识别",
+            "coverageId": "ATT-03",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "skill_default_generation",
+            "key": "skill-default-generation",
+            "title": "默认生成技能：Word / Excel / PPT / PDF 各交付一个文件",
+            "coverageId": "SKL-01",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "skill_default_parsing",
+            "key": "skill-default-parsing",
+            "title": "默认解析技能：文本 PDF 提取与 CSV 对账单合计",
+            "coverageId": "SKL-02",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "gateway_connection",
+            "key": "connection",
+            "title": "Gateway 连接检查",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "duplicate_downlink_idempotent",
+            "key": "duplicate-downlink-idempotent",
+            "title": "同一真实确认帧三次下行与幂等恢复",
+            "coverageId": "CON-04",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "protocol_unknown_event_forward_compat",
+            "key": "protocol-unknown-event-forward-compat",
+            "title": "当前真实事件的未知类型和新增字段兼容",
+            "coverageId": "PRO-03",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "protocol_chunk_boundary_reassembly",
+            "key": "protocol-chunk-boundary-reassembly",
+            "title": "当前中英 Unicode/Markdown 文本与 UTF-8 continuation 分片重组",
+            "coverageId": "PRO-06",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "local_attachment_blocked_types",
+            "key": "local_attachment_blocked_types",
+            "title": "拒绝的类型",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "local_attachment_image_containers",
+            "key": "local_attachment_image_containers",
+            "title": "图片容器",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "local_attachment_magic_mismatch",
+            "key": "local_attachment_magic_mismatch",
+            "title": "魔数不符",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "local_attachment_size_limits",
+            "key": "local_attachment_size_limits",
+            "title": "大小限制",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "local_attachment_supported_controls",
+            "key": "local_attachment_supported_controls",
+            "title": "支持的控件",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "local_attachment_preview_decode",
+            "key": "local_attachment_preview_decode",
+            "title": "预览解码",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "fixed_review_inputs_render_on_device",
+            "key": "fixed_review_inputs_render_on_device",
+            "title": "固定输入渲染",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "native_topic_projection",
+            "key": "native_topic_projection",
+            "title": "主题投影",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "native_capacity_draft",
+            "key": "native_capacity_draft",
+            "title": "容量与草稿",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "native_capacity_controls",
+            "key": "native_capacity_controls",
+            "title": "容量与控件",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          },
+          {
+            "name": "metadata_replay_and_native_buttons",
+            "key": "metadata_replay_and_native_buttons",
+            "title": "元数据回放与原生按钮",
+            "coverageId": "",
+            "status": "passed",
+            "elapsedMs": null,
+            "stage": "",
+            "detail": "reconstructed from job log: ST job success; elapsed not recoverable (artifact upload rejected by artifact quota #1710)"
+          }
+        ],
+        "liveWire": null,
+        "component": null
+      }
+    },
+    {
+      "runId": 45082619915,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45082619915",
+      "createdAt": "2026-11-22T23:19:25Z",
+      "headSha": "8c4feb381d52",
+      "conclusion": "failure",
+      "branch": "main",
+      "st": {
+        "runId": "nightly-45082619915-1",
+        "status": "skipped",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "image job failed before ST (HK image build); ST was skipped; artifacts are 0 due to quota #1710."
+        ],
+        "cases": [],
+        "liveWire": null,
+        "component": null
+      }
+    },
+    {
+      "runId": 45052600978,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45052600978",
+      "createdAt": "2026-11-22T18:00:36Z",
+      "headSha": "8c4feb381d52",
+      "conclusion": "failure",
+      "branch": "main",
+      "st": {
+        "runId": "nightly-45052600978-1",
+        "status": "skipped",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "image job failed before ST (HK image build); ST was skipped; artifacts are 0 due to quota #1710."
+        ],
+        "cases": [],
+        "liveWire": null,
+        "component": null
+      }
+    },
     {
       "runId": 44882941508,
       "attempt": 2,
