@@ -602,6 +602,157 @@
     if (note) note.textContent = `共 ${runs.length} 次运行（旧 → 新）。raw = PASS/全部；product = PASS/可判分（剔除未跑完）；工具/检索与纯推理取各轮的分组通过率。`
   }
 
+  // ------------------------------------------------------------ task matrix
+  // One row per GAIA task, one column per run in runs.json (old → new), so a
+  // regression or a fix is visible without opening each run separately.
+  const MATRIX_STATUS = {
+    PASS: { cls: 'pass', short: 'P', label: '通过' },
+    FAIL: { cls: 'fail', short: 'F', label: '未通过' },
+    NOT_RUN: { cls: 'blocked', short: 'N', label: '未运行' },
+    ERROR: { cls: 'error', short: 'E', label: '基建错误' },
+    UNKNOWN: { cls: 'unknown', short: '?', label: '未知' },
+  }
+  const bucketOf = (task) => {
+    const key = String((task && (task.bucket || task.status)) || '').toUpperCase().split('(')[0]
+    return MATRIX_STATUS[key] ? key : 'UNKNOWN'
+  }
+  const dayLabel = (run) => String(run.date || run.label || '').slice(5, 10) || '—'
+
+  let matrixData = null
+  let matrixFilter = 'all'
+  let matrixQuery = ''
+
+  async function initMatrix() {
+    const target = $('#matrix')
+    if (!target) return
+    const pick = await loadGaiaRuns()
+    if (!pick || !pick.runs.length) {
+      target.innerHTML = '<div class="empty">还没有可对比的 GAIA 运行。</div>'
+      return
+    }
+    const columns = pick.runs.slice().sort((a, b) =>
+      String(a.date || a.label || '').localeCompare(String(b.date || b.label || '')) ||
+      String(a.window || '').localeCompare(String(b.window || '')))
+    const details = await Promise.all(columns.map(async (run) => {
+      try {
+        const res = await fetch(pick.base + run.file, { cache: 'no-store' })
+        return res.ok ? await res.json() : null
+      } catch {
+        return null
+      }
+    }))
+    const rows = new Map()
+    columns.forEach((col, index) => {
+      const g = details[index]
+      col.detail = g
+      if (!g || !Array.isArray(g.tasks)) return
+      for (const task of g.tasks) {
+        if (!task.id) continue
+        let row = rows.get(task.id)
+        if (!row) {
+          row = { id: task.id, cells: new Map(), seen: 0, passRuns: 0, level: null, type: '' }
+          rows.set(task.id, row)
+        }
+        row.cells.set(col.id, task)
+        row.seen += 1
+        if (bucketOf(task) === 'PASS') row.passRuns += 1
+        if (task.level) row.level = task.level
+        if (task.type) row.type = task.type
+      }
+    })
+    matrixData = { columns, rows: [...rows.values()].sort((a, b) => (a.id < b.id ? -1 : 1)) }
+    document.querySelectorAll('[data-filter]').forEach((button) => {
+      button.addEventListener('click', () => {
+        matrixFilter = button.dataset.filter
+        document.querySelectorAll('[data-filter]').forEach((item) => item.classList.toggle('active', item === button))
+        renderMatrix()
+      })
+    })
+    $('#matrix-search').addEventListener('input', (event) => {
+      matrixQuery = event.target.value || ''
+      renderMatrix()
+    })
+    renderMatrix()
+  }
+
+  function renderMatrix() {
+    const target = $('#matrix')
+    if (!target || !matrixData) return
+    const { columns, rows } = matrixData
+    const latest = columns[columns.length - 1]
+    const previous = columns.length > 1 ? columns[columns.length - 2] : null
+    const cellOf = (row, col) => (col ? row.cells.get(col.id) : null)
+
+    let fixed = 0
+    let regressed = 0
+    let stillFailing = 0
+    let added = 0
+    let missing = 0
+    for (const row of rows) {
+      const now = cellOf(row, latest)
+      const before = cellOf(row, previous)
+      if (now && !before) added += 1
+      if (!now && before) missing += 1
+      if (!now || !before) continue
+      const a = bucketOf(before)
+      const b = bucketOf(now)
+      if (a !== 'PASS' && b === 'PASS') fixed += 1
+      else if (a === 'PASS' && b !== 'PASS') regressed += 1
+      else if (b !== 'PASS') stillFailing += 1
+    }
+    $('#matrix-summary').textContent = previous
+      ? `最新两轮对比（${dayLabel(previous)} → ${dayLabel(latest)}）：修复 ${fixed} · 回归 ${regressed} · 持续未通过 ${stillFailing} · 新增题 ${added} · 本轮缺席 ${missing}`
+      : '只有一轮数据，至少两轮后才能对比变化。'
+
+    const query = matrixQuery.trim().toLowerCase()
+    const visible = rows.filter((row) => {
+      if (query && !row.id.toLowerCase().includes(query)) return false
+      if (matrixFilter === 'all') return true
+      const now = cellOf(row, latest)
+      const before = cellOf(row, previous)
+      if (matrixFilter === 'failing') return now && bucketOf(now) !== 'PASS'
+      if (!now || !before) return false
+      const a = bucketOf(before)
+      const b = bucketOf(now)
+      if (matrixFilter === 'changed') return a !== b
+      if (matrixFilter === 'regressed') return a === 'PASS' && b !== 'PASS'
+      return true
+    })
+
+    const head = columns.map((col) => {
+      const tip = `${col.label || col.id}${col.window ? `\n${col.window}` : ''}${col.note ? `\n${col.note}` : ''}`
+      const commit = String(col.commit || '').slice(0, 7)
+      return `<th class="run-col" title="${esc(tip)}"><a class="run-date" href="../data/bench/gaia-165/index.html#run-${esc(encodeURIComponent(col.id))}" target="_blank" rel="noopener">${esc(dayLabel(col))}</a><span class="run-score">${pct1(col.rate)}</span><span class="run-commit mono">${esc(commit)}</span></th>`
+    }).join('')
+    const body = visible.map((row) => {
+      const cells = columns.map((col, index) => {
+        const task = cellOf(row, col)
+        if (!task) return '<td class="cell"><span class="cell-none" title="本轮未包含此题">·</span></td>'
+        const bucket = bucketOf(task)
+        const spec = MATRIX_STATUS[bucket]
+        const tip = [
+          col.label || col.id,
+          `${spec.label}（${task.bucket || task.status}）`,
+          task.reason ? `原因 ${task.reason}` : '',
+          Number(task.durationMs) > 0 ? `时长 ${fmtMs(task.durationMs)}` : '',
+          task.tokensIn !== undefined ? `tokens ${Number(task.tokensIn).toLocaleString()} in / ${Number(task.tokensOut || 0).toLocaleString()} out` : '',
+        ].filter(Boolean).join('\n')
+        const isLatest = index === columns.length - 1 ? ' latest' : ''
+        return `<td class="cell${isLatest}"><span class="cell-mark ${spec.cls}" title="${esc(tip)}">${spec.short}</span></td>`
+      }).join('')
+      return `<tr>
+        <td class="task-col"><div class="task-line"><span class="mono task-id">${esc(row.id)}</span>${row.level ? `<span class="lvl">L${esc(row.level)}</span>` : ''}${row.type ? `<span class="task-type">${esc(row.type)}</span>` : ''}</div></td>
+        ${cells}
+        <td class="rate-col"><span class="mono">${row.passRuns}/${row.seen}</span><span class="rate-bar"><span style="width:${(row.seen ? (row.passRuns / row.seen) * 100 : 0).toFixed(0)}%"></span></span></td>
+      </tr>`
+    }).join('')
+    target.innerHTML = `<div class="scroll"><table class="matrix">
+      <thead><tr><th class="task-col">题目（${visible.length}/${rows.length}）</th>${head}<th class="rate-col">通过轮次</th></tr></thead>
+      <tbody>${body || '<tr><td class="empty" colspan="99">没有符合筛选条件的题目。</td></tr>'}</tbody>
+    </table></div>`
+    $('#matrix-note').textContent = `共 ${columns.length} 轮（旧 → 新），列头为该轮日期、raw pass@1 与 commit，点击日期看该轮逐题明细。P 通过 · F 未通过 · N 未运行（不进 product 分母） · E 基建错误 · · 本轮未包含；悬停单元格查看失败原因、时长与 token。`
+  }
+
   async function main() {
     try {
       const pick = await loadGaiaRuns()
@@ -611,6 +762,7 @@
       }
       await initGaia()
       await renderGaiaTrend()
+      await initMatrix()
     } catch (err) {
       const box = $('#error')
       if (box) { box.hidden = false; box.textContent = err.message || String(err) }

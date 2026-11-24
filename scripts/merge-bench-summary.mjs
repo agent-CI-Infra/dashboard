@@ -243,6 +243,17 @@ function entryFrom({ bench, run }) {
   }
 }
 
+// The board tracks only the full GAIA run. Component/proxy benchmarks are no
+// longer recorded; a nightly without a full GAIA result leaves the history
+// untouched instead of adding an ERROR row.
+function keepFullGaia(bench) {
+  if (!bench || !Array.isArray(bench.benchmarks)) return bench
+  const benchmarks = bench.benchmarks.filter(
+    (item) => /GAIA/i.test((item && item.name) || '') && !/component/i.test(item.name),
+  )
+  return benchmarks.length ? { ...bench, benchmarks } : null
+}
+
 function main() {
   const args = parse(process.argv.slice(2))
   const run = readJson(args.run)
@@ -250,6 +261,14 @@ function main() {
   if (!bench) {
     const report = findFile(args.bench, 'bench-report.md')
     if (report) bench = reportEntry(args.bench ? path.resolve(String(args.bench)) : '', report, run)
+  }
+  bench = keepFullGaia(bench)
+  const out = args.out || 'bench.json'
+  if (!bench) {
+    const history = previousRuns(args.previous)
+    writeFileSync(out, `${JSON.stringify({ schemaVersion: 1, updatedAt: new Date().toISOString(), runs: history }, null, 2)}\n`)
+    console.log(JSON.stringify({ out, runs: history.length, skipped: 'no full GAIA benchmark in artifacts' }))
+    return
   }
   const entry = entryFrom({ bench, run })
   if (!entry.runNumber && !entry.runId) throw new Error('no run id in artifacts or run metadata')
@@ -259,7 +278,6 @@ function main() {
   const merged = [entry, ...history.filter((item) => String(item.runId) !== String(entry.runId))]
     .sort((a, b) => new Date(b.generatedAt || 0) - new Date(a.generatedAt || 0))
     .slice(0, 60)
-  const out = args.out || 'bench.json'
   writeFileSync(out, `${JSON.stringify({ schemaVersion: 1, updatedAt: new Date().toISOString(), runs: merged }, null, 2)}\n`)
   console.log(JSON.stringify({ out, runs: merged.length, latest: entry.runId, status: entry.status }))
 }

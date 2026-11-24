@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>DigitalMate Bench</title>
-    <link rel="stylesheet" href="style.css?v=20261121.1" />
+    <link rel="stylesheet" href="style.css?v=20261124.2" />
   </head>
   <body>
     <main class="page">
@@ -48,7 +48,25 @@
         <p id="gaia-trend-note" class="muted small"></p>
       </section>
 
+      <section class="block" aria-labelledby="matrix-title">
+        <div class="block-head">
+          <h2 id="matrix-title">逐题横向对比</h2>
+          <div class="matrix-controls">
+            <div class="segmented" role="group" aria-label="状态筛选">
+              <button type="button" data-filter="all" class="active">全部</button>
+              <button type="button" data-filter="failing">最新轮未通过</button>
+              <button type="button" data-filter="changed">较上轮有变化</button>
+              <button type="button" data-filter="regressed">仅看回归</button>
+            </div>
+            <input id="matrix-search" type="search" placeholder="搜索题目 id" aria-label="搜索题目" />
+          </div>
+        </div>
+        <p id="matrix-summary" class="muted small"></p>
+        <div id="matrix" class="matrix-wrap" aria-live="polite"></div>
+        <p id="matrix-note" class="muted small" style="margin-top: 8px"></p>
+      </section>
+
       </main>
-    <script src="app.js?v=20261112.2"></script>
+    <script src="app.js?v=20261124.2"></script>
   </body>
 </html>
