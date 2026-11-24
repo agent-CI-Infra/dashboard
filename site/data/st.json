@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-24T16:40:30Z",
+  "updatedAt": "2026-11-24T18:20:00Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -259,6 +259,31 @@
     }
   ],
   "runs": [
+    {
+      "runId": 45454772455,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45454772455",
+      "createdAt": "2026-11-24T18:00:30Z",
+      "headSha": "b94420b6f066",
+      "conclusion": "failure",
+      "branch": "main",
+      "st": {
+        "runId": "nightly-45454772455-1",
+        "status": "failed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "ST blocked before case execution: Missing historical Git blob 5eea53596b85...; prepare.mjs not run (new #2683).",
+          "Component attachment-policy/session-proximity/suggestions failed on the same historical blob gap (#2683), not independent business regressions.",
+          "E2E/live-wire blocked: legacy simulator driver incompatible with HM-C1 (#2578); 0 E2E cases executed.",
+          "Bench Fetch Pi-Bench failed (HF ConnectError EOF); artifacts=0 (#1710); OBS report archive partial: digitalmate/v1/repos/openJiuwen-ai/DigitalMate/sources/nightly/runs/45454772455/attempts/1/lanes/report/manifest.json"
+        ],
+        "cases": [],
+        "liveWire": null,
+        "component": null
+      }
+    },
     {
       "runId": 45432121036,
       "attempt": 1,
