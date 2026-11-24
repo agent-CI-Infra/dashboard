@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-23T17:45:00Z",
+  "updatedAt": "2026-11-24T06:03:59Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -275,6 +275,30 @@
         "machine": "",
         "issues": [
           "main nightly paused by operator until 2026-11-25; release_v0.1.13 slots continue"
+        ],
+        "cases": [],
+        "liveWire": null,
+        "component": null
+      }
+    },
+    {
+      "runId": 45323529523,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45323529523",
+      "createdAt": "2026-11-24T04:01:56Z",
+      "headSha": "e4e56f380519",
+      "conclusion": "failure",
+      "branch": "release_v0.1.13",
+      "st": {
+        "runId": "nightly-45323529523-1",
+        "status": "failed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "ST 13/13 failed at compile independent test HAP; ComposerHost duplicates are absent; execution-error.txt unavailable (#1710).",
+          "E2E Run E2E case(s)/final-image gate failed; 16 cases, 9 failed, 1 not reviewed; per-case backend reset failed (Missing HK kubeconfig).",
+          "live-wire all suites blocked; component job failed (log BlobNotFound); Bench Fetch Pi-Bench failed."
         ],
         "cases": [],
         "liveWire": null,
