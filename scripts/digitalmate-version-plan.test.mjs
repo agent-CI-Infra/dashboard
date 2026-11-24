@@ -93,5 +93,5 @@ test('ST and E2E run displays wire the version chip next to the run id', () => {
   assert.ok(source.includes('最近一次可读取的逐用例报告：${dmVersionBadge(report.created_at)}'), 'E2E report line shows the version');
   assert.ok(source.includes('口径 ${dmVersionBadge(currentRun.at)}'), 'nightly performance header shows the version');
   assert.ok(source.includes('${dmVersionBadge(p.finished_at || p.date)}<code>'), 'performance history table shows the version');
-  assert.ok(source.includes('${esc(dmVersionText(record.created_at))}'), 'E2E record tooltips include the version');
+  assert.ok(source.includes('${dmVersionText(record.created_at)}'), 'E2E record tooltips include the version');
 });

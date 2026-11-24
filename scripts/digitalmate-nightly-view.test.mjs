@@ -65,3 +65,47 @@ test('drawer bodies load lazily from data/details.json', () => {
   assert.ok(boardLocal.includes("if(!Object.hasOwn(snapshot.details,key))"), 'later opens reuse the cached file');
   assert.ok(boardLocal.includes("catch(e){/* keep the empty cache; the fallback text still explains */}"), 'a missing file keeps the drawer usable');
 });
+
+test('Orbit UI and cloud trace helpers are removed', () => {
+  assert.ok(!/Orbit|perfCloud|PERF_PHASE_NAME/.test(app));
+});
+
+test('profiling aggregates only valid queries from completed cases', () => {
+  const start = app.indexOf('  const perfIsCompleted = ');
+  const end = app.indexOf('\n  function perfHistoryTable', start);
+  assert.ok(start >= 0 && end > start);
+  const context = vm.createContext({});
+  vm.runInContext(`${app.slice(start, end)};globalThis.stats = perfQueryStats;globalThis.mean = perfWeightedMean;globalThis.median = perfWeightedMedian;`, context);
+  const current = { status: 'COMPLETED', query_count: 3, query_ms: 400, queries: [
+    { outcome: 'completed', duration_ms: 100 },
+    { outcome: 'ok', duration_ms: 300 },
+    { outcome: 'failed', duration_ms: 900 },
+  ] };
+  const historical = { status: 'COMPLETED', query_count: 3, query_ms: 500 };
+  const failed = { status: 'FAILED', query_count: 1, query_ms: 1 };
+  assert.deepEqual({ ...context.stats(current) }, { count: 2, total: 400, mean: 200 });
+  assert.equal(context.mean([current, historical, failed]), 380);
+  assert.equal(context.median([current, historical, failed]), 500);
+  assert.equal(context.mean([failed, { status: 'COMPLETED', query_count: 0, query_ms: null }]), null);
+  assert.equal(context.median([{ status: 'COMPLETED', query_count: 2, query_ms: null }]), null);
+});
+
+test('E2E daily history uses Beijing days and the last run of each day', () => {
+  const dayStart = app.indexOf('  const scoreDay = ');
+  const dayEnd = app.indexOf('\n  const metricKey', dayStart);
+  const dailyStart = app.indexOf('  function e2eDailyHistory');
+  const dailyEnd = app.indexOf('\n  function e2eDailySummary', dailyStart);
+  const context = vm.createContext({});
+  vm.runInContext(`${app.slice(dayStart, dayEnd)}${app.slice(dailyStart, dailyEnd)};globalThis.daily = e2eDailyHistory;`, context);
+  const history = [
+    { record: { created_at: '2026-11-23T15:30:00Z' }, c: { status: 'failed' } },
+    { record: { created_at: '2026-11-23T16:30:00Z' }, c: { status: 'failed' } },
+    { record: { created_at: '2026-11-23T18:00:00Z' }, c: { status: 'passed' } },
+  ];
+  const daily = context.daily(history);
+  assert.equal(daily.length, 2);
+  assert.equal(daily[0].day, '2026-11-23');
+  assert.equal(daily[1].day, '2026-11-24');
+  assert.equal(daily[1].runs, 2);
+  assert.equal(daily[1].c.status, 'passed');
+});

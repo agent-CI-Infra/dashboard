@@ -469,7 +469,7 @@ function outcomeClass(outcome) {
 function queryWaterfall(latest) {
   const queries = Array.isArray(latest?.queries) ? latest.queries : [];
   if (!queries.length) {
-    return '<p class="empty">本次运行没有 Orbit profiling 查询记录；不使用 E2E 总耗时替代。</p>';
+    return '<p class="empty">本次运行没有 profiling 查询记录；不使用 E2E 总耗时替代。</p>';
   }
   const max = Math.max(...queries.map((query) => query.duration_ms || 0), 1);
   const latestQuery = queries[queries.length - 1];

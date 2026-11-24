@@ -1102,41 +1102,88 @@
       }).sort((a, b) => a.title.localeCompare(b.title, 'zh-CN') || a.file.localeCompare(b.file)),
     }));
   }
-  function e2eHistoryCase(item) {
-    const latest = item.history.at(-1).c;
-    const points = item.history.map(({record, c}) => {
-      const href = caseHTMLPath(c, record, item.slice);
-      const viewer = href ? `./e2e-report.html?${new URLSearchParams({ src: href.slice(2), line: currentLine(STATE.snap).key, case: item.key })}` : '';
-      const description = `${date(record.created_at)} · ${esc(dmVersionText(record.created_at))} · ${E2E_NAME[c.status]} · 耗时 ${msText(c.duration_ms)} · ${record.title || 'run'} ${record.run_id}${c.project ? ` · ${c.project}` : ''}${href ? ' · 打开执行记录 HTML' : ''}`;
-      const content = `<span class="e2e-status-mark ${esc(c.status)}" aria-hidden="true">${E2E_MARK[c.status]}</span>`;
-      return `<li class="e2e-history-point ${esc(c.status)}" data-e2e-artifact="${esc(record.artifact_id)}">${href
-        ? `<a class="e2e-point e2e-case-html" href="${esc(viewer)}" target="_blank" rel="noopener"${tip(description)} aria-label="${esc(description)}">${content}</a>`
-        : `<span class="e2e-point" tabindex="0" role="img"${tip(description)} aria-label="${esc(description)}">${content}</span>`}</li>`;
+  function e2eDailyHistory(history) {
+    const byDay = new Map();
+    for (const point of history) {
+      const day = scoreDay(point.record.created_at);
+      if (!day) continue;
+      const previous = byDay.get(day);
+      // History is chronological: overwriting keeps the last run of each day.
+      byDay.set(day, { ...point, day, runs: (previous?.runs || 0) + 1 });
+    }
+    return [...byDay.values()];
+  }
+  function e2eDailySummary(groups, day) {
+    const counts = Object.fromEntries(E2E_ORDER.map((status) => [status, 0]));
+    const recordIds = new Set();
+    for (const group of groups) for (const item of group.cases) {
+      const point = e2eDailyHistory(item.history).find((entry) => entry.day === day);
+      if (!point) continue;
+      counts[point.c.status] += 1;
+      recordIds.add(point.record.artifact_id);
+    }
+    const executed = counts.failed + counts.flaky + counts.passed;
+    const passing = counts.flaky + counts.passed;
+    return { day, ...counts, executed, passing, runs: recordIds.size, rate: executed ? passing / executed * 100 : null };
+  }
+  function e2eHistoryCell(item, point) {
+    if (!point) return '<td class="e2e-day-cell"><span class="muted" title="当天没有该用例的执行记录">·</span></td>';
+    const { record, c } = point;
+    const href = caseHTMLPath(c, record, item.slice);
+    const viewer = href ? `./e2e-report.html?${new URLSearchParams({ src: href.slice(2), line: currentLine(STATE.snap).key, case: item.key })}` : '';
+    const description = `${point.day} · ${date(record.created_at)} · ${dmVersionText(record.created_at)} · ${E2E_NAME[c.status]} · 耗时 ${msText(c.duration_ms)} · 当天 ${point.runs} 轮，取最后一轮 · ${record.title || 'run'} ${record.run_id}${c.project ? ` · ${c.project}` : ''}${href ? ' · 打开执行记录 HTML' : ''}`;
+    const content = `<span class="e2e-status-mark ${esc(c.status)}" aria-hidden="true">${E2E_MARK[c.status]}</span><small>${msText(c.duration_ms)}</small>`;
+    return `<td class="e2e-day-cell ${esc(c.status)}" data-e2e-artifact="${esc(record.artifact_id)}">${href
+      ? `<a class="e2e-day-result" href="${esc(viewer)}" target="_blank" rel="noopener"${tip(description)} aria-label="${esc(description)}">${content}</a>`
+      : `<span class="e2e-day-result" tabindex="0"${tip(description)} aria-label="${esc(description)}">${content}</span>`}</td>`;
+  }
+  function e2eDailyTable(group, days) {
+    const rows = group.cases.map((item) => {
+      const daily = e2eDailyHistory(item.history);
+      const byDay = new Map(daily.map((point) => [point.day, point]));
+      const latest = item.history.at(-1).c;
+      return `<tr data-e2e-case="${esc(item.key)}"><th scope="row" class="e2e-matrix-case"><span class="e2e-matrix-case-title">${esc(item.title)}</span><span class="e2e-matrix-case-meta"><code>${esc(item.file)}</code> · ${n(item.history.length)} 轮 / ${n(daily.length)} 天 · 最新 ${badge(E2E_NAME[latest.status], E2E_TONE[latest.status])}</span></th>${days.map((day) => e2eHistoryCell(item, byDay.get(day))).join('')}</tr>`;
     }).join('');
-    return `<article class="e2e-case" data-e2e-case="${esc(item.key)}"><header class="e2e-case-head"><h4 class="e2e-case-title">${esc(item.title)}</h4><span class="sub">${n(item.history.length)} 次执行 · 最新 ${badge(E2E_NAME[latest.status], E2E_TONE[latest.status])}</span></header>
-      <div class="sub e2e-case-file"><code>${esc(item.file)}</code></div>
-      <ol class="e2e-timeline" aria-label="${esc(item.title)}的执行历史">${points}</ol></article>`;
+    const head = days.map((day) => {
+      const summary = e2eDailySummary([group], day);
+      return `<th class="e2e-day-head"><span>${esc(day.slice(5).replace('-', '/'))}</span><small>${summary.rate == null ? '无执行' : `${Math.round(summary.rate)}% · ${summary.passing}/${summary.executed}`}</small></th>`;
+    }).join('');
+    return `<div class="table-wrap e2e-daily-wrap"><table class="e2e-daily-table"><thead><tr><th class="e2e-matrix-case">用例 / 文件</th>${head}</tr></thead><tbody>${rows}</tbody></table></div>`;
   }
   function e2eHistoryContent() {
     const groups = e2eCaseGroups(), filter = STATE.e2eFilter, records = e2eRecords();
     const count = groups.reduce((sum, g) => sum + g.cases.length, 0);
-    let html = sectionHead('E2E 执行记录', `${n(groups.length)} 个类别 · ${n(count)} 个用例 · 保留期内的执行历史`);
+    const days = [...new Set(groups.flatMap((group) => group.cases.flatMap((item) => e2eDailyHistory(item.history).map((point) => point.day))))].sort().slice(-12);
+    let html = sectionHead('E2E 每日表现', `${n(groups.length)} 个类别 · ${n(count)} 个用例 · 最近 ${n(days.length)} 个执行日 · Asia/Shanghai`);
     if (!STATE.e2e) return html + `<div class="card">${empty('尚未读取到 E2E 执行记录')}</div>`;
-    const options = ['', ...E2E_ORDER].map(k => `<option value="${k}"${filter.status === k ? ' selected' : ''}>${k ? `最新${E2E_NAME[k]}` : '全部结果'}</option>`).join('');
-    html += `<div class="filters e2e-filters"><select data-e2e-filter="status" aria-label="按最新结果筛选">${options}</select><input type="search" data-e2e-filter="q" value="${esc(filter.q)}" placeholder="搜索类别、用例、文件" aria-label="搜索用例"></div>`;
     const loading = records.filter(r => STATE.e2eLoading.has(e2eDataKey(r))).length;
     const errors = records.filter(r => STATE.e2eErrors.has(e2eDataKey(r))).length;
     if (loading) html += `<div class="muted" role="status">正在读取 ${n(loading)} 份执行记录…</div>`;
     if (errors) html += `<div class="muted" role="status">${n(errors)} 份执行记录暂不可读取，已展示其余可用用例。</div>`;
+    if (days.length) {
+      const summaries = days.map((day) => e2eDailySummary(groups, day)).reverse();
+      html += `<div class="card e2e-daily-overview">${table('t-e2e-daily', [
+        { key: 'day', label: '日期', render: (row) => `<span class="nowrap">${esc(row.day)}</span>` },
+        { key: 'rate', label: '通过率', num: true, render: (row) => row.rate == null ? '—' : `${ratioBar(row.rate, row.rate === 100 ? 'good' : 'warn')}${pct(row.rate)}`, sort: (row) => row.rate ?? -1 },
+        { key: 'passing', label: '通过 / 执行', num: true, render: (row) => `${row.passing}/${row.executed}` },
+        { key: 'passed', label: '一次通过', num: true },
+        { key: 'flaky', label: '重试通过', num: true },
+        { key: 'failed', label: '失败', num: true, render: (row) => row.failed ? `<span class="bad">${n(row.failed)}</span>` : '0' },
+        { key: 'skipped', label: '跳过', num: true },
+        { key: 'runs', label: '运行批次', num: true },
+      ], summaries, { defaultSort: null })}<p class="perf-note">同日多轮时，每个用例取当天最后一轮；重试通过计入通过，跳过不计入通过率。</p></div>`;
+    }
+    const options = ['', ...E2E_ORDER].map(k => `<option value="${k}"${filter.status === k ? ' selected' : ''}>${k ? `最新${E2E_NAME[k]}` : '全部结果'}</option>`).join('');
+    html += `<div class="filters e2e-filters"><select data-e2e-filter="status" aria-label="按最新结果筛选">${options}</select><input type="search" data-e2e-filter="q" value="${esc(filter.q)}" placeholder="搜索类别、用例、文件" aria-label="搜索用例"></div>`;
     const q = filter.q.trim().toLowerCase();
     const visible = groups.map(g => ({...g, cases: g.cases.filter(c => (!filter.status || c.history.at(-1).c.status === filter.status)
       && (!q || `${g.slice} ${c.title} ${c.file}`.toLowerCase().includes(q)))})).filter(g => g.cases.length);
-    html += `<div class="e2e-legend" aria-label="执行状态图例">${E2E_ORDER.map(status => `<span><span class="e2e-status-mark ${status}" aria-hidden="true">${E2E_MARK[status]}</span>${E2E_NAME[status]}</span>`).join('')}</div>`;
+    html += `<div class="e2e-legend" aria-label="执行状态图例">${E2E_ORDER.map(status => `<span><span class="e2e-status-mark ${status}" aria-hidden="true">${E2E_MARK[status]}</span>${E2E_NAME[status]}</span>`).join('')}<span class="muted">单元格显示状态与耗时；· 表示当天未执行。</span></div>`;
     html += visible.map(g => {
       // Search/filter opens matches without overwriting the user's collapse choice.
       const open = Boolean(q || filter.status) || !STATE.e2eCollapsed.has(g.slice);
       const id = `e2e-category-${encodeURIComponent(g.slice)}`;
-      return `<section class="card e2e-category" data-e2e-slice="${esc(g.slice)}"><h3><button type="button" class="e2e-category-toggle" data-e2e-category="${esc(g.slice)}" aria-expanded="${open}" aria-controls="${esc(id)}"><span class="e2e-category-chevron" aria-hidden="true"></span><span>${esc(g.slice)}</span> <span class="sub">${n(g.cases.length)} 个用例</span></button></h3><div id="${esc(id)}"${open ? '' : ' hidden'}>${g.cases.map(e2eHistoryCase).join('')}</div></section>`;
+      return `<section class="card e2e-category" data-e2e-slice="${esc(g.slice)}"><h3><button type="button" class="e2e-category-toggle" data-e2e-category="${esc(g.slice)}" aria-expanded="${open}" aria-controls="${esc(id)}"><span class="e2e-category-chevron" aria-hidden="true"></span><span>${esc(g.slice)}</span> <span class="sub">${n(g.cases.length)} 个用例 · 逐日横向对比</span></button></h3><div id="${esc(id)}"${open ? '' : ' hidden'}>${e2eDailyTable(g, days)}</div></section>`;
     }).join('');
     if (!visible.length && !loading) html += empty(count ? '没有符合条件的用例' : '该分支线暂时没有可展示的用例执行历史');
     return html;
@@ -1328,7 +1375,7 @@
 
   function perfQueries(latest) {
     const queries = Array.isArray(latest?.queries) ? latest.queries : [];
-    if (!queries.length) return empty('这次运行没有 Orbit profiling 查询记录；不使用 E2E 总耗时替代');
+    if (!queries.length) return empty('这次运行没有 profiling 查询记录；不使用 E2E 总耗时替代');
     const max = Math.max(...queries.map((q) => q.duration_ms || 0), 1);
     const latestQuery = queries[queries.length - 1];
     return `<div class="perf-query-list">${queries.map((q, i) => {
@@ -1337,10 +1384,6 @@
     }).join('')}</div><div class="perf-stage-title">最近一次查询阶段</div>${perfQueryStages(latestQuery)}`;
   }
 
-  const perfInt = (value) => {
-    if (value == null || !Number.isFinite(Number(value))) return '—';
-    return new Intl.NumberFormat('zh-CN').format(Number(value));
-  };
   const perfBytes = (value) => {
     if (value == null || !Number.isFinite(Number(value)) || Number(value) < 0) return '—';
     const bytes = Number(value);
@@ -1348,62 +1391,37 @@
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
-  const PERF_PHASE_NAME = {
-    'route.apps': '路由应用',
-    route: '路由',
-    'task.saved': '保存任务',
-    'run.start': '启动',
-    classify: '分类',
-    'brief.memory': '记忆检索',
-    execute: '执行',
-    'post.reviews': '结果审阅',
-    'post.next_steps': '后续步骤',
-    'post.citations': '引用整理',
-    posted: '完成',
-  };
 
-  function perfCloudPhases(phases) {
-    const rows = (Array.isArray(phases) ? phases : [])
-      .filter((phase) => phase && phase.name)
-      .sort((a, b) => (Number(a.start_ms) || 0) - (Number(b.start_ms) || 0));
-    if (!rows.length) return empty('这条 trace 没有 Orbit 阶段事件');
-    const max = Math.max(...rows.map((phase) => (Number(phase.start_ms) || 0) + (Number(phase.duration_ms) || 0)), 1);
-    return `<div class="perf-waterfall">${rows.map((phase) => {
-      const start = Number(phase.start_ms) || 0;
-      const duration = Number(phase.duration_ms) || 0;
-      const label = PERF_PHASE_NAME[phase.name] || phase.name;
-      return `<div class="perf-step" title="${esc(phase.name)}${phase.note ? ` · ${esc(phase.note)}` : ''}"><span class="perf-step-id">${esc(label)}</span><span class="perf-step-action">+${perfMs(start)}</span><span class="perf-step-track"><span class="perf-step-fill ok" style="width:${Math.max(2, (duration / max) * 100).toFixed(1)}%"></span></span><span class="perf-step-ms">${perfMs(duration)}</span></div>`;
-    }).join('')}</div>`;
-  }
-
-  function perfCloud(latest) {
-    const cloud = latest?.cloud;
-    if (!cloud?.available || (!cloud.calls?.length && !cloud.phases?.length)) {
-      return empty('这次运行没有 Orbit 云端 trace；model / TTFT / TPOT 要在 profiling 落盘后才有');
+  const perfIsCompleted = (point) => String(point?.status || '').toUpperCase() === 'COMPLETED';
+  function perfQuerySamples(point) {
+    if (!perfIsCompleted(point)) return [];
+    const queries = Array.isArray(point?.queries) ? point.queries : [];
+    if (queries.length) {
+      return queries.filter((query) => ['completed', 'ok'].includes(String(query?.outcome || '').toLowerCase())
+        && query?.duration_ms != null && query.duration_ms !== ''
+        && Number.isFinite(Number(query.duration_ms)) && Number(query.duration_ms) >= 0)
+        .map((query) => Number(query.duration_ms));
     }
-    const matched = Number(cloud.matched_queries) || 0;
-    const traceCount = Number(cloud.trace_count) || 0;
-    const calls = Array.isArray(cloud.calls) ? cloud.calls.slice().reverse().slice(0, 12) : [];
-    const totals = cloud.totals || {};
-    const note = matched > 0
-      ? `已按 task id 关联 ${matched} 个 query；以下是本 case 可见的 ${traceCount} 条云端 trace`
-      : `当前 query 的云端 trace 尚未落盘 / 未按 task id 匹配；以下为本 case 目录中可见的 ${traceCount} 条 trace，仅作模型侧参考`;
-    const captured = cloud.captured_at ? `采集 ${shortDateTime(cloud.captured_at)}` : '采集时间未知';
-    return `<div class="perf-cloud-note ${matched ? 'matched' : 'unmatched'}">${esc(note)}<span class="muted"> · ${esc(captured)}</span></div>
-      <div class="perf-cloud-stats">
-        <div><span>模型调用</span><strong>${n(totals.calls ?? cloud.call_count)}</strong><em>${n(traceCount)} 条 trace</em></div>
-        <div><span>平均 TTFT</span><strong>${perfMs(totals.ttft_avg_ms)}</strong><em>首 token</em></div>
-        <div><span>平均 TPOT</span><strong>${totals.tpot_avg_ms == null ? '—' : `${Number(totals.tpot_avg_ms).toFixed(2)}ms`}</strong><em>每 token</em></div>
-        <div><span>上下文 tokens</span><strong>${perfInt(totals.input_tokens)}</strong><em>单次最大 ${perfInt(totals.input_tokens_max)}</em></div>
-        <div><span>输出 tokens</span><strong>${perfInt(totals.output_tokens)}</strong><em>模型均耗时 ${perfMs(totals.model_ms_avg)}</em></div>
-      </div>
-      ${calls.length ? `<div class="perf-model-scroll-hint">表格可左右滑动查看 TTFT / TPOT / 上下文</div><div class="perf-model-wrap"><table class="perf-model-table"><thead><tr><th>模型</th><th class="num">耗时</th><th class="num">TTFT</th><th class="num">TPOT</th><th class="num">上下文</th><th class="num">输出</th><th>流式</th></tr></thead><tbody>${calls.map((call) => {
-        const title = [call.provider, call.stream_ms != null ? `stream ${perfMs(call.stream_ms)}` : null, call.finish_reason, call.status, call.tokens_per_s != null ? `${call.tokens_per_s} tok/s` : null].filter(Boolean).join(' · ');
-        return `<tr title="${esc(title)}"><td class="model" title="${esc(call.model)}">${esc(call.model)}</td><td class="num">${perfMs(call.duration_ms)}</td><td class="num">${perfMs(call.ttft_ms)}</td><td class="num">${call.tpot_ms == null ? '—' : `${Number(call.tpot_ms).toFixed(2)}ms`}</td><td class="num">${perfInt(call.input_tokens)}</td><td class="num">${perfInt(call.output_tokens)}</td><td>${call.stream ? badge('流式', 'good') : badge('非流式', '')}</td></tr>`;
-      }).join('')}</tbody></table></div>${cloud.call_count > calls.length ? `<p class="perf-note">共 ${n(cloud.call_count)} 条调用，显示最近 ${n(calls.length)} 条。</p>` : ''}` : ''}
-      <div class="perf-stage-title">Orbit 阶段（最新一次云端 trace）</div>
-      ${perfCloudPhases(cloud.phases)}
-      <p class="perf-note">上下文 = model call 的 input tokens；缓存读取 ${perfInt(cloud.usage?.cache_read_tokens)} tokens，reasoning ${perfInt(cloud.usage?.reasoning_tokens)} tokens。trace 由 Orbit 异步写入，未匹配时不代表当前 query。</p>`;
+    const count = Math.floor(Number(point?.query_count) || 0);
+    const average = point?.query_ms == null || point.query_ms === '' ? NaN : Number(point.query_ms);
+    // Older history has only the round average and count. The count remains a
+    // valid weight, but this is not a raw per-query sample (noted in the UI).
+    return count > 0 && Number.isFinite(average) && average >= 0 ? Array(count).fill(average) : [];
+  }
+  function perfQueryStats(point) {
+    const samples = perfQuerySamples(point);
+    const total = samples.reduce((sum, value) => sum + value, 0);
+    return { count: samples.length, total, mean: samples.length ? total / samples.length : null };
+  }
+  function perfWeightedMean(points) {
+    const stats = points.map(perfQueryStats).reduce((sum, item) => ({ count: sum.count + item.count, total: sum.total + item.total }), { count: 0, total: 0 });
+    return stats.count ? stats.total / stats.count : null;
+  }
+  function perfWeightedMedian(points) {
+    const values = points.flatMap(perfQuerySamples).sort((a, b) => a - b);
+    if (!values.length) return null;
+    const middle = Math.floor(values.length / 2);
+    return values.length % 2 ? values[middle] : (values[middle - 1] + values[middle]) / 2;
   }
 
   function perfHistoryTable(points, viewRunId = '') {
@@ -1463,13 +1481,17 @@
     const completed = statuses.filter((s) => String(s).toUpperCase() === 'COMPLETED').length;
     const blocked = statuses.filter((s) => String(s).toUpperCase() === 'BLOCKED').length;
     const failed = statuses.filter((s) => ['FAILED', 'ERROR'].includes(String(s).toUpperCase())).length;
-    const latestQueries = scoped.map((c) => basis(c)?.query_ms).filter((v) => v != null);
-    const avgQuery = latestQueries.length ? Math.round(latestQueries.reduce((sum, value) => sum + value, 0) / latestQueries.length) : null;
-    const values = points.map((p) => p.query_ms).filter((v) => v != null).sort((a, b) => a - b);
-    const median = values.length ? (values.length % 2 ? values[(values.length - 1) / 2] : Math.round((values[values.length / 2 - 1] + values[values.length / 2]) / 2)) : null;
+    const scopedPoints = scoped.map((c) => basis(c));
+    const avgQuery = perfWeightedMean(scopedPoints);
+    const aggregateQueryCount = scopedPoints.reduce((sum, point) => sum + perfQueryStats(point).count, 0);
+    const excludedTimedCases = scopedPoints.filter((point) => !perfIsCompleted(point) && point?.query_ms != null).length;
+    const zeroQueryCases = scopedPoints.filter((point) => perfIsCompleted(point) && perfQueryStats(point).count === 0).length;
+    const median = perfWeightedMedian(points);
     const [selectedLabel, selectedTone] = perfStatus(latest.status);
     const activeRuns = points.length;
-    const queryCount = latest.query_count ?? (Array.isArray(latest.queries) ? latest.queries.length : 0);
+    const latestStats = perfQueryStats(latest);
+    const queryCount = latestStats.count;
+    const rawQueryCount = latest.query_count ?? (Array.isArray(latest.queries) ? latest.queries.length : 0);
     const title = selected.title || latest.title || selected.id;
     const caseButtons = scoped.map((c) => {
       const active = c.id === selected.id;
@@ -1479,26 +1501,26 @@
     const updated = history.updated_at ? shortDateTime(history.updated_at) : '—';
     const basisText = viewRunId ? `查看 run ${viewRunId}（${n(scoped.length)} 个用例）` : (currentRun ? `口径 ${dmVersionBadge(currentRun.at)}${esc(currentRun.runId)}（${n(scoped.length)} 个用例）` : '');
     return `<div class="perf-section" data-perf-section>
-      ${sectionHead('Nightly 用例性能', `真机 / 模拟器 nightly · 每用例每轮一个查询耗时点 · 从发出 query 到收到最后一条消息 · 同日重跑保留 · 数据 ${esc(updated)} · ${basisText}`)}
+      ${sectionHead('Nightly 用例性能', `真机 / 模拟器 nightly · 从发出 query 到收到最后一条消息 · 同日重跑保留 · 数据 ${esc(updated)} · ${basisText}`)}
       ${tiles([
         { label: '用例', value: n(scoped.length), sub: `${viewRunId ? '该轮' : '最新一轮'} ${n(completed)} 通过` },
         { label: '最新通过', value: `${n(completed)}<small>/ ${n(scoped.length)}</small>`, sub: `${Math.round((completed / scoped.length) * 100)}%`, tone: completed === scoped.length ? 'good' : '' },
-        { label: '阻塞 / 失败', value: `${n(blocked)} / ${n(failed)}`, sub: '阻塞不等于失败', tone: blocked || failed ? 'warn' : 'good' },
-        { label: '最新平均查询耗时', value: perfMs(avgQuery), sub: `各用例${viewRunId ? '该轮' : '最近一次'} · 不含 E2E 等待` },
+        { label: '阻塞 / 失败', value: `${n(blocked)} / ${n(failed)}`, sub: '不计入有效查询汇总', tone: blocked || failed ? 'warn' : 'good' },
+        { label: '有效查询加权均值', value: perfMs(avgQuery), sub: `${n(aggregateQueryCount)} 次有效 query · 仅 COMPLETED${excludedTimedCases ? ` · 排除 ${n(excludedTimedCases)} 个非通过用例` : ''}` },
       ])}
+      ${zeroQueryCases ? `<div class="banner warn"><span class="icon">▲</span><div><div class="title">${n(zeroQueryCases)} 个通过用例没有有效 profiling query</div><div>这些用例不进入均值和中位数，也不按 0ms 补齐；请检查对应 query 是否未落盘或未完成。</div></div></div>` : ''}
       <div class="perf-layout">
         <div class="card perf-list-card"><h3>用例 <span class="sub">${n(scoped.length)} 个 · 点击切换</span></h3><div class="perf-list">${caseButtons}</div></div>
         <div class="perf-detail">
           <div class="card perf-detail-head"><div class="perf-detail-title"><div class="perf-title-row"><h3><code>${esc(selected.id)}</code></h3>${badge(selectedLabel, selectedTone)}</div><p class="perf-case-name">${esc(title)}</p><p class="muted">完成于 ${esc(shortDateTime(latest.finished_at))} · ${dmVersionBadge(latest.finished_at)}run <code>${esc(latest.run_id || '—')}</code> · commit <span class="mono">${esc((latest.commit || '').slice(0, 7) || '—')}</span> · ${esc(perfDevice(latest.device))} · E2E 总耗时 ${perfMs(latest.duration_ms)}</p></div></div>
           <div class="perf-kpis">
-            <div><span>本轮平均查询</span><strong>${perfMs(latest.query_ms)}</strong></div>
-            <div><span>历史中位数</span><strong>${perfMs(median)}</strong></div>
-            <div><span>查询次数</span><strong>${n(queryCount)}</strong></div>
+            <div><span>本轮有效查询均值</span><strong>${perfMs(latestStats.mean)}</strong></div>
+            <div title="仅统计 COMPLETED；历史点没有逐 query 明细时，以轮均值和 query_count 加权"><span>历史加权中位数</span><strong>${perfMs(median)}</strong></div>
+            <div><span>本轮有效查询次数</span><strong>${n(queryCount)}</strong></div>
             <div><span>记录轮次</span><strong>${n(activeRuns)}</strong></div>
           </div>
-          <div class="card perf-card"><h3>${viewRunId ? '该轮' : '最近一次'} Profiling · 查询耗时 <span class="sub">${n(queryCount)} 次查询 · 以最后一条消息到达计 · E2E ${perfMs(latest.duration_ms)}</span></h3>${perfQueries(latest)}</div>
-          <div class="card perf-card"><h3>Orbit 云端 trace <span class="sub">model 耗时 · TTFT · TPOT · 上下文 tokens · 阶段</span></h3>${perfCloud(latest)}</div>
-          <div class="card perf-card"><h3>每轮平均查询耗时 <span class="sub">每轮一个点 · 从 query 到消息接收 · Asia/Shanghai</span></h3>${perfChart(points)}<p class="perf-note">当前 ${n(activeRuns)} 轮运行；每点为当轮 query 平均耗时，仅 profiling，不含 E2E 步骤等待；缺失值不补 0。</p></div>
+          <div class="card perf-card"><h3>${viewRunId ? '该轮' : '最近一次'} Profiling · 查询耗时 <span class="sub">有效 ${n(queryCount)} / 记录 ${n(rawQueryCount)} 次查询 · 以最后一条消息到达计 · E2E ${perfMs(latest.duration_ms)}</span></h3>${perfQueries(latest)}</div>
+          <div class="card perf-card"><h3>每轮平均查询耗时 <span class="sub">原始曲线保留全部状态 · Asia/Shanghai</span></h3>${perfChart(points)}<p class="perf-note">当前 ${n(activeRuns)} 轮运行；曲线保留各状态原始轮均值，缺失值不补 0。汇总均值与中位数只统计 COMPLETED 用例的有效 query；历史无逐 query 明细时，以该轮均值及 query_count 加权，不冒充原始逐 query 中位数。</p></div>
           <details class="card perf-card perf-history"><summary>执行历史 <span class="sub">${n(points.length)} 次</span></summary>${perfHistoryTable(points, viewRunId)}</details>
         </div>
       </div>
@@ -1544,47 +1566,92 @@
     if (!d) return `<div class="banner warn"><span class="icon">⏳</span><div><div class="title">ST 数据尚未同步</div><div>collect-digitalmate-st workflow 还没有发布 data/st.json。</div></div></div>`;
     const runs = (d.runs || []).filter((r) => r && r.st);
     if (!runs.length) return empty('暂无 ST 运行数据');
-    const latest = runs[0];
+    const newest = runs[0];
+    const hasData = (r) => Boolean((r.st.cases || []).length || (r.st.liveWire || []).length || (r.st.component || []).length);
+    const latest = runs.find(hasData) || newest;
     const latestVersion = dmVersionOf(latest.createdAt);
     const cases = latest.st.cases || [];
     // One resolver for both the KPI and the matrices: direct cases, relay suites
     // and component suites (with the suite verdict for fixture-only suites).
     const catalog = Array.isArray(d.catalog) && d.catalog.length ? d.catalog : null;
-    const caseStatus = (r, name) => {
+    const caseResult = (r, name) => {
       const lw = (r.st.liveWire || []).find((x) => x.caseName === name);
-      if (lw) return lw.status;
+      if (lw) return lw;
       const componentSuites = r.st.component || [];
       const comp = componentSuites.flatMap((suite) => suite.cases || []).find((x) => x.name === name);
-      if (comp) return comp.status;
+      if (comp) return comp;
       const meta = catalog ? catalog.find((c) => c.name === name) : null;
       if (meta?.suite) {
         const suite = componentSuites.find((s) => s.suite === meta.suite);
-        if (suite) return suite.status;
+        if (suite) return suite;
       }
-      const hit = (r.st.cases || []).find((x) => x.name === name);
-      return hit ? hit.status : null;
+      return (r.st.cases || []).find((x) => x.name === name) || null;
     };
-    const medianOf = (rows) => { const v = rows.map((c) => c.elapsedMs).filter((x) => typeof x === 'number').sort((a, b) => a - b); return v.length ? v[Math.floor(v.length / 2)] : null; };
+    const caseStatus = (r, name) => caseResult(r, name)?.status || null;
+    const timedCases = (r) => [...(r.st.cases || []), ...(r.st.component || []).flatMap((suite) => suite.cases || [])];
+    const medianOf = (rows) => {
+      const values = rows.map((c) => c.elapsedMs).filter((x) => typeof x === 'number' && Number.isFinite(x)).sort((a, b) => a - b);
+      if (!values.length) return null;
+      const middle = Math.floor(values.length / 2);
+      return values.length % 2 ? values[middle] : (values[middle - 1] + values[middle]) / 2;
+    };
     const fmtMs = (ms) => (ms == null ? '—' : ms >= 60000 ? `${(ms / 60000).toFixed(1)} min` : `${(ms / 1000).toFixed(1)} s`);
-    const stBadge = (s) => (s === 'passed' ? badge('通过', 'good') : s === 'failed' ? badge('失败', 'bad') : s === 'blocked' ? badge('阻塞', 'warn') : badge(s || '未知'));
-    const failedRuns = runs.filter((r) => r.conclusion !== 'success').length;
+    const stBadge = (s) => {
+      const labels = { passed: ['通过', 'good'], failed: ['失败', 'bad'], blocked: ['阻塞', 'warn'], skipped: ['跳过', ''], cancelled: ['取消', ''] };
+      const [label, tone] = labels[s] || [s || '未知', ''];
+      return badge(label, tone);
+    };
+    const countedRuns = runs.filter((r) => !['skipped', 'cancelled'].includes(r.conclusion));
+    const failedRuns = countedRuns.filter((r) => ['failure', 'timed_out', 'startup_failure'].includes(r.conclusion)).length;
 
     const scopes = catalog ? catalog : cases.map((c) => ({ name: c.name, group: 'business' }));
     const statuses = scopes.map((c) => ({ scope: c, status: caseStatus(latest, c.name) }));
-    const passed = statuses.filter((x) => x.status === 'passed').length;
     const laneOf = (scope) => (scope.group === 'component' ? 'component' : scope.requirement === 'live-wire' ? 'relay' : 'direct');
     const laneCount = (lane) => {
       const rows = statuses.filter((x) => laneOf(x.scope) === lane);
-      return `${rows.filter((x) => x.status === 'passed').length}/${rows.length}`;
+      const executed = rows.filter((x) => x.status);
+      return `${executed.filter((x) => x.status === 'passed').length}/${executed.length}`;
     };
-    let html = tiles([
-      { label: '最新运行', value: `${dmVersionBadge(latest.createdAt)}<a href="${esc(latest.url)}" target="_blank" rel="noopener">#${esc(latest.runId)}</a>`, sub: esc(String(latest.createdAt).slice(0, 16).replace('T', ' ')) + ' UTC', tone: latest.conclusion === 'success' ? 'good' : 'bad' },
-      { label: '最新通过', value: `${passed}<small>/ ${scopes.length}</small>`, sub: `直连 ${laneCount('direct')} · relay ${laneCount('relay')} · 组件 ${laneCount('component')}`, tone: passed === scopes.length ? 'good' : 'bad' },
-      { label: '用例耗时中位', value: fmtMs(medianOf(cases)), sub: `runner ${esc(latest.st.runner || '—')}` },
-      { label: '近 90 轮失败', value: `${failedRuns}<small>/ ${runs.length}</small>`, sub: `失败率 ${runs.length ? Math.round((failedRuns / runs.length) * 100) : 0}%`, tone: failedRuns ? 'warn' : 'good' },
+    const runSummary = (r) => {
+      const results = scopes.map((scope) => caseResult(r, scope.name)).filter(Boolean);
+      const passed = results.filter((result) => result.status === 'passed').length;
+      return { run: r, day: scoreDay(r.createdAt), executed: results.length, passed,
+        failed: results.filter((result) => result.status === 'failed').length,
+        blocked: results.filter((result) => result.status === 'blocked').length,
+        rate: results.length ? passed / results.length * 100 : null };
+    };
+    const latestSummary = runSummary(latest);
+    let html = '';
+    if (!hasData(newest)) {
+      html += `<div class="banner warn"><span class="icon">▲</span><div><div class="title">最近一次触发 ${conclusionBadge(newest.conclusion)}，没有产生 ST 用例数据</div><div>${esc(newest.st.issues?.[0] || '暂停、取消或前置失败不等于用例失败；下方展示最近一次有用例数据的执行。')}</div><div class="hint">触发 ${esc(date(newest.createdAt))} · 最新执行 ${link(newest.url, `#${newest.runId}`)} → ${link(latest.url, `#${latest.runId}`)}</div></div></div>`;
+    }
+    html += tiles([
+      { label: '最新有用例数据', value: `${dmVersionBadge(latest.createdAt)}<a href="${esc(latest.url)}" target="_blank" rel="noopener">#${esc(latest.runId)}</a>`, sub: esc(date(latest.createdAt)), tone: latest.conclusion === 'success' ? 'good' : 'warn' },
+      { label: '最新执行通过', value: `${latestSummary.passed}<small>/ ${latestSummary.executed}</small>`, sub: `直连 ${laneCount('direct')} · relay ${laneCount('relay')} · 组件 ${laneCount('component')}`, tone: latestSummary.passed === latestSummary.executed && latestSummary.executed ? 'good' : 'warn' },
+      { label: '用例耗时中位', value: fmtMs(medianOf(timedCases(latest))), sub: `runner ${esc(latest.st.runner || '—')} · 业务 + 组件` },
+      { label: '执行失败', value: `${failedRuns}<small>/ ${countedRuns.length}</small>`, sub: `不含暂停 / 取消 · 失败率 ${countedRuns.length ? Math.round((failedRuns / countedRuns.length) * 100) : 0}%`, tone: failedRuns ? 'warn' : 'good' },
     ]);
 
-    const mruns = runs.slice(0, 12);
+    const byDay = new Map();
+    for (const run of runs) {
+      const day = scoreDay(run.createdAt);
+      if (!day) continue;
+      if (!byDay.has(day)) byDay.set(day, []);
+      byDay.get(day).push(run);
+    }
+    // Runs are newest-first. Prefer the latest data-bearing run each day, but
+    // keep a paused/cancelled day visible when none of its runs produced cases.
+    const mruns = [...byDay.entries()].map(([day, dayRuns]) => ({ ...(dayRuns.find(hasData) || dayRuns[0]), day, dayRuns: dayRuns.length })).slice(0, 12);
+    html += sectionHead('ST 每日概览', `最近 ${mruns.length} 天 · Asia/Shanghai · 通过率只统计当天实际有用例结果的运行`);
+    html += `<div class="card">${table('t-st-daily', [
+      { key: 'day', label: '日期', render: (r) => `<span class="nowrap">${esc(r.day)}</span>` },
+      { key: 'runId', label: '代表运行', render: (r) => `<a href="${esc(r.url)}" target="_blank" rel="noopener">#${esc(r.runId)}</a>${r.dayRuns > 1 ? ` <span class="muted">${r.dayRuns} 轮</span>` : ''}` },
+      { key: 'conclusion', label: '运行状态', render: (r) => conclusionBadge(r.conclusion) },
+      { key: 'rate', label: '通过率', num: true, render: (r) => { const s = runSummary(r); return s.rate == null ? '—' : `${ratioBar(s.rate, s.rate === 100 ? 'good' : 'warn')}${pct(s.rate)}`; }, sort: (r) => runSummary(r).rate ?? -1 },
+      { key: 'passed', label: '通过 / 执行', num: true, render: (r) => { const s = runSummary(r); return `${s.passed}/${s.executed}`; } },
+      { key: 'failed', label: '失败', num: true, render: (r) => { const count = runSummary(r).failed; return count ? `<span class="bad">${n(count)}</span>` : '0'; }, sort: (r) => runSummary(r).failed },
+      { key: 'blocked', label: '阻塞', num: true, render: (r) => runSummary(r).blocked, sort: (r) => runSummary(r).blocked },
+    ], mruns, { defaultSort: null })}<p class="perf-note">同日优先取最新有用例数据的运行；当天全部暂停、取消或前置失败时，保留最新触发状态，不把它计作用例失败。</p></div>`;
     // The collector publishes the full registered scenario set (catalog): direct
     // scenes run every nightly, the live-wire and boundary-injection scenes are
     // explicit-only and stay grey here so coverage gaps are visible.
@@ -1593,13 +1660,15 @@
       for (const r of mruns) for (const c of r.st.cases || []) if (!seen.has(c.name)) { seen.add(c.name); list.push(c); }
       return list;
     })();
-    const verdict = (status) => (status === 'passed' ? badge('✓', 'good') : status === 'failed' ? badge('✕', 'bad') : badge('!', 'warn'));
+    const verdict = (status) => (status === 'passed' ? badge('✓', 'good') : status === 'failed' ? badge('✕', 'bad') : status === 'blocked' ? badge('!', 'warn') : status === 'skipped' ? badge('−', '') : status === 'cancelled' ? badge('■', '') : badge('?', 'warn'));
     const cell = (r, name) => {
-      const status = caseStatus(r, name);
-      return status ? verdict(status) : '<span class="muted" title="本轮未运行">·</span>';
+      const result = caseResult(r, name);
+      if (!result) return '<span class="muted" title="本轮未运行或无结果">·</span>';
+      const description = `${r.day} · ${result.title || name} · ${result.status || '未知'} · run ${r.runId}`;
+      return `<span class="st-matrix-result" title="${esc(description)}">${verdict(result.status)}${result.elapsedMs != null ? `<small>${fmtMs(result.elapsedMs)}</small>` : ''}</span>`;
     };
     const requirement = (c) => (c.requirement === 'live-wire' ? badge('live-wire', '') : c.requirement === 'model-boundary' ? badge('boundary', '') : '');
-    const matrixCols = [{ key: 'title', label: '用例', render: (row) => row.html }, ...mruns.map((r) => ({ key: 'r', label: `#${String(r.runId).slice(-6)}`, sortable: false, render: (row) => row.cells[mruns.indexOf(r)] }))];
+    const matrixCols = [{ key: 'title', label: '用例', render: (row) => row.html }, ...mruns.map((r) => ({ key: `r-${r.runId}`, label: `${r.day.slice(5).replace('-', '/')} ${runSummary(r).passed}/${runSummary(r).executed}`, sortable: false, render: (row) => row.cells[mruns.indexOf(r)] }))];
     const matrixRowsFor = (rows) => rows.map((c) => ({
       html: `${esc(c.title || c.name)}${c.coverageId ? ` <span class="muted">${esc(c.coverageId)}</span>` : ''}${c.nightly === false ? ' ' + requirement(c) : ''}`,
       cells: mruns.map((r) => cell(r, c.name)),
@@ -1608,11 +1677,11 @@
     const componentOrder = catalog ? catalog.filter((c) => c.group === 'component') : [];
     const nightlyCount = businessOrder.filter((c) => c.nightly !== false).length;
     const explicitCount = businessOrder.length - nightlyCount;
-    html += sectionHead('业务用例 × 运行矩阵', catalog ? `共 ${businessOrder.length} 个业务场景 · ${nightlyCount} 个 nightly 直连 · ${explicitCount} 个显式（live-wire）` : `最近 ${mruns.length} 轮`);
-    html += `<div class="card">${table('t-st-matrix', matrixCols, matrixRowsFor(businessOrder))}</div>`;
+    html += sectionHead('业务用例 × 每日矩阵', catalog ? `共 ${businessOrder.length} 个业务场景 · ${nightlyCount} 个 nightly 直连 · ${explicitCount} 个显式（live-wire）· 列头为日期与通过/执行` : `最近 ${mruns.length} 天`);
+    html += `<div class="card st-matrix-card">${table('t-st-matrix', matrixCols, matrixRowsFor(businessOrder))}</div>`;
     if (componentOrder.length) {
-      html += sectionHead('组件用例 × 运行矩阵', `共 ${componentOrder.length} 条 · 本地确定性组件契约，无云端或模型请求`);
-      html += `<div class="card">${table('t-st-component-matrix', matrixCols, matrixRowsFor(componentOrder))}</div>`;
+      html += sectionHead('组件用例 × 每日矩阵', `共 ${componentOrder.length} 条 · 本地确定性组件契约，无云端或模型请求`);
+      html += `<div class="card st-matrix-card">${table('t-st-component-matrix', matrixCols, matrixRowsFor(componentOrder))}</div>`;
     }
 
     html += sectionHead('最新运行用例明细', `${latestVersion ? `版本 ${esc(latestVersion)} · ` : ''}${esc(latest.st.runner || '—')} · ${esc(latest.st.machine || '—')}${latest.st.runId ? ` · ST runId <code>${esc(latest.st.runId)}</code>` : ''}`);
@@ -1659,11 +1728,11 @@
     html += `<div class="card">${table('t-st-runs', [
       { key: 'runId', label: '运行', render: (r) => `<a href="${esc(r.url)}" target="_blank" rel="noopener">#${esc(r.runId)}</a>` },
       { key: 'dmVersion', label: '版本', sortable: false, render: (r) => (dmVersionOf(r.createdAt) ? badge(dmVersionOf(r.createdAt), 'none') : '<span class="muted">—</span>') },
-      { key: 'createdAt', label: '时间', render: (r) => esc(String(r.createdAt).slice(0, 16).replace('T', ' ')) + ' UTC' },
-      { key: 'conclusion', label: '结果', render: (r) => (r.conclusion === 'success' ? badge('success', 'good') : badge('failure', 'bad')) },
-      { key: 'total', label: '用例', num: true, render: (r) => n((r.st.cases || []).length) },
-      { key: 'passed', label: '通过', num: true, render: (r) => `${(r.st.cases || []).filter((c) => c.status === 'passed').length}/${(r.st.cases || []).length}` },
-      { key: 'median', label: '耗时中位', num: true, render: (r) => fmtMs(medianOf(r.st.cases || [])), sort: (r) => medianOf(r.st.cases || []) ?? Infinity },
+      { key: 'createdAt', label: '时间', render: (r) => esc(shortDateTime(r.createdAt)) },
+      { key: 'conclusion', label: '结果', render: (r) => conclusionBadge(r.conclusion) },
+      { key: 'total', label: '执行用例', num: true, render: (r) => runSummary(r).executed, sort: (r) => runSummary(r).executed },
+      { key: 'passed', label: '通过', num: true, render: (r) => { const s = runSummary(r); return `${s.passed}/${s.executed}`; }, sort: (r) => runSummary(r).passed },
+      { key: 'median', label: '耗时中位', num: true, render: (r) => fmtMs(medianOf(timedCases(r))), sort: (r) => medianOf(timedCases(r)) ?? Infinity },
       { key: 'sha', label: 'commit', render: (r) => `<code>${esc(r.headSha || '—')}</code>` },
     ], runs, { defaultSort: null })}</div>`;
     return html;
