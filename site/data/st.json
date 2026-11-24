@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-24T06:03:59Z",
+  "updatedAt": "2026-11-24T16:40:30Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -259,6 +259,31 @@
     }
   ],
   "runs": [
+    {
+      "runId": 45432121036,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45432121036",
+      "createdAt": "2026-11-24T16:00:46Z",
+      "headSha": "b2a0dfcf0e3e",
+      "conclusion": "failure",
+      "branch": "release_v0.1.13",
+      "st": {
+        "runId": "nightly-45432121036-1",
+        "status": "failed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "ST 13/13 failed at compile independent test HAP; no Verified test HAP; execution-error.txt unavailable (#1710); same failure as #505, tracked in #2588.",
+          "E2E preflight blocked: device package lacks digitalmate-* test id / uitest unresponsive; Run E2E case(s) skipped, 0 cases executed (environment, #2518); live-wire all suites blocked (#2519).",
+          "Component session-proximity failed, likely a cascade of the ST compile failure (#2531); Bench Fetch Pi-Bench failed (HuggingFace unavailable; no open Issue).",
+          "Artifacts=0, evidence from job logs only; OBS report lane archive partial: digitalmate/v1/repos/openJiuwen-ai/DigitalMate/sources/nightly/runs/45432121036/attempts/1/lanes/report/manifest.json (#1710)."
+        ],
+        "cases": [],
+        "liveWire": null,
+        "component": null
+      }
+    },
     {
       "runId": "paused-main-20261124-1400",
       "attempt": 1,
