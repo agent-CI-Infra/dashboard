@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/e2e-performance-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updated_at": "2026-11-24T18:20:00Z",
+  "updated_at": "2026-11-25T04:44:53Z",
   "cases": {
     "DM-WF-CHROME-01": {
       "id": "DM-WF-CHROME-01",
@@ -12821,6 +12821,13 @@
     }
   },
   "runs": [
+    {
+      "run_id": "nightly-45543875824-1",
+      "branch": "release_v0.1.13",
+      "createdAt": "2026-11-25T04:01:03Z",
+      "status": "blocked",
+      "reason": "E2E preflight failed: real-device package lacks digitalmate-* test id / uitest unresponsive; Run E2E case(s) skipped, 0 cases executed (#2518); #2276 dirty; artifact missing (#1710)"
+    },
     {
       "run_id": "nightly-45454772455-1",
       "branch": "main",
