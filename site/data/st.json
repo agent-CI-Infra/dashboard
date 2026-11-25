@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-24T18:20:00Z",
+  "updatedAt": "2026-11-25T04:44:53Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -259,6 +259,31 @@
     }
   ],
   "runs": [
+    {
+      "runId": 45543875824,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45543875824",
+      "createdAt": "2026-11-25T04:01:03Z",
+      "headSha": "b2a0dfcf0e3e",
+      "conclusion": "failure",
+      "branch": "release_v0.1.13",
+      "st": {
+        "runId": "nightly-45543875824-1",
+        "status": "failed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "ST 13/13 failed at compile independent test HAP; root cause is missing jumpToLatest in generated ComposerHost; fix PR #2577 open/mergeable (#2588 closed duplicate).",
+          "E2E preflight blocked on real device: package lacks digitalmate-* test id / uitest unresponsive; Run E2E case(s) skipped, 0 cases executed (#2518; #2276 dirty).",
+          "live-wire all suites blocked (#2519); component job failed but log BlobNotFound (#2531); Bench Fetch Pi-Bench failed on HF ConnectError (Nightly Bench removal #2454 pending).",
+          "Artifacts=0 (#1710); OBS local archive partial: digitalmate/v1/repos/openJiuwen-ai/DigitalMate/sources/nightly/runs/45543875824/attempts/1/lanes/report/manifest.json"
+        ],
+        "cases": [],
+        "liveWire": null,
+        "component": null
+      }
+    },
     {
       "runId": 45454772455,
       "attempt": 1,
