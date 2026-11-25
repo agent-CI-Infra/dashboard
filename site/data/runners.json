@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-25T03:42:37Z",
+  "updatedAt": "2026-11-25T13:38:10Z",
   "source": "openJiuwen-ai/DigitalMate",
   "runners": [
     {
@@ -41,7 +41,7 @@
       "name": "digitalmate-win-st-02",
       "os": "Windows",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "Windows",
@@ -59,7 +59,7 @@
       "name": "digitalmate-win-st-03",
       "os": "Windows",
       "status": "online",
-      "busy": false,
+      "busy": true,
       "labels": [
         "self-hosted",
         "Windows",
@@ -114,14 +114,22 @@
         "Linux",
         "dm-nodeut",
         "dm-utility"
-      ]
+      ],
+      "job": {
+        "name": "Fast Checks / 2 · Linux UT (Node)",
+        "workflow": "CI Advisory",
+        "run_number": 1259,
+        "run_id": 45624465535,
+        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45624465535",
+        "started_at": "2026-11-25T13:32:41Z"
+      }
     },
     {
       "id": 26,
       "name": "dm-cloud-nodeut-01",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -134,21 +142,13 @@
       "name": "dm-cloud-nodeut-02",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
         "Linux",
         "dm-utility"
-      ],
-      "job": {
-        "name": "Fast Checks / gate-report",
-        "workflow": "CI Advisory",
-        "run_number": 1007,
-        "run_id": 45540499710,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45540499710",
-        "started_at": "2026-11-25T03:42:05Z"
-      }
+      ]
     },
     {
       "id": 32,
@@ -163,22 +163,14 @@
         "dm-codecheck",
         "dm-nodeut",
         "dm-architecture"
-      ],
-      "job": {
-        "name": "TLS client-Gateway regressions",
-        "workflow": "Mobile client ST-1",
-        "run_number": 3,
-        "run_id": 45541788414,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45541788414",
-        "started_at": "2026-11-25T03:42:20Z"
-      }
+      ]
     },
     {
       "id": 33,
       "name": "dm-hk-ci-02",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -186,15 +178,7 @@
         "dm-codecheck",
         "dm-nodeut",
         "dm-architecture"
-      ],
-      "job": {
-        "name": "Read-only Gate Report",
-        "workflow": "CI Advisory",
-        "run_number": 1020,
-        "run_id": 45541499244,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45541499244",
-        "started_at": "2026-11-25T03:41:30Z"
-      }
+      ]
     },
     {
       "id": 35,
@@ -224,22 +208,14 @@
         "dm-codecheck",
         "dm-nodeut",
         "dm-architecture"
-      ],
-      "job": {
-        "name": "Fast Checks / 2 · Linux UT (Node)",
-        "workflow": "CI Advisory",
-        "run_number": 1010,
-        "run_id": 45540680028,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45540680028",
-        "started_at": "2026-11-25T03:37:16Z"
-      }
+      ]
     },
     {
       "id": 37,
       "name": "dm-hk-ci-05",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -253,7 +229,7 @@
       "name": "dm-hk-ci-06",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -267,7 +243,7 @@
       "name": "dm-hk-ci-07",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -333,83 +309,34 @@
       "job": {
         "name": "Fast Checks / 2 · Linux UT (Python) / Isolated Python UT",
         "workflow": "CI Advisory",
-        "run_number": 1010,
-        "run_id": 45540680028,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45540680028",
-        "started_at": "2026-11-25T03:41:48Z"
+        "run_number": 1259,
+        "run_id": 45624465535,
+        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45624465535",
+        "started_at": "2026-11-25T13:37:44Z"
       }
     }
   ],
   "queued": [
     {
-      "name": "Read-only Gate Report",
+      "name": "Fast Checks / 2 · Linux UT (Python) / Isolated Python UT",
       "workflow": "CI Advisory",
-      "run_number": 1027,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45541787348",
-      "created_at": "2026-11-25T03:42:11Z"
+      "run_number": 1262,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45624750207",
+      "created_at": "2026-11-25T13:34:43Z"
     },
     {
-      "name": "size",
-      "workflow": "repo-size-guard",
-      "run_number": 2401,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45541788425",
-      "created_at": "2026-11-25T03:42:12Z"
-    },
-    {
-      "name": "size",
-      "workflow": "repo-size-guard",
-      "run_number": 2400,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45541787264",
-      "created_at": "2026-11-25T03:42:11Z"
-    },
-    {
-      "name": "Read-only Gate Report",
+      "name": "Fast Checks / 2 · Linux UT (Python) / Isolated Python UT",
       "workflow": "CI Advisory",
-      "run_number": 1025,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45541761720",
-      "created_at": "2026-11-25T03:41:58Z"
+      "run_number": 1261,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45624722142",
+      "created_at": "2026-11-25T13:34:14Z"
     },
     {
-      "name": "Read-only Gate Report",
+      "name": "Fast Checks / 2 · Linux UT (Python) / Isolated Python UT",
       "workflow": "CI Advisory",
-      "run_number": 1024,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45541675883",
-      "created_at": "2026-11-25T03:41:11Z"
-    },
-    {
-      "name": "Read-only Gate Report",
-      "workflow": "CI Advisory",
-      "run_number": 1023,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45541633467",
-      "created_at": "2026-11-25T03:40:49Z"
-    },
-    {
-      "name": "Read-only Gate Report",
-      "workflow": "CI Advisory",
-      "run_number": 1022,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45541615045",
-      "created_at": "2026-11-25T03:40:39Z"
-    },
-    {
-      "name": "Read-only Gate Report",
-      "workflow": "CI Advisory",
-      "run_number": 1021,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45541578788",
-      "created_at": "2026-11-25T03:40:21Z"
-    },
-    {
-      "name": "2 · Component Proxy Conformance",
-      "workflow": "CI Advisory",
-      "run_number": 1019,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45541435786",
-      "created_at": "2026-11-25T03:42:04Z"
-    },
-    {
-      "name": "2 · ArkTS Lint / ArkTS Code Check",
-      "workflow": "CI Advisory",
-      "run_number": 1019,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45541435786",
-      "created_at": "2026-11-25T03:42:04Z"
+      "run_number": 1258,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45624465032",
+      "created_at": "2026-11-25T13:33:05Z"
     }
   ],
   "history": [
@@ -1564,6 +1491,47 @@
         "dm-hk-ci-01": "TLS client-Gateway regressions",
         "dm-hk-ci-02": "Read-only Gate Report",
         "dm-hk-ci-04": "Fast Checks / 2 · Linux UT (Node)",
+        "runtime-ut-01": "Fast Checks / 2 · Linux UT (Python) / Isolated Python UT"
+      }
+    },
+    {
+      "at": "2026-11-25T13:38:10Z",
+      "s": {
+        "HwdeMacBook-Air-2": "online",
+        "digitalmate-win-st-01": "online",
+        "digitalmate-win-st-02": "online",
+        "digitalmate-win-st-03": "online",
+        "digitalmate-win-st-04": "online",
+        "dm-cloud-codecheck-02": "online",
+        "dm-cloud-flex-01": "online",
+        "dm-cloud-nodeut-01": "online",
+        "dm-cloud-nodeut-02": "online",
+        "dm-hk-ci-01": "online",
+        "dm-hk-ci-02": "online",
+        "dm-hk-ci-03": "online",
+        "dm-hk-ci-04": "online",
+        "dm-hk-ci-05": "online",
+        "dm-hk-ci-06": "online",
+        "dm-hk-ci-07": "online",
+        "dm-hk-ci-08": "online",
+        "harmonyos-ut-01": "offline",
+        "merge-01": "online",
+        "merge-gate-01": "online",
+        "runtime-ut-01": "online"
+      },
+      "b": {
+        "digitalmate-win-st-01": true,
+        "digitalmate-win-st-03": true,
+        "digitalmate-win-st-04": true,
+        "dm-cloud-flex-01": true,
+        "dm-hk-ci-01": true,
+        "dm-hk-ci-03": true,
+        "dm-hk-ci-04": true,
+        "dm-hk-ci-08": true,
+        "runtime-ut-01": true
+      },
+      "j": {
+        "dm-cloud-flex-01": "Fast Checks / 2 · Linux UT (Node)",
         "runtime-ut-01": "Fast Checks / 2 · Linux UT (Python) / Isolated Python UT"
       }
     }
