@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-25T13:38:10Z",
+  "updatedAt": "2026-11-25T22:49:54Z",
   "source": "openJiuwen-ai/DigitalMate",
   "runners": [
     {
@@ -21,7 +21,7 @@
       "name": "digitalmate-win-st-01",
       "os": "Windows",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "Windows",
@@ -59,7 +59,7 @@
       "name": "digitalmate-win-st-03",
       "os": "Windows",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "Windows",
@@ -77,7 +77,7 @@
       "name": "digitalmate-win-st-04",
       "os": "Windows",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "Windows",
@@ -107,22 +107,14 @@
       "name": "dm-cloud-flex-01",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
         "Linux",
         "dm-nodeut",
         "dm-utility"
-      ],
-      "job": {
-        "name": "Fast Checks / 2 · Linux UT (Node)",
-        "workflow": "CI Advisory",
-        "run_number": 1259,
-        "run_id": 45624465535,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45624465535",
-        "started_at": "2026-11-25T13:32:41Z"
-      }
+      ]
     },
     {
       "id": 26,
@@ -155,7 +147,7 @@
       "name": "dm-hk-ci-01",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -185,7 +177,7 @@
       "name": "dm-hk-ci-03",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -200,7 +192,7 @@
       "name": "dm-hk-ci-04",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -257,7 +249,7 @@
       "name": "dm-hk-ci-08",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
@@ -299,46 +291,16 @@
       "name": "runtime-ut-01",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
         "Linux",
         "runtime-ut"
-      ],
-      "job": {
-        "name": "Fast Checks / 2 · Linux UT (Python) / Isolated Python UT",
-        "workflow": "CI Advisory",
-        "run_number": 1259,
-        "run_id": 45624465535,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45624465535",
-        "started_at": "2026-11-25T13:37:44Z"
-      }
+      ]
     }
   ],
-  "queued": [
-    {
-      "name": "Fast Checks / 2 · Linux UT (Python) / Isolated Python UT",
-      "workflow": "CI Advisory",
-      "run_number": 1262,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45624750207",
-      "created_at": "2026-11-25T13:34:43Z"
-    },
-    {
-      "name": "Fast Checks / 2 · Linux UT (Python) / Isolated Python UT",
-      "workflow": "CI Advisory",
-      "run_number": 1261,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45624722142",
-      "created_at": "2026-11-25T13:34:14Z"
-    },
-    {
-      "name": "Fast Checks / 2 · Linux UT (Python) / Isolated Python UT",
-      "workflow": "CI Advisory",
-      "run_number": 1258,
-      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45624465032",
-      "created_at": "2026-11-25T13:33:05Z"
-    }
-  ],
+  "queued": [],
   "history": [
     {
       "at": "2026-11-13T09:13:19Z",
@@ -1534,6 +1496,34 @@
         "dm-cloud-flex-01": "Fast Checks / 2 · Linux UT (Node)",
         "runtime-ut-01": "Fast Checks / 2 · Linux UT (Python) / Isolated Python UT"
       }
+    },
+    {
+      "at": "2026-11-25T22:49:54Z",
+      "s": {
+        "HwdeMacBook-Air-2": "online",
+        "digitalmate-win-st-01": "online",
+        "digitalmate-win-st-02": "online",
+        "digitalmate-win-st-03": "online",
+        "digitalmate-win-st-04": "online",
+        "dm-cloud-codecheck-02": "online",
+        "dm-cloud-flex-01": "online",
+        "dm-cloud-nodeut-01": "online",
+        "dm-cloud-nodeut-02": "online",
+        "dm-hk-ci-01": "online",
+        "dm-hk-ci-02": "online",
+        "dm-hk-ci-03": "online",
+        "dm-hk-ci-04": "online",
+        "dm-hk-ci-05": "online",
+        "dm-hk-ci-06": "online",
+        "dm-hk-ci-07": "online",
+        "dm-hk-ci-08": "online",
+        "harmonyos-ut-01": "offline",
+        "merge-01": "online",
+        "merge-gate-01": "online",
+        "runtime-ut-01": "online"
+      },
+      "b": {},
+      "j": {}
     }
   ]
 }
