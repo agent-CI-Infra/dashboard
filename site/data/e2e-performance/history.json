@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/e2e-performance-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updated_at": "2026-11-25T16:01:35Z",
+  "updated_at": "2026-11-25T18:03:51Z",
   "cases": {
     "DM-WF-CHROME-01": {
       "id": "DM-WF-CHROME-01",
@@ -12821,6 +12821,13 @@
     }
   },
   "runs": [
+    {
+      "run_id": "paused-main-20261126-0200",
+      "branch": "main",
+      "createdAt": "2026-11-26T02:00:00+08:00",
+      "status": "skipped",
+      "reason": "main 02:00 cancelled by operator; release 00:00 #519 also cancelled; main resumes 14:00 unless changed"
+    },
     {
       "run_id": "nightly-45557507649-1",
       "branch": "main",
