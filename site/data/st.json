@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-25T04:44:53Z",
+  "updatedAt": "2026-11-25T16:01:35Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -259,6 +259,30 @@
     }
   ],
   "runs": [
+    {
+      "runId": 45557507649,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45557507649",
+      "createdAt": "2026-11-25T06:00:54Z",
+      "headSha": "acb6691376c4",
+      "conclusion": "failure",
+      "branch": "main",
+      "st": {
+        "runId": "nightly-45557507649-1",
+        "status": "failed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "ST/component blocked before cases: Missing historical Git blob 5eea5359...; prepare.mjs not run (#2683).",
+          "E2E/live-wire blocked: simulator driver incompatible with HM-C1 (#2578); 0 E2E cases executed.",
+          "Bench Fetch Pi-Bench failed on HuggingFace; Nightly Bench removal #2453 pending; artifacts=0 (#1710)."
+        ],
+        "cases": [],
+        "liveWire": null,
+        "component": null
+      }
+    },
     {
       "runId": 45543875824,
       "attempt": 1,

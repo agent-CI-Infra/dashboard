@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/e2e-performance-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updated_at": "2026-11-25T04:44:53Z",
+  "updated_at": "2026-11-25T16:01:35Z",
   "cases": {
     "DM-WF-CHROME-01": {
       "id": "DM-WF-CHROME-01",
@@ -12821,6 +12821,13 @@
     }
   },
   "runs": [
+    {
+      "run_id": "nightly-45557507649-1",
+      "branch": "main",
+      "createdAt": "2026-11-25T06:00:54Z",
+      "status": "blocked",
+      "reason": "Simulator driver incompatible with HM-C1 (#2578); 0 E2E cases executed; artifact missing (#1710)"
+    },
     {
       "run_id": "nightly-45543875824-1",
       "branch": "release_v0.1.13",
