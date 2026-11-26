@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-26T17:17:17Z",
+  "updatedAt": "2026-11-26T18:15:04Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -259,6 +259,125 @@
     }
   ],
   "runs": [
+    {
+      "runId": 45872471304,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45872471304",
+      "createdAt": "2026-11-26T18:00:50Z",
+      "headSha": "f1f4e3a17f5eeb07787610585853cbfbafe4b16e",
+      "conclusion": "failure",
+      "branch": "main",
+      "st": {
+        "runId": "",
+        "status": "skipped",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "Image build failed: APT_MIRROR=deb.debian.org produced malformed apt sources URI (#2973); ST/E2E/Bench skipped.",
+          "component failed: Missing historical Git blob 5eea53596b85c07601887a1b799e673705cc4d96 / 6e502b8fd181557046b7a28cab47470b821a19d3; prepare not run (PR #2686).",
+          "live-wire 7/7 blocked: main lacks ST_LIVE_WIRE_UPSTREAM/ST_HIVE_HOME (PR #2060); artifacts missing (#1710)."
+        ],
+        "cases": [],
+        "liveWire": [
+          {
+            "suite": "connection",
+            "caseName": "gateway_connection",
+            "status": "blocked",
+            "nativeStatus": "blocked",
+            "issues": [
+              "main live-wire not wired to Hive Home (PR #2060); artifact missing (#1710)."
+            ]
+          },
+          {
+            "suite": "business",
+            "caseName": "business",
+            "status": "blocked",
+            "nativeStatus": "blocked",
+            "issues": [
+              "main live-wire not wired to Hive Home (PR #2060); artifact missing (#1710)."
+            ]
+          },
+          {
+            "suite": "identity",
+            "caseName": "identity",
+            "status": "blocked",
+            "nativeStatus": "blocked",
+            "issues": [
+              "main live-wire not wired to Hive Home (PR #2060); artifact missing (#1710)."
+            ]
+          },
+          {
+            "suite": "forward",
+            "caseName": "forward",
+            "status": "blocked",
+            "nativeStatus": "blocked",
+            "issues": [
+              "main live-wire not wired to Hive Home (PR #2060); artifact missing (#1710)."
+            ]
+          },
+          {
+            "suite": "optional",
+            "caseName": "optional",
+            "status": "blocked",
+            "nativeStatus": "blocked",
+            "issues": [
+              "main live-wire not wired to Hive Home (PR #2060); artifact missing (#1710)."
+            ]
+          },
+          {
+            "suite": "chunks",
+            "caseName": "chunks",
+            "status": "blocked",
+            "nativeStatus": "blocked",
+            "issues": [
+              "main live-wire not wired to Hive Home (PR #2060); artifact missing (#1710)."
+            ]
+          },
+          {
+            "suite": "artifact",
+            "caseName": "artifact-receipt-matrix",
+            "status": "blocked",
+            "nativeStatus": "blocked",
+            "issues": [
+              "main live-wire not wired to Hive Home (PR #2060); artifact missing (#1710)."
+            ]
+          }
+        ],
+        "component": [
+          {
+            "suite": "attachment-policy",
+            "title": "本地附件策略",
+            "status": "failed",
+            "runId": "",
+            "issues": [
+              "Missing historical Git blob 5eea53596b85c07601887a1b799e673705cc4d96 / 6e502b8fd181557046b7a28cab47470b821a19d3; prepare not run (PR #2686)."
+            ],
+            "cases": []
+          },
+          {
+            "suite": "session-proximity",
+            "title": "会话邻近契约",
+            "status": "failed",
+            "runId": "",
+            "issues": [
+              "Missing historical Git blob 5eea53596b85c07601887a1b799e673705cc4d96 / 6e502b8fd181557046b7a28cab47470b821a19d3; prepare not run (PR #2686)."
+            ],
+            "cases": []
+          },
+          {
+            "suite": "suggestions",
+            "title": "建议协议与按钮",
+            "status": "failed",
+            "runId": "",
+            "issues": [
+              "Missing historical Git blob 5eea53596b85c07601887a1b799e673705cc4d96 / 6e502b8fd181557046b7a28cab47470b821a19d3; prepare not run (PR #2686)."
+            ],
+            "cases": []
+          }
+        ]
+      }
+    },
     {
       "runId": 45848378805,
       "attempt": 1,
