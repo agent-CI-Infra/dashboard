@@ -4218,6 +4218,12 @@ $('granularity-select').addEventListener('change', (event) => {
   renderModels();
 });
 
+$('model-section')?.addEventListener('toggle', (event) => {
+  hideChartHover();
+  // Measure charts after the disclosure exposes their container width.
+  if (event.target.open && state.history && state.view === 'models') renderTrends();
+});
+
 function handleRangeClick(event) {
   const button = event.target.closest('[data-range]');
   if (!button || button.disabled) return;
@@ -4448,7 +4454,7 @@ load();
 // Keep the embedded view as tall as its content.
 if (window.parent !== window) {
   document.documentElement.classList.add('embedded-metrics');
-  const reportHeight = () => window.parent.postMessage({ type: 'production-metrics-height', height: document.documentElement.scrollHeight }, location.origin);
+  const reportHeight = () => window.parent.postMessage({ type: 'production-metrics-height', height: Math.ceil(document.body.getBoundingClientRect().height) }, location.origin);
   new ResizeObserver(reportHeight).observe(document.body);
   window.addEventListener('load', reportHeight);
 }
