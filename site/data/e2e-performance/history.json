@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/e2e-performance-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updated_at": "2026-11-26T17:17:17Z",
+  "updated_at": "2026-11-26T18:15:04Z",
   "cases": {
     "DM-WF-CHROME-01": {
       "id": "DM-WF-CHROME-01",
@@ -13136,6 +13136,13 @@
     }
   },
   "runs": [
+    {
+      "run_id": "nightly-45872471304-1",
+      "branch": "main",
+      "createdAt": "2026-11-26T18:00:50Z",
+      "status": "blocked",
+      "reason": "Image build failed: APT_MIRROR=deb.debian.org produced malformed apt sources URI (#2973); E2E job skipped, 0 cases executed; artifacts missing (#1710)."
+    },
     {
       "run_id": "nightly-45848378805-1",
       "branch": "release_v0.1.13",
