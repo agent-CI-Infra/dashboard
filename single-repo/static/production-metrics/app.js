@@ -998,6 +998,7 @@ function envSummary(doc) {
   if (!rows.length) return '';
   const anchor = summarizeCloudWindow(rows);
   const seconds = (value) => fmtSecondsBare(value);
+  const milliseconds = (value) => Number.isFinite(value) && value >= 0 ? value.toFixed(1).replace(/\.0$/, '') : '—';
   const formatted = (metric, field, formatter) => `${metric?.approx && field !== 'mean' && Number.isFinite(metric?.[field]) ? '≈' : ''}${formatter(metric?.[field])}`;
   const workspaceMetrics = anchor.source === 'workspace_request_logs' || Number.isFinite(anchor.model_usage_events);
   const rateValue = workspaceMetrics ? anchor.gateway_stream?.exception_rate : anchor.failure_rate;
@@ -1031,6 +1032,19 @@ function envSummary(doc) {
   const firstTile = requestTile('first_token', '首吐字', '网关受理 → 首个文本 chunk');
   const answerTile = requestTile('answer_first', '答案首吐字', '网关受理 → 首个答案 chat.delta · 网关实测');
   const reactTile = requestTile('react', 'ReAct 阶段', '网关首文本 → 网关首答案 · 同一请求配对');
+  const networkTiles = [
+    ['uplink_send', '端到云', '上行时延', '端侧发出请求 → 云侧 Bridge 收到请求'],
+    ['downlink_first_text', '云到端', '首段文字下行', '云侧 Bridge 发出首段文字 → 端侧收到'],
+    ['downlink_terminal', '云到端', '结束帧下行', '云侧 Bridge 发出结束帧 → 端侧收到'],
+  ].map(([key, direction, label, hint]) => {
+    const metric = anchor[key];
+    const count = metric?.n > 0 ? `${fmtCount(metric.n)} 个有效样本` : '所选范围无有效样本 · 等待已校时样本';
+    return `<div class="stat-card network-card" data-metric="${key}">
+      <div class="stat-label">${direction}<strong>${label}</strong> 平均 / P50 / P95（ms）</div>
+      <div class="stat-value combo">${formatted(metric, 'mean', milliseconds)} / ${formatted(metric, 'p50', milliseconds)} / ${formatted(metric, 'p95', milliseconds)}</div>
+      <div class="stat-hint">${count} · 覆盖 ${fmtCount(metric?.days)} / ${fmtCount(anchor.window_days)} 天${anchor.network_partial ? ' · 采集部分覆盖' : ''} · ${hint} · 校时误差 ≤ 50 ms；下行仅计已配对帧</div>
+    </div>`;
+  }).join('');
   const rangeNote = `${esc(anchor.window_start)} 至 ${esc(anchor.window_end)} · ${fmtCount(anchor.window_days)} 个有数据的日期${anchor.partial ? ' · 含部分覆盖' : ''}${anchor.current_sample_days ? ` · ${fmtCount(anchor.current_sample_days)} 天使用当前可读日志样本` : ''}`;
   return `<div class="env-data-notes env-range-notes"><div><strong>统计范围</strong><span>${rangeNote}</span></div><div><strong>汇总口径</strong><span>均值按样本数或输出 Token 加权；多日分位数仅在可合并分布完整时显示，≈ 表示近似。</span></div></div><section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
     <div class="stat-card">
@@ -1046,6 +1060,7 @@ function envSummary(doc) {
     ${firstTile}
     ${answerTile}
     ${reactTile}
+    ${networkTiles}
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>TPOT</strong> 平均 / P50 / P95（ms/token）</div>
       <div class="stat-value combo">${formatted(anchor.tpot, 'mean', fmtTpotBare)} / ${formatted(anchor.tpot, 'p50', fmtTpotBare)} / ${formatted(anchor.tpot, 'p95', fmtTpotBare)}</div>
@@ -1059,29 +1074,7 @@ function envSummary(doc) {
   </section>`;
 }
 
-function clientNetworkSummary(doc) {
-  const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row?.date) : [];
-  const anchor = summarizeCloudWindow(rows);
-  if (!anchor) return '<p class="empty">所选范围暂无端侧与网络时延数据。</p>';
-  const formatted = (metric, field) => Number.isFinite(metric?.[field])
-    ? `${field !== 'mean' && metric.approx ? '≈' : ''}${Number(metric[field].toFixed(1))}` : '—';
-  const networkTiles = [
-    ['uplink_send', '端到云', '上行时延', '端侧发出请求 → 云侧 Bridge 收到请求'],
-    ['downlink_first_text', '云到端', '首段文字下行', '云侧 Bridge 发出首段文字 → 端侧收到'],
-    ['downlink_terminal', '云到端', '结束帧下行', '云侧 Bridge 发出结束帧 → 端侧收到'],
-  ].map(([key, direction, label, hint]) => {
-    const metric = anchor[key];
-    const count = metric?.n > 0 ? `${fmtCount(metric.n)} 个有效样本` : '所选范围无有效样本 · 等待已校时样本';
-    return `<div class="stat-card network-card" data-metric="${key}">
-      <div class="stat-label">${direction}<strong>${label}</strong> 平均 / P50 / P95（ms）</div>
-      <div class="stat-value combo">${formatted(metric, 'mean')} / ${formatted(metric, 'p50')} / ${formatted(metric, 'p95')}</div>
-      <div class="stat-hint">${count} · 覆盖 ${fmtCount(metric?.days)} / ${fmtCount(anchor.window_days)} 天${anchor.network_partial ? ' · 采集部分覆盖' : ''} · ${hint} · 校时误差 ≤ 50 ms；下行仅计已配对帧</div>
-    </div>`;
-  }).join('');
-  return `<section class="summary model-summary" aria-label="端侧与网络时延指标">${networkTiles}</section>`;
-}
-
-const PREFIX_CACHE_SOURCES = { beebou: 'Beebou', bees: 'Bees', workswarm: 'WorkSwarm' };
+const PREFIX_CACHE_SOURCES = { bees: 'Bee', beebou: 'BeeBou', workswarm: 'WorkSwarm' };
 const PREFIX_CACHE_COHORTS = { first_observed: '首个可见调用', returning: '已见会话', unknown: '会话未知' };
 
 function summarizePrefixCache(groups) {
@@ -1125,12 +1118,21 @@ function prefixCachePanel(doc, range, today, completeThrough) {
     return `<section class="env-anomaly">${title}<p class="empty">所选日期没有缓存用量样本。</p>${details}</section>`;
   }
   const groups = days.flatMap((day) => day.groups);
-  const overall = summarizePrefixCache(groups);
   const pct = (ratio) => Number.isFinite(ratio) ? fmtPercent(100 * ratio) : '—';
   const quantiles = (stats) => `${pct(stats.p50)} / ${pct(stats.p95)}`;
   const misses = (stats) => stats.miss_eligible
     ? `${fmtCount(stats.near_miss)} / ${fmtCount(stats.miss_eligible)}（${pct(stats.missRate)}）` : '—';
   const samples = (stats) => `${fmtCount(stats.known)} / ${fmtCount(stats.calls)}`;
+  const sourceSummaries = Object.entries(PREFIX_CACHE_SOURCES).map(([source, name]) => {
+    const stats = summarizePrefixCache(groups.filter((group) => group.source === source));
+    return `<section class="stat-card prefix-cache-source" data-cache-source="${source}" aria-label="${name} 前缀缓存命中率">
+      <h4>${name}</h4>
+      <div class="prefix-cache-metric"><div class="stat-label">加权命中率</div><div class="stat-value">${pct(stats.rate)}</div><div class="stat-hint">命中 Token ÷ 有效样本的输入 Token</div></div>
+      <div class="prefix-cache-metric"><div class="stat-label">单次命中率 P50 / P95</div><div class="stat-value combo">${quantiles(stats)}</div><div class="stat-hint">按 0.1 个百分点分桶</div></div>
+      <div class="prefix-cache-metric"><div class="stat-label">近零命中 / 可判定</div><div class="stat-value combo">${misses(stats)}</div><div class="stat-hint">命中率 ≤ 1%，输入 ≥ 1,024 Token</div></div>
+      <div class="prefix-cache-metric"><div class="stat-label">已知 / 已观测调用</div><div class="stat-value combo">${samples(stats)}</div><div class="stat-hint">缺失或无效 ${fmtCount(stats.calls - stats.known)} 次</div></div>
+    </section>`;
+  }).join('');
 
   const grouped = new Map();
   for (const row of groups) {
@@ -1166,12 +1168,7 @@ function prefixCachePanel(doc, range, today, completeThrough) {
   })).join('');
 
   return `<section class="env-anomaly">${title}${details}
-    <div class="summary model-summary env-summary">
-      <div class="stat-card"><div class="stat-label">加权命中率</div><div class="stat-value">${pct(overall.rate)}</div><div class="stat-hint">命中 Token ÷ 有效样本的输入 Token</div></div>
-      <div class="stat-card"><div class="stat-label">单次命中率 P50 / P95</div><div class="stat-value combo">${quantiles(overall)}</div><div class="stat-hint">按 0.1 个百分点分桶</div></div>
-      <div class="stat-card"><div class="stat-label">近零命中 / 可判定</div><div class="stat-value combo">${misses(overall)}</div><div class="stat-hint">命中率 ≤ 1%，输入 ≥ 1,024 Token</div></div>
-      <div class="stat-card"><div class="stat-label">已知 / 已观测调用</div><div class="stat-value combo">${samples(overall)}</div><div class="stat-hint">缺失或无效 ${fmtCount(overall.calls - overall.known)} 次</div></div>
-    </div>
+    <div class="summary model-summary prefix-cache-summary">${sourceSummaries}</div>
     <details class="env-call-detail"><summary>按链路、模型与会话拆分</summary><div class="table-wrap"><table class="history-table">
       <thead><tr><th>链路</th><th>模型</th><th>会话</th><th>加权命中率</th><th>单次 P50 / P95</th><th>近零命中 / 可判定</th><th>已知 / 已观测</th></tr></thead><tbody>${breakdown}</tbody>
     </table></div><p class="chart-note">首个可见调用以当前保留日志为准，可能来自已有会话。</p></details>
@@ -4091,14 +4088,26 @@ function cloudTraceRangeLabel(rangeDays, today, completeThrough = null) {
   return `${addDays(end, -(Number(rangeDays) - 1))} 至 ${end}（按完整日）`;
 }
 
+function replyTimingSummary() {
+  const cards = [
+    ['quick_reply', '快回复'],
+    ['normal_reply_bee', '正常回复（Bee）'],
+    ['final_reply', '最终回复'],
+  ].map(([key, label]) => `<div class="stat-card reply-timing-card" data-metric="${key}">
+    <div class="stat-label">云侧 Agent<strong>${label}</strong> 平均 / P50 / P95（s）</div>
+    <div class="stat-value combo">— / — / —</div>
+    <div class="stat-hint">暂无打点数据</div>
+  </div>`).join('');
+  return `<section class="summary model-summary reply-timing-summary" aria-label="云侧回复时延指标">${cards}</section>`;
+}
+
 function renderEnv() {
   const target = $('env-latency');
   if (!target) return;
   const daily = state.envDaily;
-  const client = $('client-network');
+  const replyTimings = replyTimingSummary();
   if (!daily) {
-    target.innerHTML = '';
-    if (client) client.innerHTML = '<p class="empty">暂无端侧与网络时延数据。</p>';
+    target.innerHTML = replyTimings;
     renderRequestTraces(null);
     return;
   }
@@ -4106,7 +4115,6 @@ function renderEnv() {
   // Match the model summary's completed-day anchor; Today still shows today.
   // Historical rows with incomplete coverage remain visible and labelled.
   const scoped = { ...daily, days: cloudScopedDays(all, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history)).map(cloudDisplayRow) };
-  if (client) client.innerHTML = clientNetworkSummary(scoped);
   renderRequestTraces(daily);
   const latestObserved = scoped.days.at(-1)?.observed_at;
   const snapshotTime = daily.generated_at || daily.updated_at;
@@ -4123,7 +4131,7 @@ function renderEnv() {
   ].filter(Boolean);
   const freshness = `<div class="env-data-notes" aria-label="数据说明"><div><strong>数据更新</strong><span>${timeText} · 定时采集，并非实时流</span></div>${warnings.length ? `<div><strong>数据限制</strong><span>${warnings.join('；')}。</span></div>` : ''}<div><strong>覆盖标记</strong><span>* 表示部分日或日志覆盖不全。</span></div></div>`;
   const prefixCache = prefixCachePanel(daily.prefix_cache, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history));
-  target.innerHTML = `${freshness}${envSummary(scoped)}${prefixCache}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
+  target.innerHTML = `${freshness}${envSummary(scoped)}${replyTimings}${prefixCache}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
   refineCharts(target, state.cloudReleases);
 }
 
@@ -4216,6 +4224,12 @@ $('model-insights').addEventListener('click', (event) => {
 $('granularity-select').addEventListener('change', (event) => {
   state.granularity = event.target.value === 'weekly' ? 'weekly' : 'daily';
   renderModels();
+});
+
+$('model-section')?.addEventListener('toggle', (event) => {
+  hideChartHover();
+  // Measure charts after the disclosure exposes their container width.
+  if (event.target.open && state.history && state.view === 'models') renderTrends();
 });
 
 function handleRangeClick(event) {
@@ -4448,7 +4462,7 @@ load();
 // Keep the embedded view as tall as its content.
 if (window.parent !== window) {
   document.documentElement.classList.add('embedded-metrics');
-  const reportHeight = () => window.parent.postMessage({ type: 'production-metrics-height', height: document.documentElement.scrollHeight }, location.origin);
+  const reportHeight = () => window.parent.postMessage({ type: 'production-metrics-height', height: Math.ceil(document.body.getBoundingClientRect().height) }, location.origin);
   new ResizeObserver(reportHeight).observe(document.body);
   window.addEventListener('load', reportHeight);
 }

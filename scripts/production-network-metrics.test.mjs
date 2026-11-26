@@ -21,7 +21,7 @@ vm.runInContext(`const esc=String, fmtCount=String, fmtDateTime=String, fmtPerce
   const fmtSecondsBare=(v)=>Number.isFinite(v)?String(v/1000):'—';` +
   extract('function mergeMetricHistogram(', '// Each bucket covers') +
   extract('function aggregateCloudMetric(', '// Outlier analysis.') +
-  ';globalThis.render=clientNetworkSummary; globalThis.cloud=envSummary; globalThis.summary=summarizeCloudWindow;', ctx);
+  ';globalThis.render=envSummary; globalThis.summary=summarizeCloudWindow;', ctx);
 
 const row = (date, value, count = 1) => ({ date, gateway: { n: 0 },
   uplink_send: { n: count, sum: value * count, mean: value, p50: value, p95: value,
@@ -38,7 +38,7 @@ test('production script releases invalidate the shell bundle and embedded page c
     'the archive module and its range-event producer must release together');
 });
 
-test('all three network cards remain available in the collapsed client section without samples', () => {
+test('all three network cards stay in the cloud summary without valid samples', () => {
   const html = ctx.render({ days: [{ date: '2026-11-19', gateway: { n: 3 } }] });
   for (const key of ['uplink_send', 'downlink_first_text', 'downlink_terminal']) {
     const text = card(html, key);
@@ -53,12 +53,12 @@ test('cloud summary shows measured first answer without a historical estimate ca
   const measured = { n: 1, mean: 100, p50: 100, p95: 100 };
   const data = { date: '2026-11-19', gateway: measured, answer_first: measured,
     answer_first_history: { n: 100, mean: 999, p50: 999, p95: 999 } };
-  const html = ctx.cloud({ days: [data] });
+  const html = ctx.render({ days: [data] });
   assert.match(html, /<strong>答案首吐字<\/strong>/);
   assert.match(html, /0\.1 \/ 0\.1 \/ 0\.1/);
   assert.doesNotMatch(html, /历史估算|999/);
   delete data.answer_first;
-  const missing = ctx.cloud({ days: [data] }).match(/<div class="stat-card">[\s\S]*?<\/div>\s*<\/div>/g)
+  const missing = ctx.render({ days: [data] }).match(/<div class="stat-card">[\s\S]*?<\/div>\s*<\/div>/g)
     .find(text => text.includes('<strong>答案首吐字</strong>'));
   assert.match(missing, /— \/ — \/ —/);
 });
@@ -145,7 +145,7 @@ test('curves break at release-phase changes while retaining existing gaps and ar
   assert.equal(splitPath('M0,1L10,2', []), 'M0,1L10,2');
 });
 
-test('the page folds client metrics after cloud diagnostics and keeps release annotations through range changes', async () => {
+test('the entire model section follows cloud diagnostics, starts folded and retains controls and release annotations', async () => {
   const browser = await chromium.launch();
   try {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
@@ -172,6 +172,14 @@ test('the page folds client metrics after cloud diagnostics and keeps release an
     await page.route('**/*', (route) => {
       const { pathname, hostname } = new URL(route.request().url());
       if (hostname !== '127.0.0.1') return route.abort();
+      if (pathname === '/shell.html') return route.fulfill({ contentType: 'text/html', body: `<!doctype html>
+        <style>body { margin: 0; } iframe { display: block; width: 100%; border: 0; }</style>
+        <iframe src="/production-metrics/#models" style="height: 1800px"></iframe>
+        <script>addEventListener('message', (event) => {
+          const frame = document.querySelector('iframe');
+          if (event.source === frame.contentWindow && event.data?.type === 'production-metrics-height')
+            frame.style.height = Math.max(200, event.data.height + 24) + 'px';
+        });</script>` });
       if (pathname.startsWith('/data/')) {
         const data = snapshots[pathname.split('/').at(-1)];
         return data ? route.fulfill({ json: data }) : route.fulfill({ status: 404 });
@@ -182,26 +190,69 @@ test('the page folds client metrics after cloud diagnostics and keeps release an
     });
     await page.goto('http://127.0.0.1:16831/production-metrics/#models');
     await page.locator('#env-latency .release-chip').getByText('v0.2.1', { exact: true }).first().waitFor();
-    const client = page.locator('#client-section');
-    assert.equal(await client.evaluate((node) => node.open), false);
-    assert.equal(await page.locator('#env-latency .network-card').count(), 0);
-    assert.equal(await page.locator('#client-network .network-card').count(), 3);
-    assert(await client.evaluate((node) => Boolean(document.querySelector('#request-lookup')
+    const models = page.locator('#model-section');
+    assert.equal(await models.evaluate((node) => node.open), false);
+    for (const id of ['model-insights', 'model-compare', 'model-summary', 'model-trends-card', 'model-failure-card', 'model-stats']) {
+      assert.equal(await models.locator(`#${id}`).count(), 1, `${id} belongs inside the model disclosure`);
+      assert.equal(await models.locator(`#${id}`).isVisible(), false, `${id} starts hidden`);
+    }
+    assert(await models.evaluate((node) => Boolean(document.querySelector('#request-lookup')
       .compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING)));
+    assert.equal(await page.locator('#view-models > .view-section-head').first().getAttribute('id'), 'env-section');
+    assert.equal(await page.locator('#client-section').count(), 0);
+    assert.equal(await page.locator('#env-latency .network-card').count(), 3);
+    assert(await page.locator('#env-latency .network-card').first().isVisible());
+    assert(await page.locator('#env-latency .env-summary').evaluate((node) => {
+      const cards = [...node.children];
+      const network = cards.filter((card) => card.classList.contains('network-card'));
+      return cards.indexOf(network[0]) === 5 && cards.indexOf(network[2]) === 7;
+    }));
+    const replies = page.locator('#env-latency .reply-timing-card');
+    assert.equal(await replies.count(), 3);
+    assert.deepEqual(await replies.locator('.stat-label strong').allTextContents(), ['快回复', '正常回复（Bee）', '最终回复']);
+    for (const card of await replies.all()) {
+      assert.equal(await card.isVisible(), true);
+      assert.equal(await card.locator('.stat-value').innerText(), '— / — / —');
+      assert.match(await card.innerText(), /暂无打点数据/);
+    }
+    assert.equal(await page.locator('#env-latency [data-env-series*="reply"]').count(), 0);
     const zone = page.locator('#env-latency .hover-zone[data-date="2026-11-04"]').first();
     assert.match(await zone.getAttribute('data-tip'), /v0\.2\.0 → v0\.2\.1（发布日）/);
     assert.match(await zone.getAttribute('data-tip'), /非请求实际部署版本/);
     assert(await page.locator('#env-latency .release-divider').count() > 0);
     assert(await page.locator('#model-trends .release-chip').count() > 0);
-    await client.locator('summary').click();
-    await page.locator('#model-controls [data-range="1"]').click();
-    assert.equal(await client.evaluate((node) => node.open), true);
-    assert.match(await client.innerText(), /所选范围暂无/);
-    await page.locator('#model-controls [data-range="7"]').click();
-    assert.equal(await page.locator('#client-network .network-card').count(), 3);
-    assert.equal(await client.evaluate((node) => node.open), true);
+    await page.locator('#floating-range-controls [data-range="1"]').click();
+    assert.equal(await models.evaluate((node) => node.open), false);
+    assert.equal(await page.locator('#env-latency .network-card').count(), 0);
+    assert.equal(await replies.count(), 3);
+    assert(await replies.first().isVisible());
+    await page.locator('#floating-range-controls [data-range="7"]').click();
+    assert.equal(await page.locator('#env-latency .network-card').count(), 3);
+    await models.locator(':scope > summary').click();
+    await models.locator('#model-trends .release-chip').first().waitFor();
+    assert.equal(await models.locator('#model-summary').isVisible(), true);
+    await models.locator('#model-controls [data-range="30"]').click();
+    assert.equal(await models.evaluate((node) => node.open), true);
+    await page.evaluate(() => refreshProductionSnapshots());
+    assert.equal(await models.evaluate((node) => node.open), true);
     await page.setViewportSize({ width: 390, height: 844 });
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('http://127.0.0.1:16831/shell.html');
+    const embedded = page.frameLocator('iframe');
+    await embedded.locator('#env-latency .release-chip').first().waitFor();
+    const matchesContentHeight = () => {
+      const frame = document.querySelector('iframe');
+      return Math.abs(frame.getBoundingClientRect().height - (frame.contentDocument.body.getBoundingClientRect().height + 24)) < 2;
+    };
+    await page.waitForFunction(matchesContentHeight);
+    const foldedHeight = (await page.locator('iframe').boundingBox()).height;
+    await embedded.locator('#model-section > summary').click();
+    await page.waitForFunction((height) => document.querySelector('iframe').getBoundingClientRect().height > height + 500, foldedHeight);
+    await page.waitForFunction(matchesContentHeight);
+    await embedded.locator('#model-section > summary').click();
+    await page.waitForFunction((height) => document.querySelector('iframe').getBoundingClientRect().height < height + 2, foldedHeight);
+    await page.waitForFunction(matchesContentHeight);
     assert.deepEqual(errors, []);
   } finally {
     await browser.close();

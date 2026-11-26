@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>DigitalMate · Nightly E2E 性能看板</title>
-    <link rel="stylesheet" href="style.css?v=20261126.2" />
+    <link rel="stylesheet" href="style.css?v=20261126.3" />
   </head>
   <body>
     <style>.topbar, #tabs, .footer { display: none; } .page { padding-top: 0; }</style>
@@ -57,93 +57,11 @@
           <button class="range-btn" type="button" data-range="30" aria-pressed="false">近 30 天</button>
           <button class="range-btn active" type="button" data-range="0" aria-pressed="true">全部</button>
         </div>
-        <header class="view-section-head">
-          <div>
-            <p class="eyebrow">模型侧 · 现网模型请求</p>
-            <h2>模型请求指标</h2>
-            <p class="section-note">曲线底色按 Release 发布时间区分版本；发布日可能跨版本，不代表请求实际部署版本。</p>
-            <p class="section-note single-line">按模型 × Asia/Shanghai 自然日聚合：请求数与失败率、失败原因、超时与最慢 5% 请求、请求耗时、TTFT / TPOT、Token。模型对比列出所选时间范围内的全部模型；下方汇总、曲线与明细只针对当前所选模型。</p>
-          </div>
-        </header>
-
-        <div id="model-insights"></div>
-
-        <section class="card">
-          <div class="card-head comparison-head">
-            <div class="comparison-title">
-              <h2>模型对比</h2>
-              <span id="compare-current" class="selected-model-badge">—</span>
-              <span id="model-range" class="muted">—</span>
-            </div>
-            <div id="model-controls" class="comparison-controls">
-              <div class="range-picker" role="group" aria-label="时间范围（影响模型对比及下方汇总、曲线与明细）">
-                <button class="range-btn" type="button" data-range="1" aria-pressed="false">当天</button>
-                <button class="range-btn" type="button" data-range="7" aria-pressed="false">近 7 天</button>
-                <button class="range-btn" type="button" data-range="30" aria-pressed="false">近 30 天</button>
-                <button class="range-btn active" type="button" data-range="0" aria-pressed="true">全部</button>
-              </div>
-              <span id="updated" class="muted comparison-updated">加载中…</span>
-            </div>
-          </div>
-          <div id="model-compare"><p class="empty">加载中…</p></div>
-          <details class="comparison-note">
-            <summary>统计口径</summary>
-            <p>
-              所选时间范围内列出全部有足量调用的模型，按调用数排序；近 7 天少于 50 次调用的模型不在此列出。
-              选择当天时展示当天截至上次采集的累计数据；其他范围的汇总按完整日统计。点击模型可切换下方汇总、曲线与明细。
-              <span id="compare-version" class="muted">—</span>
-            </p>
-          </details>
-        </section>
-
-        <section id="model-summary" class="summary model-summary" aria-label="模型指标汇总">
-          <p class="empty">加载中…</p>
-        </section>
-
-        <section class="card" id="model-trends-card">
-          <div class="card-head">
-            <h2>模型请求耗时、TTFT / TPOT 与 Token 曲线</h2>
-            <span class="muted">按日聚合 · Asia/Shanghai</span>
-          </div>
-          <div id="model-trends" class="trend-grid"><p class="empty">加载中…</p></div>
-          <details class="chart-note-details">
-            <summary>统计口径</summary>
-            <p class="chart-note">
-              统计此网关的模型请求（未区分测试或其他业务），耗时口径为模型请求耗时（不含端侧与网络）。
-              TTFT/TPOT 只统计 <code>stream === true</code> 的成功调用；无流式标记的样本按分桶近似单独统计 TTFT 与 TPOT；TTFT ≥ 95% 总耗时、TPOT &lt; 0.1 ms/token 视为时间戳异常并剔除。
-              P50/P95 是成功调用的请求级分位，至少需要 20 个样本；模型请求平均耗时按成功调用量加权，TPOT 按输出 Token 数减一加权；TTFT 和 TPOT 的 P50/P95 是请求级分位，基于可合并分桶近似计算（误差约 1%），每类至少 20 个样本。
-              Token 汇总卡展示所选时间范围内成功调用的累计值；当日未结束的数据标记为「部分日」，选择当天时计入汇总。
-              趋势图均可点击图例单独显示或隐藏曲线；模型请求失败率按所选模型统计；含未知状态的日期留空；缺失值留空，不补 0。
-            
-            </p>
-          </details>
-        </section>
-
-        <section class="card" id="model-failure-card">
-          <div id="model-failure"><p class="empty">加载中…</p></div>
-        </section>
-
-        <section class="card">
-          <div class="card-head">
-            <h2>模型侧统计明细</h2>
-            <div class="stats-controls">
-              <label class="granularity-picker" for="granularity-select">
-                <span class="muted">粒度</span>
-                <select id="granularity-select">
-                  <option value="daily" selected>每日</option>
-                  <option value="weekly">每周</option>
-                </select>
-              </label>
-              <span id="daily-range" class="muted">Asia/Shanghai</span>
-            </div>
-          </div>
-          <div id="model-stats"><p class="empty">加载中…</p></div>
-        </section>
-
         <header class="view-section-head" id="env-section">
           <div>
             <p class="eyebrow">云侧 Agent</p>
             <h2>云侧 Agent 调用指标</h2>
+            <p class="section-note">曲线底色按 Release 发布时间区分版本；发布日可能跨版本，不代表请求实际部署版本。</p>
             <dl class="env-metric-guide" aria-label="指标口径">
               <div><dt>请求耗时</dt><dd>网关受理至流结束</dd></div>
               <div><dt>首吐字</dt><dd>网关受理至首个文本</dd></div>
@@ -190,9 +108,92 @@
           <div id="lookup-result" aria-live="polite"></div>
         </section>
 
-        <details class="card client-details" id="client-section">
-          <summary>端侧与网络时延 <span class="muted">展开查看端到云、首段文字与结束帧下行</span></summary>
-          <div id="client-network"><p class="empty">加载中…</p></div>
+        <details class="card model-details" id="model-section">
+          <summary>模型侧 · 现网模型请求 <span class="muted">展开查看模型对比、汇总、曲线与明细</span></summary>
+          <div class="model-details-content">
+            <header class="view-section-head">
+              <div>
+                <p class="eyebrow">模型侧 · 现网模型请求</p>
+                <h2>模型请求指标</h2>
+                <p class="section-note">曲线底色按 Release 发布时间区分版本；发布日可能跨版本，不代表请求实际部署版本。</p>
+                <p class="section-note single-line">按模型 × Asia/Shanghai 自然日聚合：请求数与失败率、失败原因、超时与最慢 5% 请求、请求耗时、TTFT / TPOT、Token。模型对比列出所选时间范围内的全部模型；下方汇总、曲线与明细只针对当前所选模型。</p>
+              </div>
+            </header>
+
+            <div id="model-insights"></div>
+
+            <section class="card">
+              <div class="card-head comparison-head">
+                <div class="comparison-title">
+                  <h2>模型对比</h2>
+                  <span id="compare-current" class="selected-model-badge">—</span>
+                  <span id="model-range" class="muted">—</span>
+                </div>
+                <div id="model-controls" class="comparison-controls">
+                  <div class="range-picker" role="group" aria-label="时间范围（影响模型对比及下方汇总、曲线与明细）">
+                    <button class="range-btn" type="button" data-range="1" aria-pressed="false">当天</button>
+                    <button class="range-btn" type="button" data-range="7" aria-pressed="false">近 7 天</button>
+                    <button class="range-btn" type="button" data-range="30" aria-pressed="false">近 30 天</button>
+                    <button class="range-btn active" type="button" data-range="0" aria-pressed="true">全部</button>
+                  </div>
+                  <span id="updated" class="muted comparison-updated">加载中…</span>
+                </div>
+              </div>
+              <div id="model-compare"><p class="empty">加载中…</p></div>
+              <details class="comparison-note">
+                <summary>统计口径</summary>
+                <p>
+                  所选时间范围内列出全部有足量调用的模型，按调用数排序；近 7 天少于 50 次调用的模型不在此列出。
+                  选择当天时展示当天截至上次采集的累计数据；其他范围的汇总按完整日统计。点击模型可切换下方汇总、曲线与明细。
+                  <span id="compare-version" class="muted">—</span>
+                </p>
+              </details>
+            </section>
+
+            <section id="model-summary" class="summary model-summary" aria-label="模型指标汇总">
+              <p class="empty">加载中…</p>
+            </section>
+
+            <section class="card" id="model-trends-card">
+              <div class="card-head">
+                <h2>模型请求耗时、TTFT / TPOT 与 Token 曲线</h2>
+                <span class="muted">按日聚合 · Asia/Shanghai</span>
+              </div>
+              <div id="model-trends" class="trend-grid"><p class="empty">加载中…</p></div>
+              <details class="chart-note-details">
+                <summary>统计口径</summary>
+                <p class="chart-note">
+                  统计此网关的模型请求（未区分测试或其他业务），耗时口径为模型请求耗时（不含端侧与网络）。
+                  TTFT/TPOT 只统计 <code>stream === true</code> 的成功调用；无流式标记的样本按分桶近似单独统计 TTFT 与 TPOT；TTFT ≥ 95% 总耗时、TPOT &lt; 0.1 ms/token 视为时间戳异常并剔除。
+                  P50/P95 是成功调用的请求级分位，至少需要 20 个样本；模型请求平均耗时按成功调用量加权，TPOT 按输出 Token 数减一加权；TTFT 和 TPOT 的 P50/P95 是请求级分位，基于可合并分桶近似计算（误差约 1%），每类至少 20 个样本。
+                  Token 汇总卡展示所选时间范围内成功调用的累计值；当日未结束的数据标记为「部分日」，选择当天时计入汇总。
+                  趋势图均可点击图例单独显示或隐藏曲线；模型请求失败率按所选模型统计；含未知状态的日期留空；缺失值留空，不补 0。
+
+                </p>
+              </details>
+            </section>
+
+            <section class="card" id="model-failure-card">
+              <div id="model-failure"><p class="empty">加载中…</p></div>
+            </section>
+
+            <section class="card">
+              <div class="card-head">
+                <h2>模型侧统计明细</h2>
+                <div class="stats-controls">
+                  <label class="granularity-picker" for="granularity-select">
+                    <span class="muted">粒度</span>
+                    <select id="granularity-select">
+                      <option value="daily" selected>每日</option>
+                      <option value="weekly">每周</option>
+                    </select>
+                  </label>
+                  <span id="daily-range" class="muted">Asia/Shanghai</span>
+                </div>
+              </div>
+              <div id="model-stats"><p class="empty">加载中…</p></div>
+            </section>
+          </div>
         </details>
 
       </section>
@@ -205,9 +206,9 @@
 
     <div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>
 
-    <script src="release-timeline.js?v=20261126.2" defer></script>
-    <script src="app.js?v=20261126.2" defer></script>
-    <script type="module" src="trajectory-archive.js?v=20261126.2"></script>
+    <script src="release-timeline.js?v=20261126.3" defer></script>
+    <script src="app.js?v=20261126.3" defer></script>
+    <script type="module" src="trajectory-archive.js?v=20261126.3"></script>
     <link rel="stylesheet" href="trajectory-archive.css?v=20261119.1" />
   </body>
 </html>
