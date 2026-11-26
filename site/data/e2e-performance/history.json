@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/e2e-performance-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updated_at": "2026-11-25T18:03:51Z",
+  "updated_at": "2026-11-26T04:21:57Z",
   "cases": {
     "DM-WF-CHROME-01": {
       "id": "DM-WF-CHROME-01",
@@ -12821,6 +12821,13 @@
     }
   },
   "runs": [
+    {
+      "run_id": "nightly-45752546622-1",
+      "branch": "release_v0.1.13",
+      "createdAt": "2026-11-26T04:01:20Z",
+      "status": "skipped",
+      "reason": "Image job failed before E2E: HK API i/o timeout during PVC archive (#2907); E2E not run"
+    },
     {
       "run_id": "paused-main-20261126-0200",
       "branch": "main",
