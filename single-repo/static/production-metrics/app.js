@@ -1076,7 +1076,7 @@ function envSummary(doc, replyCards = '') {
   </section>`;
 }
 
-const PREFIX_CACHE_SOURCES = { bees: 'Bee', beebou: 'BeeBou', workswarm: 'WorkSwarm' };
+const PREFIX_CACHE_SOURCES = { bees: 'Bee', beebou: 'BeeBou' };
 const PREFIX_CACHE_COHORTS = { first_observed: '首个可见调用', returning: '已见会话', unknown: '会话未知' };
 
 function summarizePrefixCache(groups) {
@@ -1109,7 +1109,9 @@ function prefixCachePanel(doc, range, today, completeThrough) {
   if (doc?.schema !== 'digitalmate/prefix-cache-daily@1') {
     return `<section class="env-anomaly">${title}<p class="empty">等待现网缓存用量采集。</p></section>`;
   }
-  const days = cloudScopedDays(doc.days, range, today, completeThrough);
+  const days = cloudScopedDays(doc.days, range, today, completeThrough).map((day) => ({
+    ...day, groups: day.groups.filter((group) => Object.hasOwn(PREFIX_CACHE_SOURCES, group.source)),
+  })).filter((day) => day.groups.length);
   const coverage = Object.entries(PREFIX_CACHE_SOURCES).map(([source, name]) => {
     const counts = doc.coverage?.[source];
     const incomplete = counts?.incomplete ? `，未读全 ${fmtCount(counts.incomplete)} 个` : '';

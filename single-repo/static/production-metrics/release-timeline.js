@@ -21,25 +21,19 @@
 
   function phase(date, releases) {
     const start = /^\d{4}-\d{2}-\d{2}$/.test(date) ? Date.parse(`${date}T00:00:00+08:00`) : NaN;
-    if (!Number.isFinite(start)) return { key: '', label: UNKNOWN, tags: [], color: 0 };
+    if (!Number.isFinite(start)) return { label: UNKNOWN, tags: [], periods: [], events: [] };
     const prior = releases.filter((row) => row.published <= start).at(-1);
     const changes = releases.filter((row) => row.published > start && row.published < start + DAY);
-    const tags = [prior?.tag || UNKNOWN, ...changes.map((row) => row.tag)];
-    const last = changes.at(-1) || prior;
-    return { key: tags.join('|'), label: tags.join(' → ') + (changes.length ? '（发布日）' : ''),
-      tags, color: last ? releases.indexOf(last) % 4 + 1 : 0 };
-  }
-
-  function splitPath(path, points) {
-    // Only straight time-series lines use this syntax; area bands stay intact.
-    if (!/^(?:[ML]-?\d+(?:\.\d+)?,-?\d+(?:\.\d+)?)+$/.test(path) || !points.length) return path;
-    let previous;
-    return path.replace(/([ML])(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g, (_, command, x, y) => {
-      const closest = points.reduce((a, b) => Math.abs(b.x - Number(x)) < Math.abs(a.x - Number(x)) ? b : a);
-      const next = command === 'L' && previous !== undefined && previous !== closest.key ? 'M' : command;
-      previous = closest.key;
-      return `${next}${x},${y}`;
-    });
+    const events = releases.filter((row) => row.published >= start && row.published < start + DAY);
+    const boundaries = [{ at: start, release: prior }, ...changes.map((release) => ({ at: release.published, release }))];
+    const periods = boundaries.map(({ at, release }, index) => ({
+      tag: release?.tag || UNKNOWN, published: release?.published,
+      from: (at - start) / DAY, to: ((boundaries[index + 1]?.at || start + DAY) - start) / DAY,
+      color: release ? releases.indexOf(release) % 4 + 1 : 0,
+    })).filter((period) => period.to > period.from);
+    const tags = [...new Set(periods.map((period) => period.tag))];
+    return { label: tags.join(' → ') + (events.length ? `（当日 ${events.length} 次发布）` : ''),
+      tags, periods, events };
   }
 
   function decorate(root, releases) {
@@ -55,32 +49,35 @@
       svg.querySelector('.release-bands')?.remove();
       svg.previousElementSibling?.matches('.release-legend') && svg.previousElementSibling.remove();
       const bands = svgElement('g', { class: 'release-bands', 'aria-hidden': 'true' });
-      const points = [];
       const segments = [];
       const tags = new Set();
       for (const zone of zones) {
         const current = phase(zone.dataset.date, releases);
         current.tags.forEach((tag) => tags.add(tag));
         zone.dataset.releaseBaseTip ??= zone.dataset.tip;
-        zone.dataset.tip = `${zone.dataset.releaseBaseTip}\n发布阶段：${current.label}\n按发布时间标记，非请求实际部署版本`;
+        const events = current.events.map((release) => `${release.tag} ${new Date(release.published + 8 * 3600000).toISOString().slice(11, 16)}`).join('；');
+        zone.dataset.tip = `${zone.dataset.releaseBaseTip}\n发布阶段：${current.label}`
+          + (events ? `\n当日发布（北京时间）：${events}\n日聚合数据无法按发布时刻拆分` : '')
+          + '\n按发布时间标记，非请求实际部署版本';
         const x = Number(zone.getAttribute('x'));
-        const right = x + Number(zone.getAttribute('width'));
-        points.push({ x: Number(zone.dataset.x), key: current.key });
-        const previous = segments.at(-1);
-        if (previous?.key === current.key && Math.abs(previous.right - x) < 0.2) previous.right = right;
-        else segments.push({ ...current, x, right, y: zone.getAttribute('y'), height: zone.getAttribute('height') });
+        const width = Number(zone.getAttribute('width'));
+        for (const period of current.periods) {
+          const left = x + width * period.from;
+          const right = x + width * period.to;
+          const previous = segments.at(-1);
+          if (previous?.tag === period.tag && Math.abs(previous.right - left) < 0.2) previous.right = right;
+          else segments.push({ ...period, x: left, right, y: zone.getAttribute('y'), height: zone.getAttribute('height') });
+        }
       }
       for (const [index, segment] of segments.entries()) {
         bands.append(svgElement('rect', { x: segment.x, y: segment.y, width: segment.right - segment.x,
           height: segment.height, class: `release-band release-color-${segment.color}` }));
         if (index) bands.append(svgElement('line', { x1: segment.x, x2: segment.x, y1: segment.y,
-          y2: Number(segment.y) + Number(segment.height), class: 'release-divider' }));
+          y2: Number(segment.y) + Number(segment.height), class: 'release-divider',
+          'data-release': segment.tag,
+          'data-published-at': Number.isFinite(segment.published) ? new Date(segment.published).toISOString() : '' }));
       }
       svg.prepend(bands);
-      for (const path of svg.querySelectorAll('path.trend-series')) {
-        path.dataset.releaseOriginalPath ??= path.getAttribute('d');
-        path.setAttribute('d', splitPath(path.dataset.releaseOriginalPath, points));
-      }
       const legend = doc.createElement('div');
       legend.className = 'release-legend';
       legend.setAttribute('aria-label', '发布版本时间分段');
@@ -99,5 +96,5 @@
     }
   }
 
-  globalThis.DigitalMateReleaseTimeline = { normalize, phase, splitPath, decorate };
+  globalThis.DigitalMateReleaseTimeline = { normalize, phase, decorate };
 })();

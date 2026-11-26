@@ -28,8 +28,9 @@ test('production page shows the SFS cache sample even when it chooses a differen
         ...daily, generated_at: '2026-11-17T06:00:00Z', days: [{ date: yesterday }],
         prefix_cache: {
           schema: 'digitalmate/prefix-cache-daily@1', observed_at: stamp, workspaces: 3,
-          coverage: { beebou: { with_calls: 1 }, bees: { with_calls: 1 }, workswarm: { with_calls: 0 } },
+          coverage: { beebou: { with_calls: 1 }, bees: { with_calls: 1 }, workswarm: { with_calls: 2 } },
           days: [
+            { date: '2026-11-15', groups: [group('workswarm', 'returning', { model: 'legacy/model' })] },
             { date: yesterday, observed_at: stamp, groups: [group('beebou', 'first_observed', {})] },
             {
               date: today, observed_at: stamp,
@@ -39,6 +40,8 @@ test('production page shows the SFS cache sample even when it chooses a differen
                 group('bees', 'returning', { calls: 30, known: 30, input_tokens: 122880, miss_eligible: 30,
                   near_miss: 30, histogram: [[0, 30]] }),
                 group('bees', 'returning', { calls: 3 }),
+                group('workswarm', 'returning', { model: 'legacy/model', calls: 500, known: 500,
+                  input_tokens: 2048000, cache_read_tokens: 2048000, histogram: [[1000, 500]] }),
               ],
               sessions: { beebou: { known: 1, p50: 1, p95: 1 }, bees: { known: 1, p50: 0, p95: 0 } },
               watch: { bees: { status: 'spike', near_miss: 30, eligible: 30 } },
@@ -65,18 +68,29 @@ test('production page shows the SFS cache sample even when it chooses a differen
     await cache.getByText('近零命中突增').waitFor();
     const bee = cache.locator('[data-cache-source="bees"]');
     const beebou = cache.locator('[data-cache-source="beebou"]');
-    const workswarm = cache.locator('[data-cache-source="workswarm"]');
-    assert.deepEqual(await cache.locator('.prefix-cache-source h4').allTextContents(), ['Bee', 'BeeBou', 'WorkSwarm']);
+    assert.deepEqual(await cache.locator('.prefix-cache-source h4').allTextContents(), ['Bee', 'BeeBou']);
     assert.equal(await bee.locator('.stat-value').first().innerText(), '0.0%');
     assert.equal(await beebou.locator('.stat-value').first().innerText(), '100.0%');
-    assert.equal(await workswarm.locator('.stat-value').first().innerText(), '—');
     assert.match(await bee.innerText(), /30 \/ 33/);
     assert.match(await beebou.innerText(), /15 \/ 15/);
     assert.match(await cache.innerText(), /缺失或无效 3 次/);
     assert.match(await cache.innerText(), /BeeBou 1 \/ 3/);
+    assert.doesNotMatch(await cache.innerText(), /WorkSwarm|legacy\/model|undefined/);
     assert.doesNotMatch(await cache.innerText(), /2026-11-16/);
     await cache.getByText('按链路、模型与会话拆分').click();
     assert.equal(await cache.getByText('test/model', { exact: true }).filter({ visible: true }).count(), 2);
+    const desktop = await cache.locator('.prefix-cache-source').evaluateAll((cards) => cards.map((card) => {
+      const { x, y, width } = card.getBoundingClientRect();
+      return { x, y, width };
+    }));
+    assert.equal(desktop[0].y, desktop[1].y);
+    assert.ok(desktop[1].x > desktop[0].x);
+    await page.setViewportSize({ width: 390, height: 844 });
+    const mobile = await cache.locator('.prefix-cache-source').evaluateAll((cards) => cards.map((card) => card.getBoundingClientRect().y));
+    assert.ok(mobile[1] > mobile[0]);
+    await page.goto('http://127.0.0.1:16830/production-metrics/?history#models');
+    await cache.locator('.prefix-cache-source').first().waitFor();
+    assert.doesNotMatch(await cache.innerText(), /WorkSwarm|legacy\/model|2026-11-15|undefined/);
     assert.deepEqual(errors, []);
   } finally {
     await browser.close();

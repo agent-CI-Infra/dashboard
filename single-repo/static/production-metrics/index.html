@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>DigitalMate · Nightly E2E 性能看板</title>
-    <link rel="stylesheet" href="style.css?v=20261126.4" />
+    <link rel="stylesheet" href="style.css?v=20261126.5" />
   </head>
   <body>
     <style>.topbar, #tabs, .footer { display: none; } .page { padding-top: 0; }</style>
@@ -61,7 +61,7 @@
           <div>
             <p class="eyebrow">云侧 Agent</p>
             <h2>云侧 Agent 调用指标</h2>
-            <p class="section-note">曲线底色按 Release 发布时间区分版本；发布日可能跨版本，不代表请求实际部署版本。</p>
+            <p class="section-note">曲线保持连续，底色按 Release 发布时间分段；同日多次发布按北京时间标记，日聚合不代表请求实际部署版本。</p>
             <dl class="env-metric-guide" aria-label="指标口径">
               <div><dt>请求耗时</dt><dd>网关受理至流结束</dd></div>
               <div><dt>首吐字</dt><dd>网关受理至首个文本</dd></div>
@@ -125,7 +125,7 @@
               <div>
                 <p class="eyebrow">模型侧 · 现网模型请求</p>
                 <h2>模型请求指标</h2>
-                <p class="section-note">曲线底色按 Release 发布时间区分版本；发布日可能跨版本，不代表请求实际部署版本。</p>
+                <p class="section-note">曲线保持连续，底色按 Release 发布时间分段；同日多次发布按北京时间标记，日聚合不代表请求实际部署版本。</p>
                 <p class="section-note single-line">按模型 × Asia/Shanghai 自然日聚合：请求数与失败率、失败原因、超时与最慢 5% 请求、请求耗时、TTFT / TPOT、Token。模型对比列出所选时间范围内的全部模型；下方汇总、曲线与明细只针对当前所选模型。</p>
               </div>
             </header>
@@ -216,9 +216,9 @@
 
     <div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>
 
-    <script src="release-timeline.js?v=20261126.4" defer></script>
-    <script src="app.js?v=20261126.4" defer></script>
-    <script type="module" src="trajectory-archive.js?v=20261126.4"></script>
+    <script src="release-timeline.js?v=20261126.5" defer></script>
+    <script src="app.js?v=20261126.5" defer></script>
+    <script type="module" src="trajectory-archive.js?v=20261126.5"></script>
     <link rel="stylesheet" href="trajectory-archive.css?v=20261119.1" />
   </body>
 </html>

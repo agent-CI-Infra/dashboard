@@ -89,7 +89,7 @@ test('selected date ranges pool sample weights and histograms, exposing partial 
 
 const context = vm.createContext({});
 vm.runInContext(readFileSync(new URL('../single-repo/static/production-metrics/release-timeline.js', import.meta.url), 'utf8'), context);
-const { normalize, phase, splitPath } = context.DigitalMateReleaseTimeline;
+const { normalize, phase } = context.DigitalMateReleaseTimeline;
 const releases = normalize({ releases: [
   { tag: 'v0.1.0', published_at: '2026-11-01T00:00:00Z' },
   { tag: 'v0.2.0', published_at: '2026-11-02T16:00:00Z' },
@@ -116,11 +116,14 @@ test('uses the refreshed operations release feed and ignores drafts, prereleases
 
 test('release at midnight Shanghai applies to the new day, not the previous UTC date', () => {
   assert.equal(phase('2026-11-02', releases).label, 'v0.1.0');
-  assert.equal(phase('2026-11-03', releases).label, 'v0.2.0');
+  const day = phase('2026-11-03', releases);
+  assert.equal(day.label, 'v0.2.0（当日 1 次发布）');
+  assert.equal(day.events.length, 1);
+  assert.deepEqual(Array.from(day.periods, (period) => [period.tag, period.from, period.to]), [['v0.2.0', 0, 1]]);
 });
 
 test('a publication day retains both phases instead of attributing the entire day to the latest version', () => {
-  assert.equal(phase('2026-11-04', releases).label, 'v0.2.0 → v0.2.1（发布日）');
+  assert.equal(phase('2026-11-04', releases).label, 'v0.2.0 → v0.2.1（当日 1 次发布）');
   assert.equal(phase('2026-11-05', releases).label, 'v0.2.1');
 });
 
@@ -133,16 +136,50 @@ test('earlier dates and missing release history stay unknown', () => {
 
 test('all same-day publications stay visible and colors remain stable across range changes', () => {
   const extra = [...releases, { tag: 'v0.2.2', published: Date.parse('2026-11-04T06:00:00Z') }];
-  assert.equal(phase('2026-11-04', extra).label, 'v0.2.0 → v0.2.1 → v0.2.2（发布日）');
-  assert.equal(phase('2026-11-05', releases).color, phase('2026-11-06', releases).color);
+  const day = phase('2026-11-04', extra);
+  assert.equal(day.label, 'v0.2.0 → v0.2.1 → v0.2.2（当日 2 次发布）');
+  assert.deepEqual(Array.from(day.periods, (period) => [period.from, period.to]), [[0, 13 / 24], [13 / 24, 14 / 24], [14 / 24, 1]]);
+  assert.equal(day.events.length, 2);
+  assert.equal(phase('2026-11-05', releases).periods[0].color, phase('2026-11-06', releases).periods[0].color);
 });
 
-test('curves break at release-phase changes while retaining existing gaps and area shapes', () => {
-  const points = [{ x: 0, key: 'old' }, { x: 10, key: 'old' }, { x: 20, key: 'new' }, { x: 30, key: 'new' }];
-  assert.equal(splitPath('M0,1L10,2L20,3L30,4', points), 'M0,1L10,2M20,3L30,4');
-  assert.equal(splitPath('M0,1M10,2L20,3L30,4', points), 'M0,1M10,2M20,3L30,4');
-  assert.equal(splitPath('M0,1L10,2L20,3Z', points), 'M0,1L10,2L20,3Z');
-  assert.equal(splitPath('M0,1L10,2', []), 'M0,1L10,2');
+test('release markers preserve continuous lines, data gaps and areas while distinguishing same-day publications', async () => {
+  const browser = await chromium.launch();
+  try {
+    const page = await browser.newPage();
+    const errors = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    const paths = ['M120,70L360,55L600,60', 'M120,45M360,40L600,35', 'M120,90L360,65L600,90Z'];
+    await page.setContent(`<div id="charts"><svg class="trend-chart" viewBox="0 0 720 100">
+      ${paths.map((path) => `<path class="trend-series" d="${path}"></path>`).join('')}
+      ${['2026-11-03', '2026-11-04', '2026-11-05'].map((date, index) => `<rect
+        class="hover-zone" data-date="${date}" data-tip="${date} 请求数：10"
+        x="${index * 240}" y="10" width="240" height="80"></rect>`).join('')}
+      </svg></div>`);
+    await page.addScriptTag({ path: fileURLToPath(new URL('../single-repo/static/production-metrics/release-timeline.js', import.meta.url)) });
+    await page.evaluate((rows) => {
+      const timeline = window.DigitalMateReleaseTimeline;
+      const root = document.querySelector('#charts');
+      timeline.decorate(root, rows);
+      timeline.decorate(root, rows);
+    }, [...releases, { tag: 'v0.2.2', published: Date.parse('2026-11-04T06:00:00Z') }]);
+    assert.deepEqual(await page.locator('path.trend-series').evaluateAll((paths) => paths.map((path) => path.getAttribute('d'))), paths);
+    const markers = await page.locator('.release-divider').evaluateAll((lines) => lines.map((line) => [line.dataset.release, Number(line.getAttribute('x1'))]));
+    assert.deepEqual(markers, [['v0.2.1', 370], ['v0.2.2', 380]]);
+    assert.equal(await page.locator('.release-bands').count(), 1);
+    assert.equal(await page.locator('.release-legend').count(), 1);
+    const tip = await page.locator('[data-date="2026-11-04"]').getAttribute('data-tip');
+    assert.match(tip, /v0\.2\.1 13:00；v0\.2\.2 14:00/);
+    assert.match(tip, /当日 2 次发布/);
+    assert.match(tip, /日聚合数据无法按发布时刻拆分/);
+    assert.match(tip, /非请求实际部署版本/);
+    assert.equal(tip.match(/请求数：10/g).length, 1);
+    await page.evaluate(() => window.DigitalMateReleaseTimeline.decorate(document.querySelector('#charts'), []));
+    assert.deepEqual(await page.locator('path.trend-series').evaluateAll((paths) => paths.map((path) => path.getAttribute('d'))), paths);
+    assert.deepEqual(errors, []);
+  } finally {
+    await browser.close();
+  }
 });
 
 test('production metrics and version analysis preserve ranges, trace links, disclosures and embedded sizing', async () => {
@@ -226,7 +263,7 @@ test('production metrics and version analysis preserve ranges, trace links, disc
     }
     assert.equal(await page.locator('#env-latency [data-env-series*="reply"]').count(), 0);
     const zone = page.locator('#env-latency .hover-zone[data-date="2026-11-04"]').first();
-    assert.match(await zone.getAttribute('data-tip'), /v0\.2\.0 → v0\.2\.1（发布日）/);
+    assert.match(await zone.getAttribute('data-tip'), /v0\.2\.0 → v0\.2\.1（当日 1 次发布）/);
     assert.match(await zone.getAttribute('data-tip'), /非请求实际部署版本/);
     assert(await page.locator('#env-latency .release-divider').count() > 0);
     assert(await page.locator('#model-trends .release-chip').count() > 0);
