@@ -145,7 +145,7 @@ test('curves break at release-phase changes while retaining existing gaps and ar
   assert.equal(splitPath('M0,1L10,2', []), 'M0,1L10,2');
 });
 
-test('the entire model section follows cloud diagnostics, starts folded and retains controls and release annotations', async () => {
+test('production metrics and version analysis preserve ranges, trace links, disclosures and embedded sizing', async () => {
   const browser = await chromium.launch();
   try {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
@@ -157,16 +157,25 @@ test('the entire model section follows cloud diagnostics, starts folded and reta
       generated_at: '2026-11-06T01:00:00Z', days: [1, 2, 3, 4, 5].map((day) => ({
         date: `2026-11-0${day}`, n: 1, gateway: metric, first_token: metric,
         uplink_send: metric, downlink_first_text: metric, downlink_terminal: metric,
+        gateway_stream: { exception: 1, observed: 2, cancelled: 5, unknown: 3 },
+        ...(day === 5 ? { anomaly: { available: false, timeouts: { count: 1, records: 1, identified: 1,
+          requests: [{ request_id: 'digitalmate-timeout', gateway: 100 }] }, error_categories: { timeout: 1 } } } : {}),
       })) };
     const points = daily.days.map((row) => ({ date: row.date, query_ms: 100, query_count: 100,
       success_count: 100, failed_queries: 0, unknown_status_count: 0, duration_sum_ms: 10000,
       duration_sample_count: 100, benchmark_models: [{ model: 'test/model', call_count: 100,
         success_count: 100, duration_sum_ms: 10000, duration_sample_count: 100 }] }));
+    const archiveKey = 'a'.repeat(64);
     const snapshots = {
       'production-model-history.json': { metrics_version: 7,
         cases: { PROD: { title: 'Test model', points } }, complete_through: '2026-11-05' },
       'env-request-latency-daily.json': daily,
       'snapshot.json': { releases: releases.map((row) => ({ tag: row.tag, published_at: new Date(row.published).toISOString() })) },
+      'index.json': { schema: 'digitalmate/trajectory-archive@1', generated_at: '2026-11-06T01:00:00Z',
+        coverage: {}, traces: [{ key: archiveKey, request_id: 'archived-request', start_time: '2026-11-05T05:00:00Z',
+          lifecycle: 'final', span_count: 1, duration_ms: 100, pages: [`traces/${archiveKey}/0.json`] }] },
+      '0.json': { schema: 'digitalmate/trajectory-archive@1', key: archiveKey, offset: 0, total: 1,
+        spans: [{ label: '任务执行', lifecycle: 'final', start_ms: 0, duration_ms: 100, span_id: 'span', kind: 'phase' }] },
     };
     const site = new URL('../single-repo/static/production-metrics/', import.meta.url);
     await page.route('**/*', (route) => {
@@ -221,11 +230,36 @@ test('the entire model section follows cloud diagnostics, starts folded and reta
     assert.match(await zone.getAttribute('data-tip'), /非请求实际部署版本/);
     assert(await page.locator('#env-latency .release-divider').count() > 0);
     assert(await page.locator('#model-trends .release-chip').count() > 0);
+    assert.equal(await page.locator('.cloud-metric-summary > .stat-card').count(), 13);
+    assert.equal(await page.locator('#env-latency [aria-label="异常请求分析"]').count(), 0);
+    const analysis = page.locator('#version-analysis');
+    assert.equal(await analysis.getByRole('heading', { name: '版本现网分析', exact: true }).count(), 1);
+    assert.equal(await page.locator('#analysis-failed').isVisible(), true);
+    assert.equal(await page.locator('#analysis-slow').isVisible(), false);
+    assert.equal(await page.locator('#analysis-all').isVisible(), false);
+    await page.locator('#analysis-tab-failed').focus();
+    await page.keyboard.press('ArrowRight');
+    assert.equal(await page.locator('#analysis-tab-slow').getAttribute('aria-selected'), 'true');
+    assert.equal(await page.locator('#analysis-slow #request-traces').isVisible(), true);
+    await page.keyboard.press('End');
+    assert.equal(await page.locator('#analysis-tab-all').getAttribute('aria-selected'), 'true');
+    assert.equal(await page.locator('#analysis-all #request-lookup').isVisible(), true);
+    await page.locator('#analysis-tab-failed').click();
+    await page.locator('#analysis-failures [data-trace-id="digitalmate-timeout"]').click();
+    assert.equal(await page.locator('#analysis-tab-slow').getAttribute('aria-selected'), 'true');
+    assert.match(await page.locator('#trace-select option:checked').innerText(), /digitalmate-timeout/);
+    await page.locator('#analysis-tab-all').click();
+    await page.locator('#archive-query').fill('archived-request');
+    await page.locator('#archive-form button[type="submit"]').click();
+    await page.locator('#archive-list [data-archive-key]').click();
+    await page.locator('#archive-detail').getByText('任务执行', { exact: true }).waitFor();
     await page.locator('#floating-range-controls [data-range="1"]').click();
     assert.equal(await models.evaluate((node) => node.open), false);
     assert.equal(await page.locator('#env-latency .network-card').count(), 0);
     assert.equal(await replies.count(), 3);
     assert(await replies.first().isVisible());
+    assert.equal(await page.locator('#analysis-tab-all').getAttribute('aria-selected'), 'true');
+    await page.locator('#archive-detail').filter({ hasText: '任务执行' }).waitFor({ state: 'hidden' });
     await page.locator('#floating-range-controls [data-range="7"]').click();
     assert.equal(await page.locator('#env-latency .network-card').count(), 3);
     await models.locator(':scope > summary').click();
