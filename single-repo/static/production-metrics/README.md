@@ -3,8 +3,10 @@
 ## Model prefix-cache coverage
 
 The hourly SFS collection reads Beebou's workspace
-`beebou-prefix-cache.jsonl` and the existing `context_usage.jsonl` files of
-the owned Bee and WorkSwarm runtimes. It reads the active file and up to three
+`beebou-prefix-cache.jsonl` and the owned Bee runtime's
+`bee-workswarm/.jiuwenswarm/agent/.logs/context_usage.jsonl`. The legacy
+`workswarm/` cache source is excluded from collection, retained history and
+all dashboard cards and tables. It reads the active file and up to three
 rotations of each source. The reader deduplicates calls by ID within each
 workspace and source. Conflicting observations for one call are excluded and
 counted. Only daily aggregates, coverage counts and model labels are published
@@ -24,7 +26,7 @@ workspace, call and session identifiers stay on the mount.
   distribution. The first observed call marks the start of that session's
   visible evidence in the retained logs. The session may predate the window.
 - The watch compares returning-session near-zero counts and proportions
-  separately for Beebou, Bees and WorkSwarm. A day flags a spike when both
+  separately for BeeBou and Bee. A day flags a spike when both
   exceed every qualifying day in the preceding seven Shanghai calendar days.
   The compared day and each baseline day require at least 20 eligible calls,
   and the baseline needs at least three days. Incomplete reads are ineligible
@@ -42,6 +44,17 @@ The regression suite replays both wire formats with cold, continuing,
 near-zero, short and missing observations, then checks the dashboard in
 Chromium. Current provider hit rates and the effect of actual context
 compression require production observations.
+
+## Release publication markers
+
+Version decoration preserves the metric paths, including their existing data
+gaps. Background bands mark release publication stages without disconnecting
+adjacent observations. A day's band is divided in proportion to the publication
+times in Asia/Shanghai; multiple releases within that day get separate boundaries
+and their exact local times appear in the daily tooltip. Midnight belongs to the
+new calendar day. These are publication markers: daily aggregates cannot be
+split into per-version metrics, and publication does not identify the version
+that actually served each request.
 
 ## Full native trajectory archive
 

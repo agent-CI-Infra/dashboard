@@ -49,7 +49,7 @@ class PrefixCacheTests(unittest.TestCase):
                                             lambda _name, path: (root / path).resolve(strict=True), now=DAY)
 
         day, = snapshot['days']
-        self.assertEqual(day['calls'], 15)
+        self.assertEqual(day['calls'], 10)
         for source in CACHE_LOGS:
             groups = {g['cohort']: g for g in day['groups'] if g['source'] == source}
             self.assertEqual((groups['first_observed']['near_miss'], groups['first_observed']['known']), (1, 1))
@@ -68,7 +68,7 @@ class PrefixCacheTests(unittest.TestCase):
             for inputs, cached in [(None, 0), (1024, True), (1024, -1), (1024, 1025), (0, 0), (1024, '0')]:
                 with self.subTest(source=source, inputs=inputs, cached=cached):
                     self.assertIsNone(cache_call(json.dumps(event(source, 1, inputs, cached)), source).cached)
-        for source in ('bees', 'workswarm'):
+        for source in ('bees',):
             self.assertIsNone(cache_call(json.dumps(event(source, 1, 1024, 0, valid=False)), source).cached)
 
     def test_conflicting_call_ids_are_excluded_and_unknown_sessions_still_contribute(self):
@@ -91,7 +91,7 @@ class PrefixCacheTests(unittest.TestCase):
                 for days_ago in (3, 2, 1, 0):
                     date = DAY - dt.timedelta(days=days_ago)
                     for i in range(22):
-                        cached = 0 if i == 0 or (not days_ago and source != 'workswarm' and i < 8) else 1800
+                        cached = 0 if i == 0 or (not days_ago and i < 8) else 1800
                         rows.append(event(source, days_ago * 100 + i, 2048, cached, date=date))
                 write_rows(root, source, rows)
             snapshot = collect_prefix_cache(['workspace'], lambda _, path: (root / path).resolve(strict=True), now=DAY)
@@ -100,20 +100,60 @@ class PrefixCacheTests(unittest.TestCase):
         self.assertEqual(old_day['watch']['beebou']['status'], 'insufficient_baseline')
         self.assertEqual(today['watch']['beebou']['status'], 'spike')
         self.assertEqual(today['watch']['bees']['status'], 'spike')
-        self.assertEqual(today['watch']['workswarm']['status'], 'within_baseline')
         self.assertEqual(today['watch']['bees']['near_miss'], 8)
         self.assertEqual(today['watch']['bees']['baseline_max'], 1)
         snapshot['days'][-1]['incomplete_sources'] = ['bees']
         self.assertEqual(retain_prefix_cache(None, snapshot)['days'][-1]['watch']['bees']['status'], 'incomplete')
 
     def test_rotation_retains_more_complete_day_and_expires_outside_window(self):
+        def row(date, calls, **extra):
+            return {'date': date, 'calls': calls, 'groups': [{'source': 'bees', 'calls': calls,
+                    'cohort': 'returning', 'near_miss': 0, 'miss_eligible': calls}], **extra}
+
         snapshot = {'schema': 'digitalmate/prefix-cache-daily@1', 'days': [
-            {'date': '2026-11-16', 'calls': 10, 'groups': [], 'observed_at': 'older'},
-            {'date': '2026-10-01', 'calls': 50, 'groups': []},
+            row('2026-11-16', 10, observed_at='older'),
+            row('2026-10-01', 50),
         ]}
         current = {'schema': snapshot['schema'], 'start': '2026-10-19', 'today': '2026-11-17',
-                   'days': [{'date': '2026-11-16', 'calls': 4, 'groups': []}]}
+                   'days': [row('2026-11-16', 4)]}
         day, = retain_prefix_cache(snapshot, current)['days']
         self.assertTrue(day['retained'])
         self.assertEqual(day['observed_at'], 'older')
         self.assertEqual(day['calls'], 10)
+
+    def test_collector_does_not_read_legacy_workswarm_cache(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            write_rows(root, 'bees', [event('bees', 1, 2048, 1024)])
+            attempted = []
+
+            def resolve(_, path):
+                attempted.append(path)
+                return (root / path).resolve(strict=True)
+
+            snapshot = collect_prefix_cache(['workspace'], resolve, now=DAY)
+        self.assertFalse(any(path.startswith('workswarm/') for path in attempted))
+        self.assertEqual(snapshot['days'][0]['calls'], 1)
+        self.assertEqual(set(snapshot['coverage']), {'bees', 'beebou'})
+
+    def test_legacy_history_is_filtered_before_comparing_population_sizes(self):
+        def row(date, bee_calls, legacy_calls):
+            return {'date': date, 'calls': bee_calls + legacy_calls,
+                    'groups': [{'source': source, 'cohort': 'returning', 'calls': calls,
+                                'near_miss': 0, 'miss_eligible': calls}
+                               for source, calls in [('bees', bee_calls), ('workswarm', legacy_calls)] if calls],
+                    'sessions': {'bees': {'known': 1}, 'workswarm': {'known': 100}},
+                    'incomplete_sources': ['workswarm']}
+
+        previous = {'schema': 'digitalmate/prefix-cache-daily@1', 'days': [
+            row('2026-11-14', 0, 100), row('2026-11-15', 10, 100), row('2026-11-16', 4, 100),
+        ]}
+        current = {'schema': previous['schema'], 'start': '2026-10-19', 'today': '2026-11-17',
+                   'coverage': {'bees': {'with_calls': 1}, 'workswarm': {'with_calls': 100}},
+                   'days': [row('2026-11-15', 3, 0), row('2026-11-16', 6, 0)]}
+        result = retain_prefix_cache(previous, current)
+        older, newer = result['days']
+        self.assertEqual((older['date'], older['calls'], older['retained']), ('2026-11-15', 10, True))
+        self.assertEqual((newer['date'], newer['calls']), ('2026-11-16', 6))
+        self.assertNotIn('workswarm', json.dumps(result))
+        self.assertEqual(previous['days'][0]['calls'], 100)

@@ -20,7 +20,6 @@ CACHE_MIN_WATCH_CALLS = 20
 CACHE_LOGS = {
     'beebou': ('beebou-prefix-cache.jsonl', 4 * 1024**2),
     'bees': ('bee-workswarm/.jiuwenswarm/agent/.logs/context_usage.jsonl', 10 * 1024**2),
-    'workswarm': ('workswarm/.jiuwenswarm/agent/.logs/context_usage.jsonl', 10 * 1024**2),
 }
 CACHE_ID = re.compile(r'[a-f0-9]{32}')
 CACHE_MODEL = re.compile(r'(?:[A-Za-z0-9._-]+/)?[A-Za-z0-9][A-Za-z0-9._:-]{0,95}')
@@ -194,9 +193,21 @@ def collect_prefix_cache(names, resolve_path, *, now=None):
 
 def retain_prefix_cache(previous, current):
     """Keep the widest observed population per day across rotating log reads."""
-    rows = {row['date']: dict(row) for row in current['days']}
+
+    def supported_days(snapshot):
+        for row in snapshot.get('days', []):
+            groups = [group for group in row['groups'] if group['source'] in CACHE_LOGS]
+            if not groups:
+                continue
+            yield dict(row, groups=groups, calls=sum(group['calls'] for group in groups),
+                       sessions={source: stats for source, stats in row.get('sessions', {}).items()
+                                 if source in CACHE_LOGS},
+                       incomplete_sources=[source for source in row.get('incomplete_sources', [])
+                                           if source in CACHE_LOGS])
+
+    rows = {row['date']: row for row in supported_days(current)}
     if previous and previous.get('schema') == CACHE_SCHEMA:
-        for old in previous.get('days', []):
+        for old in supported_days(previous):
             date = old['date']
             observed = rows.get(date)
             if current['start'] <= date <= current['today'] and (observed is None or old['calls'] > observed['calls']):
@@ -209,7 +220,9 @@ def retain_prefix_cache(previous, current):
         cutoff = (date - dt.timedelta(days=CACHE_BASELINE_DAYS)).isoformat()
         history = [old for old in days[max(0, index - CACHE_BASELINE_DAYS):index] if old['date'] >= cutoff]
         day['watch'] = {source: prefix_cache_watch(day, history, source) for source in CACHE_LOGS}
-    return dict(current, days=days)
+    return dict(current, days=days,
+                coverage={source: counts for source, counts in current.get('coverage', {}).items()
+                          if source in CACHE_LOGS})
 
 
 def prefix_cache_watch(day, history, source):
