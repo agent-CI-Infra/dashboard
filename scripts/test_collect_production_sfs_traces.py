@@ -43,8 +43,22 @@ class SfsTests(unittest.TestCase):
             with patch.object(sfs.collector, 'collect_workspaces', return_value={'binding_count': 100, 'read_log_count': 94}):
                 with self.assertRaisesRegex(RuntimeError, 'coverage'):
                     sfs.collect()
-            with patch.object(sfs.collector, 'collect_workspaces', return_value={'binding_count': 100, 'read_log_count': 95}):
+            with patch.object(sfs.collector, 'collect_workspaces', return_value={'binding_count': 100, 'read_log_count': 95}), \
+                 patch.object(sfs, 'ssh_operation', return_value={'coverage': {}, 'days': []}):
                 self.assertEqual(sfs.collect()['collection_source'], 'production_sfs_ssh')
+
+    def test_hive_is_read_even_without_legacy_request_events(self):
+        name = 'w-' + 'a' * 64
+        hive = {'schema': 'digitalmate/hive-daily@1', 'coverage': {'expected': 1}, 'days': []}
+        with patch.object(sfs, 'select_workspaces', return_value=([name], 1, {})), \
+             patch.object(sfs.collector, 'collect_workspaces', return_value={'binding_count': 1, 'read_log_count': 1, 'days': []}), \
+             patch.object(sfs, 'ssh_operation', return_value=hive) as operation:
+            result = sfs.collect()
+        self.assertIs(result['hive_daily'], hive)
+        self.assertEqual(operation.call_args.args[0], {'names': [name]})
+        source = operation.call_args.kwargs['remote_source']
+        self.assertIn('copy_archive_image(db, local, before)', source)
+        self.assertIn('collect_hive_daily', source)
 
     def test_declared_production_volume_resolves_without_a_log_download(self):
         name = 'digitalmate-w-' + 'a' * 64
