@@ -73,7 +73,9 @@ test('production page shows the SFS cache sample even when it chooses a differen
     assert.equal(await beebou.locator('.stat-value').first().innerText(), '100.0%');
     assert.match(await bee.innerText(), /30 \/ 33/);
     assert.match(await beebou.innerText(), /15 \/ 15/);
-    assert.match(await cache.innerText(), /缺失或无效 3 次/);
+    assert.equal(await bee.getByText('有效缓存样本 / 已采集模型调用', { exact: true }).count(), 1);
+    assert.match(await cache.innerText(), /缓存计数缺失或无效 3 次，不计入命中率/);
+    assert.match(await cache.innerText(), /一次用户请求可能调用模型多次/);
     assert.match(await cache.innerText(), /BeeBou 1 \/ 3/);
     assert.doesNotMatch(await cache.innerText(), /WorkSwarm|legacy\/model|undefined/);
     assert.doesNotMatch(await cache.innerText(), /2026-11-16/);
