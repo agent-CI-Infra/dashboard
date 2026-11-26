@@ -39,17 +39,18 @@ class SfsTests(unittest.TestCase):
         self.assertEqual(namespace['collect_prefix_cache']([], namespace['path_for'])['days'], [])
 
     def test_coverage_below_threshold_is_rejected(self):
-        with patch.object(sfs, 'select_workspaces', return_value=([], 100, {})):
+        names = [f'w-{i:064x}' for i in range(100)]
+        with patch.object(sfs, 'select_workspaces', return_value=(names, 100, {})):
             with patch.object(sfs.collector, 'collect_workspaces', return_value={'binding_count': 100, 'read_log_count': 94}):
                 with self.assertRaisesRegex(RuntimeError, 'coverage'):
                     sfs.collect()
             with patch.object(sfs.collector, 'collect_workspaces', return_value={'binding_count': 100, 'read_log_count': 95}), \
-                 patch.object(sfs, 'ssh_operation', return_value={'coverage': {}, 'days': []}):
+                 patch.object(sfs, 'ssh_operation', return_value={'coverage': {'expected': 100, 'read': 100}, 'days': []}):
                 self.assertEqual(sfs.collect()['collection_source'], 'production_sfs_ssh')
 
     def test_hive_is_read_even_without_legacy_request_events(self):
         name = 'w-' + 'a' * 64
-        hive = {'schema': 'digitalmate/hive-daily@1', 'coverage': {'expected': 1}, 'days': []}
+        hive = {'schema': 'digitalmate/hive-daily@1', 'coverage': {'expected': 1, 'read': 1}, 'days': []}
         with patch.object(sfs, 'select_workspaces', return_value=([name], 1, {})), \
              patch.object(sfs.collector, 'collect_workspaces', return_value={'binding_count': 1, 'read_log_count': 1, 'days': []}), \
              patch.object(sfs, 'ssh_operation', return_value=hive) as operation:
@@ -59,6 +60,14 @@ class SfsTests(unittest.TestCase):
         source = operation.call_args.kwargs['remote_source']
         self.assertIn('copy_archive_image(db, local, before)', source)
         self.assertIn('collect_hive_daily', source)
+
+    def test_hive_coverage_failure_cannot_publish_a_fresh_empty_sample(self):
+        names = [f'w-{i:064x}' for i in range(100)]
+        with patch.object(sfs, 'select_workspaces', return_value=(names, 100, {})), \
+             patch.object(sfs.collector, 'collect_workspaces', return_value={'binding_count': 100, 'read_log_count': 100}), \
+             patch.object(sfs, 'ssh_operation', return_value={'coverage': {'expected': 100, 'read': 94}, 'days': []}):
+            with self.assertRaisesRegex(RuntimeError, 'Hive SFS coverage below 95%'):
+                sfs.collect()
 
     def test_declared_production_volume_resolves_without_a_log_download(self):
         name = 'digitalmate-w-' + 'a' * 64
