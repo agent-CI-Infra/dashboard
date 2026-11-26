@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-25T18:03:51Z",
+  "updatedAt": "2026-11-26T04:21:57Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -259,6 +259,30 @@
     }
   ],
   "runs": [
+    {
+      "runId": 45752546622,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45752546622",
+      "createdAt": "2026-11-26T04:01:20Z",
+      "headSha": "dcc36087591d",
+      "conclusion": "failure",
+      "branch": "release_v0.1.13",
+      "st": {
+        "runId": "nightly-45752546622-1",
+        "status": "skipped",
+        "mode": "business",
+        "runner": "",
+        "machine": "",
+        "issues": [
+          "Image job failed at Archive ST and E2E backend PVCs: HK API 121.91.168.49:5443 i/o timeout; ST/live-wire/component/E2E not run (#2907).",
+          "Image pushed sha256:ef252ae50b2730c5eaa71c4bd0d3f5eadd498c2eb76ca3e54e9ed2cbab140d55; E2E PVC snapshot succeeded before API timeout.",
+          "Artifacts=0 (#1710); local OBS report archive partial."
+        ],
+        "cases": [],
+        "liveWire": null,
+        "component": null
+      }
+    },
     {
       "runId": "paused-main-20261126-0200",
       "attempt": 1,
