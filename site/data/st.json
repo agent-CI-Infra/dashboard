@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-26T04:21:57Z",
+  "updatedAt": "2026-11-26T06:01:44Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -259,6 +259,28 @@
     }
   ],
   "runs": [
+    {
+      "runId": "paused-main-20261126-1400",
+      "attempt": 1,
+      "url": "",
+      "createdAt": "2026-11-26T14:00:00+08:00",
+      "headSha": "",
+      "conclusion": "skipped",
+      "branch": "main",
+      "st": {
+        "runId": "",
+        "status": "skipped",
+        "mode": "business",
+        "runner": "",
+        "machine": "",
+        "issues": [
+          "main 14:00 cancelled by operator; HK API 121.91.168.49:5443 still i/o timeout and digitalmate-nightly-e2e/st are at 0 replicas (#2907); no test run"
+        ],
+        "cases": [],
+        "liveWire": null,
+        "component": null
+      }
+    },
     {
       "runId": 45752546622,
       "attempt": 1,
