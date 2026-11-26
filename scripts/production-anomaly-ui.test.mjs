@@ -13,7 +13,35 @@ vm.runInContext(`const esc=String,fmtCount=(v)=>Number.isFinite(v)?String(v):'�
  extract('function envTrendChart(', 'function envLatencyTrend(') +
  extract('const ANOMALY_METRICS =', '// Cloud call volume') +
  extract('function refineCharts(', 'function hideChartHover(') +
- ';globalThis.label=pointLabel;globalThis.chart=envTrendChart;globalThis.summary=summarizeCloudAnomalies;globalThis.render=envAnomaly;globalThis.refine=refineCharts;', ctx);
+ ';globalThis.label=pointLabel;globalThis.chart=envTrendChart;globalThis.summary=summarizeCloudAnomalies;globalThis.render=envAnomaly;globalThis.failures=envFailureAnalysis;globalThis.refine=refineCharts;', ctx);
+
+test('failure analysis pools explicit exceptions and timeouts without treating cancellations as failures', () => {
+  const html = ctx.failures({ days: [
+    { date: '2026-11-04', gateway_stream: { exception: 2, observed: 12, cancelled: 40, unknown: 8 },
+      anomaly: { timeouts: { records: 3, identified: 2, requests: [{ request_id: 'timeout-1', gateway: 100 }] }, error_categories: { timeout: 3 } } },
+    { date: '2026-11-05', gateway_stream: { exception: 1, observed: 8, cancelled: 200 },
+      anomaly: { timeouts: { records: 2, identified: 1 }, error_categories: { rate_limit: 2 } } },
+    { date: '2026-11-06' },
+  ] });
+  assert.match(html, /data-failure-metric="stream_exception"[\s\S]*?3 \/ 20/);
+  assert.match(html, /data-failure-metric="timeout_records"[\s\S]*?>5<\/div>/);
+  assert.match(html, /data-failure-metric="timeout_requests"[\s\S]*?>3<\/div>/);
+  assert.match(html, /覆盖 2 \/ 3 天/);
+  assert.match(html, /data-trace-id="timeout-1"/);
+  assert.doesNotMatch(html, /243 \/|240 \/|251/);
+});
+
+test('missing failure telemetry stays unknown while explicit zero counts remain zero', () => {
+  const missing = ctx.failures({ days: [{ date: '2026-11-05' }] });
+  assert.match(missing, /data-failure-metric="stream_exception"[\s\S]*?— \/ —/);
+  assert.match(missing, /data-failure-metric="timeout_records"[\s\S]*?>—<\/div>/);
+  assert.match(missing, /失败原因尚未采集/);
+  const zero = ctx.failures({ days: [{ date: '2026-11-05', gateway_stream: { exception: 0, observed: 4 },
+    anomaly: { timeouts: { records: 0, identified: 0 }, error_categories: {} } }] });
+  assert.match(zero, /data-failure-metric="stream_exception"[\s\S]*?0 \/ 4/);
+  assert.match(zero, /data-failure-metric="timeout_records"[\s\S]*?>0<\/div>/);
+  assert.match(zero, /所选范围没有已记录的失败原因/);
+});
 
 test('18 and 30 day charts retain values and change annotations', () => {
   for (const count of [18, 30]) {

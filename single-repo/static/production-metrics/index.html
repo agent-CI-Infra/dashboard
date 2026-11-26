@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>DigitalMate · Nightly E2E 性能看板</title>
-    <link rel="stylesheet" href="style.css?v=20261126.3" />
+    <link rel="stylesheet" href="style.css?v=20261126.4" />
   </head>
   <body>
     <style>.topbar, #tabs, .footer { display: none; } .page { padding-top: 0; }</style>
@@ -76,36 +76,46 @@
           <div id="env-latency"><p class="empty">加载中…</p></div>
         </section>
 
-        <header class="view-section-head" id="tools-section">
-          <div>
-            <p class="eyebrow">工具</p>
-            <h2>单请求诊断</h2>
-            <p class="section-note">选择云侧慢请求查看分层轨迹或请求阶段与工具事件。两种视图的起点不同；线上只展示经过筛选的阶段和时间，不展示工具参数或消息内容。</p>
-          </div>
-        </header>
-
-        <section class="card" id="trajectory-archive" aria-label="全部原生轨迹"></section>
-        <section class="card" id="request-traces">
-          <div class="card-head"><h2>云侧慢请求轨迹</h2><span class="muted">云侧慢请求与超时请求 · 所选时间范围</span></div>
-          <div id="trace-picker"></div>
-          <div id="trace-result" aria-live="polite"></div>
-        </section>
-
-        <section class="card" id="request-lookup">
+        <section class="card version-analysis" id="version-analysis" aria-labelledby="version-analysis-title">
           <div class="card-head">
-            <h2>按请求 ID 查询</h2>
-            <span class="muted">单请求性能诊断</span>
+            <h2 id="version-analysis-title">版本现网分析</h2>
+            <span class="muted">跟随所选时间范围</span>
           </div>
-          <form id="lookup-form" class="lookup-form">
-            <input id="lookup-id" type="text" placeholder="粘贴模型请求 ID（request_id）" autocomplete="off" spellcheck="false" required>
-            <button type="submit">查询</button>
-          </form>
-          <details class="lookup-key">
-            <summary>网关访问凭据（仅当前页面有效）</summary>
-            <input id="lookup-key" type="password" placeholder="sk-…（prod / adx-jiuwen admin key）" autocomplete="off" spellcheck="false">
-            <p class="chart-note">凭据仅保留在当前页面内，直查时发送至网关；不填时仅搜索已加载的本地快照。结果只展示性能指标，不展示消息内容。</p>
-          </details>
-          <div id="lookup-result" aria-live="polite"></div>
+          <div class="analysis-tabs" role="tablist" aria-label="版本现网分析分类">
+            <button id="analysis-tab-failed" class="analysis-tab" type="button" role="tab" aria-selected="true" aria-controls="analysis-failed" data-analysis-view="failed">失败请求分析</button>
+            <button id="analysis-tab-slow" class="analysis-tab" type="button" role="tab" aria-selected="false" aria-controls="analysis-slow" data-analysis-view="slow" tabindex="-1">慢请求分析</button>
+            <button id="analysis-tab-all" class="analysis-tab" type="button" role="tab" aria-selected="false" aria-controls="analysis-all" data-analysis-view="all" tabindex="-1">全量分析</button>
+          </div>
+          <section id="analysis-failed" class="analysis-panel" role="tabpanel" aria-labelledby="analysis-tab-failed">
+            <div id="analysis-failures" aria-live="polite"><p class="empty">加载中…</p></div>
+          </section>
+          <section id="analysis-slow" class="analysis-panel" role="tabpanel" aria-labelledby="analysis-tab-slow" hidden>
+            <div id="analysis-slow-summary"></div>
+            <section class="card" id="request-traces">
+              <div class="card-head"><h2>云侧慢请求轨迹</h2><span class="muted">云侧慢请求与超时请求 · 所选时间范围</span></div>
+              <div id="trace-picker"></div>
+              <div id="trace-result" aria-live="polite"></div>
+            </section>
+          </section>
+          <section id="analysis-all" class="analysis-panel" role="tabpanel" aria-labelledby="analysis-tab-all" hidden>
+            <section class="card" id="trajectory-archive" aria-label="全部原生轨迹"></section>
+            <section class="card" id="request-lookup">
+              <div class="card-head">
+                <h2>按请求 ID 查询</h2>
+                <span class="muted">单请求性能诊断</span>
+              </div>
+              <form id="lookup-form" class="lookup-form">
+                <input id="lookup-id" type="text" placeholder="粘贴模型请求 ID（request_id）" autocomplete="off" spellcheck="false" required>
+                <button type="submit">查询</button>
+              </form>
+              <details class="lookup-key">
+                <summary>网关访问凭据（仅当前页面有效）</summary>
+                <input id="lookup-key" type="password" placeholder="sk-…（prod / adx-jiuwen admin key）" autocomplete="off" spellcheck="false">
+                <p class="chart-note">凭据仅保留在当前页面内，直查时发送至网关；不填时仅搜索已加载的本地快照。结果只展示性能指标，不展示消息内容。</p>
+              </details>
+              <div id="lookup-result" aria-live="polite"></div>
+            </section>
+          </section>
         </section>
 
         <details class="card model-details" id="model-section">
@@ -206,9 +216,9 @@
 
     <div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>
 
-    <script src="release-timeline.js?v=20261126.3" defer></script>
-    <script src="app.js?v=20261126.3" defer></script>
-    <script type="module" src="trajectory-archive.js?v=20261126.3"></script>
+    <script src="release-timeline.js?v=20261126.4" defer></script>
+    <script src="app.js?v=20261126.4" defer></script>
+    <script type="module" src="trajectory-archive.js?v=20261126.4"></script>
     <link rel="stylesheet" href="trajectory-archive.css?v=20261119.1" />
   </body>
 </html>

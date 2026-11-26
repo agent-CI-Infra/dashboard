@@ -11,6 +11,7 @@ const state = {
   history: null,
   productionDoc: null,
   cloudReleases: null,
+  analysisView: 'failed',
   selected: null,
   model: null,
   hashModel: null,
@@ -993,9 +994,9 @@ function summarizeCloudWindow(rows) {
 }
 
 // Headline tiles summarize the selected calendar window, including partial days.
-function envSummary(doc) {
+function envSummary(doc, replyCards = '') {
   const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row && row.date && row.gateway) : [];
-  if (!rows.length) return '';
+  if (!rows.length) return replyCards ? `<section class="summary model-summary env-summary cloud-metric-summary" aria-label="云侧 Agent 指标">${replyCards}</section>` : '';
   const anchor = summarizeCloudWindow(rows);
   const seconds = (value) => fmtSecondsBare(value);
   const milliseconds = (value) => Number.isFinite(value) && value >= 0 ? value.toFixed(1).replace(/\.0$/, '') : '—';
@@ -1046,7 +1047,7 @@ function envSummary(doc) {
     </div>`;
   }).join('');
   const rangeNote = `${esc(anchor.window_start)} 至 ${esc(anchor.window_end)} · ${fmtCount(anchor.window_days)} 个有数据的日期${anchor.partial ? ' · 含部分覆盖' : ''}${anchor.current_sample_days ? ` · ${fmtCount(anchor.current_sample_days)} 天使用当前可读日志样本` : ''}`;
-  return `<div class="env-data-notes env-range-notes"><div><strong>统计范围</strong><span>${rangeNote}</span></div><div><strong>汇总口径</strong><span>均值按样本数或输出 Token 加权；多日分位数仅在可合并分布完整时显示，≈ 表示近似。</span></div></div><section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
+  return `<div class="env-data-notes env-range-notes"><div><strong>统计范围</strong><span>${rangeNote}</span></div><div><strong>汇总口径</strong><span>均值按样本数或输出 Token 加权；多日分位数仅在可合并分布完整时显示，≈ 表示近似。</span></div></div><section class="summary model-summary env-summary cloud-metric-summary" aria-label="云侧 Agent 指标">
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>${countLabel}</strong> / <strong>${rateLabel}</strong></div>
       <div class="stat-value combo">${fmtCount(countValue)} / <span class="${failureTone}">${rate}</span></div>
@@ -1071,6 +1072,7 @@ function envSummary(doc) {
       <div class="stat-value combo">${tokenBare(anchor.tokens?.input)} / ${tokenBare(anchor.tokens?.output)} / ${tokenBare(anchor.tokens?.total)}</div>
       <div class="stat-hint">llm_usage 记录累计 · 输出覆盖 ${fmtCount(anchor.tokens?.days?.output)} / ${fmtCount(anchor.window_days)} 天 · 可能含重复记录</div>
     </div>
+    ${replyCards}
   </section>`;
 }
 
@@ -1402,6 +1404,66 @@ function envAnomaly(doc) {
     ${cohort ? `<h4 class="anomaly-subhead">慢请求阶段对比（均值）</h4><div class="table-wrap"><table class="history-table anomaly-table"><thead><tr><th>阶段</th><th class="num">正常请求</th><th class="num">异常请求</th><th class="num">增量</th></tr></thead><tbody>${cohortRows}</tbody></table></div>` : ''}
     <p class="chart-note">${detailNote} 慢请求按每个自然日已读取请求的最慢 5% 选取；请求明细只保留最近 7 天。${sampled ? '旧快照只有慢请求样本，超时统计未采集。' : '超时仅识别 llm_call_error 或网关流异常日志中的 TimeoutError / timeout / timed out / deadline exceeded；同一工作区按 request_id 去重，无 ID 的事件只计记录数。'} 公开看板仅展示请求标识和耗时。</p>
     <p class="chart-note">每个自然日使用其之前 7 个已结束自然日的可读日志样本计算最近排名 P95，每项至少需要 20 个基线样本。当天样本严格超过其历史基线即计为超基线，范围汇总仅使用有基线的样本；表格显示各日阈值范围。工作区缺失时，历史基线及当日结果均只代表已读日志。阶段对比按各组有效样本数加权汇总，主要拉高阶段为首吐字、ReAct 和答案尾段中均值增量最大的正值。</p>
+  </div>`;
+}
+
+function envFailureAnalysis(doc) {
+  const rows = (Array.isArray(doc?.days) ? doc.days : []).filter((row) => row?.date);
+  const traceDays = new Map((Array.isArray(doc?.cloud_trace_collection?.days) ? doc.cloud_trace_collection.days : [])
+    .filter((row) => row?.date).map((row) => [row.date, row.anomaly]));
+  const entries = rows.map((row) => ({ row, anomaly: row.anomaly || traceDays.get(row.date) || {} }));
+  const valid = (value) => Number.isSafeInteger(value) && value >= 0;
+  const total = (values) => {
+    const known = values.filter(valid);
+    const sum = known.reduce((a, b) => a + b, 0);
+    return known.length && Number.isSafeInteger(sum) ? sum : null;
+  };
+  const streams = rows.filter((row) => valid(row.gateway_stream?.exception) && valid(row.gateway_stream?.observed)
+    && row.gateway_stream.exception <= row.gateway_stream.observed);
+  const exceptions = total(streams.map((row) => row.gateway_stream.exception));
+  const observed = total(streams.map((row) => row.gateway_stream.observed));
+  const timeouts = total(entries.map(({ anomaly }) => anomaly.timeouts?.records));
+  const identified = total(entries.map(({ anomaly }) => anomaly.timeouts?.identified));
+  const categories = new Map();
+  let categoriesKnown = false;
+  for (const { anomaly } of entries) {
+    if (anomaly.error_categories && typeof anomaly.error_categories === 'object' && !Array.isArray(anomaly.error_categories)) {
+      categoriesKnown = true;
+      for (const [key, count] of Object.entries(anomaly.error_categories)) {
+        if (valid(count) && count > 0) categories.set(key, (categories.get(key) || 0) + count);
+      }
+    }
+  }
+  const reasons = [...categories].sort((a, b) => b[1] - a[1])
+    .map(([key, count]) => `<tr><td>${esc(MODEL_FAILURE_LABELS[key] || key)}</td><td class="num">${fmtCount(count)}</td></tr>`).join('');
+  const daily = entries.map(({ row, anomaly }) => `<tr><td>${esc(row.date)}${row.partial ? ' *' : ''}</td>
+    <td class="num">${fmtCount(row.gateway_stream?.exception)} / ${fmtCount(row.gateway_stream?.observed)}</td>
+    <td class="num">${fmtCount(anomaly.timeouts?.records)}</td><td class="num">${fmtCount(anomaly.timeouts?.identified)}</td></tr>`).join('');
+  const requests = entries.flatMap(({ row, anomaly }) => (Array.isArray(anomaly.timeouts?.requests) ? anomaly.timeouts.requests : [])
+    .filter((item) => typeof item?.request_id === 'string' && item.request_id)
+    .map((item) => ({ ...item, date: row.date })))
+    .sort((a, b) => b.date.localeCompare(a.date) || (b.gateway || 0) - (a.gateway || 0)).slice(0, 20);
+  const requestRows = requests.map((item) => `<tr><td>${esc(item.date)}</td><td class="run-id">${esc(item.request_id)}</td>
+    <td class="num">${fmtDuration(item.gateway)}</td><td><button type="button" class="trace-link" data-trace-id="${esc(item.request_id)}">查看轨迹</button></td></tr>`).join('');
+  return `<div class="failure-analysis-content">
+    <p class="muted">按所选范围内可读取的日志汇总显式网关流异常、超时和失败原因记录。</p>
+    <section class="summary model-summary" aria-label="失败与超时指标">
+      <div class="stat-card" data-failure-metric="stream_exception"><div class="stat-label">网关流异常 / 已识别结束记录</div>
+        <div class="stat-value combo">${fmtCount(exceptions)} / ${fmtCount(observed)}</div>
+        <div class="stat-hint">覆盖 ${fmtCount(streams.length)} / ${fmtCount(rows.length)} 天${observed > 0 ? ` · 异常占比 ${fmtPercent(100 * exceptions / observed)}` : ''}</div></div>
+      <div class="stat-card" data-failure-metric="timeout_records"><div class="stat-label">日志内超时事件</div>
+        <div class="stat-value">${fmtCount(timeouts)}</div><div class="stat-hint">显式超时错误记录</div></div>
+      <div class="stat-card" data-failure-metric="timeout_requests"><div class="stat-label">已识别超时请求</div>
+        <div class="stat-value">${fmtCount(identified)}</div><div class="stat-hint">具有请求 ID 的超时样本</div></div>
+    </section>
+    <h3>失败原因记录</h3>
+    ${reasons ? `<div class="table-wrap"><table class="history-table"><thead><tr><th>原因</th><th class="num">事件数</th></tr></thead><tbody>${reasons}</tbody></table></div>`
+      : `<p class="empty">${categoriesKnown ? '所选范围没有已记录的失败原因。' : '失败原因尚未采集。'}</p>`}
+    <details class="env-call-detail"><summary>每日失败与超时记录</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>日期</th><th class="num">网关流异常 / 已识别结束</th><th class="num">超时事件</th><th class="num">已识别超时请求</th></tr></thead><tbody>${daily || '<tr><td colspan="4">所选范围暂无日志记录。</td></tr>'}</tbody></table></div></details>
+    <h3>可定位的超时请求</h3>
+    ${requestRows ? `<div class="table-wrap"><table class="history-table"><thead><tr><th>日期</th><th>请求 ID</th><th class="num">请求耗时</th><th>轨迹</th></tr></thead><tbody>${requestRows}</tbody></table></div>`
+      : '<p class="empty">所选范围没有可定位的超时请求记录。</p>'}
+    <p class="chart-note">失败原因按日志事件计数；超时请求按采集端提供的已识别请求数汇总。缺失字段显示「—」，* 表示部分日。可定位请求只展示已采集明细，最多 20 条。</p>
   </div>`;
 }
 
@@ -4088,7 +4150,7 @@ function cloudTraceRangeLabel(rangeDays, today, completeThrough = null) {
   return `${addDays(end, -(Number(rangeDays) - 1))} 至 ${end}（按完整日）`;
 }
 
-function replyTimingSummary() {
+function replyTimingCards() {
   const cards = [
     ['quick_reply', '快回复'],
     ['normal_reply_bee', '正常回复（Bee）'],
@@ -4098,16 +4160,35 @@ function replyTimingSummary() {
     <div class="stat-value combo">— / — / —</div>
     <div class="stat-hint">暂无打点数据</div>
   </div>`).join('');
-  return `<section class="summary model-summary reply-timing-summary" aria-label="云侧回复时延指标">${cards}</section>`;
+  return cards;
+}
+
+function setAnalysisView(view, { focus = false } = {}) {
+  const next = ['failed', 'slow', 'all'].includes(view) ? view : 'failed';
+  state.analysisView = next;
+  const root = $('version-analysis');
+  if (!root) return;
+  root.querySelectorAll('[data-analysis-view]').forEach((button) => {
+    const selected = button.dataset.analysisView === next;
+    button.setAttribute('aria-selected', String(selected));
+    button.tabIndex = selected ? 0 : -1;
+  });
+  for (const name of ['failed', 'slow', 'all']) $(`analysis-${name}`).hidden = name !== next;
+  if (next === 'slow' && state.history) renderRequestTraces(state.envDaily);
+  if (focus) root.querySelector(`[data-analysis-view="${next}"]`)?.focus();
 }
 
 function renderEnv() {
   const target = $('env-latency');
   if (!target) return;
   const daily = state.envDaily;
-  const replyTimings = replyTimingSummary();
+  const replyTimings = replyTimingCards();
+  const failures = $('analysis-failures');
+  const slowSummary = $('analysis-slow-summary');
   if (!daily) {
-    target.innerHTML = replyTimings;
+    target.innerHTML = envSummary(null, replyTimings);
+    if (failures) failures.innerHTML = envFailureAnalysis(null);
+    if (slowSummary) slowSummary.innerHTML = envAnomaly(null);
     renderRequestTraces(null);
     return;
   }
@@ -4115,6 +4196,8 @@ function renderEnv() {
   // Match the model summary's completed-day anchor; Today still shows today.
   // Historical rows with incomplete coverage remain visible and labelled.
   const scoped = { ...daily, days: cloudScopedDays(all, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history)).map(cloudDisplayRow) };
+  if (failures) { failures.innerHTML = envFailureAnalysis(scoped); refineCharts(failures); }
+  if (slowSummary) { slowSummary.innerHTML = envAnomaly(scoped); refineCharts(slowSummary); }
   renderRequestTraces(daily);
   const latestObserved = scoped.days.at(-1)?.observed_at;
   const snapshotTime = daily.generated_at || daily.updated_at;
@@ -4131,7 +4214,7 @@ function renderEnv() {
   ].filter(Boolean);
   const freshness = `<div class="env-data-notes" aria-label="数据说明"><div><strong>数据更新</strong><span>${timeText} · 定时采集，并非实时流</span></div>${warnings.length ? `<div><strong>数据限制</strong><span>${warnings.join('；')}。</span></div>` : ''}<div><strong>覆盖标记</strong><span>* 表示部分日或日志覆盖不全。</span></div></div>`;
   const prefixCache = prefixCachePanel(daily.prefix_cache, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history));
-  target.innerHTML = `${freshness}${envSummary(scoped)}${replyTimings}${prefixCache}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
+  target.innerHTML = `${freshness}${envSummary(scoped, replyTimings)}${prefixCache}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
   refineCharts(target, state.cloudReleases);
 }
 
@@ -4281,13 +4364,22 @@ $('model-trends').addEventListener('click', (event) => {
   if (next) next.focus();
 });
 
-$('env-latency').addEventListener('click', (event) => {
+function handleCloudMetricClick(event) {
   const traceButton = event.target.closest('[data-trace-id]');
   if (traceButton) {
-    state.traceTouched = true;
-    state.traceId = `cloud:${traceButton.dataset.traceId}`;
-    const index = state.traceCandidates?.findIndex((item) => `${item.scope}:${item.request_id}` === state.traceId) ?? -1;
-    if (index >= 0) { $('trace-select').value = String(index); $('trace-result').innerHTML = traceHtml(state.traceCandidates[index]); }
+    setAnalysisView('slow');
+    const id = `cloud:${traceButton.dataset.traceId}`;
+    const index = state.traceCandidates?.findIndex((item) => `${item.scope}:${item.request_id}` === id) ?? -1;
+    if (index >= 0) {
+      state.traceTouched = true;
+      state.traceId = id;
+      state.traceDisplay = 'native';
+      state.traceFilter = state.traceCandidates[index].native_trajectory ? 'all' : 'tools';
+      $('trace-select').value = String(index);
+      $('trace-result').innerHTML = traceHtml(state.traceCandidates[index]);
+    } else {
+      $('trace-result').innerHTML = `<p class="empty">请求 ${esc(traceButton.dataset.traceId)} 尚无可用轨迹明细。</p>`;
+    }
     $('request-traces')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
   }
@@ -4300,6 +4392,22 @@ $('env-latency').addEventListener('click', (event) => {
   document.querySelectorAll(`#env-latency [data-env-series="${key}"]`).forEach((node) => {
     node.classList.toggle('is-hidden', hide);
   });
+}
+$('env-latency').addEventListener('click', handleCloudMetricClick);
+$('version-analysis')?.addEventListener('click', handleCloudMetricClick);
+$('version-analysis')?.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-analysis-view]');
+  if (button) setAnalysisView(button.dataset.analysisView);
+});
+document.querySelector('#version-analysis .analysis-tabs')?.addEventListener('keydown', (event) => {
+  const button = event.target.closest('[data-analysis-view]');
+  if (!button || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  const tabs = [...document.querySelectorAll('#version-analysis [data-analysis-view]')];
+  const index = tabs.indexOf(button);
+  const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
+    : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+  event.preventDefault();
+  setAnalysisView(tabs[next].dataset.analysisView, { focus: true });
 });
 
 // One hover readout for every chart: a crosshair snaps to the nearest date and
@@ -4455,6 +4563,7 @@ window.addEventListener('resize', () => {
   }, 160);
 });
 
+setAnalysisView(state.analysisView);
 showView(viewFromHash(), { updateHash: false });
 bindRequestLookup();
 load();

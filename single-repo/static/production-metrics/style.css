@@ -995,6 +995,31 @@ h1 {
   font-size: 1.35rem;
 }
 
+/* Balance the last four cards when a three-column grid would leave one alone. */
+@media (min-width: 901px) {
+  .cloud-metric-summary {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .cloud-metric-summary > .stat-card {
+    grid-column: span 2;
+  }
+  .cloud-metric-summary:has(> .stat-card:last-child:nth-child(3n + 1)) > .stat-card:nth-last-child(-n + 4) {
+    grid-column: span 3;
+  }
+  .cloud-metric-summary:has(> .stat-card:last-child:nth-child(3n + 2)) > .stat-card:nth-last-child(-n + 2) {
+    grid-column: span 3;
+  }
+  .cloud-metric-summary > .stat-card:only-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 621px) and (max-width: 900px) {
+  .cloud-metric-summary > .stat-card:last-child:nth-child(2n + 1) {
+    grid-column: 1 / -1;
+  }
+}
+
 /* Per-point value + day-over-day glyph on trend charts. */
 .point-label {
   font-size: 9px;
@@ -1601,6 +1626,59 @@ h1 {
 .prefix-cache-source h4 {
   margin: 0 0 12px;
   font-size: 15px;
+}
+
+.version-analysis {
+  min-width: 0;
+  scroll-margin-top: 64px;
+}
+
+.version-analysis > .card-head h2 {
+  font-size: 18px;
+}
+
+.analysis-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.analysis-tab {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.analysis-tab[aria-selected="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.analysis-tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.analysis-panel:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.analysis-panel[hidden] {
+  display: none;
 }
 
 .prefix-cache-metric + .prefix-cache-metric {
