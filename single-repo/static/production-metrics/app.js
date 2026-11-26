@@ -10,6 +10,7 @@ const STATUS_LABEL = {
 const state = {
   history: null,
   productionDoc: null,
+  cloudReleases: null,
   selected: null,
   model: null,
   hashModel: null,
@@ -800,7 +801,7 @@ function envTrendChart(doc, opts) {
       const cx = x(index);
       const left = Math.max(pad.left, cx - zoneWidth / 2);
       const right = Math.min(width - pad.right, cx + zoneWidth / 2);
-      return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right - left).toFixed(1)}" height="${innerHeight}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
+      return `<rect class="hover-zone" data-date="${esc(row.date)}" x="${left.toFixed(1)}" y="${pad.top}" width="${(right - left).toFixed(1)}" height="${innerHeight}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
     })
     .join('');
 
@@ -997,7 +998,6 @@ function envSummary(doc) {
   if (!rows.length) return '';
   const anchor = summarizeCloudWindow(rows);
   const seconds = (value) => fmtSecondsBare(value);
-  const milliseconds = (value) => Number.isFinite(value) && value >= 0 ? value.toFixed(1).replace(/\.0$/, '') : '—';
   const formatted = (metric, field, formatter) => `${metric?.approx && field !== 'mean' && Number.isFinite(metric?.[field]) ? '≈' : ''}${formatter(metric?.[field])}`;
   const workspaceMetrics = anchor.source === 'workspace_request_logs' || Number.isFinite(anchor.model_usage_events);
   const rateValue = workspaceMetrics ? anchor.gateway_stream?.exception_rate : anchor.failure_rate;
@@ -1031,19 +1031,6 @@ function envSummary(doc) {
   const firstTile = requestTile('first_token', '首吐字', '网关受理 → 首个文本 chunk');
   const answerTile = requestTile('answer_first', '答案首吐字', '网关受理 → 首个答案 chat.delta · 网关实测');
   const reactTile = requestTile('react', 'ReAct 阶段', '网关首文本 → 网关首答案 · 同一请求配对');
-  const networkTiles = [
-    ['uplink_send', '端到云', '上行时延', '端侧发出请求 → 云侧 Bridge 收到请求'],
-    ['downlink_first_text', '云到端', '首段文字下行', '云侧 Bridge 发出首段文字 → 端侧收到'],
-    ['downlink_terminal', '云到端', '结束帧下行', '云侧 Bridge 发出结束帧 → 端侧收到'],
-  ].map(([key, direction, label, hint]) => {
-    const metric = anchor[key];
-    const count = metric?.n > 0 ? `${fmtCount(metric.n)} 个有效样本` : '所选范围无有效样本 · 等待已校时样本';
-    return `<div class="stat-card network-card" data-metric="${key}">
-      <div class="stat-label">${direction}<strong>${label}</strong> 平均 / P50 / P95（ms）</div>
-      <div class="stat-value combo">${formatted(metric, 'mean', milliseconds)} / ${formatted(metric, 'p50', milliseconds)} / ${formatted(metric, 'p95', milliseconds)}</div>
-      <div class="stat-hint">${count} · 覆盖 ${fmtCount(metric?.days)} / ${fmtCount(anchor.window_days)} 天${anchor.network_partial ? ' · 采集部分覆盖' : ''} · ${hint} · 校时误差 ≤ 50 ms；下行仅计已配对帧</div>
-    </div>`;
-  }).join('');
   const rangeNote = `${esc(anchor.window_start)} 至 ${esc(anchor.window_end)} · ${fmtCount(anchor.window_days)} 个有数据的日期${anchor.partial ? ' · 含部分覆盖' : ''}${anchor.current_sample_days ? ` · ${fmtCount(anchor.current_sample_days)} 天使用当前可读日志样本` : ''}`;
   return `<div class="env-data-notes env-range-notes"><div><strong>统计范围</strong><span>${rangeNote}</span></div><div><strong>汇总口径</strong><span>均值按样本数或输出 Token 加权；多日分位数仅在可合并分布完整时显示，≈ 表示近似。</span></div></div><section class="summary model-summary env-summary" aria-label="云侧 Agent 指标">
     <div class="stat-card">
@@ -1059,7 +1046,6 @@ function envSummary(doc) {
     ${firstTile}
     ${answerTile}
     ${reactTile}
-    ${networkTiles}
     <div class="stat-card">
       <div class="stat-label">云侧 Agent<strong>TPOT</strong> 平均 / P50 / P95（ms/token）</div>
       <div class="stat-value combo">${formatted(anchor.tpot, 'mean', fmtTpotBare)} / ${formatted(anchor.tpot, 'p50', fmtTpotBare)} / ${formatted(anchor.tpot, 'p95', fmtTpotBare)}</div>
@@ -1071,6 +1057,28 @@ function envSummary(doc) {
       <div class="stat-hint">llm_usage 记录累计 · 输出覆盖 ${fmtCount(anchor.tokens?.days?.output)} / ${fmtCount(anchor.window_days)} 天 · 可能含重复记录</div>
     </div>
   </section>`;
+}
+
+function clientNetworkSummary(doc) {
+  const rows = Array.isArray(doc?.days) ? doc.days.filter((row) => row?.date) : [];
+  const anchor = summarizeCloudWindow(rows);
+  if (!anchor) return '<p class="empty">所选范围暂无端侧与网络时延数据。</p>';
+  const formatted = (metric, field) => Number.isFinite(metric?.[field])
+    ? `${field !== 'mean' && metric.approx ? '≈' : ''}${Number(metric[field].toFixed(1))}` : '—';
+  const networkTiles = [
+    ['uplink_send', '端到云', '上行时延', '端侧发出请求 → 云侧 Bridge 收到请求'],
+    ['downlink_first_text', '云到端', '首段文字下行', '云侧 Bridge 发出首段文字 → 端侧收到'],
+    ['downlink_terminal', '云到端', '结束帧下行', '云侧 Bridge 发出结束帧 → 端侧收到'],
+  ].map(([key, direction, label, hint]) => {
+    const metric = anchor[key];
+    const count = metric?.n > 0 ? `${fmtCount(metric.n)} 个有效样本` : '所选范围无有效样本 · 等待已校时样本';
+    return `<div class="stat-card network-card" data-metric="${key}">
+      <div class="stat-label">${direction}<strong>${label}</strong> 平均 / P50 / P95（ms）</div>
+      <div class="stat-value combo">${formatted(metric, 'mean')} / ${formatted(metric, 'p50')} / ${formatted(metric, 'p95')}</div>
+      <div class="stat-hint">${count} · 覆盖 ${fmtCount(metric?.days)} / ${fmtCount(anchor.window_days)} 天${anchor.network_partial ? ' · 采集部分覆盖' : ''} · ${hint} · 校时误差 ≤ 50 ms；下行仅计已配对帧</div>
+    </div>`;
+  }).join('');
+  return `<section class="summary model-summary" aria-label="端侧与网络时延指标">${networkTiles}</section>`;
 }
 
 const PREFIX_CACHE_SOURCES = { beebou: 'Beebou', bees: 'Bees', workswarm: 'WorkSwarm' };
@@ -1482,7 +1490,7 @@ function envCallTrend(doc) {
       const cx = x(index);
       const left = Math.max(pad.left, cx - zoneWidth / 2);
       const right = Math.min(width - pad.right, cx + zoneWidth / 2);
-      return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right - left).toFixed(1)}" height="${innerHeight}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
+      return `<rect class="hover-zone" data-date="${esc(row.date)}" x="${left.toFixed(1)}" y="${pad.top}" width="${(right - left).toFixed(1)}" height="${innerHeight}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
     })
     .join('');
 
@@ -2375,7 +2383,7 @@ function volumeTrendChart(days, failures, visibility = {}) {
               tip.push(`${item.format(value)} · ${item.label}`);
             }
           }
-          return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right - left).toFixed(1)}" height="${innerHeight}" data-tip="${esc(tip.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
+          return `<rect class="hover-zone" data-date="${esc(row.date)}" x="${left.toFixed(1)}" y="${pad.top}" width="${(right - left).toFixed(1)}" height="${innerHeight}" data-tip="${esc(tip.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
         })
         .join('')
     : '';
@@ -2529,7 +2537,7 @@ function latencyTrendChart(points, visibility = {}) {
       const cx = x(index);
       const left = Math.max(pad.left, cx - zoneWidth / 2);
       const right = Math.min(width - pad.right, cx + zoneWidth / 2);
-      return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right - left).toFixed(1)}" height="${innerHeight}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
+      return `<rect class="hover-zone" data-date="${esc(row.date)}" x="${left.toFixed(1)}" y="${pad.top}" width="${(right - left).toFixed(1)}" height="${innerHeight}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
     })
     .join('');
 
@@ -2589,7 +2597,7 @@ function ttftTrendChart(points, visibility = {}, { columns = 1 } = {}) {
     for (const [key,label,field] of defs) if (visible(key) && Number.isFinite(row[field])) lines.push(`TTFT ${label} ${fmtDuration(row[field])}`);
     if (lines.length === 1) return '';
     const cx=x(i), left=Math.max(pad.left,cx-zoneWidth/2), right=Math.min(width-pad.right,cx+zoneWidth/2);
-    return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right-left).toFixed(1)}" height="${ih}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
+    return `<rect class="hover-zone" data-date="${esc(row.date)}" x="${left.toFixed(1)}" y="${pad.top}" width="${(right-left).toFixed(1)}" height="${ih}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
   }).join('');
   return `<div class="trend-card${cardClass}">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="TTFT 请求级均值与 P50 P95 趋势">${grid}<line class="axis-line" x1="${pad.left}" y1="${pad.top+ih}" x2="${width-pad.right}" y2="${pad.top+ih}" />${layers}${labels}<line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top+ih}" hidden />${zones}</svg><p class="chart-note">均值按请求数加权；P50/P95 为请求级分位（分桶近似，每类至少 20 个样本）。</p></div>`;
 }
@@ -2636,7 +2644,7 @@ function tpotTrendChart(points, visibility = {}, { columns = 1 } = {}) {
     for (const [key,label,field] of defs) if (visible(key) && Number.isFinite(row[field])) lines.push(`TPOT ${label} ${fmtTpot(row[field])}`);
     if (lines.length === 1) return '';
     const cx=x(i), left=Math.max(pad.left,cx-zoneWidth/2), right=Math.min(width-pad.right,cx+zoneWidth/2);
-    return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right-left).toFixed(1)}" height="${ih}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
+    return `<rect class="hover-zone" data-date="${esc(row.date)}" x="${left.toFixed(1)}" y="${pad.top}" width="${(right-left).toFixed(1)}" height="${ih}" data-tip="${esc(lines.join('\n'))}" data-x="${cx.toFixed(1)}" />`;
   }).join('');
   return `<div class="trend-card${cardClass}">${head}<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="TPOT 加权均值与请求级 P50 P95 趋势">${grid}<line class="axis-line" x1="${pad.left}" y1="${pad.top+ih}" x2="${width-pad.right}" y2="${pad.top+ih}" />${layers}${labels}<line class="hover-line" x1="0" y1="${pad.top}" x2="0" y2="${pad.top+ih}" hidden />${zones}</svg><p class="chart-note">均值按输出 Token 数减一加权；P50/P95 为请求级分位（分桶近似，每类至少 20 个样本）。</p></div>`;
 }
@@ -2742,7 +2750,7 @@ function tokenTrendChart(points, visibility = {}, unit = 'query') {
               (item) => `${item.values[index] === null ? '—' : fmtTokenCompact(item.values[index])} · ${item.label}`,
             ),
           ].join('\n');
-          return `<rect class="hover-zone" x="${left.toFixed(1)}" y="${pad.top}" width="${(right - left).toFixed(1)}" height="${innerHeight}" data-tip="${esc(tip)}" data-x="${cx.toFixed(1)}" />`;
+          return `<rect class="hover-zone" data-date="${esc(row.date)}" x="${left.toFixed(1)}" y="${pad.top}" width="${(right - left).toFixed(1)}" height="${innerHeight}" data-tip="${esc(tip)}" data-x="${cx.toFixed(1)}" />`;
         })
         .join('')
     : '';
@@ -3317,7 +3325,7 @@ function renderTrends() {
     failures: failureSeries(state.history, days, state.model),
     volumeVisibility: state.volumeVisibility,
   });
-  refineCharts(target);
+  refineCharts(target, state.cloudReleases);
 }
 
 function renderModels() {
@@ -3406,7 +3414,7 @@ function renderModels() {
       failures: trendFailures,
       volumeVisibility: state.volumeVisibility,
     });
-    refineCharts(trends);
+    refineCharts(trends, state.cloudReleases);
   }
   if (failure) {
     failure.innerHTML = modelFailureAnalysis(modelFailurePoints(history, state.model, days));
@@ -4087,8 +4095,10 @@ function renderEnv() {
   const target = $('env-latency');
   if (!target) return;
   const daily = state.envDaily;
+  const client = $('client-network');
   if (!daily) {
     target.innerHTML = '';
+    if (client) client.innerHTML = '<p class="empty">暂无端侧与网络时延数据。</p>';
     renderRequestTraces(null);
     return;
   }
@@ -4096,6 +4106,7 @@ function renderEnv() {
   // Match the model summary's completed-day anchor; Today still shows today.
   // Historical rows with incomplete coverage remain visible and labelled.
   const scoped = { ...daily, days: cloudScopedDays(all, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history)).map(cloudDisplayRow) };
+  if (client) client.innerHTML = clientNetworkSummary(scoped);
   renderRequestTraces(daily);
   const latestObserved = scoped.days.at(-1)?.observed_at;
   const snapshotTime = daily.generated_at || daily.updated_at;
@@ -4113,7 +4124,7 @@ function renderEnv() {
   const freshness = `<div class="env-data-notes" aria-label="数据说明"><div><strong>数据更新</strong><span>${timeText} · 定时采集，并非实时流</span></div>${warnings.length ? `<div><strong>数据限制</strong><span>${warnings.join('；')}。</span></div>` : ''}<div><strong>覆盖标记</strong><span>* 表示部分日或日志覆盖不全。</span></div></div>`;
   const prefixCache = prefixCachePanel(daily.prefix_cache, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history));
   target.innerHTML = `${freshness}${envSummary(scoped)}${prefixCache}${envAnomaly(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
-  refineCharts(target);
+  refineCharts(target, state.cloudReleases);
 }
 
 function requireCurrentMetricsVersion(history) {
@@ -4132,6 +4143,7 @@ async function load() {
     }
     requireCurrentMetricsVersion(history);
     state.history = history;
+    void loadCloudReleases();
     state.model = busiestModel(history);
     void loadProductionMetrics();
     void loadEnvLatency();
@@ -4158,6 +4170,7 @@ async function refreshProductionSnapshots() {
     if (!history || typeof history !== 'object' || !history.cases) throw new Error('history missing cases');
     requireCurrentMetricsVersion(history);
     state.history = history;
+    await loadCloudReleases(false);
     renderHeader();
     renderModels();
     await loadEnvLatency();
@@ -4283,8 +4296,26 @@ let activeChart = null;
 // Post-render polish for charts: the 9px per-point labels collide when two
 // series sit close together, and the methodology paragraphs push the curves
 // apart. Keep the first label of each overlapping cluster and fold long notes.
-function refineCharts(root) {
+async function loadCloudReleases(renderCharts = true) {
+  try {
+    const response = await fetch('../data/snapshot.json', { cache: 'no-store' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    state.cloudReleases = window.DigitalMateReleaseTimeline.normalize(await response.json());
+  } catch {
+    // Release metadata is independent of metrics; retain the last good timeline.
+    state.cloudReleases ??= [];
+  }
+  if (renderCharts) {
+    renderModels();
+    renderEnv();
+  }
+}
+
+function refineCharts(root, releases = null) {
   if (!root) return;
+  if (releases && ['env-latency', 'model-trends'].includes(root.id)) {
+    window.DigitalMateReleaseTimeline.decorate(root, releases);
+  }
   root.querySelectorAll('.trend-chart').forEach((svg) => {
     const kept = [];
     svg.querySelectorAll('text.point-label').forEach((label) => {

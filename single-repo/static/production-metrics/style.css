@@ -1568,6 +1568,66 @@ h1 {
   max-width: none;
 }
 
+.client-details > summary {
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.client-details > summary .muted {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.client-details[open] > summary {
+  margin-bottom: 16px;
+}
+
+.client-details .summary {
+  margin-bottom: 0;
+}
+
+.release-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.release-color-0 { --release-color: var(--muted); }
+.release-color-1 { --release-color: var(--series-1); }
+.release-color-2 { --release-color: var(--series-2); }
+.release-color-3 { --release-color: var(--series-3); }
+.release-color-4 { --release-color: #8250df; }
+
+.release-chip {
+  padding: 1px 7px;
+  border: 1px solid var(--line);
+  border-inline-start: 4px solid var(--release-color);
+  border-radius: 4px;
+  color: var(--ink);
+}
+
+.release-bands {
+  pointer-events: none;
+}
+
+.release-band {
+  fill: var(--release-color);
+  fill-opacity: 0.09;
+}
+
+.release-divider {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  opacity: 0.5;
+}
+
 #model-trends-card {
   scroll-margin-top: 16px;
 }
