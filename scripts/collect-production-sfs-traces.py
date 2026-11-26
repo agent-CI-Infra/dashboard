@@ -10,6 +10,7 @@ import sys
 import urllib.request
 
 from production_prefix_cache import retain_prefix_cache
+from production_hive_metrics import retain_hive_daily
 
 HERE = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location('production_kube', HERE / 'collect-production-kube-traces.py')
@@ -94,11 +95,28 @@ def select_workspaces():
 
 
 def collect():
-    result = collector.collect_workspaces(ssh_operation, *select_workspaces(), prefix_cache=True)
+    names, binding_count, errors = select_workspaces()
+    result = collector.collect_workspaces(ssh_operation, names, binding_count, errors, prefix_cache=True)
     count, read = result.get('binding_count'), result.get('read_log_count')
     if type(count) is not int or type(read) is not int or count <= 0 or read / count < 0.95:
         raise RuntimeError('SFS coverage below 95%; previous snapshot retained')
     result['collection_source'] = 'production_sfs_ssh'
+    remote = '\n'.join((HERE / file).read_text(encoding='utf-8').rsplit('\nif __name__', 1)[0]
+                       for file in ('kube-workspace-remote.py', 'sfs-trajectory-remote.py', 'production_hive_metrics.py'))
+    remote += '\n' + (HERE / 'sfs-hive-remote.py').read_text(encoding='utf-8')
+    result['hive_daily'] = ssh_operation({'names': names}, remote_source=remote)
+    hive_coverage = result['hive_daily'].get('coverage', {})
+    expected, read = hive_coverage.get('expected'), hive_coverage.get('read')
+    if (type(expected) is not int or type(read) is not int or expected != len(names)
+            or expected <= 0 or not 0 <= read <= expected or read / expected < 0.95):
+        raise RuntimeError('Hive SFS coverage below 95%; previous snapshot retained')
+    print(f'Hive SFS database coverage: {read}/{expected}; Hive tables: '
+          f'{hive_coverage.get("with_hive", 0)}; incomplete: {hive_coverage.get("incomplete", 0)}', file=sys.stderr)
+    result['hive_daily']['binding_count'] = binding_count
+    result['hive_daily']['coverage']['unresolved_bindings'] = max(0, binding_count - len(names))
+    if errors:
+        for day in result['hive_daily']['days']:
+            day['partial'] = True
     return result
 
 
@@ -113,9 +131,12 @@ def main():
         raise SystemExit('invalid production seed; previous snapshot retained')
     traces = collect()
     prefix_cache = traces.pop('prefix_cache', None)
+    hive_daily = traces.pop('hive_daily', None)
     result = cloud.with_workspace_traces(previous, traces)
     if prefix_cache is not None:
         result['prefix_cache'] = retain_prefix_cache(previous.get('prefix_cache'), prefix_cache)
+    if hive_daily is not None:
+        result['hive_daily'] = retain_hive_daily(previous.get('hive_daily'), hive_daily)
     Path(sys.argv[1]).write_text(json.dumps(result, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     print('SFS collection complete; sanitized aggregate prepared', file=sys.stderr)
 
