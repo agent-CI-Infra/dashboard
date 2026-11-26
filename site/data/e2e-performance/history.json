@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/e2e-performance-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updated_at": "2026-11-26T04:21:57Z",
+  "updated_at": "2026-11-26T06:01:44Z",
   "cases": {
     "DM-WF-CHROME-01": {
       "id": "DM-WF-CHROME-01",
@@ -12821,6 +12821,13 @@
     }
   },
   "runs": [
+    {
+      "run_id": "paused-main-20261126-1400",
+      "branch": "main",
+      "createdAt": "2026-11-26T14:00:00+08:00",
+      "status": "skipped",
+      "reason": "main 14:00 cancelled by operator; HK API 121.91.168.49:5443 still i/o timeout and digitalmate-nightly-e2e/st are at 0 replicas (#2907); no test run"
+    },
     {
       "run_id": "nightly-45752546622-1",
       "branch": "release_v0.1.13",
