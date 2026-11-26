@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>DigitalMate · Nightly E2E 性能看板</title>
-    <link rel="stylesheet" href="style.css?v=20261126.5" />
+    <link rel="stylesheet" href="style.css?v=20261126.6" />
   </head>
   <body>
     <style>.topbar, #tabs, .footer { display: none; } .page { padding-top: 0; }</style>
@@ -76,11 +76,10 @@
           <div id="env-latency"><p class="empty">加载中…</p></div>
         </section>
 
-        <section class="card version-analysis" id="version-analysis" aria-labelledby="version-analysis-title">
-          <div class="card-head">
-            <h2 id="version-analysis-title">版本现网分析</h2>
-            <span class="muted">跟随所选时间范围</span>
-          </div>
+        <details class="card version-analysis" id="version-analysis" aria-labelledby="version-analysis-title">
+          <summary class="analysis-summary">
+            <h2 aria-labelledby="version-analysis-title"><span id="version-analysis-title">版本现网分析</span><span class="muted">跟随所选时间范围</span></h2>
+          </summary>
           <div class="analysis-tabs" role="tablist" aria-label="版本现网分析分类">
             <button id="analysis-tab-failed" class="analysis-tab" type="button" role="tab" aria-selected="true" aria-controls="analysis-failed" data-analysis-view="failed">失败请求分析</button>
             <button id="analysis-tab-slow" class="analysis-tab" type="button" role="tab" aria-selected="false" aria-controls="analysis-slow" data-analysis-view="slow" tabindex="-1">慢请求分析</button>
@@ -116,7 +115,7 @@
               <div id="lookup-result" aria-live="polite"></div>
             </section>
           </section>
-        </section>
+        </details>
 
         <details class="card model-details" id="model-section">
           <summary>模型侧 · 现网模型请求 <span class="muted">展开查看模型对比、汇总、曲线与明细</span></summary>
@@ -216,9 +215,9 @@
 
     <div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>
 
-    <script src="release-timeline.js?v=20261126.5" defer></script>
-    <script src="app.js?v=20261126.5" defer></script>
-    <script type="module" src="trajectory-archive.js?v=20261126.5"></script>
+    <script src="release-timeline.js?v=20261126.6" defer></script>
+    <script src="app.js?v=20261126.6" defer></script>
+    <script type="module" src="trajectory-archive.js?v=20261126.6"></script>
     <link rel="stylesheet" href="trajectory-archive.css?v=20261119.1" />
   </body>
 </html>

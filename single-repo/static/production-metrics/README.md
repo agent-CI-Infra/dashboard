@@ -18,6 +18,10 @@ workspace, call and session identifiers stay on the mount.
   the sum of cache reads divided by the sum of input tokens of known calls.
   Calls missing either count appear in the observed population with unavailable
   rates. Explicit zero cache reads remain valid.
+  The board labels these counts as effective cache samples / collected model
+  calls. Collected calls are deduplicated model-call log records within each
+  workspace and source, including records whose cache counts are unavailable.
+  They are not user-request counts: one user request can make multiple model calls.
 - The single-call distribution uses nearest-rank percentiles over 0.1
   percentage-point buckets. The near-zero count covers known calls of at least
   1,024 input tokens with a hit rate at or below 1%. Its denominator is known

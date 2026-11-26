@@ -1134,7 +1134,7 @@ function prefixCachePanel(doc, range, today, completeThrough) {
       <div class="prefix-cache-metric"><div class="stat-label">加权命中率</div><div class="stat-value">${pct(stats.rate)}</div><div class="stat-hint">命中 Token ÷ 有效样本的输入 Token</div></div>
       <div class="prefix-cache-metric"><div class="stat-label">单次命中率 P50 / P95</div><div class="stat-value combo">${quantiles(stats)}</div><div class="stat-hint">按 0.1 个百分点分桶</div></div>
       <div class="prefix-cache-metric"><div class="stat-label">近零命中 / 可判定</div><div class="stat-value combo">${misses(stats)}</div><div class="stat-hint">命中率 ≤ 1%，输入 ≥ 1,024 Token</div></div>
-      <div class="prefix-cache-metric"><div class="stat-label">已知 / 已观测调用</div><div class="stat-value combo">${samples(stats)}</div><div class="stat-hint">缺失或无效 ${fmtCount(stats.calls - stats.known)} 次</div></div>
+      <div class="prefix-cache-metric"><div class="stat-label">有效缓存样本 / 已采集模型调用</div><div class="stat-value combo">${samples(stats)}</div><div class="stat-hint">缓存计数缺失或无效 ${fmtCount(stats.calls - stats.known)} 次，不计入命中率</div></div>
     </section>`;
   }).join('');
 
@@ -1173,11 +1173,12 @@ function prefixCachePanel(doc, range, today, completeThrough) {
 
   return `<section class="env-anomaly">${title}${details}
     <div class="summary model-summary prefix-cache-summary">${sourceSummaries}</div>
+    <p class="stat-hint">已采集模型调用按采到的日志去重计数；一次用户请求可能调用模型多次。</p>
     <details class="env-call-detail"><summary>按链路、模型与会话拆分</summary><div class="table-wrap"><table class="history-table">
-      <thead><tr><th>链路</th><th>模型</th><th>会话</th><th>加权命中率</th><th>单次 P50 / P95</th><th>近零命中 / 可判定</th><th>已知 / 已观测</th></tr></thead><tbody>${breakdown}</tbody>
+      <thead><tr><th>链路</th><th>模型</th><th>会话</th><th>加权命中率</th><th>单次 P50 / P95</th><th>近零命中 / 可判定</th><th>有效样本 / 采集调用</th></tr></thead><tbody>${breakdown}</tbody>
     </table></div><p class="chart-note">首个可见调用以当前保留日志为准，可能来自已有会话。</p></details>
     <details class="env-call-detail" open><summary>每日会话统计与异常看护</summary><div class="table-wrap"><table class="history-table">
-      <thead><tr><th>北京时间</th><th>链路</th><th>加权命中率</th><th>近零命中 / 可判定</th><th>已知 / 已观测</th><th>有效会话数 · 累计命中率 P50 / P95</th><th>已见会话看护</th></tr></thead><tbody>${daily}</tbody>
+      <thead><tr><th>北京时间</th><th>链路</th><th>加权命中率</th><th>近零命中 / 可判定</th><th>有效样本 / 采集调用</th><th>有效会话数 · 累计命中率 P50 / P95</th><th>已见会话看护</th></tr></thead><tbody>${daily}</tbody>
     </table></div><p class="chart-note">会话累计以单日有效用量计算。已见会话的近零命中次数和比例同时超过过去 7 天基线时标记突增。</p></details>
   </section>`;
 }
@@ -4369,6 +4370,8 @@ $('model-trends').addEventListener('click', (event) => {
 function handleCloudMetricClick(event) {
   const traceButton = event.target.closest('[data-trace-id]');
   if (traceButton) {
+    const analysis = $('version-analysis');
+    if (analysis) analysis.open = true;
     setAnalysisView('slow');
     const id = `cloud:${traceButton.dataset.traceId}`;
     const index = state.traceCandidates?.findIndex((item) => `${item.scope}:${item.request_id}` === id) ?? -1;
@@ -4464,7 +4467,7 @@ function refineCharts(root, releases = null) {
   });
   const groups = new Map();
   root.querySelectorAll('p.chart-note').forEach((note) => {
-    if (note.closest('details')) return;
+    if (note.closest('details:not(.version-analysis)')) return;
     const parent = note.parentElement;
     if (!groups.has(parent)) groups.set(parent, []);
     groups.get(parent).push(note);

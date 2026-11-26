@@ -1639,8 +1639,35 @@ h1 {
   scroll-margin-top: 64px;
 }
 
-.version-analysis > .card-head h2 {
+.analysis-summary {
+  cursor: pointer;
+}
+
+.analysis-summary h2 {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: calc(100% - 20px);
+  margin: 0;
   font-size: 18px;
+  vertical-align: middle;
+}
+
+.analysis-summary .muted {
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.analysis-summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.version-analysis[open] > .analysis-summary {
+  margin-bottom: 16px;
 }
 
 .analysis-tabs {
