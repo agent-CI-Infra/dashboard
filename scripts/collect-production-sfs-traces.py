@@ -110,6 +110,13 @@ def collect():
                        for file in ('kube-workspace-remote.py', 'sfs-trajectory-remote.py', 'production_hive_metrics.py'))
     remote += '\n' + (HERE / 'sfs-hive-remote.py').read_text(encoding='utf-8')
     result['hive_daily'] = ssh_operation({'names': names}, remote_source=remote)
+    hive_coverage = result['hive_daily'].get('coverage', {})
+    expected, read = hive_coverage.get('expected'), hive_coverage.get('read')
+    if (type(expected) is not int or type(read) is not int or expected != len(names)
+            or expected <= 0 or not 0 <= read <= expected or read / expected < 0.95):
+        raise RuntimeError('Hive SFS coverage below 95%; previous snapshot retained')
+    print(f'Hive SFS database coverage: {read}/{expected}; Hive tables: '
+          f'{hive_coverage.get("with_hive", 0)}; incomplete: {hive_coverage.get("incomplete", 0)}', file=sys.stderr)
     result['hive_daily']['binding_count'] = binding_count
     result['hive_daily']['coverage']['unresolved_bindings'] = max(0, binding_count - len(names))
     if errors:

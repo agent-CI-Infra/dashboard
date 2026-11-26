@@ -26,6 +26,9 @@ query; the collection has a four-minute workspace budget. Missing, changing,
 oversized, invalid or unreadable images are counted in coverage. A workspace is
 merged only after all its queries succeed, so a failed query cannot publish half
 of its population. Unexpected state/reason values are mapped to `other`.
+Below 95% readable Hive database coverage rejects publication and retains the
+previous snapshot through the existing workflow fallback. The collection log
+prints aggregate read coverage independently of legacy log coverage.
 
 The public projection contains only daily counts, state categories and timing
 distributions. It exports no workspace, principal, session, message, task or Run
