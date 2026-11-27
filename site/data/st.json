@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-26T18:15:04Z",
+  "updatedAt": "2026-11-27T05:07:50Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -259,6 +259,568 @@
     }
   ],
   "runs": [
+    {
+      "runId": 45937414754,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45937414754",
+      "createdAt": "2026-11-27T04:00:44Z",
+      "headSha": "dd7c9a8a5dcff707d25980c80dea391b470a2714",
+      "conclusion": "failure",
+      "branch": "release_v0.1.13",
+      "st": {
+        "runId": "nightly-45937414754-1",
+        "status": "failed",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "ST 10/13: structured_choice/reset_detached_recovery NO_STRUCTURED_INTERACTION; skill_default_generation xlsx 0 entries; tracked #2139/#2138.",
+          "E2E job cancelled mid-run: 6 COMPLETED PASS, 21 BLOCKED (18 unexecuted 0.0s), 1 FAIL; tracked #2997.",
+          "live-wire 5/6 passed; artifact blocked by device PDF capability (PdfDocument undefined); no open Issue.",
+          "component 5/5 passed; image build PASS."
+        ],
+        "cases": [
+          {
+            "name": "real_model_text_reply",
+            "key": "text",
+            "title": "文本回复",
+            "coverageId": "TEXT",
+            "status": "passed",
+            "elapsedMs": 3112,
+            "stage": "business",
+            "detail": "Home reply marker verified on the account Home"
+          },
+          {
+            "name": "real_model_txt_download_and_content",
+            "key": "text-file",
+            "title": "文本生成 TXT 并下载",
+            "coverageId": "TEXT-FILE",
+            "status": "passed",
+            "elapsedMs": 32238,
+            "stage": "business",
+            "detail": "PDF stable control (ST-1795752887524-2bf41d.pdf) delivered the random code through the product file path, and the DOCX body equals it exactly: ST-1795752887524-2bf41d.docx"
+          },
+          {
+            "name": "real_model_multi_turn",
+            "key": "multi",
+            "title": "三轮对话与上下文更新",
+            "coverageId": "MULTI",
+            "status": "passed",
+            "elapsedMs": 6797,
+            "stage": "business",
+            "detail": "Three Home turns retained the random code and updated quantity"
+          },
+          {
+            "name": "real_model_file_to_text",
+            "key": "file-text",
+            "title": "上传文件并提取文本",
+            "coverageId": "FILE-TEXT",
+            "status": "passed",
+            "elapsedMs": 8553,
+            "stage": "business",
+            "detail": "Uploaded source was referenced and hidden fixture values extracted"
+          },
+          {
+            "name": "real_model_file_to_file",
+            "key": "file-file",
+            "title": "上传 CSV 并生成转换文件",
+            "coverageId": "FILE-FILE",
+            "status": "passed",
+            "elapsedMs": 31793,
+            "stage": "business",
+            "detail": "Real CSV uploaded and read; transformed values 20 and 60 verified in the delivered DOCX"
+          },
+          {
+            "name": "real_model_structured_choice",
+            "key": "choice",
+            "title": "结构化选项回答并继续任务",
+            "coverageId": "CHOICE",
+            "status": "failed",
+            "elapsedMs": 326006,
+            "stage": "business",
+            "detail": "NO_STRUCTURED_INTERACTION: this turn never held a real Hive question in waiting_user; no answer was fabricated or approved. Channels checked: a Hive task question (snapshot.hive_tasks[] with question_open and hive.result.get state waiting_user), and an open Home choice card (snapshot.messages[].choice with choice_state open). Last snapshot: {\"hiveTaskChannel\":{\"active\":0,\"open\":[],\"rows\":[]},\"homeCardChannel\":{\"nowMs\":1795753605779,\"cards\":[],\"legacyTasks\":0}}"
+          },
+          {
+            "name": "real_model_structured_choice_home",
+            "key": "",
+            "title": "real_model_structured_choice_home",
+            "coverageId": "CHOICE",
+            "status": "passed",
+            "elapsedMs": 20478,
+            "stage": "business",
+            "detail": "The Home asked a real clarification card; the YI-ST-1795753595628-97d4d6 option was clicked through the product click path (choice_label 乙方案（YI-ST-1795753595628-97d4d6）, choice_state answered) and the next reply used YI-ST-1795753595628-97d4d6"
+          },
+          {
+            "name": "reset_detached_recovery",
+            "key": "reset-detached-recovery",
+            "title": "独立房间 reset/detached 与真实断链恢复",
+            "coverageId": "REC-03",
+            "status": "failed",
+            "elapsedMs": 312352,
+            "stage": "business",
+            "detail": "NO_STRUCTURED_INTERACTION: this turn never held a real Hive question in waiting_user; no answer was fabricated or approved. Channels checked: a Hive task question (snapshot.hive_tasks[] with question_open and hive.result.get state waiting_user), and an open Home choice card (snapshot.messages[].choice with choice_state open). Last snapshot: {\"hiveTaskChannel\":{\"active\":0,\"open\":[],\"rows\":[]},\"homeCardChannel\":{\"nowMs\":1795754059068,\"cards\":[],\"legacyTasks\":0}}"
+          },
+          {
+            "name": "attachment_metadata_conflict",
+            "key": "attachment-metadata-conflict",
+            "title": "附件元数据冲突与真实云端对照",
+            "coverageId": "ATT-01",
+            "status": "passed",
+            "elapsedMs": 9932,
+            "stage": "business",
+            "detail": "Local import policy rejected text-as-JPG, PNG-as-JPEG and an executable extension with a measured zero socket calls; the cloud sniffed a PNG renamed to .txt back to image/png, the receipts report the server's own type and size for a real PNG and TXT, and the model read back the TXT's hidden value."
+          },
+          {
+            "name": "attachment_corrupt_recovery",
+            "key": "attachment-corrupt-recovery",
+            "title": "损坏图片与文本恢复",
+            "coverageId": "ATT-02",
+            "status": "passed",
+            "elapsedMs": 6229,
+            "stage": "business",
+            "detail": "Zero-byte and wrong-signature uploads failed before any socket call; the truncated PNG failure phase was recorded as cloud-read with a hint naming the file problem, and a later plain-text turn in the same Home completed."
+          },
+          {
+            "name": "attachment_image_understanding",
+            "key": "attachment-image-understanding",
+            "title": "真实华为 HDR/MPF 相机 JPG 原图识别",
+            "coverageId": "ATT-03",
+            "status": "passed",
+            "elapsedMs": 3223,
+            "stage": "business",
+            "detail": "The repository Huawei HDR/MPF camera JPEG was uploaded unchanged, the receipt identifies the fixture by name and exact byte count, and the brand-only question was answered HONOR/荣耀 by the live model."
+          },
+          {
+            "name": "skill_default_generation",
+            "key": "skill-default-generation",
+            "title": "默认生成技能：Word / Excel / PPT / PDF 各交付一个文件",
+            "coverageId": "SKL-01",
+            "status": "failed",
+            "elapsedMs": 491204,
+            "stage": "business",
+            "detail": "[ASSERT_MISMATCH] SKL-01 xlsx-delivery/artifact: expected=exactly one delivered artifact named \"ST-1795754243364-41d3cf-GEN.xlsx\"; actual=0 entry(ies) after the turn | SKL-01 xlsx-delivery/media-type: expected=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; actual=no artifact | SKL-01 xlsx-delivery/download: expected=the product download path returns the delivered bytes; actual=download not attempted: publish wait ended: no published artifact named \"ST-1795754243364-41d3cf-GEN.xlsx\" after 420090ms (budget 420000ms; hive_artifacts has no active row with that name) at stage wait-publish; the turn was not resubmitted | SKL-01 xlsx-delivery/size: expected=published size equals the downloaded length; actual=no artifact"
+          },
+          {
+            "name": "skill_default_parsing",
+            "key": "skill-default-parsing",
+            "title": "默认解析技能：文本 PDF 提取与 CSV 对账单合计",
+            "coverageId": "SKL-02",
+            "status": "passed",
+            "elapsedMs": 14150,
+            "stage": "business",
+            "detail": "SKL-02 attachment-only values (historic ID SKL-02): pdf-id=PASS; csv-total+count=PASS; fixtures generated in code (605 byte PDF, 141 byte CSV, 5 data rows)"
+          }
+        ],
+        "liveWire": [
+          {
+            "suite": "connection",
+            "caseName": "gateway_connection",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "business",
+            "caseName": "business",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "identity",
+            "caseName": "identity",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "forward",
+            "caseName": "forward",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "chunks",
+            "caseName": "chunks",
+            "status": "passed",
+            "nativeStatus": "passed",
+            "issues": []
+          },
+          {
+            "suite": "artifact",
+            "caseName": "artifact-receipt-matrix",
+            "status": "blocked",
+            "nativeStatus": "blocked",
+            "issues": [
+              "Device PDF capability missing: reader-error Cannot read property PdfDocument of undefined (ART-01 control); receipt matrix not completed."
+            ]
+          }
+        ],
+        "component": [
+          {
+            "suite": "artifact-versions",
+            "title": "产物版本与分组",
+            "status": "passed",
+            "runId": "ST-1795755413242-17944a",
+            "issues": [],
+            "cases": [
+              {
+                "name": "artifact_center_version_list",
+                "title": "artifact_center_version_list",
+                "status": "passed",
+                "elapsedMs": 13,
+                "detail": "Production artifact projection, catalog and downloader verified"
+              },
+              {
+                "name": "artifact_center_conversation_grouping",
+                "title": "artifact_center_conversation_grouping",
+                "status": "passed",
+                "elapsedMs": 584,
+                "detail": "Production artifact projection, catalog and downloader verified"
+              },
+              {
+                "name": "artifact_range_download",
+                "title": "artifact_range_download",
+                "status": "passed",
+                "elapsedMs": 165,
+                "detail": "Production artifact projection, catalog and downloader verified"
+              },
+              {
+                "name": "artifact_version_mismatch",
+                "title": "artifact_version_mismatch",
+                "status": "passed",
+                "elapsedMs": 96,
+                "detail": "Production artifact projection, catalog and downloader verified"
+              },
+              {
+                "name": "artifact_legacy_fallback",
+                "title": "artifact_legacy_fallback",
+                "status": "passed",
+                "elapsedMs": 107,
+                "detail": "Production artifact projection, catalog and downloader verified"
+              },
+              {
+                "name": "artifact_cancelled_download",
+                "title": "artifact_cancelled_download",
+                "status": "passed",
+                "elapsedMs": 82,
+                "detail": "Production artifact projection, catalog and downloader verified"
+              }
+            ]
+          },
+          {
+            "suite": "attachment-policy",
+            "title": "本地附件策略",
+            "status": "passed",
+            "runId": "ST-1795755374781-8b4550",
+            "issues": [],
+            "cases": [
+              {
+                "name": "local_attachment_blocked_types",
+                "title": "local_attachment_blocked_types",
+                "status": "passed",
+                "elapsedMs": 64,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_image_containers",
+                "title": "local_attachment_image_containers",
+                "status": "passed",
+                "elapsedMs": 124,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_magic_mismatch",
+                "title": "local_attachment_magic_mismatch",
+                "status": "passed",
+                "elapsedMs": 63,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_size_limits",
+                "title": "local_attachment_size_limits",
+                "status": "passed",
+                "elapsedMs": 266,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_supported_controls",
+                "title": "local_attachment_supported_controls",
+                "status": "passed",
+                "elapsedMs": 769,
+                "detail": "Production upload policy and native files verified"
+              },
+              {
+                "name": "local_attachment_preview_decode",
+                "title": "local_attachment_preview_decode",
+                "status": "passed",
+                "elapsedMs": 23,
+                "detail": "Production upload policy and native files verified"
+              }
+            ]
+          },
+          {
+            "suite": "markdown",
+            "title": "Markdown 渲染",
+            "status": "passed",
+            "runId": "markdown-697772063ed6a5790bc9c58126b98c4d",
+            "issues": [],
+            "cases": [
+              {
+                "name": "dash-value",
+                "title": "dash-value",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "three-dash-value",
+                "title": "three-dash-value",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "malformed-separator",
+                "title": "malformed-separator",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "short-final-row",
+                "title": "short-final-row",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "open-final-pipe",
+                "title": "open-final-pipe",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "sole-operator",
+                "title": "sole-operator",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "padded-operator",
+                "title": "padded-operator",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "orphan-leading",
+                "title": "orphan-leading",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "orphan-trailing",
+                "title": "orphan-trailing",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "fenced-table",
+                "title": "fenced-table",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "fenced-operator",
+                "title": "fenced-operator",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "comparison",
+                "title": "comparison",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "stream-pending",
+                "title": "stream-pending",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "stream-boundary",
+                "title": "stream-boundary",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-prose-period",
+                "title": "link-prose-period",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-markdown-period",
+                "title": "link-markdown-period",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-balanced-parens",
+                "title": "link-balanced-parens",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-brace-boundary",
+                "title": "link-brace-boundary",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              },
+              {
+                "name": "link-unmatched-open",
+                "title": "link-unmatched-open",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Parser contract and native rendered text verified"
+              }
+            ]
+          },
+          {
+            "suite": "session-proximity",
+            "title": "会话邻近契约",
+            "status": "passed",
+            "runId": "ST-1795755395312-8cdffb",
+            "issues": [],
+            "cases": [
+              {
+                "name": "native_topic_projection",
+                "title": "native_topic_projection",
+                "status": "passed",
+                "elapsedMs": 4,
+                "detail": "Native contract verified"
+              },
+              {
+                "name": "native_capacity_draft",
+                "title": "native_capacity_draft",
+                "status": "passed",
+                "elapsedMs": 36,
+                "detail": "Native contract verified"
+              },
+              {
+                "name": "native_capacity_controls",
+                "title": "native_capacity_controls",
+                "status": "passed",
+                "elapsedMs": 3,
+                "detail": "Native contract verified"
+              }
+            ]
+          },
+          {
+            "suite": "suggestions",
+            "title": "建议协议与按钮",
+            "status": "passed",
+            "runId": "suggestions-88b5eac2408c04a1e8355a45f6b0581b",
+            "issues": [],
+            "cases": [
+              {
+                "name": "shopping-inline-tail",
+                "title": "shopping-inline-tail",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "inline-protocol-tail",
+                "title": "inline-protocol-tail",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "multiline-sources",
+                "title": "multiline-sources",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "sources-with-colon",
+                "title": "sources-with-colon",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "truncated-array",
+                "title": "truncated-array",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "fenced-example",
+                "title": "fenced-example",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "ordinary-next",
+                "title": "ordinary-next",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "inline-ordinary-next",
+                "title": "inline-ordinary-next",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "unsupported-view",
+                "title": "unsupported-view",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "malformed-suggestion",
+                "title": "malformed-suggestion",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              },
+              {
+                "name": "deduplicated-limited",
+                "title": "deduplicated-limited",
+                "status": "passed",
+                "elapsedMs": 0,
+                "detail": "Production projection, replay, tap handler and native suggestion buttons verified"
+              }
+            ]
+          }
+        ]
+      }
+    },
     {
       "runId": 45872471304,
       "attempt": 1,
