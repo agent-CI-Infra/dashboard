@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/test-matrix@1",
- "generatedAt": "2026-11-27T00:04:13.619Z",
+ "generatedAt": "2026-11-27T09:08:58.934Z",
  "source": {
   "repository": "openJiuwen-ai/DigitalMate",
-  "main": "93e38c8c",
+  "main": "3fe9466f",
   "refs": [
    {
     "label": "test/st-complete-coverage",
@@ -25,16 +25,16 @@
   "e2e": 27
  },
  "nightly": {
-  "createdAt": "2026-11-26T18:00:50Z",
-  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45872471304",
+  "createdAt": "2026-11-27T06:00:40Z",
+  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45949152805",
   "jobs": {
    "Update HK DigitalMate (latest main)": "failure",
    "Finalize archived REMINDER evidence": "skipped",
-   "DigitalMate ST live-wire (Windows)": "failure",
    "Nightly report": "success",
-   "Bench (full)": "skipped",
-   "E2E (${{ (inputs.e2e_case || 'all') }})": "skipped",
+   "DigitalMate ST live-wire (Windows)": "failure",
    "DigitalMate ST (Windows)": "skipped",
+   "E2E (${{ (inputs.e2e_case || 'all') }})": "skipped",
+   "Bench (full)": "skipped",
    "DigitalMate ST component (Windows)": "failure"
   }
  },
@@ -79,7 +79,7 @@
   "layers": {
    "UT": {
     "cases": 299,
-    "tests": 3457,
+    "tests": 3462,
     "byStatus": {
      "ci_lane": 299
     },
@@ -5312,7 +5312,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 4,
+   "tests": 5,
    "layer": "UT",
    "id": "mobile-cold-start.test.mjs",
    "title": "mobile",
@@ -5669,7 +5669,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 4,
+   "tests": 5,
    "layer": "UT",
    "id": "mobile-session-client.test.mjs",
    "title": "mobile",
@@ -5690,7 +5690,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 6,
+   "tests": 8,
    "layer": "UT",
    "id": "mobile-session-http.test.mjs",
    "title": "mobile",
@@ -6236,7 +6236,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 13,
+   "tests": 14,
    "layer": "UT",
    "id": "sync-app-config.test.mjs",
    "title": "sync",
