@@ -51,13 +51,11 @@ test('missing distributions remain unknown, explicit zero remains zero, and lega
   const legacy = [{ date: '2026-11-01', gateway: latencyMetric(500, 5) }];
   assert.equal(ctx.aggregateLatency(legacy, 'all').n, 5);
   const missing = ctx.latencyHtml(legacy, 'failed');
-  assert.match(missing, /data-latency-stat="n">—/);
-  assert.match(missing, /等待采集/);
+  assert.equal(missing, '');
   const known = [latencyDay('2026-11-01', latencyMetric(500), latencyMetric(0, 0), latencyMetric(500))];
   const empty = ctx.latencyHtml(known, 'failed');
-  assert.match(empty, /data-latency-stat="n">0/);
-  assert.match(empty, /没有已采集且符合该分类的有效时延样本/);
-  assert.doesNotMatch(empty, /等待采集/);
+  assert.equal(ctx.aggregateLatency(known, 'failed').n, 0);
+  assert.equal(empty, '');
   const zero = latencyDay('2026-11-02', { n: 0, sum: 999999, histogram: [] }, null, null);
   assert.equal(ctx.aggregateLatency([...legacy, zero], 'all').mean, 500);
 });

@@ -21,7 +21,8 @@ vm.runInContext(`const esc=String, fmtCount=String, fmtDateTime=String, fmtPerce
   const fmtSecondsBare=(v)=>Number.isFinite(v)?String(v/1000):'—';` +
   extract('function mergeMetricHistogram(', '// Each bucket covers') +
   extract('function aggregateCloudMetric(', '// Outlier analysis.') +
-  ';globalThis.render=envSummary; globalThis.summary=summarizeCloudWindow;', ctx);
+  extract('function cloudRequestSampleStatus(', 'function renderEnv(') +
+  ';globalThis.render=envSummary; globalThis.summary=summarizeCloudWindow; globalThis.sampleStatus=cloudRequestSampleStatus;', ctx);
 
 const row = (date, value, count = 1) => ({ date, gateway: { n: 0 },
   uplink_send: { n: count, sum: value * count, mean: value, p50: value, p95: value,
@@ -38,15 +39,24 @@ test('production script releases invalidate the shell bundle and embedded page c
     'the archive module and its range-event producer must release together');
 });
 
-test('all three network cards stay in the cloud summary without valid samples', () => {
+test('network cards without measured samples stay out of the cloud summary', () => {
   const html = ctx.render({ days: [{ date: '2026-11-19', gateway: { n: 3 } }] });
   for (const key of ['uplink_send', 'downlink_first_text', 'downlink_terminal']) {
-    const text = card(html, key);
-    assert.match(text, /平均 \/ P50 \/ P95（ms）/);
-    assert.match(text, /— \/ — \/ —/);
-    assert.match(text, /所选范围无有效样本/);
-    assert.match(text, /覆盖 0 \/ 1 天/);
+    assert.equal(card(html, key), undefined);
   }
+});
+
+test('a new collection timestamp cannot make old request samples current, and zero durations remain real samples', () => {
+  const doc = { generated_at: '2026-11-27T01:00:00Z', cloud_trace_collection: { generated_at: '2026-11-27T01:00:00Z' },
+    days: [{ date: '2026-11-24', gateway: { n: 3, mean: 100 } }, { date: '2026-11-27', gateway: { n: 0 } }] };
+  const old = ctx.sampleStatus(doc, '2026-11-27');
+  assert.equal(old.latest, '2026-11-24');
+  assert.equal(old.lagDays, 3);
+  assert.equal(old.historical, true);
+  doc.days[1].gateway = { n: 1, mean: 0, p50: 0, p95: 0 };
+  assert.equal(ctx.sampleStatus(doc, '2026-11-27').historical, false);
+  assert.match(ctx.render({ days: [doc.days[1]] }), /0 \/ 0 \/ 0/);
+  assert.equal(ctx.sampleStatus({ days: [{ date: '2026-11-28', gateway: { n: 1 } }] }, '2026-11-27').latest, undefined);
 });
 
 test('cloud summary shows measured first answer without a historical estimate card or fallback', () => {
@@ -58,9 +68,8 @@ test('cloud summary shows measured first answer without a historical estimate ca
   assert.match(html, /0\.1 \/ 0\.1 \/ 0\.1/);
   assert.doesNotMatch(html, /历史估算|999/);
   delete data.answer_first;
-  const missing = ctx.render({ days: [data] }).match(/<div class="stat-card">[\s\S]*?<\/div>\s*<\/div>/g)
-    .find(text => text.includes('<strong>答案首吐字</strong>'));
-  assert.match(missing, /— \/ — \/ —/);
+  const missing = ctx.render({ days: [data] });
+  assert.doesNotMatch(missing, /<strong>答案首吐字<\/strong>|历史估算|999/);
 });
 
 test('network cards use milliseconds and distinguish first text and terminal downlink', () => {
@@ -254,23 +263,19 @@ test('production metrics and version analysis preserve ranges, trace links, disc
     assert(await page.locator('#env-latency .env-summary').evaluate((node) => {
       const cards = [...node.children];
       const network = cards.filter((card) => card.classList.contains('network-card'));
-      return cards.indexOf(network[0]) === 5 && cards.indexOf(network[2]) === 7;
+      return cards.indexOf(network[0]) === 2 && cards.indexOf(network[2]) === 4;
     }));
     const replies = page.locator('#env-latency .reply-timing-card');
-    assert.equal(await replies.count(), 3);
-    assert.deepEqual(await replies.locator('.stat-label strong').allTextContents(), ['快回复', '正常回复（Bee）', '最终回复']);
-    for (const card of await replies.all()) {
-      assert.equal(await card.isVisible(), true);
-      assert.equal(await card.locator('.stat-value').innerText(), '— / — / —');
-      assert.match(await card.innerText(), /暂无打点数据/);
-    }
+    assert.equal(await replies.count(), 0);
+    assert.doesNotMatch(await page.locator('#env-latency').innerText(), /暂无打点数据/);
     assert.equal(await page.locator('#env-latency [data-env-series*="reply"]').count(), 0);
     const zone = page.locator('#env-latency .hover-zone[data-date="2026-11-04"]').first();
     assert.match(await zone.getAttribute('data-tip'), /v0\.2\.0 → v0\.2\.1（当日 1 次发布）/);
     assert.match(await zone.getAttribute('data-tip'), /非请求实际部署版本/);
     assert(await page.locator('#env-latency .release-divider').count() > 0);
     assert(await page.locator('#model-trends .release-chip').count() > 0);
-    assert.equal(await page.locator('.cloud-metric-summary > .stat-card').count(), 13);
+    assert.equal(await page.locator('.cloud-metric-summary > .stat-card').count(), 5);
+    assert.doesNotMatch(await page.locator('.cloud-metric-summary').innerText(), /答案首吐字|ReAct|TPOT|暂无打点数据/);
     assert.equal(await page.locator('#env-latency [aria-label="异常请求分析"]').count(), 0);
     const analysis = page.locator('#version-analysis');
     assert.equal(await analysis.getByRole('heading', { name: '版本现网分析', exact: true }).count(), 1);
@@ -310,12 +315,11 @@ test('production metrics and version analysis preserve ranges, trace links, disc
     assert.equal(await analysis.evaluate((node) => node.open), false);
     assert.equal(await models.evaluate((node) => node.open), false);
     assert.equal(await page.locator('#env-latency .network-card').count(), 0);
-    assert.equal(await replies.count(), 3);
-    assert(await replies.first().isVisible());
+    assert.equal(await replies.count(), 0);
     assert.equal(await page.locator('#analysis-tab-all').getAttribute('aria-selected'), 'true');
     await analysisSummary.click();
     assert.equal(await page.locator('#analysis-tab-all').getAttribute('aria-selected'), 'true');
-    assert.equal(await page.locator('#analysis-all-latency [data-latency-stat="n"]').innerText(), '—');
+    assert.equal(await page.locator('#analysis-all-latency [data-latency-stat="n"]').count(), 0);
     await page.locator('#archive-detail').filter({ hasText: '任务执行' }).waitFor({ state: 'hidden' });
     await page.locator('#floating-range-controls [data-range="7"]').click();
     assert.equal(await page.locator('#analysis-all-latency [data-latency-stat="n"]').innerText(), '5');
