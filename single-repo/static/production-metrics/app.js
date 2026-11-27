@@ -1125,7 +1125,7 @@ function hiveDailyPanel(doc, range, today, completeThrough) {
     <details class="env-call-detail" open><summary>每日 Hive 时序与样本量</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>北京时间</th><th>用户输入</th><th>活跃工作区</th><th>Run 启动 / 未结束</th>${measured.map(([, label]) => `<th>${label} 平均 / P50 / P95（s）</th>`).join('')}</tr></thead><tbody>${daily}</tbody></table></div></details></section>`;
 }
 
-function cloudReplyPanel(doc, range, today, completeThrough) {
+function cloudReplyPanel(doc, range, today) {
   if (doc?.schema !== 'digitalmate/cloud-reply-daily@1') return '';
   const definitions = [
     ['normal_response', 'Beebou 普通回复准备耗时', '收到消息 → 普通回复准备好返回'],
@@ -1133,7 +1133,8 @@ function cloudReplyPanel(doc, range, today, completeThrough) {
     ['normal_push', 'Beebou 普通回复推送耗时', '收到消息 → 普通回复推送回调返回'],
   ];
   const measured = (row) => definitions.some(([key]) => row?.[key]?.n > 0);
-  const days = cloudScopedDays(doc.days, range, today, completeThrough).filter(measured);
+  // Live reply observations include today's partial day in every range.
+  const days = cloudScopedDays(doc.days, range, today, today).filter(measured);
   if (!days.length) return '';
   const latest = (doc.days || []).filter(measured).map((day) => day.date).sort().at(-1);
   const metrics = definitions.filter(([key]) => days.some((day) => day[key]?.n > 0));
@@ -4425,7 +4426,7 @@ function renderEnv() {
   const freshness = `<div class="env-data-notes" aria-label="数据说明"><div><strong>文件读取</strong><span>${timeText}</span></div>${warnings.length ? `<div><strong>数据限制</strong><span>${warnings.join('；')}。</span></div>` : ''}<div><strong>覆盖标记</strong><span>* 表示部分日或日志覆盖不全。</span></div></div>`;
   const prefixCache = prefixCachePanel(daily.prefix_cache, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history));
   const hiveDaily = hiveDailyPanel(daily.hive_daily, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history));
-  const replies = cloudReplyPanel(daily.cloud_reply_daily, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history));
+  const replies = cloudReplyPanel(daily.cloud_reply_daily, state.rangeDays, todayShanghai());
   const requestMetrics = `${envSummary(scoped)}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
   const requestHeading = sampleStatus.historical ? `历史请求指标（样本截至 ${esc(sampleStatus.latest)}）` : '请求与流式指标';
   const legacy = requestMetrics ? (sampleStatus.historical

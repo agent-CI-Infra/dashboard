@@ -43,9 +43,11 @@ test('current reply cards and curves use current samples independently of legacy
     assert.match(await replies.innerText(), /5 个有效消息样本/);
     assert.equal(await replies.locator('[data-cloud-reply-metric="normal_push"]').count(), 0);
     assert.equal(await page.locator('.historical-request-metrics:not([open])').count(), 1);
-    await page.locator('#floating-range-controls [data-range="1"]').click();
-    assert.equal(await replies.locator('[data-cloud-reply-metric]').count(), 2);
-    assert.match(await replies.innerText(), /2026-11-27/);
+    for (const range of [1, 7, 30, 0]) {
+      await page.locator(`#floating-range-controls [data-range="${range}"]`).click();
+      assert.equal(await replies.locator('[data-cloud-reply-metric]').count(), 2);
+      assert.match(await replies.innerText(), /2026-11-27/);
+    }
     await page.setViewportSize({ width: 390, height: 844 });
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     assert.deepEqual(errors, []);
