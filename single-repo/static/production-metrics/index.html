@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>DigitalMate · Nightly E2E 性能看板</title>
-    <link rel="stylesheet" href="style.css?v=20261127.4" />
+    <link rel="stylesheet" href="style.css?v=20261127.5" />
   </head>
   <body>
     <style>.topbar, #tabs, .footer { display: none; } .page { padding-top: 0; }</style>
@@ -63,12 +63,11 @@
             <h2>云侧 Agent 调用指标</h2>
             <p class="section-note">曲线保持连续，底色按 Release 发布时间分段；同日多次发布按北京时间标记，日聚合不代表请求实际部署版本。</p>
             <dl class="env-metric-guide" aria-label="指标口径">
-              <div><dt>请求耗时</dt><dd>网关受理至流结束</dd></div>
-              <div><dt>首吐字</dt><dd>网关受理至首个文本</dd></div>
-              <div><dt>答案首吐字</dt><dd>网关受理至首个答案文本</dd></div>
-              <div><dt>ReAct 阶段</dt><dd>首文本至首答案的时间差</dd></div>
+              <div><dt>普通回复准备</dt><dd>收到消息至普通回复准备好返回</dd></div>
+              <div><dt>快回发送</dt><dd>收到消息至快回发送回调返回</dd></div>
+              <div><dt>普通回复推送</dt><dd>收到消息至普通回复推送回调返回</dd></div>
             </dl>
-            <p class="section-note">工具、网络与模型用量分别统计。慢请求和异常分析仅覆盖可读取的数据；详细口径见各图表说明。</p>
+            <p class="section-note">只展示已有样本。旧流式请求耗时、首吐字与 ReAct 保留在历史指标中；工具、网络与模型用量分别统计，详细口径见各图表说明。</p>
           </div>
         </header>
 
@@ -218,9 +217,9 @@
 
     <div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>
 
-    <script src="release-timeline.js?v=20261127.4" defer></script>
-    <script src="app.js?v=20261127.4" defer></script>
-    <script type="module" src="trajectory-archive.js?v=20261127.4"></script>
+    <script src="release-timeline.js?v=20261127.5" defer></script>
+    <script src="app.js?v=20261127.5" defer></script>
+    <script type="module" src="trajectory-archive.js?v=20261127.5"></script>
     <link rel="stylesheet" href="trajectory-archive.css?v=20261119.1" />
   </body>
 </html>

@@ -11,6 +11,11 @@ on:
       - scripts/collect-sfs-trajectory-archive.py
       - scripts/sfs-trajectory-remote.py
       - scripts/production_sfs_api.py
+      - scripts/production_sfs_freshness.py
+      - scripts/production_reply_metrics.py
+      - scripts/production_cloud_replies.py
+      - scripts/production_cluster_exec.py
+      - scripts/collect-production-cloud-replies.py
   workflow_dispatch:
     inputs:
       validate_only:
@@ -59,7 +64,8 @@ jobs:
           mkdir -p /tmp/cloud-metrics
           git fetch origin digitalmate:refs/remotes/origin/digitalmate
           if git show origin/digitalmate:site/data/trajectory-archive/index.json > /tmp/cloud-metrics/freshness.json; then
-            due=$(python3 scripts/production_sfs_freshness.py /tmp/cloud-metrics/freshness.json)
+            git show origin/digitalmate:site/data/env-request-latency-daily.json > /tmp/cloud-metrics/metrics-freshness.json || true
+            due=$(python3 scripts/production_sfs_freshness.py /tmp/cloud-metrics/freshness.json /tmp/cloud-metrics/metrics-freshness.json)
           else
             due=true
           fi
@@ -73,6 +79,7 @@ jobs:
           ADX_TOKEN: ${{ secrets.ADX_TOKEN }}
           ADX_BINDING_TRANSPORT: sfs-ssh
           SFS_SSH_PRIVATE_KEY: ${{ secrets.SFS_SSH_PRIVATE_KEY }}
+          PRODUCTION_KUBE_READ_CREDENTIALS: ${{ secrets.PRODUCTION_KUBE_READ_CREDENTIALS }}
         run: |
           set -euo pipefail
           if [ -z "$ADX_TOKEN" ]; then
@@ -112,6 +119,10 @@ jobs:
             --output /tmp/cloud-metrics/trajectory-archive \
             --next-state /tmp/cloud-metrics/trajectory-archive-state.json \
             "${metrics_args[@]}"
+          python3 -B scripts/collect-production-cloud-replies.py \
+            /tmp/cloud-metrics/env-request-latency-daily.json \
+            /tmp/cloud-metrics/seed/.sync/cloud-reply-state.json \
+            /tmp/cloud-metrics/cloud-reply-state.json
       - name: Publish aggregate to the DigitalMate data branch
         if: ${{ steps.freshness.outputs.collect == 'true' && (github.event_name != 'workflow_dispatch' || !inputs.validate_only) }}
         id: update
@@ -123,7 +134,8 @@ jobs:
           mkdir -p site/data/trajectory-archive .sync
           rsync -a --delete /tmp/cloud-metrics/trajectory-archive/ site/data/trajectory-archive/
           cp /tmp/cloud-metrics/trajectory-archive-state.json .sync/trajectory-archive.json
-          git add site/data/env-request-latency-daily.json site/data/trajectory-archive .sync/trajectory-archive.json
+          cp /tmp/cloud-metrics/cloud-reply-state.json .sync/cloud-reply-state.json
+          git add site/data/env-request-latency-daily.json site/data/trajectory-archive .sync/trajectory-archive.json .sync/cloud-reply-state.json
           if git diff --cached --quiet; then
             echo 'changed=false' >> "$GITHUB_OUTPUT"
             exit 0

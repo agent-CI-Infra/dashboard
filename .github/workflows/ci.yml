@@ -46,7 +46,7 @@ jobs:
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts -p 'test_production_sfs_freshness.py' -v
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts -p 'test_production_sfs_api.py' -v
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts -p 'test_slow_trace_quota.py' -v
-          node --test scripts/trajectory-archive.test.mjs scripts/production-detailed-trace.test.mjs scripts/production-network-metrics.test.mjs scripts/production-anomaly-ui.test.mjs scripts/production-trace-range.test.mjs scripts/production-floating-range.test.mjs scripts/production-prefix-cache.test.mjs
+          node --test scripts/trajectory-archive.test.mjs scripts/production-detailed-trace.test.mjs scripts/production-network-metrics.test.mjs scripts/production-anomaly-ui.test.mjs scripts/production-trace-range.test.mjs scripts/production-floating-range.test.mjs scripts/production-prefix-cache.test.mjs scripts/production-cloud-replies.test.mjs
 
       - name: Run tests
         run: npm test
