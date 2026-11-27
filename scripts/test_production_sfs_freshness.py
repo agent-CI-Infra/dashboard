@@ -5,7 +5,7 @@ import sys
 import tempfile
 import unittest
 
-from production_sfs_freshness import collection_due
+from production_sfs_freshness import collection_due, reply_collection_due
 
 
 class SfsFreshnessTest(unittest.TestCase):
@@ -43,6 +43,19 @@ class SfsFreshnessTest(unittest.TestCase):
                 check=True, capture_output=True, text=True,
             )
         self.assertEqual(result.stdout.strip(), 'true')
+
+    def test_fresh_archive_does_not_hide_missing_or_failed_current_reply_read(self):
+        metrics = {'schema': 'digitalmate/env-request-latency-daily@1', 'env': 'adx-jiuwen'}
+        self.assertTrue(reply_collection_due(metrics, now=self.now))
+        replies = {'schema': 'digitalmate/cloud-reply-daily@1', 'observed_at': '2026-11-14T04:20:00Z',
+                   'coverage': {'expected_nodes': 6, 'read_nodes': 6}}
+        metrics['cloud_reply_daily'] = replies
+        self.assertFalse(reply_collection_due(metrics, now=self.now))
+        replies['coverage']['read_nodes'] = 5
+        self.assertTrue(reply_collection_due(metrics, now=self.now))
+        replies['coverage']['read_nodes'] = 6
+        replies['observed_at'] = '2026-11-14T03:59:59Z'
+        self.assertTrue(reply_collection_due(metrics, now=self.now))
 
 
 if __name__ == '__main__':

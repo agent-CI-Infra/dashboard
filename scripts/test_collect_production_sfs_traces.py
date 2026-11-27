@@ -12,6 +12,24 @@ spec.loader.exec_module(sfs)
 
 
 class SfsTests(unittest.TestCase):
+    def test_transient_transport_reset_retries_without_printing_stderr(self):
+        reset = SimpleNamespace(returncode=255, stderr=b'Connection reset by peer PRIVATE')
+        success = SimpleNamespace(returncode=0, stdout=b'{}')
+        with patch.dict(os.environ, {'SFS_SSH_KEY_FILE': 'key', 'SFS_KNOWN_HOSTS_FILE': 'hosts'}), \
+             patch.object(sfs.subprocess, 'run', side_effect=[reset, success]) as run, \
+             patch.object(sfs.time, 'sleep'):
+            self.assertEqual(sfs.ssh_operation({'mode': 'inventory'}), {})
+        self.assertEqual(run.call_count, 2)
+
+    def test_remote_reader_error_is_not_retried_or_leaked(self):
+        failed = SimpleNamespace(returncode=1, stderr=b'PRIVATE trace')
+        with patch.dict(os.environ, {'SFS_SSH_KEY_FILE': 'key', 'SFS_KNOWN_HOSTS_FILE': 'hosts'}), \
+             patch.object(sfs.subprocess, 'run', return_value=failed) as run:
+            with self.assertRaisesRegex(RuntimeError, 'remote reader') as error:
+                sfs.ssh_operation({'mode': 'inventory'})
+        self.assertEqual(run.call_count, 1)
+        self.assertNotIn('PRIVATE', str(error.exception))
+
     def test_ssh_is_pinned_and_sends_only_command_payload_on_stdin(self):
         with patch.dict(os.environ, {'SFS_SSH_KEY_FILE': 'key', 'SFS_KNOWN_HOSTS_FILE': 'hosts', 'SFS_SSH_JUMP': 'hk-leihui'}), \
              patch.object(sfs.subprocess, 'run', return_value=SimpleNamespace(returncode=0, stdout='{}')) as run:

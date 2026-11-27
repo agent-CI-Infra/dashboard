@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import time
 import urllib.request
 
 from production_prefix_cache import retain_prefix_cache
@@ -40,11 +41,29 @@ def ssh_operation(payload, *, remote_source=None):
         if payload.get('prefix_cache'):
             source = (HERE / 'production_prefix_cache.py').read_text(encoding='utf-8') + '\n' + source
         command_data = json.dumps({'source': source, 'payload': payload}).encode('utf-8')
-        result = subprocess.run(args, input=command_data, capture_output=True, timeout=900, check=False)
+        for attempt in range(3):
+            result = subprocess.run(args, input=command_data, capture_output=True, timeout=900, check=False)
+            if result.returncode != 255:
+                break
+            stderr = getattr(result, 'stderr', b'') or b''
+            if isinstance(stderr, str):
+                stderr = stderr.encode()
+            transient = any(marker in stderr.lower() for marker in
+                            (b'connection reset', b'connection closed', b'connection timed out',
+                             b'connection refused', b'kex_exchange_identification'))
+            if not transient or attempt == 2:
+                break
+            time.sleep(2 ** attempt)
     except (OSError, subprocess.TimeoutExpired) as error:
         raise RuntimeError('SFS SSH collection failed') from error
     if result.returncode:
-        raise RuntimeError('SFS SSH collection failed; previous snapshot retained')
+        stderr = getattr(result, 'stderr', b'') or b''
+        if isinstance(stderr, str):
+            stderr = stderr.encode()
+        kind = ('authentication' if b'permission denied' in stderr.lower() else
+                'host verification' if b'host key verification' in stderr.lower() else
+                'transport' if result.returncode == 255 else 'remote reader')
+        raise RuntimeError('SFS SSH collection failed (' + kind + '); previous snapshot retained')
     try:
         return json.loads(result.stdout)
     except ValueError as error:

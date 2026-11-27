@@ -39,14 +39,40 @@ def collection_due(snapshot: object, *, now: dt.datetime | None = None) -> bool:
     return not hour <= observed <= current
 
 
+def reply_collection_due(metrics: object, *, now: dt.datetime | None = None) -> bool:
+    if not isinstance(metrics, dict) or metrics.get('schema') != 'digitalmate/env-request-latency-daily@1' or metrics.get('env') != 'adx-jiuwen':
+        return True
+    replies = metrics.get('cloud_reply_daily')
+    if not isinstance(replies, dict) or replies.get('schema') != 'digitalmate/cloud-reply-daily@1':
+        return True
+    c = replies.get('coverage') or {}
+    if type(c.get('expected_nodes')) is not int or c['expected_nodes'] <= 0 or c.get('read_nodes') != c['expected_nodes']:
+        return True
+    try:
+        observed = dt.datetime.fromisoformat(replies['observed_at'].replace('Z', '+00:00'))
+        if observed.tzinfo is None or observed.utcoffset() is None:
+            return True
+    except (KeyError, ValueError, AttributeError, TypeError):
+        return True
+    current = (now or dt.datetime.now(dt.timezone.utc)).astimezone(dt.timezone.utc)
+    return not current.replace(minute=0, second=0, microsecond=0) <= observed <= current
+
+
 def main() -> None:
-    if len(sys.argv) != 2:
-        raise SystemExit('usage: production_sfs_freshness.py SNAPSHOT')
+    if len(sys.argv) not in (2, 3):
+        raise SystemExit('usage: production_sfs_freshness.py SNAPSHOT [METRICS]')
     try:
         snapshot = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
     except (OSError, ValueError):
         snapshot = None
-    print('true' if collection_due(snapshot) else 'false')
+    due = collection_due(snapshot)
+    if len(sys.argv) == 3:
+        try:
+            metrics = json.loads(Path(sys.argv[2]).read_text(encoding='utf-8'))
+        except (OSError, ValueError):
+            metrics = None
+        due = due or reply_collection_due(metrics)
+    print('true' if due else 'false')
 
 
 if __name__ == '__main__':
