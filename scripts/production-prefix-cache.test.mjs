@@ -168,7 +168,7 @@ test('production page shows the SFS cache sample even when it chooses a differen
       const quick = hive.locator('.stat-card').filter({ hasText: '快回服务端提交' });
       assert.match(await quick.innerText(), /— \/ — \/ —/);
       assert.doesNotMatch(await hive.locator('tbody').innerText(), /2026-11-25/);
-      await page.locator('#model-controls [data-range="7"]').click();
+      await page.locator('#floating-range-controls [data-range="7"]').click();
       await hive.getByText(/用户输入 10 条/).waitFor();
       assert.match(await hive.innerText(), /5\.000 \/ 5\.000 \/ 5\.000/);
       assert.doesNotMatch(await hive.locator('tbody').innerText(), /2026-11-26/);

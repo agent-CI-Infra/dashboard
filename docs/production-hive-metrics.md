@@ -12,6 +12,14 @@ Legacy gateway and stream metrics keep their original meaning and population.
 
 ## Collection
 
+The collection workflows use `ADX_BINDING_TRANSPORT=sfs-ssh` and
+`PRODUCTION_GATEWAY_TRANSPORT=sfs-ssh` to read the binding inventory and model
+gateway over the existing pinned SFS SSH connection. Inside that connection,
+only GET requests to the fixed cluster services and existing read paths are
+allowed. Credentials are sent on SSH stdin and never written to SFS. Redirects
+are rejected. This path remains usable when the public ingress certificate has
+expired, without disabling HTTPS certificate checks on public endpoints.
+
 The same ADX production binding allowlist used by the existing SFS collector is
 passed to the Hive reader. Each DB and its WAL are copied to a private temporary
 directory outside SFS and checked twice with the existing archive image reader.
