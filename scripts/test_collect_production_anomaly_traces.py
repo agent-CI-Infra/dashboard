@@ -93,6 +93,61 @@ class ProductionAnomalyTests(unittest.TestCase):
         self.assertEqual(result['days'][0]['anomaly']['metrics']['gateway']['n'], 10)
         self.assertEqual(result['anomaly_version'], 3)
 
+    def test_latency_distributions_keep_separate_populations_and_old_days_have_no_ids(self):
+        records = self.records(list(range(120)), request_id='digitalmate-PRIVATE')
+        for index, (_, _, row) in enumerate(records):
+            row['gateway_stream_status'] = 'exception' if index in (0, 119) else 'normal'
+        records[1][2]['gateway_stream_status'] = 'cancelled'
+        records[2][2]['gateway_stream_status'] = 'unknown'
+        day = traces.request_daily_metrics(records, '2026-11-01', 'observed', False)
+        dist = day['request_latency_distributions']
+        self.assertEqual((dist['all']['n'], dist['failed']['n'], dist['slow']['n']), (120, 2, 12))
+        self.assertEqual(dist['failed']['sum'], 119)
+        self.assertEqual(dist['slow']['sum'], sum(range(108, 120)))
+        self.assertIn([-1001, 1], dist['failed']['histogram'])
+        for mode in ('all', 'failed', 'slow'):
+            self.assertEqual(sum(count for _, count in dist[mode]['histogram']), dist[mode]['n'])
+        self.assertNotIn('PRIVATE', json.dumps(dist))
+        small = traces.request_daily_metrics(self.records([1, 2, 3]), '2026-11-01', 'now', False)
+        self.assertEqual(small['request_latency_distributions']['slow']['n'], 3)
+        self.assertEqual(small['request_latency_distributions']['failed']['n'], 0)
+
+    def test_distribution_drops_invalid_latencies_and_preserves_zero(self):
+        records = self.records([0, 50, -1, True, float('nan')], gateway_stream_status='exception')
+        dist = traces.request_daily_metrics(records, '2026-11-01', 'now', False)['request_latency_distributions']
+        for mode in ('all', 'failed', 'slow'):
+            self.assertEqual(dist[mode]['n'], 2)
+            self.assertEqual(dist[mode]['sum'], 50)
+        empty = traces.request_daily_metrics([], '2026-11-01', 'now', False)['request_latency_distributions']
+        self.assertEqual([empty[key]['n'] for key in ('all', 'failed', 'slow')], [0, 0, 0])
+
+    def test_distribution_is_retained_as_one_population_after_rotation(self):
+        old = traces.request_daily_metrics(self.records(list(range(120)), gateway_stream_status='exception'),
+                                          '2026-11-01', 'old-observation', False)
+        previous = {'days': [old]}
+        before = json.dumps(previous)
+        fresh = traces.request_daily_metrics(self.records([5, 6, 7]), '2026-11-01', 'fresh-observation', False)
+        result = cloud.with_workspace_traces(previous, {'schema': 'digitalmate/cloud-traces@1',
+            'read_log_count': 1, 'request_daily_metrics': [fresh]})
+        retained = result['days'][0]['request_latency_distributions']
+        self.assertEqual((retained['all']['n'], retained['failed']['n'], retained['slow']['n']), (120, 120, 12))
+        self.assertEqual(retained['observed_at'], 'old-observation')
+        self.assertTrue(retained['retained'])
+        self.assertEqual(json.dumps(previous), before)
+
+    def test_distribution_can_upgrade_a_larger_legacy_day_without_relabelling_its_population(self):
+        previous = {'days': [{'date': '2026-11-01', 'n': 100, 'gateway': {'n': 100}}]}
+        fresh = traces.request_daily_metrics(self.records([1, 2, 3], gateway_stream_status='exception'),
+                                            '2026-11-01', 'fresh-observation', False)
+        result = cloud.with_workspace_traces(previous, {'schema': 'digitalmate/cloud-traces@1',
+            'read_log_count': 1, 'request_daily_metrics': [fresh]})
+        day = result['days'][0]
+        self.assertEqual(day['n'], 100)
+        self.assertEqual(day['request_latency_distributions']['all']['n'], 3)
+        self.assertEqual(day['request_latency_distributions']['failed']['n'], 3)
+        self.assertEqual(day['request_latency_distributions']['observed_at'], 'fresh-observation')
+        self.assertTrue(day['request_latency_distributions']['partial'])
+
     def test_actual_remote_collector_publishes_anomalies_and_timeout_counts(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder); name = 'w-' + 'a' * 64
@@ -112,6 +167,8 @@ class ProductionAnomalyTests(unittest.TestCase):
             with patch.object(remote, 'ROOT', root):
                 result = remote.run_collector([name], Path(traces.__file__).read_text(encoding='utf8'))
             day = result['request_daily_metrics'][-1]
+            self.assertEqual(day['request_latency_distributions']['failed']['n'], 1)
+            self.assertEqual(day['request_latency_distributions']['failed']['sum'], 5000)
             self.assertEqual(day['anomaly']['metrics']['gateway']['outliers'], 1)
             self.assertEqual(day['anomaly']['timeouts']['count'], 1)
             self.assertEqual(day['anomaly']['timeouts']['requests'][0]['gateway'], 5000)

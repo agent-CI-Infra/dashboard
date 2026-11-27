@@ -1714,6 +1714,68 @@ h1 {
   display: none;
 }
 
+.latency-distribution-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 12px 0 18px;
+}
+
+.latency-distribution-summary dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.latency-distribution-summary dd {
+  margin: 5px 0 0;
+  font-size: 20px;
+  font-weight: 650;
+}
+
+.latency-distribution-bars {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.latency-distribution-row {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr) 120px;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.latency-distribution-track {
+  height: 14px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--line-soft);
+}
+
+.latency-distribution-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+.latency-distribution-count {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 620px) {
+  .latency-distribution-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .latency-distribution-row {
+    grid-template-columns: 68px minmax(0, 1fr) 92px;
+    gap: 8px;
+  }
+}
+
 .prefix-cache-metric + .prefix-cache-metric {
   margin-top: 12px;
   padding-top: 12px;

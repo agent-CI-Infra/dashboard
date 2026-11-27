@@ -194,7 +194,10 @@ test('production metrics and version analysis preserve ranges, trace links, disc
       generated_at: '2026-11-06T01:00:00Z', days: [1, 2, 3, 4, 5].map((day) => ({
         date: `2026-11-0${day}`, n: 1, gateway: metric, first_token: metric,
         uplink_send: metric, downlink_first_text: metric, downlink_terminal: metric,
-        gateway_stream: { exception: 1, observed: 2, cancelled: 5, unknown: 3 },
+        gateway_stream: { exception: day % 2, observed: 1, cancelled: 0, unknown: 0, population: 1 },
+        request_latency_distributions: { schema: 'digitalmate/request-latency-distributions@1',
+          all: metric, failed: day % 2 ? metric : { n: 0 }, slow: metric,
+          slow_policy: { ratio: .1, minimum: 10 } },
         ...(day === 5 ? { anomaly: { available: false, timeouts: { count: 1, records: 1, identified: 1,
           requests: [{ request_id: 'digitalmate-timeout', gateway: 100 }] }, error_categories: { timeout: 1 } } } : {}),
       })) };
@@ -280,13 +283,17 @@ test('production metrics and version analysis preserve ranges, trace links, disc
     assert.equal(await page.locator('#analysis-failed').isVisible(), true);
     assert.equal(await page.locator('#analysis-slow').isVisible(), false);
     assert.equal(await page.locator('#analysis-all').isVisible(), false);
+    assert.equal(await page.locator('#analysis-failed-latency [data-latency-stat="n"]').innerText(), '3');
+    assert.equal(await page.locator('#analysis-failed-latency [data-latency-bucket]').count(), 9);
     await page.locator('#analysis-tab-failed').focus();
     await page.keyboard.press('ArrowRight');
     assert.equal(await page.locator('#analysis-tab-slow').getAttribute('aria-selected'), 'true');
     assert.equal(await page.locator('#analysis-slow #request-traces').isVisible(), true);
+    assert.equal(await page.locator('#analysis-slow-latency [data-latency-stat="n"]').innerText(), '5');
     await page.keyboard.press('End');
     assert.equal(await page.locator('#analysis-tab-all').getAttribute('aria-selected'), 'true');
     assert.equal(await page.locator('#analysis-all #request-lookup').isVisible(), true);
+    assert.equal(await page.locator('#analysis-all-latency [data-latency-stat="n"]').innerText(), '5');
     await page.locator('#analysis-tab-failed').click();
     await page.locator('#analysis-failures [data-trace-id="digitalmate-timeout"]').click();
     assert.equal(await page.locator('#analysis-tab-slow').getAttribute('aria-selected'), 'true');
@@ -296,6 +303,7 @@ test('production metrics and version analysis preserve ranges, trace links, disc
     await page.locator('#archive-form button[type="submit"]').click();
     await page.locator('#archive-list [data-archive-key]').click();
     await page.locator('#archive-detail').getByText('任务执行', { exact: true }).waitFor();
+    assert.equal(await page.locator('#analysis-all-latency [data-latency-stat="n"]').innerText(), '5');
     await analysisSummary.click();
     assert.equal(await analysis.evaluate((node) => node.open), false);
     await page.locator('#floating-range-controls [data-range="1"]').click();
@@ -307,8 +315,10 @@ test('production metrics and version analysis preserve ranges, trace links, disc
     assert.equal(await page.locator('#analysis-tab-all').getAttribute('aria-selected'), 'true');
     await analysisSummary.click();
     assert.equal(await page.locator('#analysis-tab-all').getAttribute('aria-selected'), 'true');
+    assert.equal(await page.locator('#analysis-all-latency [data-latency-stat="n"]').innerText(), '—');
     await page.locator('#archive-detail').filter({ hasText: '任务执行' }).waitFor({ state: 'hidden' });
     await page.locator('#floating-range-controls [data-range="7"]').click();
+    assert.equal(await page.locator('#analysis-all-latency [data-latency-stat="n"]').innerText(), '5');
     assert.equal(await page.locator('#env-latency .network-card').count(), 3);
     await models.locator(':scope > summary').click();
     await models.locator('#model-trends .release-chip').first().waitFor();

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>DigitalMate · Nightly E2E 性能看板</title>
-    <link rel="stylesheet" href="style.css?v=20261126.6" />
+    <link rel="stylesheet" href="style.css?v=20261127.1" />
   </head>
   <body>
     <style>.topbar, #tabs, .footer { display: none; } .page { padding-top: 0; }</style>
@@ -86,9 +86,11 @@
             <button id="analysis-tab-all" class="analysis-tab" type="button" role="tab" aria-selected="false" aria-controls="analysis-all" data-analysis-view="all" tabindex="-1">全量分析</button>
           </div>
           <section id="analysis-failed" class="analysis-panel" role="tabpanel" aria-labelledby="analysis-tab-failed">
+            <div id="analysis-failed-latency"></div>
             <div id="analysis-failures" aria-live="polite"><p class="empty">加载中…</p></div>
           </section>
           <section id="analysis-slow" class="analysis-panel" role="tabpanel" aria-labelledby="analysis-tab-slow" hidden>
+            <div id="analysis-slow-latency"></div>
             <div id="analysis-slow-summary"></div>
             <section class="card" id="request-traces">
               <div class="card-head"><h2>云侧慢请求轨迹</h2><span class="muted">云侧慢请求与超时请求 · 所选时间范围</span></div>
@@ -97,6 +99,7 @@
             </section>
           </section>
           <section id="analysis-all" class="analysis-panel" role="tabpanel" aria-labelledby="analysis-tab-all" hidden>
+            <div id="analysis-all-latency"></div>
             <section class="card" id="trajectory-archive" aria-label="全部原生轨迹"></section>
             <section class="card" id="request-lookup">
               <div class="card-head">
@@ -215,9 +218,9 @@
 
     <div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>
 
-    <script src="release-timeline.js?v=20261126.6" defer></script>
-    <script src="app.js?v=20261126.6" defer></script>
-    <script type="module" src="trajectory-archive.js?v=20261126.6"></script>
+    <script src="release-timeline.js?v=20261127.1" defer></script>
+    <script src="app.js?v=20261127.1" defer></script>
+    <script type="module" src="trajectory-archive.js?v=20261127.1"></script>
     <link rel="stylesheet" href="trajectory-archive.css?v=20261119.1" />
   </body>
 </html>
