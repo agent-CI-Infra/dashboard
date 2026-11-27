@@ -20,17 +20,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.ref }}
           fetch-depth: 0
       - name: Collect aggregated gateway metrics
         env:
           PRODUCTION_GATEWAY_KEY: ${{ secrets.PRODUCTION_GATEWAY_KEY }}
+          PRODUCTION_GATEWAY_TRANSPORT: sfs-ssh
+          SFS_SSH_PRIVATE_KEY: ${{ secrets.SFS_SSH_PRIVATE_KEY }}
         run: |
           set -euo pipefail
           if [ -z "$PRODUCTION_GATEWAY_KEY" ]; then
             echo '::error::PRODUCTION_GATEWAY_KEY is not configured.'
             exit 1
           fi
+          if [ -z "$SFS_SSH_PRIVATE_KEY" ]; then
+            echo '::error::SFS_SSH_PRIVATE_KEY is not configured.'
+            exit 1
+          fi
+          key_file="$RUNNER_TEMP/production-sfs-key"
+          trap 'rm -f "$key_file"' EXIT
+          umask 077
+          printf '%s\n' "$SFS_SSH_PRIVATE_KEY" > "$key_file"
+          unset SFS_SSH_PRIVATE_KEY
+          export SFS_SSH_KEY_FILE="$key_file"
+          export SFS_KNOWN_HOSTS_FILE="$GITHUB_WORKSPACE/config/production-sfs-known-hosts"
           mkdir -p /tmp/production-model-metrics
           # Merge into the published history: re-read only the last two days and
           # keep older days from the digitalmate branch.

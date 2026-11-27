@@ -102,6 +102,9 @@ class CappedWindow(ValueError):
 
 
 def fetch_json(path, key, params=None):
+    if os.environ.get('PRODUCTION_GATEWAY_TRANSPORT') == 'sfs-ssh':
+        from production_sfs_api import gateway_json
+        return gateway_json(path, key, params)
     url = f'{BASE}{path}'
     if params:
         url += '?' + urllib.parse.urlencode(params)

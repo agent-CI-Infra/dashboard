@@ -1079,6 +1079,48 @@ function envSummary(doc, replyCards = '') {
 const PREFIX_CACHE_SOURCES = { bees: 'Bee', beebou: 'BeeBou' };
 const PREFIX_CACHE_COHORTS = { first_observed: '首个可见调用', returning: '已见会话', unknown: '会话未知' };
 
+function hiveMetric(days, key) {
+  const metrics = days.map((day) => day.metrics?.[key]).filter((metric) => metric?.n > 0);
+  const n = metrics.reduce((sum, metric) => sum + metric.n, 0);
+  if (!n) return { n: 0, mean_ms: null, p50_ms: null, p95_ms: null, approximate: false };
+  if (metrics.length === 1) return { ...metrics[0], approximate: false };
+  const bins = new Map();
+  const complete = metrics.every((metric) => mergeMetricHistogram(bins, metric.histogram, metric.n));
+  return { n, mean_ms: metrics.reduce((sum, metric) => sum + metric.sum_ms, 0) / n,
+    p50_ms: tpotPercentile(bins, n, complete, .5), p95_ms: tpotPercentile(bins, n, complete, .95), approximate: true };
+}
+
+function hiveDailyPanel(doc, range, today, completeThrough) {
+  if (doc?.schema !== 'digitalmate/hive-daily@1') return '';
+  const title = '<h3>云侧 Hive 时序</h3>';
+  const days = cloudScopedDays(doc.days, range, today, completeThrough);
+  const c = doc.coverage || {};
+  const coverage = `<p class="data-freshness">采集于 ${esc(fmtDateTime(doc.observed_at))} · 生产绑定允许清单 ${fmtCount(c.expected)} 个工作区，读取 ${fmtCount(c.read)} 个，其中 ${fmtCount(c.with_hive)} 个有 Hive 表；缺失 ${fmtCount(c.missing)}，未读全 ${fmtCount(c.incomplete)}${c.unresolved_bindings ? `，未解析绑定 ${fmtCount(c.unresolved_bindings)}` : ''} · 稳定副本观测，非原子快照</p>`;
+  if (!days.length) return `<section class="env-anomaly hive-daily">${title}${coverage}<p class="empty">所选范围没有 Hive 时序样本。</p></section>`;
+  const count = (key) => days.reduce((sum, day) => sum + (day.counts?.[key] || 0), 0);
+  const value = (metric, key) => Number.isFinite(metric?.[key]) ? `${metric.approximate && key !== 'mean_ms' ? '≈' : ''}${(metric[key] / 1000).toFixed(3)}` : '—';
+  const combo = (metric) => ['mean_ms', 'p50_ms', 'p95_ms'].map((key) => value(metric, key)).join(' / ');
+  const definitions = [
+    ['normal_claim', '普通回合认领等待', '用户输入入库 → 普通回合认领，发生在模型处理前'],
+    ['bee_queue_wait', 'Bee 排队等待', '所选日期入队 → 对应 Run 开始'],
+    ['bee_run_natural', 'Bee 自然结束 Run 历时', '所选日期启动的 Run 开始 → 自然结束'],
+    ['quick_commit', '快回服务端提交', '用户输入入库 → 仍有效的快回提交'],
+  ];
+  const tiles = definitions.map(([key, label, hint]) => {
+    const metric = hiveMetric(days, key);
+    return `<div class="stat-card"><div class="stat-label">${label} 平均 / P50 / P95（s）</div><div class="stat-value combo">${combo(metric)}</div><div class="stat-hint">${fmtCount(metric.n)} 个有效样本 · ${hint}</div></div>`;
+  }).join('');
+  const daily = [...days].reverse().map((day) => {
+    const metric = (key) => { const m = day.metrics?.[key]; return `${combo(m)}（n=${fmtCount(m?.n)}）`; };
+    return `<tr><td title="${esc(fmtDateTime(day.observed_at))}">${esc(day.date)}${day.retained ? '（保留样本）' : ''}${day.partial ? '*' : ''}</td><td>${fmtCount(day.counts?.user_inputs)}</td><td>${fmtCount(day.active_workspaces)}</td><td>${fmtCount(day.counts?.runs_started)} / ${fmtCount(day.counts?.runs_unended)}</td><td>${metric('bee_queue_wait')}</td><td>${metric('bee_run_natural')}</td><td>${metric('quick_commit')}</td></tr>`;
+  }).join('');
+  return `<section class="env-anomaly hive-daily">${title}${coverage}
+    <p class="data-freshness">${esc(days[0].date)} 至 ${esc(days.at(-1).date)} · 用户输入 ${fmtCount(count('user_inputs'))} 条 · Bee Run 启动 ${fmtCount(count('runs_started'))} 个，未结束 ${fmtCount(count('runs_unended'))} 个 · Beebou 失败尝试 ${fmtCount(count('failure_attempts'))} 次（可含重试，不是用户请求失败率）${days.some((day) => day.retained) ? ' · 含保留样本，请查看每日采集时间' : ''}${days.some((day) => day.partial) ? ' · * 部分日或采集部分覆盖' : ''}</p>
+    <div class="summary model-summary env-summary">${tiles}</div>
+    <p class="section-note">Run 历时包含内部模型、工具及等待，不等于用户端到端时延；普通回合认领不是回复完成。未结束 Run 不参与耗时分布。快回样本不能代替普通答案首吐字；普通回复完成、首吐字、ReAct 和端云网络仍需对应时间戳。多日分位数使用合并分桶，≈ 表示约 1% 误差；样本少于 20 时不展示多日分位数。</p>
+    <details class="env-call-detail" open><summary>每日 Hive 时序与样本量</summary><div class="table-wrap"><table class="history-table"><thead><tr><th>北京时间</th><th>用户输入</th><th>活跃工作区</th><th>Run 启动 / 未结束</th><th>排队 平均 / P50 / P95（s）</th><th>自然结束 Run 平均 / P50 / P95（s）</th><th>快回提交 平均 / P50 / P95（s）</th></tr></thead><tbody>${daily}</tbody></table></div></details></section>`;
+}
+
 function summarizePrefixCache(groups) {
   const totals = { calls: 0, known: 0, input_tokens: 0, cache_read_tokens: 0, miss_eligible: 0, near_miss: 0 };
   const histogram = new Map();
@@ -4064,7 +4106,8 @@ async function loadEnvLatency() {
   state.envRefreshFailed = !freshDaily;
   // The freshest latency producer may not carry the independent SFS cache sample.
   const prefixCache = newestPrefixCache(candidates, state.envDaily?.prefix_cache);
-  state.envDaily = freshDaily ? { ...freshDaily, prefix_cache: prefixCache } : state.envDaily || null;
+  const hiveDaily = newestHiveDaily(candidates, state.envDaily?.hive_daily);
+  state.envDaily = freshDaily ? { ...freshDaily, prefix_cache: prefixCache, hive_daily: hiveDaily } : state.envDaily || null;
   // The per-environment GateWay / WorkSwarm table is parked for now; the daily
   // charts carry the same measurements in a more readable form.
   renderEnv();
@@ -4078,6 +4121,18 @@ function newestPrefixCache(candidates, previous) {
     if (cache?.schema !== 'digitalmate/prefix-cache-daily@1' || !Array.isArray(cache.days)) continue;
     const observed = Date.parse(cache.observed_at);
     if (Number.isFinite(observed) && (!newest || observed > Date.parse(newest.observed_at))) newest = cache;
+  }
+  return newest;
+}
+
+function newestHiveDaily(candidates, previous) {
+  let newest = previous;
+  for (const doc of candidates) {
+    if (doc?.schema !== 'digitalmate/env-request-latency-daily@1' || doc.env !== 'adx-jiuwen') continue;
+    const hive = doc.hive_daily;
+    if (hive?.schema !== 'digitalmate/hive-daily@1' || !Array.isArray(hive.days)) continue;
+    const observed = Date.parse(hive.observed_at);
+    if (Number.isFinite(observed) && (!newest || observed > Date.parse(newest.observed_at))) newest = hive;
   }
   return newest;
 }
@@ -4310,7 +4365,8 @@ function renderEnv() {
   ].filter(Boolean);
   const freshness = `<div class="env-data-notes" aria-label="数据说明"><div><strong>数据更新</strong><span>${timeText} · 定时采集，并非实时流</span></div>${warnings.length ? `<div><strong>数据限制</strong><span>${warnings.join('；')}。</span></div>` : ''}<div><strong>覆盖标记</strong><span>* 表示部分日或日志覆盖不全。</span></div></div>`;
   const prefixCache = prefixCachePanel(daily.prefix_cache, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history));
-  target.innerHTML = `${freshness}${envSummary(scoped, replyTimings)}${prefixCache}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
+  const hiveDaily = hiveDailyPanel(daily.hive_daily, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history));
+  target.innerHTML = `${hiveDaily}${hiveDaily ? '<h3>旧链路网关与流式指标</h3>' : ''}${freshness}${envSummary(scoped, replyTimings)}${prefixCache}${envCallTrend(scoped)}${envLatencyTrend(scoped)}${envFirstTokenTrend(scoped)}${envAnswerFirstTrend(scoped)}${envReactTrend(scoped)}${envToolTrend(scoped)}${envTpotTrend(scoped)}${envCallDetail(scoped)}`;
   refineCharts(target, state.cloudReleases);
 }
 

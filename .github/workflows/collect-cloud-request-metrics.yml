@@ -10,6 +10,7 @@ on:
       - scripts/collect-cloud-request-metrics.py
       - scripts/collect-sfs-trajectory-archive.py
       - scripts/sfs-trajectory-remote.py
+      - scripts/production_sfs_api.py
   workflow_dispatch:
     inputs:
       validate_only:
@@ -70,6 +71,7 @@ jobs:
         if: steps.freshness.outputs.collect == 'true'
         env:
           ADX_TOKEN: ${{ secrets.ADX_TOKEN }}
+          ADX_BINDING_TRANSPORT: sfs-ssh
           SFS_SSH_PRIVATE_KEY: ${{ secrets.SFS_SSH_PRIVATE_KEY }}
         run: |
           set -euo pipefail
