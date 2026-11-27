@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-27T15:19:17Z",
+  "updatedAt": "2026-11-27T23:35:28Z",
   "source": "openJiuwen-ai/DigitalMate",
   "runners": [
     {
@@ -21,7 +21,7 @@
       "name": "digitalmate-win-st-01",
       "os": "Windows",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "Windows",
@@ -34,15 +34,7 @@
       ],
       "machine": "winbox · PC-20261103OHIZ",
       "emulator": "Mate 90 Pro",
-      "device": "127.0.0.1:5555",
-      "job": {
-        "name": "Fast Checks / 2 · HarmonyOS UT",
-        "workflow": "CI Advisory",
-        "run_number": 1768,
-        "run_id": 46023008767,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/46023008767",
-        "started_at": "2026-11-27T15:14:40Z"
-      }
+      "device": "127.0.0.1:5555"
     },
     {
       "id": 34,
@@ -243,22 +235,14 @@
       "name": "dm-hk-ci-07",
       "os": "Linux",
       "status": "online",
-      "busy": true,
+      "busy": false,
       "labels": [
         "self-hosted",
         "X64",
         "Linux",
         "dm-codecheck",
         "dm-nodeut"
-      ],
-      "job": {
-        "name": "Fast Checks / 2 · Linux UT (Node)",
-        "workflow": "CI Advisory",
-        "run_number": 1768,
-        "run_id": 46023008767,
-        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/46023008767",
-        "started_at": "2026-11-27T15:14:40Z"
-      }
+      ]
     },
     {
       "id": 40,
@@ -1574,6 +1558,34 @@
         "digitalmate-win-st-01": "Fast Checks / 2 · HarmonyOS UT",
         "dm-hk-ci-07": "Fast Checks / 2 · Linux UT (Node)"
       }
+    },
+    {
+      "at": "2026-11-27T23:35:28Z",
+      "s": {
+        "HwdeMacBook-Air-2": "offline",
+        "digitalmate-win-st-01": "online",
+        "digitalmate-win-st-02": "online",
+        "digitalmate-win-st-03": "online",
+        "digitalmate-win-st-04": "online",
+        "dm-cloud-codecheck-02": "online",
+        "dm-cloud-flex-01": "online",
+        "dm-cloud-nodeut-01": "online",
+        "dm-cloud-nodeut-02": "online",
+        "dm-hk-ci-01": "online",
+        "dm-hk-ci-02": "online",
+        "dm-hk-ci-03": "online",
+        "dm-hk-ci-04": "online",
+        "dm-hk-ci-05": "online",
+        "dm-hk-ci-06": "online",
+        "dm-hk-ci-07": "online",
+        "dm-hk-ci-08": "online",
+        "harmonyos-ut-01": "offline",
+        "merge-01": "online",
+        "merge-gate-01": "online",
+        "runtime-ut-01": "online"
+      },
+      "b": {},
+      "j": {}
     }
   ]
 }
