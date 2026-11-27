@@ -49,6 +49,25 @@ near-zero, short and missing observations, then checks the dashboard in
 Chromium. Current provider hit rates and the effect of actual context
 compression require production observations.
 
+## Version analysis latency distributions
+
+Each analysis tab includes a request-duration distribution using the same gateway
+accept-to-end clock and the global date range. The failure population consists
+of ended gateway stream exceptions with valid durations; cancellation and unknown
+stream outcomes are separate. The slow population uses each day's slowest 10%
+(rounded up), at least 10 when available, matching the diagnostic list quota.
+The full population is all readable ended requests with valid durations. Its
+scope is independent of the native-archive table's search and pagination.
+
+The collector publishes `request_latency_distributions` with count, sum and
+mergeable 2%-wide duration buckets for all three populations. Aggregate-only
+history survives the seven-day detail retention window and is retained as one
+population after log rotation, preserving its original observation time. Legacy
+full-request histograms remain usable; missing failure/slow distributions stay
+unavailable until collected. The UI pools bucket counts and sample sums across
+days, displays interval counts/shares and approximate P50/P95, and marks incomplete
+coverage. It never synthesizes distributions from daily percentile values.
+
 ## Release publication markers
 
 Version decoration preserves the metric paths, including their existing data

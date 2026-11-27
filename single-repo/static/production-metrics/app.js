@@ -4166,6 +4166,97 @@ function replyTimingCards() {
   return cards;
 }
 
+const LATENCY_DISTRIBUTION_BUCKETS = [
+  [1000, '< 1 秒'], [3000, '1–3 秒'], [10000, '3–10 秒'],
+  [30000, '10–30 秒'], [60000, '30–60 秒'], [180000, '1–3 分钟'],
+  [300000, '3–5 分钟'], [600000, '5–10 分钟'], [Infinity, '≥ 10 分钟'],
+];
+const LATENCY_DISTRIBUTION_MODES = {
+  failed: { title: '失败请求时延分布', scope: '已结束且具有完整耗时的网关流异常请求。' },
+  slow: { title: '慢请求时延分布', scope: '各日按请求耗时取最慢 10%（向上取整），至少 10 条，不足 10 条时全取。' },
+  all: { title: '全量请求时延分布', scope: '所选日期内已采集且具有完整耗时的全部已结束请求。' },
+};
+
+function aggregateAnalysisLatency(rows, mode) {
+  const bins = new Map();
+  let n = 0, sum = 0, validSum = true, coveredDays = 0, partial = false, retained = false;
+  for (const row of rows) {
+    const distribution = row.request_latency_distributions;
+    const supported = distribution?.schema === 'digitalmate/request-latency-distributions@1';
+    if (mode === 'slow' && (distribution?.slow_policy?.ratio !== .1 || distribution?.slow_policy?.minimum !== 10)) continue;
+    const metric = supported ? distribution[mode] : mode === 'all' ? row.gateway : null;
+    if (!Number.isSafeInteger(metric?.n) || metric.n < 0 || !Number.isSafeInteger(n + metric.n)) continue;
+    if (metric.n > 0 && !mergeMetricHistogram(bins, metric.histogram, metric.n)) continue;
+    if (!metric.n && metric.histogram?.length) continue;
+    n += metric.n;
+    coveredDays++;
+    if (metric.n) {
+      if (!Number.isFinite(metric.sum) || metric.sum < 0) validSum = false;
+      else sum += metric.sum;
+    }
+    partial ||= Boolean(distribution?.partial || row.partial);
+    retained ||= Boolean(distribution?.retained);
+  }
+  const sorted = [...bins.entries()].sort((a, b) => a[0] - b[0]);
+  const midpoint = (index) => index === -1001 ? 0 : 1.02 ** (index + .5);
+  const counts = LATENCY_DISTRIBUTION_BUCKETS.map(() => 0);
+  for (const [index, count] of sorted) {
+    const bucket = LATENCY_DISTRIBUTION_BUCKETS.findIndex(([upper]) => midpoint(index) < upper);
+    counts[bucket] += count;
+  }
+  const percentile = (q) => {
+    let seen = 0;
+    for (const [index, count] of sorted) {
+      seen += count;
+      if (seen >= Math.ceil(n * q)) return midpoint(index);
+    }
+    return null;
+  };
+  return { n, counts, coveredDays, days: rows.length, partial, retained,
+    mean: n && validSum && Number.isFinite(sum) ? sum / n : null,
+    p50: percentile(.5), p95: percentile(.95) };
+}
+
+function analysisLatencyHtml(rows, mode) {
+  const config = LATENCY_DISTRIBUTION_MODES[mode];
+  const stats = aggregateAnalysisLatency(rows, mode);
+  const known = stats.coveredDays > 0;
+  const approximate = (value) => Number.isFinite(value) ? `≈${fmtDuration(value)}` : '—';
+  const bars = stats.n ? `<div class="latency-distribution-bars" aria-label="各时延区间的请求数与占比">
+    ${LATENCY_DISTRIBUTION_BUCKETS.map(([, label], index) => {
+      const count = stats.counts[index];
+      const share = count / stats.n * 100;
+      return `<div class="latency-distribution-row" data-latency-bucket="${index}" data-count="${count}">
+        <span>${esc(label)}</span><span class="latency-distribution-track" aria-hidden="true"><span style="width:${share.toFixed(3)}%"></span></span>
+        <span class="latency-distribution-count">${fmtCount(count)} <span class="muted">(${fmtPercent(share)})</span></span>
+      </div>`;
+    }).join('')}</div>` : `<p class="empty">${known ? '所选范围没有已采集且符合该分类的有效时延样本。' : '等待采集该分类的时延分布；缺失数据不计为零。'}</p>`;
+  const notes = [
+    '时延口径：网关受理 → 请求结束。', config.scope,
+    '区间计数与 P50/P95 按可合并分桶近似统计；均值按样本数加权。',
+    stats.coveredDays < stats.days && `另有 ${fmtCount(stats.days - stats.coveredDays)} 个日志日缺少可用分布，仅统计已有样本。`,
+    stats.partial && '包含部分日或日志覆盖不全的样本。',
+    stats.retained && '包含日志轮转前保留的历史分布。',
+  ].filter(Boolean).join(' ');
+  const range = rows.length ? `${esc(rows[0].date)} 至 ${esc(rows.at(-1).date)}` : '所选时间范围';
+  return `<section class="trend-card latency-distribution" data-latency-distribution="${mode}" aria-label="${config.title}">
+    <div class="trend-head"><h3>${config.title}</h3><span class="muted">${range} · 分布覆盖 ${fmtCount(stats.coveredDays)} / ${fmtCount(stats.days)} 个日志日</span></div>
+    <dl class="latency-distribution-summary">
+      <div><dt>有效样本</dt><dd data-latency-stat="n">${known ? fmtCount(stats.n) : '—'}</dd></div>
+      <div><dt>平均时延</dt><dd data-latency-stat="mean">${fmtDuration(stats.mean)}</dd></div>
+      <div><dt>P50</dt><dd data-latency-stat="p50">${approximate(stats.p50)}</dd></div>
+      <div><dt>P95</dt><dd data-latency-stat="p95">${approximate(stats.p95)}</dd></div>
+    </dl>${bars}<p class="stat-hint">${esc(notes)}</p>
+  </section>`;
+}
+
+function renderAnalysisLatencyDistributions(doc) {
+  for (const mode of Object.keys(LATENCY_DISTRIBUTION_MODES)) {
+    const target = $(`analysis-${mode}-latency`);
+    if (target) target.innerHTML = analysisLatencyHtml(doc?.days || [], mode);
+  }
+}
+
 function setAnalysisView(view, { focus = false } = {}) {
   const next = ['failed', 'slow', 'all'].includes(view) ? view : 'failed';
   state.analysisView = next;
@@ -4189,6 +4280,7 @@ function renderEnv() {
   const failures = $('analysis-failures');
   const slowSummary = $('analysis-slow-summary');
   if (!daily) {
+    renderAnalysisLatencyDistributions(null);
     target.innerHTML = envSummary(null, replyTimings);
     if (failures) failures.innerHTML = envFailureAnalysis(null);
     if (slowSummary) slowSummary.innerHTML = envAnomaly(null);
@@ -4199,6 +4291,7 @@ function renderEnv() {
   // Match the model summary's completed-day anchor; Today still shows today.
   // Historical rows with incomplete coverage remain visible and labelled.
   const scoped = { ...daily, days: cloudScopedDays(all, state.rangeDays, todayShanghai(), historyCompleteThrough(state.history)).map(cloudDisplayRow) };
+  renderAnalysisLatencyDistributions(scoped);
   if (failures) { failures.innerHTML = envFailureAnalysis(scoped); refineCharts(failures); }
   if (slowSummary) { slowSummary.innerHTML = envAnomaly(scoped); refineCharts(slowSummary); }
   renderRequestTraces(daily);

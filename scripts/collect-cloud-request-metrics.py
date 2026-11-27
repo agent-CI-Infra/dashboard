@@ -840,6 +840,17 @@ def with_workspace_traces(previous, traces):
         if not isinstance(day, dict) or not isinstance(day.get('date'), str) or not isinstance(day.get('n'), int):
             raise ValueError('invalid request daily metrics')
         old = existing.get(day['date'])
+        # Retain all three distributions together, with their original clock
+        # and population, independently of the seven-day request detail tail.
+        prior_distribution = (old or {}).get('request_latency_distributions')
+        distribution = day.get('request_latency_distributions')
+        if (isinstance(prior_distribution, dict)
+                and prior_distribution.get('schema') == 'digitalmate/request-latency-distributions@1'
+                and (not isinstance(distribution, dict)
+                     or prior_distribution.get('all', {}).get('n', 0) > distribution.get('all', {}).get('n', 0))):
+            day['request_latency_distributions'] = dict(copy.deepcopy(prior_distribution), retained=True)
+        elif isinstance(distribution, dict) and old and day['n'] < old.get('n', 0):
+            distribution['partial'] = True
         # Do not erase a more complete historical request population after a
         # restart or temporary loss of workspace files.
         if old and day['n'] < old.get('n', 0):
@@ -850,7 +861,7 @@ def with_workspace_traces(previous, traces):
                 old['model_usage_events'] = day['model_usage_events']
                 old['gateway_stream'] = dict(day['gateway_stream'])
                 for key in ('tokens', 'tpot', 'uplink_send', 'downlink_first_text', 'downlink_terminal',
-                            'network_partial', 'anomaly'):
+                            'network_partial', 'anomaly', 'request_latency_distributions'):
                     if key in day:
                         old[key] = day[key]
                 old['telemetry_observed_at'] = day.get('telemetry_observed_at') or day.get('observed_at')
