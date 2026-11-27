@@ -53,7 +53,12 @@ def ssh_operation(payload, *, remote_source=None):
 def select_workspaces():
     if not collector.traces.TOKEN:
         raise RuntimeError('ADX_TOKEN is required to select production bindings')
-    bindings = [item for item in collector.traces.binding_list()
+    if os.environ.get('ADX_BINDING_TRANSPORT') == 'sfs-ssh':
+        from production_sfs_api import binding_list
+        inventory = binding_list(collector.traces.TOKEN, operation=ssh_operation)
+    else:
+        inventory = collector.traces.binding_list()
+    bindings = [item for item in inventory
                 if (item.get('binding') or {}).get('scope', {}).get('tenant') == 'jiuwen']
     if not bindings:
         raise RuntimeError('no production bindings')
