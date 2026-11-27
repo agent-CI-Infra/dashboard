@@ -3514,7 +3514,12 @@ function renderModels() {
     compare.innerHTML = modelCompareCard(modelComparison(history, state.rangeDays), { selected: state.model });
   }
   if (compareVersion) compareVersion.textContent = versionLine(history);
-  if (summary) summary.innerHTML = modelSummary(complete, state.model, { failure: rangeFailure });
+  if (summary) {
+    summary.innerHTML = modelSummary(complete, state.model, { failure: rangeFailure });
+    for (const card of summary.querySelectorAll('.stat-card')) {
+      if (!/\d/.test(card.querySelector('.stat-value')?.textContent || '')) card.remove();
+    }
+  }
   if (trends) {
     const trendFailures = failureSeries(history, days, state.model);
     trends.innerHTML = modelTrends(days, state.tokenVisibility, state.latencyVisibility, {
