@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/st-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updatedAt": "2026-11-27T05:07:50Z",
+  "updatedAt": "2026-11-27T06:17:13Z",
   "catalog": [
     {
       "name": "real_model_text_reply",
@@ -259,6 +259,146 @@
     }
   ],
   "runs": [
+    {
+      "runId": 45949152805,
+      "attempt": 1,
+      "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/45949152805",
+      "createdAt": "2026-11-27T06:00:43Z",
+      "headSha": "2d83641295a4f6ce1781a3bcd07bbbffbca1bba0",
+      "conclusion": "failure",
+      "branch": "main",
+      "st": {
+        "runId": "",
+        "status": "skipped",
+        "mode": "business",
+        "runner": "digitalmate-win-st-01",
+        "machine": "PC-20261103OHIZ",
+        "issues": [
+          "Image build failed again: APT_MIRROR=deb.debian.org produced malformed apt sources URI (#2973); ST/E2E/Bench skipped.",
+          "component job failed, job log BlobNotFound; recent main failure is historical Git blob (PR #2686).",
+          "live-wire job failed, job log BlobNotFound; recent main failure is Hive Home wiring (PR #2060).",
+          "Artifacts missing (#1710); no case-level data for this run."
+        ],
+        "cases": [],
+        "liveWire": [
+          {
+            "suite": "connection",
+            "caseName": "gateway_connection",
+            "status": "unknown",
+            "nativeStatus": "unknown",
+            "issues": [
+              "job failed; log BlobNotFound; tracked PR #2060."
+            ]
+          },
+          {
+            "suite": "business",
+            "caseName": "business",
+            "status": "unknown",
+            "nativeStatus": "unknown",
+            "issues": [
+              "job failed; log BlobNotFound; tracked PR #2060."
+            ]
+          },
+          {
+            "suite": "identity",
+            "caseName": "identity",
+            "status": "unknown",
+            "nativeStatus": "unknown",
+            "issues": [
+              "job failed; log BlobNotFound; tracked PR #2060."
+            ]
+          },
+          {
+            "suite": "forward",
+            "caseName": "forward",
+            "status": "unknown",
+            "nativeStatus": "unknown",
+            "issues": [
+              "job failed; log BlobNotFound; tracked PR #2060."
+            ]
+          },
+          {
+            "suite": "optional",
+            "caseName": "optional",
+            "status": "unknown",
+            "nativeStatus": "unknown",
+            "issues": [
+              "job failed; log BlobNotFound; tracked PR #2060."
+            ]
+          },
+          {
+            "suite": "chunks",
+            "caseName": "chunks",
+            "status": "unknown",
+            "nativeStatus": "unknown",
+            "issues": [
+              "job failed; log BlobNotFound; tracked PR #2060."
+            ]
+          },
+          {
+            "suite": "artifact",
+            "caseName": "artifact-receipt-matrix",
+            "status": "unknown",
+            "nativeStatus": "unknown",
+            "issues": [
+              "job failed; log BlobNotFound; tracked PR #2060."
+            ]
+          }
+        ],
+        "component": [
+          {
+            "suite": "artifact-versions",
+            "title": "产物版本与分组",
+            "status": "unknown",
+            "runId": "",
+            "issues": [
+              "job failed; log BlobNotFound; tracked PR #2686."
+            ],
+            "cases": []
+          },
+          {
+            "suite": "attachment-policy",
+            "title": "本地附件策略",
+            "status": "unknown",
+            "runId": "",
+            "issues": [
+              "job failed; log BlobNotFound; tracked PR #2686."
+            ],
+            "cases": []
+          },
+          {
+            "suite": "markdown",
+            "title": "Markdown 渲染",
+            "status": "unknown",
+            "runId": "",
+            "issues": [
+              "job failed; log BlobNotFound; tracked PR #2686."
+            ],
+            "cases": []
+          },
+          {
+            "suite": "session-proximity",
+            "title": "会话邻近契约",
+            "status": "unknown",
+            "runId": "",
+            "issues": [
+              "job failed; log BlobNotFound; tracked PR #2686."
+            ],
+            "cases": []
+          },
+          {
+            "suite": "suggestions",
+            "title": "建议协议与按钮",
+            "status": "unknown",
+            "runId": "",
+            "issues": [
+              "job failed; log BlobNotFound; tracked PR #2686."
+            ],
+            "cases": []
+          }
+        ]
+      }
+    },
     {
       "runId": 45937414754,
       "attempt": 1,
