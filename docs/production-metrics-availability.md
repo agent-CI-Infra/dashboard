@@ -17,6 +17,8 @@ The page labels a request sample more than one calendar day old as historical
 and displays its actual last sample day. File collection time is labelled
 separately. Re-reading a retained file cannot make its measurements current.
 Current Hive and prefix-cache samples retain their independent dates.
+The All and Today selections include the current partial day. The 7/30-day
+comparison windows remain anchored to the latest complete day.
 
 This change neither enables production instrumentation nor deploys a server
 version. The dashboard preserves existing historical samples and filters only

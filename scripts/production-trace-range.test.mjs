@@ -13,6 +13,22 @@ const rangeCode = extract('function addDays(date, days)', 'function weekSeries(d
   + extract('function inRange(days, rangeDays, endDate = null)', 'function latestModelDate(history)')
   + extract('function cloudScopedDays(', 'function renderEnv()');
 
+test('All includes current partial-day Hive and cache observations instead of stopping at the completed day', () => {
+  const context = vm.createContext({});
+  vm.runInContext(rangeCode + ';globalThis.scope=cloudScopedDays;', context);
+  const rows = [
+    { date: '2026-11-24', n: 32 }, { date: '2026-11-25', n: 379 },
+    { date: '2026-11-26', n: 141 }, { date: '2026-11-27', n: 16, partial: true },
+    { date: '2026-11-28', n: 999 },
+  ];
+  const scope = range => Array.from(context.scope(rows, range, '2026-11-27', '2026-11-26'));
+  assert.equal(scope(0).reduce((sum, row) => sum + row.n, 0), 568);
+  assert.equal(scope(0).at(-1).partial, true);
+  assert.equal(scope(7).reduce((sum, row) => sum + row.n, 0), 552);
+  assert.equal(scope(30).reduce((sum, row) => sum + row.n, 0), 552);
+  assert.deepEqual(scope(1).map(row => row.date), ['2026-11-27']);
+});
+
 test('slow traces follow the visible complete-day window, with today included in All', () => {
   const context = vm.createContext({});
   vm.runInContext(rangeCode + ';globalThis.scope=cloudTraceScopedDays;globalThis.label=cloudTraceRangeLabel;', context);

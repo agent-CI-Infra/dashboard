@@ -327,6 +327,8 @@ test('production metrics and version analysis preserve ranges, trace links, disc
     await models.locator(':scope > summary').click();
     await models.locator('#model-trends .release-chip').first().waitFor();
     assert.equal(await models.locator('#model-summary').isVisible(), true);
+    assert.equal(await models.locator('#model-summary > .stat-card').count(), 2);
+    assert.doesNotMatch(await models.locator('#model-summary').innerText(), /TTFT|TPOT/);
     await models.locator('#model-controls [data-range="30"]').click();
     assert.equal(await models.evaluate((node) => node.open), true);
     await page.evaluate(() => refreshProductionSnapshots());

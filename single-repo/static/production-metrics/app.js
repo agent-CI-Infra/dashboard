@@ -3514,7 +3514,12 @@ function renderModels() {
     compare.innerHTML = modelCompareCard(modelComparison(history, state.rangeDays), { selected: state.model });
   }
   if (compareVersion) compareVersion.textContent = versionLine(history);
-  if (summary) summary.innerHTML = modelSummary(complete, state.model, { failure: rangeFailure });
+  if (summary) {
+    summary.innerHTML = modelSummary(complete, state.model, { failure: rangeFailure });
+    for (const card of summary.querySelectorAll('.stat-card')) {
+      if (!/\d/.test(card.querySelector('.stat-value')?.textContent || '')) card.remove();
+    }
+  }
   if (trends) {
     const trendFailures = failureSeries(history, days, state.model);
     trends.innerHTML = modelTrends(days, state.tokenVisibility, state.latencyVisibility, {
@@ -4187,7 +4192,7 @@ function cloudDisplayRow(row) {
 }
 
 function cloudScopedDays(days, rangeDays, today, completeThrough = null) {
-  const end = rangeDays === 1 ? today : (completeThrough || today);
+  const end = rangeDays === 0 || rangeDays === 1 ? today : (completeThrough || today);
   const eligible = (Array.isArray(days) ? days : []).filter((row) => row?.date <= end);
   return inRange(eligible, rangeDays, end);
 }
