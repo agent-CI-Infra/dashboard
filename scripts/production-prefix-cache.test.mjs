@@ -173,6 +173,10 @@ test('production page shows the SFS cache sample even when it chooses a differen
       await hive.getByText(/用户输入 10 条/).waitFor();
       assert.match(await hive.innerText(), /5\.000 \/ 5\.000 \/ 5\.000/);
       assert.doesNotMatch(await hive.locator('tbody').innerText(), /2026-11-26/);
+      await page.locator('#floating-range-controls [data-range="0"]').click();
+      await hive.getByText(/用户输入 30 条/).waitFor();
+      assert.match(await hive.locator('tbody').innerText(), /2026-11-25/);
+      assert.match(await hive.locator('tbody').innerText(), /2026-11-26/);
       await page.setViewportSize({ width: 390, height: 844 });
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       assert.deepEqual(errors, []);

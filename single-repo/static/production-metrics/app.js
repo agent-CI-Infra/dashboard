@@ -4187,7 +4187,7 @@ function cloudDisplayRow(row) {
 }
 
 function cloudScopedDays(days, rangeDays, today, completeThrough = null) {
-  const end = rangeDays === 1 ? today : (completeThrough || today);
+  const end = rangeDays === 0 || rangeDays === 1 ? today : (completeThrough || today);
   const eligible = (Array.isArray(days) ? days : []).filter((row) => row?.date <= end);
   return inRange(eligible, rangeDays, end);
 }
