@@ -12,8 +12,71 @@ vm.runInContext(`const esc=String,fmtCount=(v)=>Number.isFinite(v)?String(v):'�
  extract('function pointLabel(', '// A signed delta') +
  extract('function envTrendChart(', 'function envLatencyTrend(') +
  extract('const ANOMALY_METRICS =', '// Cloud call volume') +
+ extract('function mergeMetricHistogram(', '// Each bucket covers') +
+ extract('const LATENCY_DISTRIBUTION_BUCKETS =', 'function setAnalysisView(') +
  extract('function refineCharts(', 'function hideChartHover(') +
- ';globalThis.label=pointLabel;globalThis.chart=envTrendChart;globalThis.summary=summarizeCloudAnomalies;globalThis.render=envAnomaly;globalThis.failures=envFailureAnalysis;globalThis.refine=refineCharts;', ctx);
+ ';globalThis.label=pointLabel;globalThis.chart=envTrendChart;globalThis.summary=summarizeCloudAnomalies;globalThis.render=envAnomaly;globalThis.failures=envFailureAnalysis;globalThis.refine=refineCharts;globalThis.aggregateLatency=aggregateAnalysisLatency;globalThis.latencyHtml=analysisLatencyHtml;', ctx);
+
+const latencyMetric = (value, n = 1) => ({ n, sum: value * n,
+  histogram: n ? [[value === 0 ? -1001 : Math.floor(Math.log(value) / Math.log(1.02)), n]] : [] });
+const latencyDay = (date, all, failed, slow) => ({ date, request_latency_distributions: {
+  schema: 'digitalmate/request-latency-distributions@1', all, failed, slow,
+  slow_policy: { ratio: .1, minimum: 10 },
+} });
+
+test('analysis latency pools each population and histogram weights instead of daily percentiles', () => {
+  const days = [
+    latencyDay('2026-11-01', latencyMetric(100), latencyMetric(0), latencyMetric(100)),
+    latencyDay('2026-11-02', latencyMetric(6000, 9), latencyMetric(20000, 2), latencyMetric(6000, 3)),
+  ];
+  const all = ctx.aggregateLatency(days, 'all');
+  assert.equal(all.n, 10);
+  assert.equal(all.mean, 5410);
+  assert.equal(all.counts[0], 1);
+  assert.equal(all.counts[2], 9);
+  assert(Math.abs(all.p50 / 6000 - 1) < .011);
+  assert(Math.abs(all.p95 / 6000 - 1) < .011);
+  assert.equal(ctx.aggregateLatency(days, 'failed').n, 3);
+  assert.equal(ctx.aggregateLatency(days, 'slow').n, 4);
+  for (const mode of ['all', 'failed', 'slow']) {
+    const stats = ctx.aggregateLatency(days, mode);
+    assert.equal(stats.counts.reduce((a, b) => a + b, 0), stats.n);
+    const html = ctx.latencyHtml(days, mode);
+    assert.equal([...html.matchAll(/data-count="(\d+)"/g)].reduce((sum, match) => sum + Number(match[1]), 0), stats.n);
+    assert.doesNotMatch(html, /NaN|undefined|Infinity/);
+  }
+});
+
+test('missing distributions remain unknown, explicit zero remains zero, and legacy all-request histograms still work', () => {
+  const legacy = [{ date: '2026-11-01', gateway: latencyMetric(500, 5) }];
+  assert.equal(ctx.aggregateLatency(legacy, 'all').n, 5);
+  const missing = ctx.latencyHtml(legacy, 'failed');
+  assert.match(missing, /data-latency-stat="n">—/);
+  assert.match(missing, /等待采集/);
+  const known = [latencyDay('2026-11-01', latencyMetric(500), latencyMetric(0, 0), latencyMetric(500))];
+  const empty = ctx.latencyHtml(known, 'failed');
+  assert.match(empty, /data-latency-stat="n">0/);
+  assert.match(empty, /没有已采集且符合该分类的有效时延样本/);
+  assert.doesNotMatch(empty, /等待采集/);
+  const zero = latencyDay('2026-11-02', { n: 0, sum: 999999, histogram: [] }, null, null);
+  assert.equal(ctx.aggregateLatency([...legacy, zero], 'all').mean, 500);
+});
+
+test('invalid histogram counts cannot contaminate valid days, and incompatible slow policies stay unavailable', () => {
+  const invalid = latencyDay('2026-11-01', { ...latencyMetric(1, 3), histogram: [[0, 2]] }, null, null);
+  const valid = latencyDay('2026-11-02', latencyMetric(6000), latencyMetric(6000), latencyMetric(6000));
+  valid.request_latency_distributions.partial = true;
+  valid.request_latency_distributions.retained = true;
+  const stats = ctx.aggregateLatency([invalid, valid], 'all');
+  assert.equal(stats.n, 1);
+  assert.equal(stats.coveredDays, 1);
+  assert.equal(stats.partial, true);
+  assert.equal(stats.retained, true);
+  assert.equal(stats.counts.reduce((a, b) => a + b, 0), 1);
+  assert.match(ctx.latencyHtml([invalid, valid], 'all'), /另有 1 个日志日缺少可用分布/);
+  valid.request_latency_distributions.slow_policy.ratio = .2;
+  assert.equal(ctx.aggregateLatency([valid], 'slow').coveredDays, 0);
+});
 
 test('failure analysis pools explicit exceptions and timeouts without treating cancellations as failures', () => {
   const html = ctx.failures({ days: [

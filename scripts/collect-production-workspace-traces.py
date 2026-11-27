@@ -554,10 +554,10 @@ def attach_answer_estimates(query, rows):
 
 def request_daily_metrics(records, date, generated_at, incomplete, usage=None):
     """Summarize the same finished requests used for the slow-request ranking."""
-    def summary(field):
-        values = sorted(row[field] for _, _, row in records
+    def summary(field, members=None):
+        values = sorted(row[field] for _, _, row in (records if members is None else members)
                         if isinstance(row.get(field), (int, float))
-                        and not isinstance(row[field], bool) and math.isfinite(row[field]))
+                        and not isinstance(row[field], bool) and math.isfinite(row[field]) and row[field] >= 0)
         if not values:
             return {'n': 0}
         return {'n': len(values), 'sum': sum(values), 'mean': round(sum(values) / len(values), 1),
@@ -565,6 +565,18 @@ def request_daily_metrics(records, date, generated_at, incomplete, usage=None):
                 'p95': round(values[int(round(.95 * (len(values) - 1)))], 1),
                 'histogram': metric_histogram([(value, 1) for value in values])}
 
+    ordered = sorted((record for record in records if anomaly_value(record[2], 'gateway') is not None),
+                     key=lambda record: record[2]['gateway'], reverse=True)
+    partial = incomplete or date == dt.datetime.now(CST).date().isoformat()
+    distributions = {
+        'schema': 'digitalmate/request-latency-distributions@1',
+        'observed_at': generated_at, 'partial': partial,
+        'all': summary('gateway', ordered),
+        'failed': summary('gateway', [record for record in ordered
+                                     if record[2].get('gateway_stream_status') == 'exception']),
+        'slow': summary('gateway', ordered[:slow_trace_count(len(ordered))]),
+        'slow_policy': {'ratio': .1, 'minimum': 10},
+    }
     statuses = collections.Counter(row.get('gateway_stream_status', 'unknown') for _, _, row in records)
     observed = statuses['normal'] + statuses['exception']
     usage = usage or new_usage()
@@ -606,6 +618,7 @@ def request_daily_metrics(records, date, generated_at, incomplete, usage=None):
                                'cancelled': statuses['cancelled'], 'unknown': statuses['unknown'],
                                'observed': observed, 'population': len(records),
                                'exception_rate': statuses['exception'] / observed if observed else None},
+            'request_latency_distributions': distributions,
             **{key: summary(key) for key in ('gateway', 'first_token', 'answer_first', 'react')},
             'answer_first_history': summary('answer_first_history_ms')}
 
