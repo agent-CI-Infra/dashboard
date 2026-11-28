@@ -1,7 +1,7 @@
 {
   "schema": "digitalmate/e2e-performance-history@1",
   "repository": "openJiuwen-ai/DigitalMate",
-  "updated_at": "2026-11-27T06:17:13Z",
+  "updated_at": "2026-11-28T06:39:09Z",
   "cases": {
     "DM-WF-CHROME-01": {
       "id": "DM-WF-CHROME-01",
@@ -13444,6 +13444,13 @@
     }
   },
   "runs": [
+    {
+      "run_id": "nightly-46116515428-1",
+      "branch": "main",
+      "createdAt": "2026-11-28T06:25:15Z",
+      "status": "blocked",
+      "reason": "Image build failed: APT_MIRROR malformed apt sources URI (#2973); fix PR #2974 not merged; E2E skipped, 0 cases; artifacts missing (#1710)."
+    },
     {
       "run_id": "nightly-45949152805-1",
       "branch": "main",
