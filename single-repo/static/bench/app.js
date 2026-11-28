@@ -327,6 +327,22 @@
         const meta = $('#gaia-meta')
         if (meta) meta.textContent = [run.window, run.note].filter(Boolean).join(' · ')
         if (detail) detail.href = '../data/bench/gaia-165/index.html#run-' + encodeURIComponent(run.id)
+        // A run may publish a public evidence bundle (GitHub release asset); link it when present.
+        const dl = $('#gaia-download')
+        if (dl) {
+          const ev = run.evidence || {}
+          if (ev.bundle_url) {
+            const mb = Number(ev.bundle_bytes) ? `，${(Number(ev.bundle_bytes) / 1048576).toFixed(1)} MB` : ''
+            dl.href = ev.bundle_url
+            dl.textContent = `下载本轮数据（zip${mb}）→`
+            dl.hidden = false
+            dl.title = ev.bundle_sha256 ? `sha256 ${ev.bundle_sha256}` : ''
+          } else {
+            dl.hidden = true
+            dl.removeAttribute('href')
+            dl.title = ''
+          }
+        }
       } catch (e) {
         const kpis = $('#gaia-kpis')
         if (kpis) kpis.innerHTML = card('加载失败', esc(String(e && e.message ? e.message : e)), [])
