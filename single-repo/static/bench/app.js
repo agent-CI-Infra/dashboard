@@ -332,7 +332,8 @@
         if (dl) {
           const ev = run.evidence || {}
           if (ev.bundle_url) {
-            const mb = Number(ev.bundle_bytes) ? `，${(Number(ev.bundle_bytes) / 1048576).toFixed(1)} MB` : ''
+            const bytes = Number(ev.bundle_bytes)
+            const mb = bytes ? `，${bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`}` : ''
             dl.href = ev.bundle_url
             dl.textContent = `下载本轮数据（zip${mb}）→`
             dl.hidden = false
