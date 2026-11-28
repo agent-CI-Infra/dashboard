@@ -1,12 +1,12 @@
 {
-  "updatedAt": "2026-11-27T23:35:28Z",
+  "updatedAt": "2026-11-28T04:56:46Z",
   "source": "openJiuwen-ai/DigitalMate",
   "runners": [
     {
       "id": 21,
       "name": "HwdeMacBook-Air-2",
       "os": "macOS",
-      "status": "offline",
+      "status": "online",
       "busy": false,
       "labels": [
         "self-hosted",
@@ -59,7 +59,7 @@
       "name": "digitalmate-win-st-03",
       "os": "Windows",
       "status": "online",
-      "busy": false,
+      "busy": true,
       "labels": [
         "self-hosted",
         "Windows",
@@ -70,7 +70,15 @@
       ],
       "machine": "winbox2 · PC-20261103SYCB",
       "emulator": "Mate 90 Pro B",
-      "device": "127.0.0.1:10001"
+      "device": "127.0.0.1:10001",
+      "job": {
+        "name": "Fast Checks / 2 · HarmonyOS UT",
+        "workflow": "CI Advisory",
+        "run_number": 1874,
+        "run_id": 46108387397,
+        "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/46108387397",
+        "started_at": "2026-11-28T04:56:26Z"
+      }
     },
     {
       "id": 42,
@@ -1586,6 +1594,38 @@
       },
       "b": {},
       "j": {}
+    },
+    {
+      "at": "2026-11-28T04:56:46Z",
+      "s": {
+        "HwdeMacBook-Air-2": "online",
+        "digitalmate-win-st-01": "online",
+        "digitalmate-win-st-02": "online",
+        "digitalmate-win-st-03": "online",
+        "digitalmate-win-st-04": "online",
+        "dm-cloud-codecheck-02": "online",
+        "dm-cloud-flex-01": "online",
+        "dm-cloud-nodeut-01": "online",
+        "dm-cloud-nodeut-02": "online",
+        "dm-hk-ci-01": "online",
+        "dm-hk-ci-02": "online",
+        "dm-hk-ci-03": "online",
+        "dm-hk-ci-04": "online",
+        "dm-hk-ci-05": "online",
+        "dm-hk-ci-06": "online",
+        "dm-hk-ci-07": "online",
+        "dm-hk-ci-08": "online",
+        "harmonyos-ut-01": "offline",
+        "merge-01": "online",
+        "merge-gate-01": "online",
+        "runtime-ut-01": "online"
+      },
+      "b": {
+        "digitalmate-win-st-03": true
+      },
+      "j": {
+        "digitalmate-win-st-03": "Fast Checks / 2 · HarmonyOS UT"
+      }
     }
   ]
 }
