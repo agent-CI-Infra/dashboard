@@ -1,9 +1,9 @@
 {
  "schema": "digitalmate/test-matrix@1",
- "generatedAt": "2026-11-28T03:34:29.583Z",
+ "generatedAt": "2026-11-28T12:28:01.216Z",
  "source": {
   "repository": "openJiuwen-ai/DigitalMate",
-  "main": "73795260",
+  "main": "2a357f05",
   "refs": [
    {
     "label": "test/st-complete-coverage",
@@ -25,8 +25,8 @@
   "e2e": 27
  },
  "nightly": {
-  "createdAt": "2026-11-28T01:12:20Z",
-  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/46091911522",
+  "createdAt": "2026-11-28T06:25:14Z",
+  "url": "https://github.com/openJiuwen-ai/DigitalMate/actions/runs/46116515428",
   "jobs": {
    "Update HK DigitalMate (latest main)": "failure",
    "Finalize archived REMINDER evidence": "skipped",
@@ -78,14 +78,14 @@
  "summary": {
   "layers": {
    "UT": {
-    "cases": 299,
-    "tests": 3475,
+    "cases": 302,
+    "tests": 3503,
     "byStatus": {
-     "ci_lane": 299
+     "ci_lane": 302
     },
     "bySuite": {},
     "byImpl": {
-     "main": 299
+     "main": 302
     }
    },
    "REG": {
@@ -5249,7 +5249,28 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 4,
+   "tests": 1,
+   "layer": "UT",
+   "id": "mobile-adx-files-gate.test.mjs",
+   "title": "mobile",
+   "module": "mobile",
+   "file": "tests/unit/mobile-adx-files-gate.test.mjs",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "ut.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 5,
    "layer": "UT",
    "id": "mobile-bee-activity.test.mjs",
    "title": "mobile",
@@ -5501,7 +5522,28 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 12,
+   "tests": 10,
+   "layer": "UT",
+   "id": "mobile-file-view-sync.test.mjs",
+   "title": "mobile",
+   "module": "mobile",
+   "file": "tests/unit/mobile-file-view-sync.test.mjs",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "ut.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 13,
    "layer": "UT",
    "id": "mobile-home-reply-stop.test.mjs",
    "title": "mobile",
@@ -5543,7 +5585,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 11,
+   "tests": 12,
    "layer": "UT",
    "id": "mobile-home-stop-ui.test.mjs",
    "title": "mobile",
@@ -5564,7 +5606,7 @@
    "evidence": null,
    "issue": null,
    "note": "",
-   "tests": 5,
+   "tests": 6,
    "layer": "UT",
    "id": "mobile-interaction-actions.test.mjs",
    "title": "mobile",
@@ -5696,6 +5738,27 @@
    "title": "mobile",
    "module": "mobile",
    "file": "tests/unit/mobile-session-http.test.mjs",
+   "impl": "main",
+   "status": "ci_lane",
+   "lane": "ut.yml"
+  },
+  {
+   "priority": null,
+   "owner": null,
+   "planId": null,
+   "suite": null,
+   "dependency": "",
+   "dependencyTags": [],
+   "prs": [],
+   "evidence": null,
+   "issue": null,
+   "note": "",
+   "tests": 13,
+   "layer": "UT",
+   "id": "mobile-unsupported-write-paths.test.mjs",
+   "title": "mobile",
+   "module": "mobile",
+   "file": "tests/unit/mobile-unsupported-write-paths.test.mjs",
    "impl": "main",
    "status": "ci_lane",
    "lane": "ut.yml"
