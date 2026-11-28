@@ -336,6 +336,22 @@
     await apply(0)
   }
 
+  // GAIA labels every task L1/L2/L3; a few old runs predate that field, so
+  // return only the levels that actually appear.
+  const levelStats = (tasks) => {
+    const levels = new Map()
+    for (const task of tasks) {
+      const level = Number(task.level)
+      if (!level) continue
+      if (!levels.has(level)) levels.set(level, { level, n: 0, passed: 0 })
+      const row = levels.get(level)
+      const bucket = String(task.bucket || task.status || '').toUpperCase().split('(')[0]
+      row.n += 1
+      if (bucket === 'PASS') row.passed += 1
+    }
+    return [...levels.values()].sort((a, b) => a.level - b.level)
+  }
+
   function renderGaia(g) {
     if (!g || !Array.isArray(g.tasks) || !g.tasks.length) return
     const raw = g.raw || {}
@@ -346,6 +362,7 @@
     const errors = Number(buckets.ERROR) || 0
     const judged = Number(prod.den) || n - notRun - errors
     const lat = g.latency_ms || {}
+    const levels = levelStats(g.tasks)
     const listOf = (obj) => Object.entries(obj || {}).map(([k, v]) => `${k} ${v}`).join(' · ')
 
     $('#gaia-meta').textContent = [g.window, '单 trial', g.backend ? '集群内专用后端' : ''].filter(Boolean).join(' · ')
@@ -358,6 +375,10 @@
         ['含义', 'PASS ÷ 可判分任务（剔除 NOT_RUN 与 ERROR）'],
         ['值', `<b>${pct1(prod.rate)}</b>`],
       ]),
+      ...(levels.length ? [card('难度分层', '<span class="mono">raw 通过 / 题数</span>', levels.map((item) => [
+        `L${item.level}`,
+        `<b>${item.passed}/${item.n}</b> <span class="muted">${pct1(item.passed / item.n)}</span>`,
+      ]))] : []),
       card('可判分率', `<span class="mono">${judged}/${n}</span>`, [
         ['含义', '可判分 ÷ 全部；低于 80% 时 product 只能算有限覆盖'],
         ['值', `<b>${pct1(judged / n)}</b>`],
