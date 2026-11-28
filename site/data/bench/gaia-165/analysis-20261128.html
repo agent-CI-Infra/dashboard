@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DigitalMate Bench · 2026-11-28</title>
+<style>
+:root{color-scheme:light dark;--bg:#f4f6f8;--panel:#fff;--ink:#1f2328;--muted:#656d76;--line:#d8dee4;--ok:#1a7f37;--warn:#9a6700;--blue:#0969da}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1117;--panel:#161b22;--ink:#e6edf3;--muted:#8d96a0;--line:#30363d;--ok:#3fb950;--warn:#d29922;--blue:#58a6ff}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif}
+main{max-width:1080px;margin:auto;padding:30px 20px 60px}a{color:var(--blue)}h1{font-size:28px;margin:8px 0}h2{font-size:20px;margin:30px 0 8px}h3{font-size:16px;margin:20px 0 6px}.meta,.note{color:var(--muted);font-size:13px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin:20px 0}.card,table{background:var(--panel);border:1px solid var(--line);border-radius:10px}.card{padding:13px}.card b{font-size:22px;display:block}.card span{color:var(--muted);font-size:12px}table{width:100%;border-collapse:collapse;border-radius:10px;overflow:hidden}td,th{padding:9px 11px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{font-size:13px;color:var(--muted)}tr:last-child td{border:0}.callout{padding:12px 15px;border-left:4px solid var(--blue);background:var(--panel);margin:14px 0}.tag{font-size:12px;color:var(--ok);font-weight:700}.warn{color:var(--warn)}ul{padding-left:22px}code{font-size:12px;overflow-wrap:anywhere}
+</style></head><body><main>
+<a href="../../../../#bench">← DigitalMate Bench</a>
+<h1>Bench 最新结果与归因 · 2026-11-28</h1>
+<p class="meta">全量 GAIA validation 165 题 + 单独 31 题专项归因。两个范围分开呈现；专项结论来自本轮用户提供的逐题分析。</p>
+<div class="grid">
+<div class="card"><b>110 / 165</b><span>全量 PASS · raw 66.7%</span></div><div class="card"><b>70.5%</b><span>剔除 9 个 ERROR 后 · 110 / 156</span></div><div class="card"><b>94.4 / 641.4 秒</b><span>任务耗时 P50 / P95</span></div><div class="card"><b>4,788</b><span>模型调用 · 输入 tokens 225.4M</span></div>
+</div>
+<h2>全量运行记录</h2>
+<table><tbody>
+<tr><th>运行窗口</th><td>2026-11-28 04:05 → 2026-11-28 06:18 (Asia/Shanghai)</td></tr>
+<tr><th>源码 / 镜像</th><td><code>6aba256b7d342ceb59884f0f772ef1976bf8bc74</code><br><code>nullius/base:ede782af55a8 · nullius-eval 0.1.1</code></td></tr>
+<tr><th>模型 / 并发</th><td>Nullius standard（本机 Docker，每题独立容器 + relay）· 4 并发 · 单题上限 1800s（适配器 1800s）· deepseek-flash · 页面读取经运营方代理（PAGE_READ_PROXY=1）· Keenable=关</td></tr>
+<tr><th>结果构成</th><td>PASS 110 · FAIL 46 · ERROR 9 · NOT_RUN 0</td></tr>
+<tr><th>失败原因</th><td>答错 38 · 未交最终答案 8 · Agent 非零退出 9</td></tr>
+<tr><th>Token / Cache</th><td>输入 225,399,073 · 输出 2,791,572 · 缓存 217,782,880（输入 token 的 96.6%）</td></tr>
+<tr><th>全量对 Nov 20</th><td>Nov 20: 90/165 PASS、27 ERROR、48 FAIL；Nov 28: 110/165 PASS、9 ERROR、46 FAIL。运行环境和模型标签/超时口径存在差异，不能把分数变化单独归因于代码。</td></tr>
+</tbody></table>
+<h2>31 题专项：相对 11 月 20 日</h2>
+<div class="callout"><b>观察结果：</b>31 题从 18 FAIL、13 ERROR 转为 31 PASS。逐题归因中，2 题有 PR 的直接受益证据，8 题显示 PR 帮助排除中间障碍，另 21 题暂时无法归因到具体 PR。31/31 是单轮结果，不代表新增能力已稳定。</div>
+<table><thead><tr><th>改动/议题</th><th>观察到的证据</th><th>归因边界</th></tr></thead><tbody>
+<tr><td>推理预算恢复 · <a href="https://github.com/openJiuwen-ai/DigitalMate/pull/3031">PR #3031</a></td><td>Unlambda 和概率球题此前重试仍耗尽预算且没有答案；改动后 Unlambda 答出 backtick，概率球题成功派 Bee，并在最终转述再次撞墙后交出 3。校验码和地铁题也恢复派单。</td><td>2 题直接受益；2 题部分受益，校验码和地铁题在 PR 合入前已有通过记录。</td></tr>
+<tr><td>附件交接 · <a href="https://github.com/openJiuwen-ai/DigitalMate/pull/3052">PR #3052</a></td><td>蓝光库存表、机车表、绿色多边形、Secret Santa 文档题把文件名当附件 ID；新报错指出合法 ID 为空，模型修正派单后 Bee 从工作目录读取文件并答对。</td><td>4 题部分受益；错误反馈和后续重派有轨迹证据。</td></tr>
+<tr><td>派单范围校验 · <a href="https://github.com/openJiuwen-ai/DigitalMate/pull/3031">PR #3031</a></td><td>论文脚注题和乐评专辑题首次派单分别遇到引文不匹配、参数冲突；校验回执说明原因，下一次派单被接受并完成检索。</td><td>2 题部分受益。</td></tr>
+<tr><td>性能观察</td><td>校验码题 1.56 秒出现快速确认，比普通回复早约 17.6 秒。另有 5 道旧超时题在 126–560 秒内通过。</td><td>已有数据无法拆分启动、上下文压缩、检索路径和模型选择的耗时贡献。</td></tr>
+</tbody></table>
+<h2>11 月 20 日通过、11 月 28 日回退的 17 题</h2>
+<table><thead><tr><th>类别</th><th>数量</th><th>例子与影响</th><th>处理线索</th></tr></thead><tbody>
+<tr><td>Harness 分句错误</td><td>1 ERROR</td><td>阿奎那图片日期题：Harness 在 “St. Thomas” 的缩写后切断合法引用。</td><td><a href="https://github.com/openJiuwen-ai/DigitalMate/issues/3123">Issue #3123</a>；用含缩写的完整原句回归。</td></tr>
+<tr><td>工具/参数误用与纠错反馈不足</td><td>1 ERROR + 1 FAIL</td><td>招聘 PDF 附件 ID 错误；VSCode 题重复调用错误网页工具。</td><td><a href="https://github.com/openJiuwen-ai/DigitalMate/issues/3124">#3124</a>，关联 <a href="https://github.com/openJiuwen-ai/DigitalMate/issues/3065">#3065</a>、<a href="https://github.com/openJiuwen-ai/DigitalMate/issues/3088">#3088</a>；<a href="https://github.com/openJiuwen-ai/DigitalMate/pull/3073">PR #3073</a> 需同题验证。</td></tr>
+<tr><td>拆题不完整，后续派单受限</td><td>1 FAIL</td><td>Excel 迷宫先只导出网格，后续求解派单被拒，未交最终答案。</td><td>首次派单保留用户最终目标，用完整题回归。</td></tr>
+<tr><td>未取得图片内容便作答</td><td>1 FAIL</td><td>套餐价格图题未读图，回答 0.05，正确值 0.03，未派 Bee。</td><td><a href="https://github.com/openJiuwen-ai/DigitalMate/issues/3085">#3085</a>、<a href="https://github.com/openJiuwen-ai/DigitalMate/issues/3059">#3059</a>。</td></tr>
+<tr><td>模型能力差异</td><td>10 FAIL</td><td>6 题出在最终交付（5 题内容正确但格式不符，1 题改写书名）；4 题涉及论文选择、城市查证、姓氏拼写、原文词形。</td><td>区分证据支持与答案格式；通过同题多轮衡量模型波动。</td></tr>
+<tr><td>评测口径问题</td><td>2 FAIL</td><td>军团名英文异写；房价答案提供地址和价格，但评分只收价格。</td><td>复核可接受写法；让评分字段符合题意。</td></tr>
+</tbody></table>
+<h2>结论</h2>
+<ul><li>这批 31 题最强的证据是：恢复机制和校验反馈让 Agent 更可能从中间错误继续完成。</li><li>同一源码/模型标签的两轮结果有 11 题在 PASS 与未通过间切换；IPCC 题两轮找到相同两种统计口径，却一次选 1、一次选 0。</li><li>因此不把所有 31 个 PASS 都归因到 PR；21 题归因未知，模型与检索波动仍然重要。</li></ul>
+<p class="note">全量明细与专项分析范围不同。全量运行文件：<a href="dm-release-20261128.json">165 题数据</a>；历史基线：<a href="dm-release-165-20261120.json">2026-11-20</a>。</p>
+</main></body></html>
